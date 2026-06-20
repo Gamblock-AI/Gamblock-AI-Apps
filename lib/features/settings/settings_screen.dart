@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/auth/auth_state.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/widgets/brand_widgets.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -15,7 +16,12 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Pengaturan')),
       body: ListView(
+        padding: const EdgeInsets.only(bottom: 24),
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: EyebrowPill(label: 'akun & preferensi', color: AppColors.navy),
+          ),
           // Profile
           Padding(
             padding: const EdgeInsets.all(16),

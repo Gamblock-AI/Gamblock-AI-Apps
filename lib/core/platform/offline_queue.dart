@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../network/api_client.dart';
 
-/// Offline queue — stores pending API requests when device is offline
-/// and automatically syncs when connectivity returns.
+/// Offline queue — stores pending API requests when the device is offline
+/// and automatically syncs when connectivity returns (PRD §6.3: offline
+/// reliability). Pending emergency/uninstall requests stay queued locally
+/// and flush to the server once the connection is restored. Entries are
+/// stored in flutter_secure_storage (platform keychain/keystore).
 class OfflineQueue {
   static const _storage = FlutterSecureStorage();
   static const _queueKey = 'offline_queue';

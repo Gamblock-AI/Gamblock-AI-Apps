@@ -1,7 +1,14 @@
 import 'package:flutter/services.dart';
 
-/// Platform bridge — communicates with native Android Accessibility Service
-/// and Windows Service via MethodChannels.
+/// Platform bridge — communicates with the native Android Accessibility
+/// Service and the Windows Service via the `com.gamblock/protection`
+/// MethodChannel (PRD §3.2: anti-uninstall via Accessibility Service on
+/// Android and a Windows Service on desktop).
+///
+/// CONTRACT: every method here must tolerate a missing native handler
+/// (returns false / no-op) so the Flutter UI launches even when the
+/// native side is absent or the platform is unsupported. Do not let a
+/// MissingPluginException escape to the caller — catch it here.
 class PlatformBridge {
   static const _channel = MethodChannel('com.gamblock/protection');
 

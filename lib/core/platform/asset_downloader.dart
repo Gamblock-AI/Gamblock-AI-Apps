@@ -1,14 +1,16 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
+import '../config/app_config.dart';
 
 /// Downloads Pattern Interrupt assets (videos, animations) on first launch
-/// to keep the installer lean.
+/// to keep the installer lean. Asset host is configured via `ASSET_BASE_URL`
+/// in `.env` (see [AppConfig]).
 class AssetDownloader {
-  static const _assets = [
-    'https://gamblock-ai.vercel.app/assets/interrupt_meditation.lottie',
-    'https://gamblock-ai.vercel.app/assets/interrupt_breathing.lottie',
-    'https://gamblock-ai.vercel.app/assets/interrupt_calm.json',
+  static List<String> get _assets => [
+    '${AppConfig.assetBaseUrl}/assets/interrupt_meditation.lottie',
+    '${AppConfig.assetBaseUrl}/assets/interrupt_breathing.lottie',
+    '${AppConfig.assetBaseUrl}/assets/interrupt_calm.json',
   ];
 
   static bool _downloaded = false;

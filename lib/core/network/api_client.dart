@@ -1,21 +1,30 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../config/app_config.dart';
 
+/// Centralized HTTP client for the Gamblock-AI backend.
+///
+/// The base URL is read from [AppConfig] (`.env` → `API_BASE_URL`) so it is never
+/// hardcoded here. Tokens are persisted in flutter_secure_storage (platform
+/// keychain/keystore). A 401 triggers a single refresh attempt with retry.
 class ApiClient {
   static const _storage = FlutterSecureStorage();
   static const _accessTokenKey = 'access_token';
   static const _refreshTokenKey = 'refresh_token';
 
-  static final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'http://10.0.2.2:8080', // Android emulator → host
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 10),
-    headers: {'Content-Type': 'application/json'},
-  ));
+  static late final Dio _dio;
+  static bool _initialized = false;
 
-  static Dio get dio => _dio;
-
+  /// Initialize the Dio instance with interceptors. Must be called once after
+  /// `AppConfig` is available (i.e. after `dotenv.load()` in main).
   static Future<void> init() async {
+    if (_initialized) return;
+    _dio = Dio(BaseOptions(
+      baseUrl: AppConfig.apiBaseUrl,
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+      headers: {'Content-Type': 'application/json'},
+    ));
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         final token = await _storage.read(key: _accessTokenKey);
@@ -36,13 +45,23 @@ class ApiClient {
         handler.next(error);
       },
     ));
+    _initialized = true;
   }
+
+  static Dio get dio {
+    if (!_initialized) {
+      throw StateError('ApiClient.init() must be called before use');
+    }
+    return _dio;
+  }
+
+  static String get baseUrl => AppConfig.apiBaseUrl;
 
   static Future<bool> _tryRefresh() async {
     try {
       final refreshToken = await _storage.read(key: _refreshTokenKey);
       if (refreshToken == null) return false;
-      final response = await Dio(BaseOptions(baseUrl: _dio.options.baseUrl))
+      final response = await Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl))
           .post('/v1/auth/refresh', data: {'refresh_token': refreshToken});
       final data = response.data['data'];
       if (data != null) {
