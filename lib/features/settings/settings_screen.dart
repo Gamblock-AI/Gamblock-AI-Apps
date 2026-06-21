@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,13 +15,13 @@ class SettingsScreen extends ConsumerWidget {
     final auth = ref.watch(authProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Pengaturan')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.settingsTitle)),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 24),
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: EyebrowPill(label: 'akun & preferensi', color: AppColors.navy),
+            child: EyebrowPill(label: AppLocalizations.of(context)!.settingsAccountPreferences, color: AppColors.navy),
           ),
           // Profile
           Padding(
@@ -50,7 +51,7 @@ class SettingsScreen extends ConsumerWidget {
                           color: AppColors.sage.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text(auth.role == 'partner' ? 'Kepala' : 'Member', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.sage)),
+                        child: Text(auth.role == 'partner' ? AppLocalizations.of(context)!.roleKepala : AppLocalizations.of(context)!.roleMember, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.sage)),
                       ),
                     ]),
                   ),
@@ -60,14 +61,14 @@ class SettingsScreen extends ConsumerWidget {
           ),
 
           const Divider(height: 1),
-          const ListTile(
+          ListTile(
             leading: Icon(Icons.people, color: AppColors.navy),
-            title: Text('Accountability Partner'),
-            subtitle: Text('Kelola pendamping'),
+            title: Text(AppLocalizations.of(context)!.settingsAccountabilityPartner),
+            subtitle: Text(AppLocalizations.of(context)!.settingsManagePartner),
             trailing: Icon(Icons.chevron_right),
           ),
           const Divider(height: 1),
-          const ListTile(
+          ListTile(
             leading: Icon(Icons.notifications, color: AppColors.navy),
             title: Text('Notifikasi'),
             trailing: Switch(value: true, onChanged: null),
@@ -75,26 +76,26 @@ class SettingsScreen extends ConsumerWidget {
           const Divider(height: 1),
           ListTile(
             leading: const Icon(Icons.language, color: AppColors.navy),
-            title: const Text('Buka Web Psikoedukasi'),
+            title: Text(AppLocalizations.of(context)!.settingsOpenPsychoeducation),
             onTap: () => launchUrl(Uri.parse('https://gamblock-ai.vercel.app/education')),
           ),
           const Divider(height: 1),
-          const ListTile(
+          ListTile(
             leading: Icon(Icons.info, color: AppColors.navy),
-            title: Text('Tentang Aplikasi'),
-            subtitle: Text('Gamblock AI v1.0.0'),
+            title: Text(AppLocalizations.of(context)!.settingsAboutApp),
+            subtitle: Text(AppLocalizations.of(context)!.settingsAppVersion),
           ),
           const Divider(height: 1),
           ListTile(
             leading: const Icon(Icons.logout, color: AppColors.crimson),
-            title: const Text('Keluar', style: TextStyle(color: AppColors.crimson)),
+            title: Text(AppLocalizations.of(context)!.settingsLogout, style: TextStyle(color: AppColors.crimson)),
             onTap: () async {
               final confirm = await showDialog<bool>(context: context, builder: (ctx) => AlertDialog(
-                title: const Text('Keluar'),
-                content: const Text('Apakah Anda yakin ingin keluar?'),
+                title: Text(AppLocalizations.of(context)!.settingsLogout),
+                content: Text(AppLocalizations.of(context)!.settingsLogoutConfirm),
                 actions: [
-                  TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
-                  FilledButton(onPressed: () => Navigator.pop(ctx, true), style: FilledButton.styleFrom(backgroundColor: AppColors.crimson), child: const Text('Keluar')),
+                  TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(AppLocalizations.of(context)!.cancel)),
+                  FilledButton(onPressed: () => Navigator.pop(ctx, true), style: FilledButton.styleFrom(backgroundColor: AppColors.crimson), child: Text(AppLocalizations.of(context)!.settingsLogout)),
                 ],
               ));
               if (confirm == true) {

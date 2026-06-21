@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/repositories/dashboard_repository_impl.dart';
@@ -51,7 +52,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget build(BuildContext context) {
     if (_loading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Dashboard')),
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.dashboardTitle)),
         body: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           children: [
@@ -83,15 +84,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final weeklyBlocks = _progress?.weeklyBlocks ?? [0, 0, 0, 0, 0, 0, 0];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Dashboard')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.dashboardTitle)),
       body: RefreshIndicator(
         onRefresh: _fetch,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           children: [
-            EyebrowPill(label: 'analitik perlindungan', color: AppColors.crimson),
+            EyebrowPill(label: AppLocalizations.of(context)!.dashboardAnalytics, color: AppColors.crimson),
             const SizedBox(height: 10),
-            Text('Perkembangan Anda.',
+            Text(AppLocalizations.of(context)!.dashboardYourProgress,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     color: AppColors.navy,
                     letterSpacing: -0.8,
@@ -101,7 +102,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               Expanded(
                   child: SummaryCard(
                       icon: Icons.block,
-                      label: 'Total Blokir',
+                      label: AppLocalizations.of(context)!.protectionTotalBlocks,
                       value: '$blocked',
                       color: AppColors.crimson)),
               const SizedBox(width: 12),
@@ -117,7 +118,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               Expanded(
                   child: SummaryCard(
                       icon: Icons.calendar_today,
-                      label: 'Hari Aktif',
+                      label: AppLocalizations.of(context)!.protectionActiveDays,
                       value: '$days',
                       color: AppColors.navy)),
               const SizedBox(width: 12),
@@ -129,7 +130,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       color: AppColors.sage)),
             ]),
             const SizedBox(height: 24),
-            Text('Tren Mingguan',
+            Text(AppLocalizations.of(context)!.dashboardWeeklyTrend,
                 style: Theme.of(context)
                     .textTheme
                     .titleMedium
@@ -140,7 +141,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             FilledButton.icon(
               onPressed: () => context.go('/protection'),
               icon: const Icon(Icons.shield),
-              label: const Text('Lihat Status Proteksi'),
+              label: Text(AppLocalizations.of(context)!.dashboardViewProtectionStatus),
             ),
           ],
         ),

@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'slide_shell.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -15,15 +16,15 @@ class HeroSlide extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 24),
-          Image.asset('assets/images/gami.png', height: 240),
+          Image.asset('assets/images/gami.webp', height: 240),
           const SizedBox(height: 28),
-          EyebrowPill(label: 'on-device ai shield', color: AppColors.crimson),
+          EyebrowPill(label: AppLocalizations.of(context)!.introAiShield, color: AppColors.crimson),
           const SizedBox(height: 20),
-          Text('putuskan siklus\njudi online.',
+          Text(AppLocalizations.of(context)!.introHeroTitle,
               textAlign: TextAlign.center, style: displayStyle(context)),
           const SizedBox(height: 16),
           Text(
-            'deteksi cerdas berbasis on-device ai, intervensi psikologis otomatis, dan rehabilitasi mandiri — untuk mahasiswa indonesia.',
+            AppLocalizations.of(context)!.introHeroDesc,
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white.withValues(alpha: 0.65), fontSize: 15, height: 1.5),
           ),

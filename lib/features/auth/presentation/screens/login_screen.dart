@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -41,7 +42,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         context.go('/protection');
       }
     } catch (e) {
-      setState(() => _error = AppMessages.friendlyMessage(e));
+      setState(() => _error = AppMessages.friendlyMessage(context, e));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -72,12 +73,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: const Text('G', style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800)),
                   ),
                   const SizedBox(height: 20),
-                  const EyebrowPill(label: 'masuk kembali', color: AppColors.crimson),
+                  EyebrowPill(label: AppLocalizations.of(context)!.authLoginAgain, color: AppColors.crimson),
                   const SizedBox(height: 14),
-                  Text('Selamat datang\nkembali.',
+                  Text(AppLocalizations.of(context)!.authWelcomeBack,
                       style: Theme.of(context).textTheme.displaySmall?.copyWith(color: AppColors.navy, letterSpacing: -1.0, height: 1.05)),
                   const SizedBox(height: 8),
-                  Text('Masuk untuk melanjutkan perlindungan Anda.',
+                  Text(AppLocalizations.of(context)!.authLoginDesc,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.navy.withValues(alpha: 0.55))),
                   const SizedBox(height: 32),
                   if (_error != null) ...[
@@ -95,13 +96,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextField(
                     controller: _emailCtrl,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email_outlined)),
+                    decoration: InputDecoration(labelText: AppLocalizations.of(context)!.authEmail, prefixIcon: Icon(Icons.email_outlined)),
                   ),
                   const SizedBox(height: 14),
                   TextField(
                     controller: _passCtrl,
                     obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Password', prefixIcon: Icon(Icons.lock_outlined)),
+                    decoration: InputDecoration(labelText: AppLocalizations.of(context)!.authPassword, prefixIcon: Icon(Icons.lock_outlined)),
                   ),
                   const SizedBox(height: 24),
                   FilledButton(
@@ -113,16 +114,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     onPressed: _loading ? null : _submit,
                     child: _loading
                         ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
-                        : const Text('Masuk', style: TextStyle(fontWeight: FontWeight.w700)),
+                        : Text(AppLocalizations.of(context)!.authLoginBtn, style: TextStyle(fontWeight: FontWeight.w700)),
                   ),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Belum punya akun?', style: TextStyle(color: AppColors.navy.withValues(alpha: 0.6), fontSize: 14)),
+                      Text(AppLocalizations.of(context)!.authNoAccount, style: TextStyle(color: AppColors.navy.withValues(alpha: 0.6), fontSize: 14)),
                       TextButton(
                         onPressed: () => context.go('/register'),
-                        child: const Text('Daftar', style: TextStyle(fontWeight: FontWeight.w700)),
+                        child: Text(AppLocalizations.of(context)!.authRegister, style: TextStyle(fontWeight: FontWeight.w700)),
                       ),
                     ],
                   ),

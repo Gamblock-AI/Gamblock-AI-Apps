@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -50,7 +51,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         }
       }
     } catch (e) {
-      setState(() => _error = AppMessages.friendlyMessage(e));
+      setState(() => _error = AppMessages.friendlyMessage(context, e));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -77,21 +78,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     child: const Text('G', style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800)),
                   ),
                   const SizedBox(height: 20),
-                  const EyebrowPill(label: 'mulai gratis', color: AppColors.crimson),
+                  EyebrowPill(label: AppLocalizations.of(context)!.authStartFree, color: AppColors.crimson),
                   const SizedBox(height: 14),
-                  Text('Buat akun\nbaru.',
+                  Text(AppLocalizations.of(context)!.authCreateAccountTitle,
                       style: Theme.of(context).textTheme.displaySmall?.copyWith(color: AppColors.navy, letterSpacing: -1.0, height: 1.05)),
                   const SizedBox(height: 8),
-                  Text('100% gratis & privat — dirancang untuk mahasiswa Indonesia.',
+                  Text(AppLocalizations.of(context)!.authRegisterDesc,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.navy.withValues(alpha: 0.55))),
                   const SizedBox(height: 28),
-                  Text('Saya mendaftar sebagai',
+                  Text(AppLocalizations.of(context)!.authRegisterAs,
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(color: AppColors.navy, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 10),
                   Row(children: [
-                    Expanded(child: RoleCard(icon: Icons.person, label: 'Mahasiswa', sub: 'Member', selected: _role == 'user', onTap: () => setState(() => _role = 'user'))),
+                    Expanded(child: RoleCard(icon: Icons.person, label: 'Mahasiswa', sub: AppLocalizations.of(context)!.roleMember, selected: _role == 'user', onTap: () => setState(() => _role = 'user'))),
                     const SizedBox(width: 12),
-                    Expanded(child: RoleCard(icon: Icons.shield, label: 'Dosen / Pendamping', sub: 'Kepala', selected: _role == 'partner', onTap: () => setState(() => _role = 'partner'))),
+                    Expanded(child: RoleCard(icon: Icons.shield, label: AppLocalizations.of(context)!.roleLecturerPartner, sub: AppLocalizations.of(context)!.roleKepala, selected: _role == 'partner', onTap: () => setState(() => _role = 'partner'))),
                   ]),
                   const SizedBox(height: 20),
                   if (_error != null) ...[
@@ -102,25 +103,25 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     const SizedBox(height: 16),
                   ],
-                  TextField(controller: _nameCtrl, decoration: const InputDecoration(labelText: 'Nama Lengkap', prefixIcon: Icon(Icons.person_outline))),
+                  TextField(controller: _nameCtrl, decoration: InputDecoration(labelText: AppLocalizations.of(context)!.authFullName, prefixIcon: Icon(Icons.person_outline))),
                   const SizedBox(height: 14),
-                  TextField(controller: _emailCtrl, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email_outlined))),
+                  TextField(controller: _emailCtrl, keyboardType: TextInputType.emailAddress, decoration: InputDecoration(labelText: AppLocalizations.of(context)!.authEmail, prefixIcon: Icon(Icons.email_outlined))),
                   const SizedBox(height: 14),
-                  TextField(controller: _passCtrl, obscureText: true, decoration: const InputDecoration(labelText: 'Password', prefixIcon: Icon(Icons.lock_outlined))),
+                  TextField(controller: _passCtrl, obscureText: true, decoration: InputDecoration(labelText: AppLocalizations.of(context)!.authPassword, prefixIcon: Icon(Icons.lock_outlined))),
                   const SizedBox(height: 24),
                   FilledButton(
                     style: FilledButton.styleFrom(backgroundColor: AppColors.crimson, minimumSize: const Size.fromHeight(54), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
                     onPressed: _loading ? null : _submit,
                     child: _loading
                         ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
-                        : Text(_role == 'partner' ? 'Buat Akun & Lanjut ke Grup' : 'Daftar', style: const TextStyle(fontWeight: FontWeight.w700)),
+                        : Text(_role == 'partner' ? AppLocalizations.of(context)!.authRegisterAndContinue : AppLocalizations.of(context)!.authRegister, style: TextStyle(fontWeight: FontWeight.w700)),
                   ),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Sudah punya akun?', style: TextStyle(color: AppColors.navy.withValues(alpha: 0.6), fontSize: 14)),
-                      TextButton(onPressed: () => context.go('/login'), child: const Text('Masuk', style: TextStyle(fontWeight: FontWeight.w700))),
+                      Text(AppLocalizations.of(context)!.authHasAccount, style: TextStyle(color: AppColors.navy.withValues(alpha: 0.6), fontSize: 14)),
+                      TextButton(onPressed: () => context.go('/login'), child: Text(AppLocalizations.of(context)!.authLoginBtn, style: TextStyle(fontWeight: FontWeight.w700))),
                     ],
                   ),
                 ],

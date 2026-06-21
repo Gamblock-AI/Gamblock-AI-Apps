@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 
@@ -21,7 +22,7 @@ class MissionsTab extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('Misi Harian',
+          Text(AppLocalizations.of(context)!.recoveryDailyMissions,
               style: Theme.of(context)
                   .textTheme
                   .titleMedium

@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -28,7 +29,7 @@ class _GroupCodeScreenState extends ConsumerState<GroupCodeScreen> {
     Haptics.medium();
     final code = _codeCtrl.text.trim().toUpperCase();
     if (code.length < 4) {
-      setState(() => _error = 'Masukkan kode grup yang valid');
+      setState(() => _error = AppLocalizations.of(context)!.onboardingInvalidGroupCode);
       return;
     }
     setState(() {
@@ -40,7 +41,7 @@ class _GroupCodeScreenState extends ConsumerState<GroupCodeScreen> {
       await repo.joinByGroupCode(code);
       if (mounted) context.go('/protection');
     } catch (e) {
-      setState(() => _error = AppMessages.friendlyMessage(e));
+      setState(() => _error = AppMessages.friendlyMessage(context, e));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -60,14 +61,14 @@ class _GroupCodeScreenState extends ConsumerState<GroupCodeScreen> {
               children: [
                 const Icon(Icons.group_add, size: 56, color: AppColors.navy),
                 const SizedBox(height: 16),
-                Text('Masukkan Kode Grup',
+                Text(AppLocalizations.of(context)!.onboardingEnterGroupCode,
                     style: Theme.of(context)
                         .textTheme
                         .headlineMedium
                         ?.copyWith(color: AppColors.navy),
                     textAlign: TextAlign.center),
                 const SizedBox(height: 8),
-                Text('Dapatkan kode dari Dosen atau Pendamping Anda',
+                Text(AppLocalizations.of(context)!.onboardingGetCodeDesc,
                     style: Theme.of(context)
                         .textTheme
                         .bodyMedium
@@ -97,7 +98,7 @@ class _GroupCodeScreenState extends ConsumerState<GroupCodeScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text('Kode 6 karakter',
+                Text(AppLocalizations.of(context)!.onboardingCodeHint,
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall
@@ -116,7 +117,7 @@ class _GroupCodeScreenState extends ConsumerState<GroupCodeScreen> {
                 const SizedBox(height: 24),
                 TextButton(
                     onPressed: () => context.go('/login'),
-                    child: const Text('Kembali ke Login')),
+                    child: Text(AppLocalizations.of(context)!.backToLogin)),
               ],
             ),
           ),

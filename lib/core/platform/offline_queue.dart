@@ -1,15 +1,32 @@
 import 'dart:convert';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 import '../network/api_client.dart';
 
 /// Offline queue — stores pending API requests when the device is offline
 /// and automatically syncs when connectivity returns (PRD §6.3: offline
 /// reliability). Pending emergency/uninstall requests stay queued locally
 /// and flush to the server once the connection is restored. Entries are
-/// stored in flutter_secure_storage (platform keychain/keystore).
+/// stored in an SQLite database for fast O(1) reads/writes.
 class OfflineQueue {
-  static const _storage = FlutterSecureStorage();
-  static const _queueKey = 'offline_queue';
+  static Database? _db;
+
+  static Future<Database> _getDb() async {
+    if (_db != null) return _db!;
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, 'offline_queue.db');
+
+    _db = await openDatabase(
+      path,
+      version: 1,
+      onCreate: (db, version) async {
+        await db.execute(
+          'CREATE TABLE queue (id INTEGER PRIMARY KEY AUTOINCREMENT, method TEXT, path TEXT, data TEXT, timestamp TEXT)',
+        );
+      },
+    );
+    return _db!;
+  }
 
   /// Enqueue a request to be sent when online
   static Future<void> enqueue({
@@ -17,68 +34,58 @@ class OfflineQueue {
     required String path,
     Map<String, dynamic>? data,
   }) async {
-    final current = await _readQueue();
-    current.add({
+    final db = await _getDb();
+    await db.insert('queue', {
       'method': method,
       'path': path,
-      'data': data,
+      'data': data != null ? jsonEncode(data) : null,
       'timestamp': DateTime.now().toIso8601String(),
     });
-    await _writeQueue(current);
   }
 
   /// Attempt to flush the queue — send all pending requests
   static Future<int> flush() async {
-    final queue = await _readQueue();
+    final db = await _getDb();
+    final List<Map<String, dynamic>> queue = await db.query('queue', orderBy: 'id ASC');
     if (queue.isEmpty) return 0;
 
     int sent = 0;
-    final remaining = <Map<String, dynamic>>[];
 
     for (final item in queue) {
       try {
+        final id = item['id'] as int;
         final method = item['method'] as String;
         final path = item['path'] as String;
-        final data = item['data'] as Map<String, dynamic>?;
+        final dataStr = item['data'] as String?;
+        final data = dataStr != null ? jsonDecode(dataStr) as Map<String, dynamic> : null;
 
         if (method == 'POST') {
           await ApiClient.dio.post(path, data: data);
         } else if (method == 'PATCH') {
           await ApiClient.dio.patch(path, data: data);
         }
+
+        // Remove from DB immediately upon success (O(1))
+        await db.delete('queue', where: 'id = ?', whereArgs: [id]);
         sent++;
       } catch (_) {
-        remaining.add(item);
+        // If it fails (e.g., still offline or server error), we leave it in the DB to try again later.
       }
     }
 
-    await _writeQueue(remaining);
     return sent;
   }
 
   /// Get pending queue count
   static Future<int> pendingCount() async {
-    final queue = await _readQueue();
-    return queue.length;
-  }
-
-  static Future<List<Map<String, dynamic>>> _readQueue() async {
-    final raw = await _storage.read(key: _queueKey);
-    if (raw == null) return [];
-    try {
-      final list = jsonDecode(raw) as List<dynamic>;
-      return list.cast<Map<String, dynamic>>();
-    } catch (_) {
-      return [];
-    }
-  }
-
-  static Future<void> _writeQueue(List<Map<String, dynamic>> queue) async {
-    await _storage.write(key: _queueKey, value: jsonEncode(queue));
+    final db = await _getDb();
+    final count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM queue'));
+    return count ?? 0;
   }
 
   /// Clear all pending
   static Future<void> clear() async {
-    await _storage.delete(key: _queueKey);
+    final db = await _getDb();
+    await db.delete('queue');
   }
 }

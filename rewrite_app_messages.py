@@ -1,7 +1,15 @@
-import 'package:flutter/material.dart';
+import re
+
+with open('lib/core/messaging/app_messages.dart', 'r') as f:
+    content = f.read()
+
+# We need to change the class to methods that take BuildContext context
+# Or we can just rewrite the whole file using a template
+
+template = """import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import '../config/app_config.dart';
-import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AppMessages {
   AppMessages._();
@@ -126,3 +134,10 @@ class AppMessages {
     }
   }
 }
+"""
+
+with open('lib/core/messaging/app_messages.dart', 'w') as f:
+    f.write(template)
+
+print("Updated AppMessages.dart")
+

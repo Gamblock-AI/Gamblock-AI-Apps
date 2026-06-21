@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 
@@ -14,7 +15,7 @@ class RecentBlocksList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Blokir Terbaru',
+        Text(AppLocalizations.of(context)!.protectionRecentBlocks,
             style: Theme.of(context)
                 .textTheme
                 .titleMedium
@@ -31,7 +32,7 @@ class RecentBlocksList extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10)),
               child: const Icon(Icons.block, color: AppColors.crimson, size: 20),
             ),
-            title: const Text('Situs judi diblokir',
+            title: Text(AppLocalizations.of(context)!.protectionSiteBlocked,
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
             subtitle: Text('${10 + i * 5} menit lalu',
                 style: TextStyle(

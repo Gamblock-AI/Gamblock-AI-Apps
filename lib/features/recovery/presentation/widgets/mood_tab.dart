@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../domain/repositories/recovery_repository.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -36,11 +37,11 @@ class _MoodTabState extends State<MoodTab> {
           .submitReflection(text: 'Mood hari ini: $label', mood: label);
       widget.onSubmitted();
       if (mounted) {
-        AppFeedback.success(context, 'Mood tercatat');
+        AppFeedback.success(context, AppLocalizations.of(context)!.recoveryMoodLogged);
       }
     } catch (e) {
       if (mounted) {
-        AppFeedback.error(context, AppMessages.friendlyMessage(e));
+        AppFeedback.error(context, AppMessages.friendlyMessage(context, e));
       }
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -52,7 +53,7 @@ class _MoodTabState extends State<MoodTab> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text('Bagaimana kondisi emosi Anda hari ini?',
+        Text(AppLocalizations.of(context)!.recoveryMoodQuestion,
             style: Theme.of(context)
                 .textTheme
                 .titleMedium
@@ -85,7 +86,7 @@ class _MoodTabState extends State<MoodTab> {
           child: _submitting
               ? const SizedBox(
                   height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : const Text('Catat Mood'),
+              : Text(AppLocalizations.of(context)!.recoveryLogMood),
         ),
       ],
     );

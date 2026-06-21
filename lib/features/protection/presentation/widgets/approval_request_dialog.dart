@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 /// Confirmation dialog for submitting an uninstall/pause approval request to
@@ -10,19 +11,18 @@ class ApprovalRequestDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Ajukan Izin Pencopotan'),
-      content: const Text(
-          'Permohonan ini akan dikirim ke Accountability Partner Anda untuk disetujui. '
-          'Aplikasi tetap terkunci sampai ada persetujuan.'),
+      title: Text(AppLocalizations.of(context)!.protectionRequestUninstall),
+      content: Text(
+          '${AppLocalizations.of(context)!.protectionApprovalDesc} ${AppLocalizations.of(context)!.protectionAppLockedDesc}'),
       actions: [
         TextButton(
-            onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+            onPressed: () => Navigator.pop(context), child: Text(AppLocalizations.of(context)!.cancel)),
         FilledButton(
           onPressed: () async {
             Navigator.pop(context);
             await onConfirm();
           },
-          child: const Text('Kirim'),
+          child: Text(AppLocalizations.of(context)!.submit),
         ),
       ],
     );

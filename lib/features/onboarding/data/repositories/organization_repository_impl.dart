@@ -14,7 +14,7 @@ class OrganizationRepositoryImpl implements OrganizationRepository {
     final response = await _dio.post('/v1/organizations/join', data: {'group_code': groupCode});
     final json = ApiResponse.map(response);
     if (json == null) {
-      throw Exception('Group code tidak valid');
+      throw DioException(requestOptions: RequestOptions(path: ''), response: Response(requestOptions: RequestOptions(path: ''), statusCode: 400, data: {'error': {'code': 'join_failed'}}));
     }
     return Organization.fromJson(json);
   }
@@ -24,7 +24,7 @@ class OrganizationRepositoryImpl implements OrganizationRepository {
     final response = await _dio.post('/v1/organizations', data: {'name': name});
     final json = ApiResponse.map(response);
     if (json == null) {
-      throw Exception('Gagal membuat grup');
+      throw DioException(requestOptions: RequestOptions(path: ''), response: Response(requestOptions: RequestOptions(path: ''), statusCode: 400, data: {'error': {'code': 'create_org_failed'}}));
     }
     return Organization.fromJson(json);
   }

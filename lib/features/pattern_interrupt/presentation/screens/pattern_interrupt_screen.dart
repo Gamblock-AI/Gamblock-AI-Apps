@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -60,7 +61,7 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Image.asset('assets/images/gami.png', height: 180),
+        Image.asset('assets/images/gami.webp', height: 180),
         const SizedBox(height: 28),
         const Text(
           'BERHENTI',
@@ -75,13 +76,13 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen> {
             border: Border.all(color: AppColors.crimson.withValues(alpha: 0.4)),
           ),
           child: Text(
-            'PATTERN INTERRUPT AKTIF'.toUpperCase(),
+            AppLocalizations.of(context)!.patternInterruptActive.toUpperCase(),
             style: const TextStyle(color: AppColors.crimsonLight, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.5),
           ),
         ),
         const SizedBox(height: 24),
         Text(
-          'Tarik napas dalam-dalam.\nDorongan ini akan lewat.',
+          AppLocalizations.of(context)!.patternBreatheDesc,
           textAlign: TextAlign.center,
           style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 17, height: 1.5, fontWeight: FontWeight.w500),
         ),
@@ -117,9 +118,9 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen> {
           child: const Icon(Icons.check_circle, color: AppColors.sage, size: 64),
         ),
         const SizedBox(height: 24),
-        const Text('Dorongan berhasil\ndiputus.', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800, height: 1.15)),
+        Text(AppLocalizations.of(context)!.patternInterruptSuccess, textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800, height: 1.15)),
         const SizedBox(height: 12),
-        Text('Ambil kendali. Lanjutkan ke modul pemulihan diri.',
+        Text(AppLocalizations.of(context)!.patternTakeControlDesc,
             textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 15, height: 1.5)),
         const SizedBox(height: 32),
         SizedBox(
@@ -131,7 +132,7 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
             onPressed: () => launchUrl(Uri.parse('https://gamblock-ai.vercel.app/education')),
-            child: const Text('Lanjut ke Psikoedukasi', style: TextStyle(fontWeight: FontWeight.w700)),
+            child: Text(AppLocalizations.of(context)!.patternContinuePsychoeducation, style: TextStyle(fontWeight: FontWeight.w700)),
           ),
         ),
       ],

@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../core/feedback/haptics.dart';
@@ -26,7 +27,7 @@ class AppShell extends StatelessWidget {
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
           height: 68,
-          destinations: const [
+          destinations: [
             NavigationDestination(
               icon: Icon(Icons.shield_outlined),
               selectedIcon: Icon(Icons.shield),
@@ -35,17 +36,17 @@ class AppShell extends StatelessWidget {
             NavigationDestination(
               icon: Icon(Icons.dashboard_outlined),
               selectedIcon: Icon(Icons.dashboard),
-              label: 'Dashboard',
+              label: AppLocalizations.of(context)!.dashboardTitle,
             ),
             NavigationDestination(
               icon: Icon(Icons.self_improvement_outlined),
               selectedIcon: Icon(Icons.self_improvement),
-              label: 'Pemulihan',
+              label: AppLocalizations.of(context)!.recoveryTitle,
             ),
             NavigationDestination(
               icon: Icon(Icons.settings_outlined),
               selectedIcon: Icon(Icons.settings),
-              label: 'Pengaturan',
+              label: AppLocalizations.of(context)!.settingsTitle,
             ),
           ],
         ),

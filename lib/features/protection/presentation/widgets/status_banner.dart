@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 
@@ -33,7 +34,7 @@ class StatusBanner extends StatelessWidget {
         const SizedBox(width: 16),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(isActive ? 'Perlindungan Aktif' : 'Perlindungan Nonaktif',
+            Text(isActive ? AppLocalizations.of(context)!.protectionActiveTitle : AppLocalizations.of(context)!.protectionInactive,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: isActive ? AppColors.sage : AppColors.crimson)),
             const SizedBox(height: 4),

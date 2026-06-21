@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'slide_shell.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -15,15 +16,15 @@ class CtaSlide extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 40),
-          Image.asset('assets/images/gami.png', height: 180),
+          Image.asset('assets/images/gami.webp', height: 180),
           const SizedBox(height: 24),
-          EyebrowPill(label: 'unduh sekarang', color: AppColors.crimson),
+          EyebrowPill(label: AppLocalizations.of(context)!.introCtaBtn, color: AppColors.crimson),
           const SizedBox(height: 20),
-          Text('ambil kendali atas\nhidup anda, sekarang.',
+          Text(AppLocalizations.of(context)!.introCtaTitle,
               textAlign: TextAlign.center, style: displayStyle(context)),
           const SizedBox(height: 16),
           Text(
-            'aplikasi gratis, 100% privat, dirancang oleh dan untuk mahasiswa indonesia. putuskan siklus kecanduan hari ini.',
+            AppLocalizations.of(context)!.introCtaDesc,
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white.withValues(alpha: 0.65), fontSize: 15, height: 1.5),
           ),

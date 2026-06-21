@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'slide_shell.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -13,10 +14,10 @@ class FeaturesSlide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final features = [
-      (Icons.document_scanner, 'deteksi real-time berbasis konten', AppColors.crimson),
-      (Icons.remove_red_eye, 'pattern interrupt visual', AppColors.amber),
-      (Icons.people, 'accountability partner', AppColors.sageLight),
-      (Icons.shield, 'on-device ai & privasi', AppColors.navyLight),
+      (Icons.document_scanner, AppLocalizations.of(context)!.introFeature2, AppColors.crimson),
+      (Icons.remove_red_eye, AppLocalizations.of(context)!.introFeature4, AppColors.amber),
+      (Icons.people, AppLocalizations.of(context)!.introFeature3, AppColors.sageLight),
+      (Icons.shield, AppLocalizations.of(context)!.introFeature1, AppColors.navyLight),
     ];
     return SlideShell(
       child: Column(
@@ -24,7 +25,7 @@ class FeaturesSlide extends StatelessWidget {
         children: [
           EyebrowPill(label: 'fitur', color: AppColors.sageLight),
           const SizedBox(height: 20),
-          Text('ekosistem yang\nmendukung kepulihan.', style: displayStyle(context)),
+          Text(AppLocalizations.of(context)!.introFeaturesTitle, style: displayStyle(context)),
           const SizedBox(height: 24),
           ...features.map((f) => Padding(
                 padding: const EdgeInsets.only(bottom: 12),

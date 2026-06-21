@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -32,7 +33,7 @@ class _GroupCodeDisplayState extends State<GroupCodeDisplay> {
       children: [
         const Icon(Icons.check_circle, size: 56, color: AppColors.sage),
         const SizedBox(height: 16),
-        Text('Grup Berhasil Dibuat!',
+        Text(AppLocalizations.of(context)!.onboardingGroupCreated,
             style: Theme.of(context)
                 .textTheme
                 .headlineMedium
@@ -46,7 +47,7 @@ class _GroupCodeDisplayState extends State<GroupCodeDisplay> {
                   .titleMedium
                   ?.copyWith(color: AppColors.navy.withValues(alpha: 0.6))),
         const SizedBox(height: 32),
-        Text('Kode Grup',
+        Text(AppLocalizations.of(context)!.onboardingGroupCode,
             style: Theme.of(context)
                 .textTheme
                 .labelLarge

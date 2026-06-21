@@ -13,6 +13,7 @@ import '../widgets/service_indicator.dart';
 import '../widgets/recent_blocks_list.dart';
 import '../widgets/status_banner.dart';
 import '../widgets/approval_request_dialog.dart';
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import '../../../../core/messaging/app_messages.dart';
 import '../../../../core/feedback/feedback.dart';
 
@@ -67,15 +68,15 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
     try {
       await repo.requestApproval(
         action: 'pause_protection',
-        reason: 'Pengajuan dari aplikasi mobile',
+        reason: AppLocalizations.of(context)!.protectionMobileRequest,
         durationMinutes: 30,
       );
       if (mounted) {
-        AppFeedback.success(context, 'Permohonan dikirim. Menunggu persetujuan.');
+        AppFeedback.success(context, AppLocalizations.of(context)!.protectionRequestSent);
       }
     } catch (e) {
       if (mounted) {
-        AppFeedback.error(context, AppMessages.friendlyMessage(e));
+        AppFeedback.error(context, AppMessages.friendlyMessage(context, e));
       }
     }
   }
@@ -86,6 +87,11 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
+    final l10n = AppLocalizations.of(context);
+    final appName = l10n?.appName ?? AppLocalizations.of(context)!.appName;
+    final protectionActive = l10n?.protectionActive ?? 'Proteksi Aktif';
+    final protectionDesc = l10n?.protectionDesc ?? AppLocalizations.of(context)!.protectionDeviceProtected;
+
     final status = _status;
     final isActive = status?.isActive ?? true;
     final blocked = _summary?.blockedAttempts ?? 0;
@@ -95,21 +101,21 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
     final modelVersion = status?.modelVersion ?? AIInferenceStub.modelVersion;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Proteksi')),
+      appBar: AppBar(title: Text(appName)),
       body: RefreshIndicator(
         onRefresh: _fetchAll,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           children: [
-            EyebrowPill(label: 'perlindungan aktif', color: AppColors.sage),
+            EyebrowPill(label: 'status', color: AppColors.sage),
             const SizedBox(height: 10),
-            Text('Anda terlindungi.',
+            Text(protectionActive,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     color: AppColors.navy,
                     letterSpacing: -0.8,
                     fontWeight: FontWeight.w800)),
             const SizedBox(height: 4),
-            Text('On-Device AI bekerja diam-diam di latar belakang perangkat Anda.',
+            Text(protectionDesc,
                 style: Theme.of(context)
                     .textTheme
                     .bodyMedium
@@ -129,7 +135,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
               Expanded(
                   child: StatCard(
                       icon: Icons.block,
-                      label: 'Total Blokir',
+                      label: AppLocalizations.of(context)!.protectionTotalBlocks,
                       value: '$blocked',
                       color: AppColors.crimson)),
               const SizedBox(width: 12),
@@ -145,7 +151,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
               Expanded(
                   child: StatCard(
                       icon: Icons.calendar_today,
-                      label: 'Hari Aktif',
+                      label: AppLocalizations.of(context)!.protectionActiveDays,
                       value: '$days',
                       color: AppColors.navy)),
               const SizedBox(width: 12),
@@ -162,7 +168,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
             FilledButton.icon(
               onPressed: () => _showApprovalDialog(context),
               icon: const Icon(Icons.lock_open),
-              label: const Text('Ajukan Izin Pencopotan'),
+              label: Text(AppLocalizations.of(context)!.protectionRequestUninstall),
             ),
           ],
         ),

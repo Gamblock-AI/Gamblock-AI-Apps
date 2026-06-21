@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -31,7 +32,7 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
     Haptics.medium();
     final name = _nameCtrl.text.trim();
     if (name.isEmpty) {
-      setState(() => _error = 'Nama grup diperlukan');
+      setState(() => _error = AppLocalizations.of(context)!.errorGroupNameRequired);
       return;
     }
     setState(() {
@@ -46,7 +47,7 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
         _groupName = org.name;
       });
     } catch (e) {
-      setState(() => _error = AppMessages.friendlyMessage(e));
+      setState(() => _error = AppMessages.friendlyMessage(context, e));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -69,7 +70,7 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
                   FilledButton.icon(
                     onPressed: () => context.go('/dashboard'),
                     icon: const Icon(Icons.arrow_forward),
-                    label: const Text('Dashboard'),
+                    label: Text(AppLocalizations.of(context)!.dashboardTitle),
                   ),
                 ],
               ),
@@ -91,14 +92,14 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
               children: [
                 const Icon(Icons.groups, size: 56, color: AppColors.navy),
                 const SizedBox(height: 16),
-                Text('Buat Grup Monitoring',
+                Text(AppLocalizations.of(context)!.onboardingCreateGroupTitle,
                     style: Theme.of(context)
                         .textTheme
                         .headlineMedium
                         ?.copyWith(color: AppColors.navy),
                     textAlign: TextAlign.center),
                 const SizedBox(height: 8),
-                Text('Sebagai Dosen/Pendamping, buat grup untuk mengawasi mahasiswa Anda',
+                Text(AppLocalizations.of(context)!.onboardingCreateGroupDesc,
                     style: Theme.of(context)
                         .textTheme
                         .bodyMedium
@@ -111,9 +112,9 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
                 ],
                 TextField(
                   controller: _nameCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Nama Grup',
-                    hintText: 'Contoh: Kelas TI-2024A',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.onboardingGroupName,
+                    hintText: AppLocalizations.of(context)!.onboardingGroupNameHint,
                     prefixIcon: Icon(Icons.group),
                   ),
                 ),
@@ -125,7 +126,7 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Text('Buat Grup'),
+                      : Text(AppLocalizations.of(context)!.onboardingCreateGroupBtn),
                 ),
               ],
             ),

@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -93,7 +94,7 @@ class _IntroScreenState extends State<IntroScreen> {
                     }),
                   ),
                   const SizedBox(height: 20),
-                  darkCtaButton(context, _page == _pages - 1 ? 'Mulai Sekarang' : 'Lanjut', _next),
+                  darkCtaButton(context, _page == _pages - 1 ? AppLocalizations.of(context)!.introStartBtn : 'Lanjut', _next),
                 ],
               ),
             ),

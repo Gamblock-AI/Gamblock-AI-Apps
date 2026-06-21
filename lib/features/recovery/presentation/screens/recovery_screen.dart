@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/repositories/recovery_repository_impl.dart';
@@ -27,12 +28,12 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen>
   final _journalCtrl = TextEditingController();
   String _mood = 'Biasa';
   bool _loading = true;
-  final _missions = [
-    'Tidak mengakses situs judi hari ini',
-    'Menulis 1 entri jurnal refleksi',
-    'Melakukan meditasi pernapasan',
-    'Berdiskusi dengan pendamping',
-    'Menyelesaikan 1 modul psikoedukasi',
+  List<String> get _missions => [
+    AppLocalizations.of(context)!.recoveryMissionNoGambling,
+    AppLocalizations.of(context)!.recoveryMissionJournal,
+    AppLocalizations.of(context)!.recoveryMissionMeditation,
+    AppLocalizations.of(context)!.recoveryMissionDiscussion,
+    AppLocalizations.of(context)!.recoveryMissionPsychoeducation,
   ];
   final List<bool> _checked = List.filled(5, false);
 
@@ -72,11 +73,11 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen>
       _journalCtrl.clear();
       await _fetchReflections();
       if (mounted) {
-        AppFeedback.success(context, 'Jurnal disimpan');
+        AppFeedback.success(context, AppLocalizations.of(context)!.recoveryJournalSaved);
       }
     } catch (e) {
       if (mounted) {
-        AppFeedback.error(context, AppMessages.friendlyMessage(e));
+        AppFeedback.error(context, AppMessages.friendlyMessage(context, e));
       }
     }
   }
@@ -86,7 +87,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen>
     final repo = ref.read(recoveryRepositoryProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pemulihan'),
+        title: Text(AppLocalizations.of(context)!.recoveryTitle),
         bottom: TabBar(
           controller: _tabCtrl,
           labelColor: AppColors.navy,

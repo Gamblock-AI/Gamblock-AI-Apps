@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../domain/entities/reflection_entry.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -37,7 +38,7 @@ class JournalTab extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                Text('Tulis Jurnal Refleksi',
+                Text(AppLocalizations.of(context)!.recoveryWriteJournal,
                     style: Theme.of(context)
                         .textTheme
                         .titleMedium
@@ -46,8 +47,8 @@ class JournalTab extends StatelessWidget {
                 TextField(
                   controller: controller,
                   maxLines: 4,
-                  decoration: const InputDecoration(
-                      hintText: 'Ceritakan bagaimana perasaan Anda hari ini...'),
+                  decoration: InputDecoration(
+                      hintText: AppLocalizations.of(context)!.recoveryJournalHint),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -67,12 +68,12 @@ class JournalTab extends StatelessWidget {
                 FilledButton.icon(
                     onPressed: onSubmit,
                     icon: const Icon(Icons.send, size: 18),
-                    label: const Text('Simpan')),
+                    label: Text(AppLocalizations.of(context)!.save)),
               ]),
             ),
           ),
           const SizedBox(height: 16),
-          Text('Riwayat Refleksi',
+          Text(AppLocalizations.of(context)!.recoveryJournalHistory,
               style: Theme.of(context)
                   .textTheme
                   .titleMedium
@@ -84,10 +85,10 @@ class JournalTab extends StatelessWidget {
                   child: SkeletonBox(width: double.infinity, height: 56),
                 ))
           else if (entries.isEmpty)
-            const EmptyState(
+            EmptyState(
               icon: Icons.menu_book_outlined,
-              title: 'Belum ada jurnal',
-              hint: 'Tulis refleksi pertama Anda di atas untuk memulai.',
+              title: AppLocalizations.of(context)!.recoveryNoJournal,
+              hint: AppLocalizations.of(context)!.recoveryEmptyJournalDesc,
             )
           else
             ...entries.map((e) => Card(

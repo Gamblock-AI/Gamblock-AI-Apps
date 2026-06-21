@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'slide_shell.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -12,20 +13,20 @@ class CrisisSlide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stats = [
-      ('Rp286T', 'perputaran dana judi online 2025', AppColors.crimson),
-      ('12,3 jt', 'orang tercatat deposit judi', AppColors.amber),
-      ('5,5 jt+', 'konten judi ditangani sejak 2017', AppColors.crimson),
+      ('Rp286T', AppLocalizations.of(context)!.introCrisisStat2Desc, AppColors.crimson),
+      (AppLocalizations.of(context)!.introCrisisStat2, AppLocalizations.of(context)!.introCrisisStat3Desc, AppColors.amber),
+      (AppLocalizations.of(context)!.introCrisisStat1, AppLocalizations.of(context)!.introCrisisStat1Desc, AppColors.crimson),
     ];
     return SlideShell(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          EyebrowPill(label: 'darurat nasional', color: AppColors.crimson),
+          EyebrowPill(label: AppLocalizations.of(context)!.introCrisisSubtitle, color: AppColors.crimson),
           const SizedBox(height: 20),
-          Text('judi online bukan hiburan.\nini krisis generasi.', style: displayStyle(context)),
+          Text(AppLocalizations.of(context)!.introCrisisTitle, style: displayStyle(context)),
           const SizedBox(height: 14),
           Text(
-            '440 rb pemain usia 10–20 tahun dan 520 rb usia 21–30 tahun terlibat. mahasiswa berada di jantung krisis ini.',
+            AppLocalizations.of(context)!.introCrisisDesc,
             style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 14, height: 1.5),
           ),
           const SizedBox(height: 24),
@@ -43,7 +44,7 @@ class CrisisSlide extends StatelessWidget {
                   ]),
                 ),
               )),
-          Text('(PPATK 2026 · Kemkomdigi 2025)',
+          Text(AppLocalizations.of(context)!.introCrisisSource,
               style: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 11)),
         ],
       ),

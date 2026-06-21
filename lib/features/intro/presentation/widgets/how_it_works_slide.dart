@@ -1,3 +1,4 @@
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'slide_shell.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -13,17 +14,17 @@ class HowItWorksSlide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final steps = [
-      ('01', Icons.download, 'unduh & pasang', 'instal di android atau windows. gratis, tanpa kartu kredit.'),
-      ('02', Icons.auto_awesome, 'deteksi otomatis', 'hybrid ai menganalisis dom, bow, dan pola url di latar belakang.'),
-      ('03', Icons.favorite, 'pulihkan & bangkit', 'pattern interrupt memutus dorongan, lalu psikoedukasi memandu pemulihan.'),
+      ('01', Icons.download, AppLocalizations.of(context)!.introHowItWorksStep1, AppLocalizations.of(context)!.introHowItWorksStep1Desc),
+      ('02', Icons.auto_awesome, AppLocalizations.of(context)!.introHowItWorksStep2, AppLocalizations.of(context)!.introHowItWorksStep2Desc),
+      ('03', Icons.favorite, AppLocalizations.of(context)!.introHowItWorksStep3, AppLocalizations.of(context)!.introHowItWorksStep3Desc),
     ];
     return SlideShell(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          EyebrowPill(label: 'cara kerja', color: AppColors.navyLight),
+          EyebrowPill(label: AppLocalizations.of(context)!.introHowItWorksSubtitle, color: AppColors.navyLight),
           const SizedBox(height: 20),
-          Text('tiga langkah\nmenuju kendali diri.', style: displayStyle(context)),
+          Text(AppLocalizations.of(context)!.introHowItWorksTitle, style: displayStyle(context)),
           const SizedBox(height: 24),
           ...steps.map((s) => Padding(
                 padding: const EdgeInsets.only(bottom: 14),
