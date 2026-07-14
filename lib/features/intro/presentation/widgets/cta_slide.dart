@@ -18,27 +18,57 @@ class CtaSlide extends StatelessWidget {
           const SizedBox(height: 40),
           Image.asset('assets/images/gami.webp', height: 180),
           const SizedBox(height: 24),
-          EyebrowPill(label: AppLocalizations.of(context)!.introCtaBtn, color: AppColors.crimson),
+          EyebrowPill(
+            label: AppLocalizations.of(context)!.introCtaBtn,
+            color: AppColors.crimson,
+          ),
           const SizedBox(height: 20),
-          Text(AppLocalizations.of(context)!.introCtaTitle,
-              textAlign: TextAlign.center, style: displayStyle(context)),
+          Text(
+            AppLocalizations.of(context)!.introCtaTitle,
+            textAlign: TextAlign.center,
+            style: displayStyle(context),
+          ),
           const SizedBox(height: 16),
           Text(
             AppLocalizations.of(context)!.introCtaDesc,
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.65), fontSize: 15, height: 1.5),
+            style: TextStyle(
+              color: AppColors.mutedForeground,
+              fontSize: 15,
+              height: 1.5,
+            ),
           ),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.phone_android, color: Colors.white.withValues(alpha: 0.4), size: 16),
+              Icon(
+                Icons.phone_android,
+                color: AppColors.mutedForeground,
+                size: 16,
+              ),
               const SizedBox(width: 6),
-              Text('android', style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 12)),
+              Text(
+                'android',
+                style: TextStyle(
+                  color: AppColors.mutedForeground,
+                  fontSize: 12,
+                ),
+              ),
               const SizedBox(width: 16),
-              Icon(Icons.desktop_windows, color: Colors.white.withValues(alpha: 0.4), size: 16),
+              Icon(
+                Icons.desktop_windows,
+                color: AppColors.mutedForeground,
+                size: 16,
+              ),
               const SizedBox(width: 6),
-              Text('windows', style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 12)),
+              Text(
+                'windows',
+                style: TextStyle(
+                  color: AppColors.mutedForeground,
+                  fontSize: 12,
+                ),
+              ),
             ],
           ),
         ],

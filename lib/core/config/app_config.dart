@@ -50,7 +50,10 @@ class AppConfig {
   static bool get isProduction {
     final env = appEnv.toLowerCase();
     if (env == 'production') return true;
-    if (env == 'development' || env == 'staging' || env == 'test' || env == 'local') {
+    if (env == 'development' ||
+        env == 'staging' ||
+        env == 'test' ||
+        env == 'local') {
       return false;
     }
     // No explicit env: release builds are production, debug builds are dev.

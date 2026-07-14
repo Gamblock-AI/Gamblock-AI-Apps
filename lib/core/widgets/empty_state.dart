@@ -31,21 +31,25 @@ class EmptyState extends StatelessWidget {
         children: [
           Icon(icon, size: 32, color: AppColors.navy.withValues(alpha: 0.3)),
           const SizedBox(height: 10),
-          Text(title,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: AppColors.navy,
-              ),
-              textAlign: TextAlign.center),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: AppColors.navy,
+            ),
+            textAlign: TextAlign.center,
+          ),
           if (hint != null) ...[
             const SizedBox(height: 4),
-            Text(hint!,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.navy.withValues(alpha: 0.5),
-                ),
-                textAlign: TextAlign.center),
+            Text(
+              hint!,
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.navy.withValues(alpha: 0.5),
+              ),
+              textAlign: TextAlign.center,
+            ),
           ],
         ],
       ),

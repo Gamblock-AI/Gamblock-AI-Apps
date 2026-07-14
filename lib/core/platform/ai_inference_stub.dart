@@ -55,9 +55,21 @@ class AIInferenceStub {
 
     // Stub: simple keyword-based classification (fallback only).
     final gamblingKeywords = [
-      'slot', 'casino', 'poker', 'judi', 'togel', 'betting',
-      'sportbook', 'bandar', 'domino', 'ceme', 'gaple',
-      'sbobet', 'maxbet', 'pragmatic', 'ioncasino',
+      'slot',
+      'casino',
+      'poker',
+      'judi',
+      'togel',
+      'betting',
+      'sportbook',
+      'bandar',
+      'domino',
+      'ceme',
+      'gaple',
+      'sbobet',
+      'maxbet',
+      'pragmatic',
+      'ioncasino',
     ];
 
     final lower = domText.toLowerCase();

@@ -5,7 +5,12 @@ class IconChip extends StatelessWidget {
   final IconData icon;
   final Color color;
   final double size;
-  const IconChip({super.key, required this.icon, required this.color, this.size = 44});
+  const IconChip({
+    super.key,
+    required this.icon,
+    required this.color,
+    this.size = 44,
+  });
 
   @override
   Widget build(BuildContext context) {

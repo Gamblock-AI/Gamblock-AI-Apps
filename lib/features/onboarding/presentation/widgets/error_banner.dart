@@ -12,14 +12,18 @@ class ErrorBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-          color: AppColors.crimson.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.crimson.withValues(alpha: 0.2))),
-      child: Text(message,
-          style: const TextStyle(
-              color: AppColors.crimson,
-              fontSize: 13,
-              fontWeight: FontWeight.w600)),
+        color: AppColors.crimson.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.crimson.withValues(alpha: 0.2)),
+      ),
+      child: Text(
+        message,
+        style: const TextStyle(
+          color: AppColors.crimson,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }

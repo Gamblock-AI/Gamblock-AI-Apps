@@ -10,7 +10,11 @@ class SlideShell extends StatelessWidget {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(24, 56, 24, 130),
       child: Center(
-          child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 460), child: child)),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 460),
+          child: child,
+        ),
+      ),
     );
   }
 }

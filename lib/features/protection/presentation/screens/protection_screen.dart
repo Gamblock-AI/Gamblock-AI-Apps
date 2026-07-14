@@ -72,7 +72,10 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
         durationMinutes: 30,
       );
       if (mounted) {
-        AppFeedback.success(context, AppLocalizations.of(context)!.protectionRequestSent);
+        AppFeedback.success(
+          context,
+          AppLocalizations.of(context)!.protectionRequestSent,
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -90,7 +93,9 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
     final l10n = AppLocalizations.of(context);
     final appName = l10n?.appName ?? AppLocalizations.of(context)!.appName;
     final protectionActive = l10n?.protectionActive ?? 'Proteksi Aktif';
-    final protectionDesc = l10n?.protectionDesc ?? AppLocalizations.of(context)!.protectionDeviceProtected;
+    final protectionDesc =
+        l10n?.protectionDesc ??
+        AppLocalizations.of(context)!.protectionDeviceProtected;
 
     final status = _status;
     final isActive = status?.isActive ?? true;
@@ -109,66 +114,90 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
           children: [
             EyebrowPill(label: 'status', color: AppColors.sage),
             const SizedBox(height: 10),
-            Text(protectionActive,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: AppColors.navy,
-                    letterSpacing: -0.8,
-                    fontWeight: FontWeight.w800)),
+            Text(
+              protectionActive,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: AppColors.navy,
+                letterSpacing: -0.8,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
             const SizedBox(height: 4),
-            Text(protectionDesc,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(color: AppColors.navy.withValues(alpha: 0.55))),
+            Text(
+              protectionDesc,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.navy.withValues(alpha: 0.55),
+              ),
+            ),
             const SizedBox(height: 20),
-            StatusBanner(isActive: isActive, runtimeStatus: runtimeStatus, modelVersion: modelVersion),
+            StatusBanner(
+              isActive: isActive,
+              runtimeStatus: runtimeStatus,
+              modelVersion: modelVersion,
+            ),
             const SizedBox(height: 12),
-            Row(children: [
-              ServiceIndicator(label: 'Service', active: _serviceRunning),
-              const SizedBox(width: 8),
-              ServiceIndicator(label: 'AI Model', active: _modelLoaded),
-              const SizedBox(width: 8),
-              ServiceIndicator(label: 'WebSocket', active: _serviceRunning),
-            ]),
+            Row(
+              children: [
+                ServiceIndicator(label: 'Service', active: _serviceRunning),
+                const SizedBox(width: 8),
+                ServiceIndicator(label: 'AI Model', active: _modelLoaded),
+                const SizedBox(width: 8),
+                ServiceIndicator(label: 'WebSocket', active: _serviceRunning),
+              ],
+            ),
             const SizedBox(height: 16),
-            Row(children: [
-              Expanded(
+            Row(
+              children: [
+                Expanded(
                   child: StatCard(
-                      icon: Icons.block,
-                      label: AppLocalizations.of(context)!.protectionTotalBlocks,
-                      value: '$blocked',
-                      color: AppColors.crimson)),
-              const SizedBox(width: 12),
-              Expanded(
+                    icon: Icons.block,
+                    label: AppLocalizations.of(context)!.protectionTotalBlocks,
+                    value: '$blocked',
+                    color: AppColors.crimson,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
                   child: StatCard(
-                      icon: Icons.local_fire_department,
-                      label: 'Streak',
-                      value: '$streak hari',
-                      color: AppColors.amber)),
-            ]),
+                    icon: Icons.local_fire_department,
+                    label: 'Streak',
+                    value: '$streak hari',
+                    color: AppColors.amber,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 12),
-            Row(children: [
-              Expanded(
+            Row(
+              children: [
+                Expanded(
                   child: StatCard(
-                      icon: Icons.calendar_today,
-                      label: AppLocalizations.of(context)!.protectionActiveDays,
-                      value: '$days',
-                      color: AppColors.navy)),
-              const SizedBox(width: 12),
-              Expanded(
+                    icon: Icons.calendar_today,
+                    label: AppLocalizations.of(context)!.protectionActiveDays,
+                    value: '$days',
+                    color: AppColors.navy,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
                   child: StatCard(
-                      icon: Icons.self_improvement,
-                      label: 'Mood',
-                      value: '🙂',
-                      color: AppColors.sage)),
-            ]),
+                    icon: Icons.self_improvement,
+                    label: 'Mood',
+                    value: '🙂',
+                    color: AppColors.sage,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 24),
             const RecentBlocksList(),
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: () => _showApprovalDialog(context),
               icon: const Icon(Icons.lock_open),
-              label: Text(AppLocalizations.of(context)!.protectionRequestUninstall),
+              label: Text(
+                AppLocalizations.of(context)!.protectionRequestUninstall,
+              ),
             ),
           ],
         ),
@@ -183,4 +212,3 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
     );
   }
 }
-

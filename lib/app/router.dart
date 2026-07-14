@@ -17,10 +17,7 @@ import 'shell.dart';
 // Custom page builder: fade + slight slide transition for every route. Keeps
 // navigation feeling smooth and consistent. (Framework disables animations when
 // the user requests reduced motion via platform accessibility settings.)
-Page<void> _fadeSlidePage({
-  required LocalKey key,
-  required Widget child,
-}) {
+Page<void> _fadeSlidePage({required LocalKey key, required Widget child}) {
   return CustomTransitionPage<void>(
     key: key,
     child: child,
@@ -28,10 +25,13 @@ Page<void> _fadeSlidePage({
       return FadeTransition(
         opacity: animation,
         child: SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0, 0.03),
-            end: Offset.zero,
-          ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+          position:
+              Tween<Offset>(
+                begin: const Offset(0, 0.03),
+                end: Offset.zero,
+              ).animate(
+                CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+              ),
           child: child,
         ),
       );
@@ -47,7 +47,8 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: '/protection',
     redirect: (context, state) {
       final isAuth = authState.isAuthenticated;
-      final isPublic = state.uri.path == '/login' ||
+      final isPublic =
+          state.uri.path == '/login' ||
           state.uri.path == '/register' ||
           state.uri.path == '/intro';
       final isLoading = authState.isLoading;
@@ -80,36 +81,48 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/onboarding/create-group',
-        pageBuilder: (_, state) =>
-            _fadeSlidePage(key: state.pageKey, child: const CreateGroupScreen()),
+        pageBuilder: (_, state) => _fadeSlidePage(
+          key: state.pageKey,
+          child: const CreateGroupScreen(),
+        ),
       ),
       GoRoute(
         path: '/pattern-interrupt',
-        pageBuilder: (_, state) =>
-            _fadeSlidePage(key: state.pageKey, child: const PatternInterruptScreen()),
+        pageBuilder: (_, state) => _fadeSlidePage(
+          key: state.pageKey,
+          child: const PatternInterruptScreen(),
+        ),
       ),
       ShellRoute(
         builder: (_, __, child) => AppShell(child: child),
         routes: [
           GoRoute(
             path: '/protection',
-            pageBuilder: (_, state) =>
-                _fadeSlidePage(key: state.pageKey, child: const ProtectionScreen()),
+            pageBuilder: (_, state) => _fadeSlidePage(
+              key: state.pageKey,
+              child: const ProtectionScreen(),
+            ),
           ),
           GoRoute(
             path: '/dashboard',
-            pageBuilder: (_, state) =>
-                _fadeSlidePage(key: state.pageKey, child: const DashboardScreen()),
+            pageBuilder: (_, state) => _fadeSlidePage(
+              key: state.pageKey,
+              child: const DashboardScreen(),
+            ),
           ),
           GoRoute(
             path: '/recovery',
-            pageBuilder: (_, state) =>
-                _fadeSlidePage(key: state.pageKey, child: const RecoveryScreen()),
+            pageBuilder: (_, state) => _fadeSlidePage(
+              key: state.pageKey,
+              child: const RecoveryScreen(),
+            ),
           ),
           GoRoute(
             path: '/settings',
-            pageBuilder: (_, state) =>
-                _fadeSlidePage(key: state.pageKey, child: const SettingsScreen()),
+            pageBuilder: (_, state) => _fadeSlidePage(
+              key: state.pageKey,
+              child: const SettingsScreen(),
+            ),
           ),
         ],
       ),

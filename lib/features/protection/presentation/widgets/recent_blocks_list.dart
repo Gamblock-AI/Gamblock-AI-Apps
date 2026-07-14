@@ -15,11 +15,12 @@ class RecentBlocksList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(AppLocalizations.of(context)!.protectionRecentBlocks,
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(color: AppColors.navy)),
+        Text(
+          AppLocalizations.of(context)!.protectionRecentBlocks,
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(color: AppColors.navy),
+        ),
         const SizedBox(height: 8),
         ...List.generate(
           count,
@@ -28,15 +29,26 @@ class RecentBlocksList extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                  color: AppColors.crimson.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10)),
-              child: const Icon(Icons.block, color: AppColors.crimson, size: 20),
+                color: AppColors.crimson.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.block,
+                color: AppColors.crimson,
+                size: 20,
+              ),
             ),
-            title: Text(AppLocalizations.of(context)!.protectionSiteBlocked,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-            subtitle: Text('${10 + i * 5} menit lalu',
-                style: TextStyle(
-                    fontSize: 12, color: AppColors.navy.withValues(alpha: 0.5))),
+            title: Text(
+              AppLocalizations.of(context)!.protectionSiteBlocked,
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            ),
+            subtitle: Text(
+              '${10 + i * 5} menit lalu',
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.navy.withValues(alpha: 0.5),
+              ),
+            ),
           ),
         ),
       ],

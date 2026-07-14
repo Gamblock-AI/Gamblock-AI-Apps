@@ -16,7 +16,9 @@ class AppShell extends StatelessWidget {
       body: child,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: AppColors.navy.withValues(alpha: 0.08))),
+          border: Border(
+            top: BorderSide(color: AppColors.navy.withValues(alpha: 0.08)),
+          ),
         ),
         child: NavigationBar(
           selectedIndex: index,

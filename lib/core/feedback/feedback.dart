@@ -14,14 +14,18 @@ class AppFeedback {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Row(children: [
-            const Icon(Icons.check_circle, color: AppColors.sage, size: 20),
-            const SizedBox(width: 10),
-            Expanded(child: Text(message)),
-          ]),
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle, color: AppColors.sage, size: 20),
+              const SizedBox(width: 10),
+              Expanded(child: Text(message)),
+            ],
+          ),
           backgroundColor: AppColors.navy,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       );
   }
@@ -32,14 +36,22 @@ class AppFeedback {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Row(children: [
-            const Icon(Icons.error_outline, color: AppColors.crimson, size: 20),
-            const SizedBox(width: 10),
-            Expanded(child: Text(message)),
-          ]),
+          content: Row(
+            children: [
+              const Icon(
+                Icons.error_outline,
+                color: AppColors.crimson,
+                size: 20,
+              ),
+              const SizedBox(width: 10),
+              Expanded(child: Text(message)),
+            ],
+          ),
           backgroundColor: AppColors.navyDark,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       );
   }
@@ -53,7 +65,9 @@ class AppFeedback {
           content: Text(message),
           backgroundColor: AppColors.navy,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       );
   }

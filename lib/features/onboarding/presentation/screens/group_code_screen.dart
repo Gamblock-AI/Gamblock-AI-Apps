@@ -29,7 +29,9 @@ class _GroupCodeScreenState extends ConsumerState<GroupCodeScreen> {
     Haptics.medium();
     final code = _codeCtrl.text.trim().toUpperCase();
     if (code.length < 4) {
-      setState(() => _error = AppLocalizations.of(context)!.onboardingInvalidGroupCode);
+      setState(
+        () => _error = AppLocalizations.of(context)!.onboardingInvalidGroupCode,
+      );
       return;
     }
     setState(() {
@@ -61,19 +63,21 @@ class _GroupCodeScreenState extends ConsumerState<GroupCodeScreen> {
               children: [
                 const Icon(Icons.group_add, size: 56, color: AppColors.navy),
                 const SizedBox(height: 16),
-                Text(AppLocalizations.of(context)!.onboardingEnterGroupCode,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineMedium
-                        ?.copyWith(color: AppColors.navy),
-                    textAlign: TextAlign.center),
+                Text(
+                  AppLocalizations.of(context)!.onboardingEnterGroupCode,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.headlineMedium?.copyWith(color: AppColors.navy),
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: 8),
-                Text(AppLocalizations.of(context)!.onboardingGetCodeDesc,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(color: AppColors.navy.withValues(alpha: 0.6)),
-                    textAlign: TextAlign.center),
+                Text(
+                  AppLocalizations.of(context)!.onboardingGetCodeDesc,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.navy.withValues(alpha: 0.6),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: 40),
                 if (_error != null) ...[
                   ErrorBanner(message: _error!),
@@ -84,26 +88,29 @@ class _GroupCodeScreenState extends ConsumerState<GroupCodeScreen> {
                   textCapitalization: TextCapitalization.characters,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 6,
-                      color: AppColors.navy),
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 6,
+                    color: AppColors.navy,
+                  ),
                   decoration: InputDecoration(
                     hintText: 'XXXXXX',
                     hintStyle: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 6,
-                        color: AppColors.navy.withValues(alpha: 0.2)),
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 6,
+                      color: AppColors.navy.withValues(alpha: 0.2),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(AppLocalizations.of(context)!.onboardingCodeHint,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: AppColors.navy.withValues(alpha: 0.4)),
-                    textAlign: TextAlign.center),
+                Text(
+                  AppLocalizations.of(context)!.onboardingCodeHint,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.navy.withValues(alpha: 0.4),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: 32),
                 FilledButton(
                   onPressed: _loading ? null : _join,
@@ -111,13 +118,18 @@ class _GroupCodeScreenState extends ConsumerState<GroupCodeScreen> {
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : const Text('Gabung'),
                 ),
                 const SizedBox(height: 24),
                 TextButton(
-                    onPressed: () => context.go('/login'),
-                    child: Text(AppLocalizations.of(context)!.backToLogin)),
+                  onPressed: () => context.go('/login'),
+                  child: Text(AppLocalizations.of(context)!.backToLogin),
+                ),
               ],
             ),
           ),

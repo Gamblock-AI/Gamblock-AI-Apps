@@ -6,7 +6,11 @@ class ServiceIndicator extends StatelessWidget {
   final String label;
   final bool active;
 
-  const ServiceIndicator({super.key, required this.label, required this.active});
+  const ServiceIndicator({
+    super.key,
+    required this.label,
+    required this.active,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,22 +21,30 @@ class ServiceIndicator extends StatelessWidget {
           color: active
               ? AppColors.sage.withValues(alpha: 0.08)
               : AppColors.crimson.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
         ),
-        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Container(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
               width: 8,
               height: 8,
               decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: active ? AppColors.sage : AppColors.crimson)),
-          const SizedBox(width: 6),
-          Text(label,
+                shape: BoxShape.circle,
+                color: active ? AppColors.sage : AppColors.crimson,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
               style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: active ? AppColors.sage : AppColors.crimson)),
-        ]),
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: active ? AppColors.sage : AppColors.crimson,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

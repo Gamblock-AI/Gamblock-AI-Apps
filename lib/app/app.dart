@@ -33,20 +33,16 @@ class _GamblockAppState extends ConsumerState<GamblockApp> {
       GlobalCupertinoLocalizations.delegate,
     ];
 
-    final supportedLocales = const [
-      Locale('id', ''),
-      Locale('en', ''),
-    ];
+    final supportedLocales = const [Locale('id', ''), Locale('en', '')];
 
     if (authState.isLoading) {
       return MaterialApp(
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
+        themeMode: ThemeMode.light,
         localizationsDelegates: localizationsDelegates,
         supportedLocales: supportedLocales,
-        home: const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        ),
+        home: const Scaffold(body: Center(child: CircularProgressIndicator())),
       );
     }
 
@@ -54,6 +50,7 @@ class _GamblockAppState extends ConsumerState<GamblockApp> {
       title: AppLocalizations.of(context)!.appName,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.light,
       localizationsDelegates: localizationsDelegates,
       supportedLocales: supportedLocales,
       routerConfig: router,

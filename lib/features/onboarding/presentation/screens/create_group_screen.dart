@@ -32,7 +32,9 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
     Haptics.medium();
     final name = _nameCtrl.text.trim();
     if (name.isEmpty) {
-      setState(() => _error = AppLocalizations.of(context)!.errorGroupNameRequired);
+      setState(
+        () => _error = AppLocalizations.of(context)!.errorGroupNameRequired,
+      );
       return;
     }
     setState(() {
@@ -65,7 +67,10 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  GroupCodeDisplay(groupCode: _groupCode!, groupName: _groupName),
+                  GroupCodeDisplay(
+                    groupCode: _groupCode!,
+                    groupName: _groupName,
+                  ),
                   const SizedBox(height: 24),
                   FilledButton.icon(
                     onPressed: () => context.go('/dashboard'),
@@ -92,19 +97,21 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
               children: [
                 const Icon(Icons.groups, size: 56, color: AppColors.navy),
                 const SizedBox(height: 16),
-                Text(AppLocalizations.of(context)!.onboardingCreateGroupTitle,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineMedium
-                        ?.copyWith(color: AppColors.navy),
-                    textAlign: TextAlign.center),
+                Text(
+                  AppLocalizations.of(context)!.onboardingCreateGroupTitle,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.headlineMedium?.copyWith(color: AppColors.navy),
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: 8),
-                Text(AppLocalizations.of(context)!.onboardingCreateGroupDesc,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(color: AppColors.navy.withValues(alpha: 0.6)),
-                    textAlign: TextAlign.center),
+                Text(
+                  AppLocalizations.of(context)!.onboardingCreateGroupDesc,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.navy.withValues(alpha: 0.6),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: 40),
                 if (_error != null) ...[
                   ErrorBanner(message: _error!),
@@ -113,8 +120,12 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
                 TextField(
                   controller: _nameCtrl,
                   decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.onboardingGroupName,
-                    hintText: AppLocalizations.of(context)!.onboardingGroupNameHint,
+                    labelText: AppLocalizations.of(
+                      context,
+                    )!.onboardingGroupName,
+                    hintText: AppLocalizations.of(
+                      context,
+                    )!.onboardingGroupNameHint,
                     prefixIcon: Icon(Icons.group),
                   ),
                 ),
@@ -125,8 +136,16 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : Text(AppLocalizations.of(context)!.onboardingCreateGroupBtn),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          AppLocalizations.of(
+                            context,
+                          )!.onboardingCreateGroupBtn,
+                        ),
                 ),
               ],
             ),

@@ -14,10 +14,26 @@ class FeaturesSlide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final features = [
-      (Icons.document_scanner, AppLocalizations.of(context)!.introFeature2, AppColors.crimson),
-      (Icons.remove_red_eye, AppLocalizations.of(context)!.introFeature4, AppColors.amber),
-      (Icons.people, AppLocalizations.of(context)!.introFeature3, AppColors.sageLight),
-      (Icons.shield, AppLocalizations.of(context)!.introFeature1, AppColors.navyLight),
+      (
+        Icons.document_scanner,
+        AppLocalizations.of(context)!.introFeature2,
+        AppColors.crimson,
+      ),
+      (
+        Icons.remove_red_eye,
+        AppLocalizations.of(context)!.introFeature4,
+        AppColors.amber,
+      ),
+      (
+        Icons.people,
+        AppLocalizations.of(context)!.introFeature3,
+        AppColors.sageLight,
+      ),
+      (
+        Icons.shield,
+        AppLocalizations.of(context)!.introFeature1,
+        AppColors.navyLight,
+      ),
     ];
     return SlideShell(
       child: Column(
@@ -25,21 +41,35 @@ class FeaturesSlide extends StatelessWidget {
         children: [
           EyebrowPill(label: 'fitur', color: AppColors.sageLight),
           const SizedBox(height: 20),
-          Text(AppLocalizations.of(context)!.introFeaturesTitle, style: displayStyle(context)),
+          Text(
+            AppLocalizations.of(context)!.introFeaturesTitle,
+            style: displayStyle(context),
+          ),
           const SizedBox(height: 24),
-          ...features.map((f) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: GlassCard(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(children: [
+          ...features.map(
+            (f) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: GlassCard(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
                     IconChip(icon: f.$1, color: f.$3),
                     const SizedBox(width: 14),
                     Expanded(
-                        child: Text(f.$2,
-                            style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700))),
-                  ]),
+                      child: Text(
+                        f.$2,
+                        style: const TextStyle(
+                          color: AppColors.navy,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              )),
+              ),
+            ),
+          ),
         ],
       ),
     );

@@ -34,7 +34,11 @@ class ApiResponse {
       final d = body['data'];
       if (d is List) {
         return d
-            .map((e) => e is Map<String, dynamic> ? e : Map<String, dynamic>.from(e as Map))
+            .map(
+              (e) => e is Map<String, dynamic>
+                  ? e
+                  : Map<String, dynamic>.from(e as Map),
+            )
             .toList();
       }
     }

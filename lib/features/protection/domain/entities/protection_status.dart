@@ -19,7 +19,8 @@ class ProtectionStatus {
   factory ProtectionStatus.fromJson(Map<String, dynamic> json) {
     return ProtectionStatus(
       mode: json['mode']?.toString() ?? 'Active',
-      runtimeStatus: json['runtime_status']?.toString() ?? 'Local runtime ready',
+      runtimeStatus:
+          json['runtime_status']?.toString() ?? 'Local runtime ready',
       rulesetVersion: json['ruleset_version']?.toString() ?? '',
       modelVersion: json['model_version']?.toString() ?? '',
       lastSync: json['last_sync']?.toString() ?? '',

@@ -19,32 +19,38 @@ class ApiClient {
   /// `AppConfig` is available (i.e. after `dotenv.load()` in main).
   static Future<void> init() async {
     if (_initialized) return;
-    _dio = Dio(BaseOptions(
-      baseUrl: AppConfig.apiBaseUrl,
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-      headers: {'Content-Type': 'application/json'},
-    ));
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) async {
-        final token = await _storage.read(key: _accessTokenKey);
-        if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token';
-        }
-        handler.next(options);
-      },
-      onError: (error, handler) async {
-        if (error.response?.statusCode == 401) {
-          final refreshed = await _tryRefresh();
-          if (refreshed) {
-            final retryResponse = await _retryWithNewToken(error.requestOptions);
-            handler.resolve(retryResponse);
-            return;
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: AppConfig.apiBaseUrl,
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 10),
+        headers: {'Content-Type': 'application/json'},
+      ),
+    );
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          final token = await _storage.read(key: _accessTokenKey);
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
           }
-        }
-        handler.next(error);
-      },
-    ));
+          handler.next(options);
+        },
+        onError: (error, handler) async {
+          if (error.response?.statusCode == 401) {
+            final refreshed = await _tryRefresh();
+            if (refreshed) {
+              final retryResponse = await _retryWithNewToken(
+                error.requestOptions,
+              );
+              handler.resolve(retryResponse);
+              return;
+            }
+          }
+          handler.next(error);
+        },
+      ),
+    );
     _initialized = true;
   }
 
@@ -61,26 +67,29 @@ class ApiClient {
     try {
       final refreshToken = await _storage.read(key: _refreshTokenKey);
       if (refreshToken == null) return false;
-      final response = await Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl))
-          .post('/v1/auth/refresh', data: {'refresh_token': refreshToken});
+      final response = await Dio(
+        BaseOptions(baseUrl: AppConfig.apiBaseUrl),
+      ).post('/v1/auth/refresh', data: {'refresh_token': refreshToken});
       final data = response.data['data'];
       if (data != null) {
         await _storage.write(key: _accessTokenKey, value: data['access_token']);
-        await _storage.write(key: _refreshTokenKey, value: data['refresh_token']);
+        await _storage.write(
+          key: _refreshTokenKey,
+          value: data['refresh_token'],
+        );
         return true;
       }
     } catch (_) {}
     return false;
   }
 
-  static Future<Response> _retryWithNewToken(RequestOptions requestOptions) async {
+  static Future<Response> _retryWithNewToken(
+    RequestOptions requestOptions,
+  ) async {
     final token = await _storage.read(key: _accessTokenKey);
     final opts = Options(
       method: requestOptions.method,
-      headers: {
-        ...requestOptions.headers,
-        'Authorization': 'Bearer $token',
-      },
+      headers: {...requestOptions.headers, 'Authorization': 'Bearer $token'},
     );
     return _dio.request(
       requestOptions.path,

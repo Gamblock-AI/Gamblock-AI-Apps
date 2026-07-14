@@ -20,30 +20,50 @@ class RoleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? AppColors.navy : AppColors.navy.withValues(alpha: 0.4);
+    final color = selected
+        ? AppColors.navy
+        : AppColors.navy.withValues(alpha: 0.4);
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: selected ? AppColors.navy.withValues(alpha: 0.06) : Colors.transparent,
+          color: selected
+              ? AppColors.navy.withValues(alpha: 0.06)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-              color: selected ? AppColors.navy : AppColors.navy.withValues(alpha: 0.15),
-              width: selected ? 2 : 1),
+            color: selected
+                ? AppColors.navy
+                : AppColors.navy.withValues(alpha: 0.15),
+            width: selected ? 2 : 1,
+          ),
         ),
-        child: Column(children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 8),
-          Text(label,
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color),
-              textAlign: TextAlign.center),
-          const SizedBox(height: 2),
-          Text(sub,
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 28),
+            const SizedBox(height: 8),
+            Text(
+              label,
               style: TextStyle(
-                  fontSize: 10, color: AppColors.navy.withValues(alpha: 0.4), letterSpacing: 0.5)),
-        ]),
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: color,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              sub,
+              style: TextStyle(
+                fontSize: 10,
+                color: AppColors.navy.withValues(alpha: 0.4),
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

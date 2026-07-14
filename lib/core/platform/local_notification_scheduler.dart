@@ -31,7 +31,10 @@ class LocalNotificationScheduler {
     _timer = Timer(delay, () {
       _showReminder();
       // Re-schedule for every following day at the same time.
-      _timer = Timer.periodic(const Duration(hours: 24), (_) => _showReminder());
+      _timer = Timer.periodic(
+        const Duration(hours: 24),
+        (_) => _showReminder(),
+      );
     });
   }
 

@@ -13,39 +13,80 @@ class CrisisSlide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stats = [
-      ('Rp286T', AppLocalizations.of(context)!.introCrisisStat2Desc, AppColors.crimson),
-      (AppLocalizations.of(context)!.introCrisisStat2, AppLocalizations.of(context)!.introCrisisStat3Desc, AppColors.amber),
-      (AppLocalizations.of(context)!.introCrisisStat1, AppLocalizations.of(context)!.introCrisisStat1Desc, AppColors.crimson),
+      (
+        'Rp286T',
+        AppLocalizations.of(context)!.introCrisisStat2Desc,
+        AppColors.crimson,
+      ),
+      (
+        AppLocalizations.of(context)!.introCrisisStat2,
+        AppLocalizations.of(context)!.introCrisisStat3Desc,
+        AppColors.amber,
+      ),
+      (
+        AppLocalizations.of(context)!.introCrisisStat1,
+        AppLocalizations.of(context)!.introCrisisStat1Desc,
+        AppColors.crimson,
+      ),
     ];
     return SlideShell(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          EyebrowPill(label: AppLocalizations.of(context)!.introCrisisSubtitle, color: AppColors.crimson),
+          EyebrowPill(
+            label: AppLocalizations.of(context)!.introCrisisSubtitle,
+            color: AppColors.crimson,
+          ),
           const SizedBox(height: 20),
-          Text(AppLocalizations.of(context)!.introCrisisTitle, style: displayStyle(context)),
+          Text(
+            AppLocalizations.of(context)!.introCrisisTitle,
+            style: displayStyle(context),
+          ),
           const SizedBox(height: 14),
           Text(
             AppLocalizations.of(context)!.introCrisisDesc,
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 14, height: 1.5),
+            style: TextStyle(
+              color: AppColors.mutedForeground,
+              fontSize: 14,
+              height: 1.5,
+            ),
           ),
           const SizedBox(height: 24),
-          ...stats.map((s) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: GlassCard(
-                  padding: const EdgeInsets.all(18),
-                  child: Row(children: [
-                    Text(s.$1,
-                        style: TextStyle(color: s.$3, fontSize: 28, fontWeight: FontWeight.w800)),
+          ...stats.map(
+            (s) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: GlassCard(
+                padding: const EdgeInsets.all(18),
+                child: Row(
+                  children: [
+                    Text(
+                      s.$1,
+                      style: TextStyle(
+                        color: s.$3,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                     Container(width: 16),
                     Expanded(
-                        child: Text(s.$2,
-                            style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13, height: 1.4))),
-                  ]),
+                      child: Text(
+                        s.$2,
+                        style: TextStyle(
+                          color: AppColors.mutedForeground,
+                          fontSize: 13,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              )),
-          Text(AppLocalizations.of(context)!.introCrisisSource,
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 11)),
+              ),
+            ),
+          ),
+          Text(
+            AppLocalizations.of(context)!.introCrisisSource,
+            style: TextStyle(color: AppColors.mutedForeground, fontSize: 11),
+          ),
         ],
       ),
     );

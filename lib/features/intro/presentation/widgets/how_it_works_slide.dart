@@ -14,44 +14,88 @@ class HowItWorksSlide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final steps = [
-      ('01', Icons.download, AppLocalizations.of(context)!.introHowItWorksStep1, AppLocalizations.of(context)!.introHowItWorksStep1Desc),
-      ('02', Icons.auto_awesome, AppLocalizations.of(context)!.introHowItWorksStep2, AppLocalizations.of(context)!.introHowItWorksStep2Desc),
-      ('03', Icons.favorite, AppLocalizations.of(context)!.introHowItWorksStep3, AppLocalizations.of(context)!.introHowItWorksStep3Desc),
+      (
+        '01',
+        Icons.download,
+        AppLocalizations.of(context)!.introHowItWorksStep1,
+        AppLocalizations.of(context)!.introHowItWorksStep1Desc,
+      ),
+      (
+        '02',
+        Icons.auto_awesome,
+        AppLocalizations.of(context)!.introHowItWorksStep2,
+        AppLocalizations.of(context)!.introHowItWorksStep2Desc,
+      ),
+      (
+        '03',
+        Icons.favorite,
+        AppLocalizations.of(context)!.introHowItWorksStep3,
+        AppLocalizations.of(context)!.introHowItWorksStep3Desc,
+      ),
     ];
     return SlideShell(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          EyebrowPill(label: AppLocalizations.of(context)!.introHowItWorksSubtitle, color: AppColors.navyLight),
+          EyebrowPill(
+            label: AppLocalizations.of(context)!.introHowItWorksSubtitle,
+            color: AppColors.navyLight,
+          ),
           const SizedBox(height: 20),
-          Text(AppLocalizations.of(context)!.introHowItWorksTitle, style: displayStyle(context)),
+          Text(
+            AppLocalizations.of(context)!.introHowItWorksTitle,
+            style: displayStyle(context),
+          ),
           const SizedBox(height: 24),
-          ...steps.map((s) => Padding(
-                padding: const EdgeInsets.only(bottom: 14),
-                child: GlassCard(
-                  padding: const EdgeInsets.all(18),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      IconChip(icon: s.$2, color: AppColors.crimson),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(s.$1,
-                                style: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.5)),
-                            const SizedBox(height: 4),
-                            Text(s.$3, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
-                            const SizedBox(height: 4),
-                            Text(s.$4, style: TextStyle(color: Colors.white.withValues(alpha: 0.55), fontSize: 13, height: 1.4)),
-                          ],
-                        ),
+          ...steps.map(
+            (s) => Padding(
+              padding: const EdgeInsets.only(bottom: 14),
+              child: GlassCard(
+                padding: const EdgeInsets.all(18),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    IconChip(icon: s.$2, color: AppColors.crimson),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            s.$1,
+                            style: TextStyle(
+                              color: AppColors.mutedForeground,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            s.$3,
+                            style: const TextStyle(
+                              color: AppColors.navy,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            s.$4,
+                            style: TextStyle(
+                              color: AppColors.mutedForeground,
+                              fontSize: 13,
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              )),
+              ),
+            ),
+          ),
         ],
       ),
     );

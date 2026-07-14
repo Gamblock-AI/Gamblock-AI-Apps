@@ -73,7 +73,10 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen>
       _journalCtrl.clear();
       await _fetchReflections();
       if (mounted) {
-        AppFeedback.success(context, AppLocalizations.of(context)!.recoveryJournalSaved);
+        AppFeedback.success(
+          context,
+          AppLocalizations.of(context)!.recoveryJournalSaved,
+        );
       }
     } catch (e) {
       if (mounted) {

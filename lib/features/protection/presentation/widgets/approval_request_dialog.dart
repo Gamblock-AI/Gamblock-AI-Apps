@@ -13,10 +13,13 @@ class ApprovalRequestDialog extends StatelessWidget {
     return AlertDialog(
       title: Text(AppLocalizations.of(context)!.protectionRequestUninstall),
       content: Text(
-          '${AppLocalizations.of(context)!.protectionApprovalDesc} ${AppLocalizations.of(context)!.protectionAppLockedDesc}'),
+        '${AppLocalizations.of(context)!.protectionApprovalDesc} ${AppLocalizations.of(context)!.protectionAppLockedDesc}',
+      ),
       actions: [
         TextButton(
-            onPressed: () => Navigator.pop(context), child: Text(AppLocalizations.of(context)!.cancel)),
+          onPressed: () => Navigator.pop(context),
+          child: Text(AppLocalizations.of(context)!.cancel),
+        ),
         FilledButton(
           onPressed: () async {
             Navigator.pop(context);

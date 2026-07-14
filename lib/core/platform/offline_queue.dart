@@ -46,7 +46,10 @@ class OfflineQueue {
   /// Attempt to flush the queue — send all pending requests
   static Future<int> flush() async {
     final db = await _getDb();
-    final List<Map<String, dynamic>> queue = await db.query('queue', orderBy: 'id ASC');
+    final List<Map<String, dynamic>> queue = await db.query(
+      'queue',
+      orderBy: 'id ASC',
+    );
     if (queue.isEmpty) return 0;
 
     int sent = 0;
@@ -57,7 +60,9 @@ class OfflineQueue {
         final method = item['method'] as String;
         final path = item['path'] as String;
         final dataStr = item['data'] as String?;
-        final data = dataStr != null ? jsonDecode(dataStr) as Map<String, dynamic> : null;
+        final data = dataStr != null
+            ? jsonDecode(dataStr) as Map<String, dynamic>
+            : null;
 
         if (method == 'POST') {
           await ApiClient.dio.post(path, data: data);
@@ -79,7 +84,9 @@ class OfflineQueue {
   /// Get pending queue count
   static Future<int> pendingCount() async {
     final db = await _getDb();
-    final count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM queue'));
+    final count = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM queue'),
+    );
     return count ?? 0;
   }
 

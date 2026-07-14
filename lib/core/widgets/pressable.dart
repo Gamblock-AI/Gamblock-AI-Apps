@@ -23,7 +23,8 @@ class Pressable extends StatefulWidget {
   State<Pressable> createState() => _PressableState();
 }
 
-class _PressableState extends State<Pressable> with SingleTickerProviderStateMixin {
+class _PressableState extends State<Pressable>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scale;
 
@@ -34,9 +35,10 @@ class _PressableState extends State<Pressable> with SingleTickerProviderStateMix
       duration: const Duration(milliseconds: 80),
       vsync: this,
     );
-    _scale = Tween<double>(begin: 1.0, end: widget.scaleDown).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: widget.scaleDown,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
   }
 
   @override

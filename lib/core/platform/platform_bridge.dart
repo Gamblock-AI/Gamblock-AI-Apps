@@ -36,7 +36,9 @@ class PlatformBridge {
   /// Check if Accessibility Service is enabled
   static Future<bool> isAccessibilityEnabled() async {
     try {
-      final result = await _channel.invokeMethod<bool>('isAccessibilityEnabled');
+      final result = await _channel.invokeMethod<bool>(
+        'isAccessibilityEnabled',
+      );
       return result ?? false;
     } catch (_) {
       return false;
@@ -56,7 +58,9 @@ class PlatformBridge {
   /// Request overlay permission (Android)
   static Future<bool> requestOverlayPermission() async {
     try {
-      final result = await _channel.invokeMethod<bool>('requestOverlayPermission');
+      final result = await _channel.invokeMethod<bool>(
+        'requestOverlayPermission',
+      );
       return result ?? false;
     } catch (_) {
       return false;
@@ -66,7 +70,9 @@ class PlatformBridge {
   /// Start local WebSocket server for browser extension IPC (Windows only)
   static Future<bool> startWebSocketServer({int port = 9090}) async {
     try {
-      final result = await _channel.invokeMethod<bool>('startWebSocket', {'port': port});
+      final result = await _channel.invokeMethod<bool>('startWebSocket', {
+        'port': port,
+      });
       return result ?? false;
     } catch (_) {
       return false;

@@ -41,9 +41,14 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen> {
         child: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [AppColors.navyDark, Colors.black],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.navy,
+                AppColors.navyDark,
+                AppColors.crimsonDark,
+              ],
+              stops: [0.0, 0.55, 1.0],
             ),
           ),
           child: Center(
@@ -65,7 +70,12 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen> {
         const SizedBox(height: 28),
         const Text(
           'BERHENTI',
-          style: TextStyle(color: Colors.white, fontSize: 44, fontWeight: FontWeight.w900, letterSpacing: 6),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 44,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 6,
+          ),
         ),
         const SizedBox(height: 14),
         Container(
@@ -77,14 +87,24 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen> {
           ),
           child: Text(
             AppLocalizations.of(context)!.patternInterruptActive.toUpperCase(),
-            style: const TextStyle(color: AppColors.crimsonLight, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.5),
+            style: const TextStyle(
+              color: AppColors.crimsonLight,
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.5,
+            ),
           ),
         ),
         const SizedBox(height: 24),
         Text(
           AppLocalizations.of(context)!.patternBreatheDesc,
           textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 17, height: 1.5, fontWeight: FontWeight.w500),
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.8),
+            fontSize: 17,
+            height: 1.5,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         const SizedBox(height: 36),
         SizedBox(
@@ -99,7 +119,16 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen> {
                 color: AppColors.amber,
                 backgroundColor: Colors.white.withValues(alpha: 0.1),
               ),
-              Center(child: Text('$_count', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800))),
+              Center(
+                child: Text(
+                  '$_count',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -114,14 +143,37 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen> {
         Container(
           width: 88,
           height: 88,
-          decoration: BoxDecoration(color: AppColors.sage.withValues(alpha: 0.15), shape: BoxShape.circle),
-          child: const Icon(Icons.check_circle, color: AppColors.sage, size: 64),
+          decoration: BoxDecoration(
+            color: AppColors.sage.withValues(alpha: 0.15),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.check_circle,
+            color: AppColors.sage,
+            size: 64,
+          ),
         ),
         const SizedBox(height: 24),
-        Text(AppLocalizations.of(context)!.patternInterruptSuccess, textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800, height: 1.15)),
+        Text(
+          AppLocalizations.of(context)!.patternInterruptSuccess,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 26,
+            fontWeight: FontWeight.w800,
+            height: 1.15,
+          ),
+        ),
         const SizedBox(height: 12),
-        Text(AppLocalizations.of(context)!.patternTakeControlDesc,
-            textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 15, height: 1.5)),
+        Text(
+          AppLocalizations.of(context)!.patternTakeControlDesc,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.6),
+            fontSize: 15,
+            height: 1.5,
+          ),
+        ),
         const SizedBox(height: 32),
         SizedBox(
           width: double.infinity,
@@ -129,10 +181,17 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen> {
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.crimson,
               minimumSize: const Size.fromHeight(54),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
             ),
-            onPressed: () => launchUrl(Uri.parse('https://gamblock-ai.vercel.app/education')),
-            child: Text(AppLocalizations.of(context)!.patternContinuePsychoeducation, style: TextStyle(fontWeight: FontWeight.w700)),
+            onPressed: () => launchUrl(
+              Uri.parse('https://gamblock-ai.vercel.app/education'),
+            ),
+            child: Text(
+              AppLocalizations.of(context)!.patternContinuePsychoeducation,
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
           ),
         ),
       ],

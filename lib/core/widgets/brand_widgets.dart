@@ -12,3 +12,6 @@ export 'eyebrow_pill.dart';
 export 'glass_card.dart';
 export 'icon_chip.dart';
 export 'brand_helpers.dart';
+export 'mesh_background.dart';
+export 'section_heading.dart';
+export 'stat_tile.dart';

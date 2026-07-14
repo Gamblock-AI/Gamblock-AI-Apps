@@ -69,10 +69,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<Map<String, dynamic>?> login(String email, String password) async {
     try {
-      final response = await ApiClient.dio.post('/v1/auth/login', data: {
-        'email': email,
-        'password': password,
-      });
+      final response = await ApiClient.dio.post(
+        '/v1/auth/login',
+        data: {'email': email, 'password': password},
+      );
       final data = response.data['data'];
       if (data != null) {
         await ApiClient.saveTokens(
@@ -96,13 +96,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
     return null;
   }
 
-  Future<Map<String, dynamic>?> register(String email, String password, String name) async {
+  Future<Map<String, dynamic>?> register(
+    String email,
+    String password,
+    String name,
+  ) async {
     try {
-      final response = await ApiClient.dio.post('/v1/auth/register', data: {
-        'email': email,
-        'password': password,
-        'name': name,
-      });
+      final response = await ApiClient.dio.post(
+        '/v1/auth/register',
+        data: {'email': email, 'password': password, 'name': name},
+      );
       final data = response.data['data'];
       if (data != null) {
         await ApiClient.saveTokens(

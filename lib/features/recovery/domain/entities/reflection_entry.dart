@@ -18,7 +18,9 @@ class ReflectionEntry {
       id: json['id']?.toString() ?? '',
       text: json['text']?.toString() ?? '',
       mood: json['mood']?.toString() ?? '',
-      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse(json['created_at']?.toString() ?? '') ??
+          DateTime.now(),
     );
   }
 }

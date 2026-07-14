@@ -10,7 +10,11 @@ class MoodTab extends StatefulWidget {
   final RecoveryRepository repository;
   final VoidCallback onSubmitted;
 
-  const MoodTab({super.key, required this.repository, required this.onSubmitted});
+  const MoodTab({
+    super.key,
+    required this.repository,
+    required this.onSubmitted,
+  });
 
   @override
   State<MoodTab> createState() => _MoodTabState();
@@ -33,11 +37,16 @@ class _MoodTabState extends State<MoodTab> {
     final label = _moods[_selected!].$2;
     setState(() => _submitting = true);
     try {
-      await widget.repository
-          .submitReflection(text: 'Mood hari ini: $label', mood: label);
+      await widget.repository.submitReflection(
+        text: 'Mood hari ini: $label',
+        mood: label,
+      );
       widget.onSubmitted();
       if (mounted) {
-        AppFeedback.success(context, AppLocalizations.of(context)!.recoveryMoodLogged);
+        AppFeedback.success(
+          context,
+          AppLocalizations.of(context)!.recoveryMoodLogged,
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -53,11 +62,12 @@ class _MoodTabState extends State<MoodTab> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text(AppLocalizations.of(context)!.recoveryMoodQuestion,
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(color: AppColors.navy)),
+        Text(
+          AppLocalizations.of(context)!.recoveryMoodQuestion,
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(color: AppColors.navy),
+        ),
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -65,18 +75,27 @@ class _MoodTabState extends State<MoodTab> {
             5,
             (i) => GestureDetector(
               onTap: () => setState(() => _selected = i),
-              child: Column(children: [
-                Text(_moods[i].$1,
-                    style: TextStyle(fontSize: _selected == i ? 48 : 36)),
-                const SizedBox(height: 4),
-                Text(_moods[i].$2,
+              child: Column(
+                children: [
+                  Text(
+                    _moods[i].$1,
+                    style: TextStyle(fontSize: _selected == i ? 48 : 36),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _moods[i].$2,
                     style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: _selected == i ? FontWeight.w700 : FontWeight.w500,
-                        color: _selected == i
-                            ? AppColors.navy
-                            : AppColors.navy.withValues(alpha: 0.5))),
-              ]),
+                      fontSize: 11,
+                      fontWeight: _selected == i
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                      color: _selected == i
+                          ? AppColors.navy
+                          : AppColors.navy.withValues(alpha: 0.5),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -85,7 +104,13 @@ class _MoodTabState extends State<MoodTab> {
           onPressed: (_selected != null && !_submitting) ? _submit : null,
           child: _submitting
               ? const SizedBox(
-                  height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
               : Text(AppLocalizations.of(context)!.recoveryLogMood),
         ),
       ],

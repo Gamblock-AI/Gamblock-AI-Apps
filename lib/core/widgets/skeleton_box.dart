@@ -47,7 +47,9 @@ class _SkeletonBoxState extends State<SkeletonBox>
           width: widget.width,
           height: widget.height,
           decoration: BoxDecoration(
-            color: AppColors.navy.withValues(alpha: 0.04 + 0.06 * _controller.value),
+            color: AppColors.navy.withValues(
+              alpha: 0.04 + 0.06 * _controller.value,
+            ),
             borderRadius: widget.borderRadius,
           ),
         );

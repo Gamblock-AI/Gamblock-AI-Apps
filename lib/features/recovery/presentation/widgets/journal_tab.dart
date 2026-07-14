@@ -37,53 +37,66 @@ class JournalTab extends StatelessWidget {
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                Text(AppLocalizations.of(context)!.recoveryWriteJournal,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(color: AppColors.navy)),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: controller,
-                  maxLines: 4,
-                  decoration: InputDecoration(
-                      hintText: AppLocalizations.of(context)!.recoveryJournalHint),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                    children: moods.map((m) {
-                  final selected = mood == m;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(m),
-                      selected: selected,
-                      onSelected: (_) => onMoodChanged(m),
-                      selectedColor: AppColors.navy.withValues(alpha: 0.12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    AppLocalizations.of(context)!.recoveryWriteJournal,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleMedium?.copyWith(color: AppColors.navy),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: controller,
+                    maxLines: 4,
+                    decoration: InputDecoration(
+                      hintText: AppLocalizations.of(
+                        context,
+                      )!.recoveryJournalHint,
                     ),
-                  );
-                }).toList()),
-                const SizedBox(height: 12),
-                FilledButton.icon(
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: moods.map((m) {
+                      final selected = mood == m;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ChoiceChip(
+                          label: Text(m),
+                          selected: selected,
+                          onSelected: (_) => onMoodChanged(m),
+                          selectedColor: AppColors.navy.withValues(alpha: 0.12),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
                     onPressed: onSubmit,
                     icon: const Icon(Icons.send, size: 18),
-                    label: Text(AppLocalizations.of(context)!.save)),
-              ]),
+                    label: Text(AppLocalizations.of(context)!.save),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 16),
-          Text(AppLocalizations.of(context)!.recoveryJournalHistory,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(color: AppColors.navy)),
+          Text(
+            AppLocalizations.of(context)!.recoveryJournalHistory,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(color: AppColors.navy),
+          ),
           const SizedBox(height: 8),
           if (loading)
-            ...List.generate(3, (_) => const Padding(
-                  padding: EdgeInsets.only(bottom: 8),
-                  child: SkeletonBox(width: double.infinity, height: 56),
-                ))
+            ...List.generate(
+              3,
+              (_) => const Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: SkeletonBox(width: double.infinity, height: 56),
+              ),
+            )
           else if (entries.isEmpty)
             EmptyState(
               icon: Icons.menu_book_outlined,
@@ -91,20 +104,29 @@ class JournalTab extends StatelessWidget {
               hint: AppLocalizations.of(context)!.recoveryEmptyJournalDesc,
             )
           else
-            ...entries.map((e) => Card(
-                  child: ListTile(
-                    leading: CircleAvatar(
-                        backgroundColor: AppColors.sage.withValues(alpha: 0.1),
-                        child: Text('J', style: TextStyle(color: AppColors.sage))),
-                    title: Text(e.text,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 14)),
-                    subtitle: Text(e.mood,
-                        style: TextStyle(
-                            fontSize: 12, color: AppColors.navy.withValues(alpha: 0.5))),
+            ...entries.map(
+              (e) => Card(
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: AppColors.sage.withValues(alpha: 0.1),
+                    child: Text('J', style: TextStyle(color: AppColors.sage)),
                   ),
-                )),
+                  title: Text(
+                    e.text,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  subtitle: Text(
+                    e.mood,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.navy.withValues(alpha: 0.5),
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

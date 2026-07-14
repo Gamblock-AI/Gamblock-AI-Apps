@@ -12,13 +12,16 @@ class RecoveryRepositoryImpl implements RecoveryRepository {
   @override
   Future<List<ReflectionEntry>> fetchReflections() async {
     final response = await _dio.get('/v1/reflections');
-    return ApiResponse.list(response)
-        .map((e) => ReflectionEntry.fromJson(e))
-        .toList();
+    return ApiResponse.list(
+      response,
+    ).map((e) => ReflectionEntry.fromJson(e)).toList();
   }
 
   @override
-  Future<void> submitReflection({required String text, required String mood}) async {
+  Future<void> submitReflection({
+    required String text,
+    required String mood,
+  }) async {
     await _dio.post('/v1/reflections', data: {'text': text, 'mood': mood});
   }
 }

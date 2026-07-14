@@ -30,10 +30,13 @@ class ProtectionRepositoryImpl implements ProtectionRepository {
     required String reason,
     required int durationMinutes,
   }) async {
-    await _dio.post('/v1/approval-requests', data: {
-      'action': action,
-      'reason': reason,
-      'requested_duration_minutes': durationMinutes,
-    });
+    await _dio.post(
+      '/v1/approval-requests',
+      data: {
+        'action': action,
+        'reason': reason,
+        'requested_duration_minutes': durationMinutes,
+      },
+    );
   }
 }
