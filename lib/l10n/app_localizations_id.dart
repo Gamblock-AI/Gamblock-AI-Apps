@@ -528,4 +528,62 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get msgErrSendInvite => 'Gagal mengirim undangan pendamping.';
+
+  @override
+  String get msgErrDevLogin => 'Gagal masuk sebagai pengguna demo.';
+
+  @override
+  String get msgErrGoogleTokenRequired => 'Token Google wajib diisi.';
+
+  @override
+  String get msgErrCreateDevice => 'Gagal mendaftarkan perangkat.';
+
+  @override
+  String get msgErrUpdateDevice => 'Gagal memperbarui perangkat.';
+
+  @override
+  String get msgErrHeartbeat => 'Gagal mengirim sinyal aktif perangkat.';
+
+  @override
+  String get msgErrActionRequired => 'Jenis tindakan wajib dipilih.';
+
+  @override
+  String get msgErrInvalidMission => 'Nomor misi harus 1-5.';
+
+  @override
+  String get msgErrTextRequired => 'Teks refleksi wajib diisi.';
+
+  @override
+  String get msgErrTokenRequired => 'Token validasi wajib diisi.';
+
+  @override
+  String get msgErrInvalidInput =>
+      'Token dan status (approved/denied) wajib diisi.';
+
+  @override
+  String get msgErrSummaryRequired => 'Ringkasan tiket wajib diisi.';
+
+  @override
+  String get msgErrTypeRequired => 'Jenis permintaan wajib dipilih.';
+
+  @override
+  String get msgErrLoadAdminModules => 'Gagal memuat modul admin.';
+
+  @override
+  String get msgErrLoadAdminModelReleases => 'Gagal memuat rilis model.';
+
+  @override
+  String get msgErrLoadAdminSupportCases => 'Gagal memuat tiket admin.';
+
+  @override
+  String get msgErrCreateModelRelease => 'Gagal merilis model.';
+
+  @override
+  String get msgErrCreateRulesetRelease => 'Gagal merilis ruleset.';
+
+  @override
+  String get msgErrCreateNetworkRelease => 'Gagal merilis ruleset jaringan.';
+
+  @override
+  String get msgErrEmergencyKeyRequired => 'Kunci darurat wajib diisi.';
 }

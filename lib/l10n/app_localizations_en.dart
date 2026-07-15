@@ -528,4 +528,66 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get msgErrSendInvite => 'Gagal mengirim undangan pendamping.';
+
+  @override
+  String get msgErrDevLogin => 'Failed to sign in as the demo user.';
+
+  @override
+  String get msgErrGoogleTokenRequired => 'A Google token is required.';
+
+  @override
+  String get msgErrCreateDevice => 'Failed to register the device.';
+
+  @override
+  String get msgErrUpdateDevice => 'Failed to update the device.';
+
+  @override
+  String get msgErrHeartbeat => 'Failed to send the device heartbeat.';
+
+  @override
+  String get msgErrActionRequired => 'Please select an action type.';
+
+  @override
+  String get msgErrInvalidMission =>
+      'The mission number must be between 1 and 5.';
+
+  @override
+  String get msgErrTextRequired => 'Reflection text is required.';
+
+  @override
+  String get msgErrTokenRequired => 'A validation token is required.';
+
+  @override
+  String get msgErrInvalidInput =>
+      'A token and status (approved/denied) are required.';
+
+  @override
+  String get msgErrSummaryRequired => 'A ticket summary is required.';
+
+  @override
+  String get msgErrTypeRequired => 'Please select a request type.';
+
+  @override
+  String get msgErrLoadAdminModules => 'Failed to load admin modules.';
+
+  @override
+  String get msgErrLoadAdminModelReleases => 'Failed to load model releases.';
+
+  @override
+  String get msgErrLoadAdminSupportCases =>
+      'Failed to load admin support tickets.';
+
+  @override
+  String get msgErrCreateModelRelease => 'Failed to create the model release.';
+
+  @override
+  String get msgErrCreateRulesetRelease =>
+      'Failed to create the ruleset release.';
+
+  @override
+  String get msgErrCreateNetworkRelease =>
+      'Failed to create the network ruleset release.';
+
+  @override
+  String get msgErrEmergencyKeyRequired => 'An emergency key is required.';
 }

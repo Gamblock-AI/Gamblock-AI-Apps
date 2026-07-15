@@ -1,20 +1,24 @@
 # Gamblock AI — Flutter Client (Android & Windows)
 
-Lightweight protection client for Gamblock AI. It runs the on-device AI
-classifier, executes blocking + Pattern Interrupt, manages group-code linking,
-and keeps the Windows Service / Android Accessibility Service alive.
+Flutter protection-client prototype for Gamblock AI. It contains the UI,
+group-code/recovery flows, platform bridges, and contracts for on-device
+classification and native protection. See the capability notes below before
+assuming a contract or native source file is wired end to end.
 
-> The AI model is a separate artifact (PRD §1.3). The runtime integration
-> contract lives in `lib/core/platform/ai_inference_stub.dart`.
+> The PKM proposal requires a locally trained/evaluated URL-rule + BoW +
+> Logistic Regression artifact pipeline. The current runtime contract lives in
+> `lib/core/platform/ai_inference_stub.dart` and is not wired.
 
 ## Run
 
 ```sh
+cp .env.example .env
 flutter pub get
 flutter run                 # or: flutter run -d windows / -d <android-device>
 ```
 
-Minimum: Flutter 3.8 / Dart 3.8 (see `pubspec.yaml`).
+The project pins Flutter `3.41.9` via `.fvmrc` and CI. Dart constraints live in
+`pubspec.yaml`.
 
 ## Architecture (clean architecture, feature-first)
 
@@ -49,20 +53,34 @@ Windows). `.env` is gitignored and holds configuration only — never secrets.
 
 - `platform_bridge.dart` — MethodChannel `com.gamblock/protection` to the native
   Android Accessibility Service and Windows Service. All calls tolerate a
-  missing native handler (PRD §3.2).
+  missing native handler (current prototype behavior).
 - `ai_inference_stub.dart` — **integration contract** for the on-device Logistic
-  Regression model. Threshold 0.72; input = DOM text; output = probability.
-  Replace the bodies of `loadModel`/`classify` only.
-- `local_notification_scheduler.dart` — daily reminder trigger (PRD §7.2). NOTE:
+  Regression model. Threshold 0.72 is an uncalibrated engineering baseline;
+  its DOM-only contract is incomplete relative to proposal-required URL rules
+  + DOM/BoW. It is not currently loaded or called by the app.
+- `local_notification_scheduler.dart` — supporting daily reminder trigger. NOTE:
   in-process `Timer`; full reliability needs `flutter_local_notifications`.
-- `offline_queue.dart` — pending-request queue, flushes on reconnect (PRD §6.3).
+- `offline_queue.dart` — supporting pending-request queue, flushes on reconnect.
 - `asset_downloader.dart` — downloads Pattern Interrupt assets on first launch.
 
 ## Native
 
-- Android: Accessibility Service for anti-uninstall (PRD §3.2).
-- Windows: `windows/runner/gamblock_service.{h,cpp}` — LocalSystem service,
-  auto-restart hardening, process + window-title monitoring, and the
-  authenticated WebSocket server (port 9090) for the browser extension.
+- Android: Accessibility Service target for protection/accountability per the
+  proposal; real-device runtime evidence remains required.
+- Windows: `windows/runner/gamblock_service.{h,cpp}` is a prototype for the
+  LocalSystem service and authenticated loopback WebSocket. It is not included
+  in the current runner CMake target, so the extension-to-service flow is not
+  yet end-to-end active.
 
-See the root `AGENTS.md` for the end-to-end architecture and PRD alignment.
+## Validate
+
+```sh
+./scripts/verify.sh
+./scripts/verify-ai-context.sh
+```
+
+`verify.sh` runs `flutter analyze` only. Dependency installation, tests, and
+Android/Windows builds run only when explicitly requested by the user.
+
+`AGENTS.md` and `docs/ai/README.md` are self-contained contributor and AI
+context for a standalone clone.

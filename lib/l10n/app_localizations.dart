@@ -1081,6 +1081,120 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Gagal mengirim undangan pendamping.'**
   String get msgErrSendInvite;
+
+  /// No description provided for @msgErrDevLogin.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal masuk sebagai pengguna demo.'**
+  String get msgErrDevLogin;
+
+  /// No description provided for @msgErrGoogleTokenRequired.
+  ///
+  /// In id, this message translates to:
+  /// **'Token Google wajib diisi.'**
+  String get msgErrGoogleTokenRequired;
+
+  /// No description provided for @msgErrCreateDevice.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal mendaftarkan perangkat.'**
+  String get msgErrCreateDevice;
+
+  /// No description provided for @msgErrUpdateDevice.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal memperbarui perangkat.'**
+  String get msgErrUpdateDevice;
+
+  /// No description provided for @msgErrHeartbeat.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal mengirim sinyal aktif perangkat.'**
+  String get msgErrHeartbeat;
+
+  /// No description provided for @msgErrActionRequired.
+  ///
+  /// In id, this message translates to:
+  /// **'Jenis tindakan wajib dipilih.'**
+  String get msgErrActionRequired;
+
+  /// No description provided for @msgErrInvalidMission.
+  ///
+  /// In id, this message translates to:
+  /// **'Nomor misi harus 1-5.'**
+  String get msgErrInvalidMission;
+
+  /// No description provided for @msgErrTextRequired.
+  ///
+  /// In id, this message translates to:
+  /// **'Teks refleksi wajib diisi.'**
+  String get msgErrTextRequired;
+
+  /// No description provided for @msgErrTokenRequired.
+  ///
+  /// In id, this message translates to:
+  /// **'Token validasi wajib diisi.'**
+  String get msgErrTokenRequired;
+
+  /// No description provided for @msgErrInvalidInput.
+  ///
+  /// In id, this message translates to:
+  /// **'Token dan status (approved/denied) wajib diisi.'**
+  String get msgErrInvalidInput;
+
+  /// No description provided for @msgErrSummaryRequired.
+  ///
+  /// In id, this message translates to:
+  /// **'Ringkasan tiket wajib diisi.'**
+  String get msgErrSummaryRequired;
+
+  /// No description provided for @msgErrTypeRequired.
+  ///
+  /// In id, this message translates to:
+  /// **'Jenis permintaan wajib dipilih.'**
+  String get msgErrTypeRequired;
+
+  /// No description provided for @msgErrLoadAdminModules.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal memuat modul admin.'**
+  String get msgErrLoadAdminModules;
+
+  /// No description provided for @msgErrLoadAdminModelReleases.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal memuat rilis model.'**
+  String get msgErrLoadAdminModelReleases;
+
+  /// No description provided for @msgErrLoadAdminSupportCases.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal memuat tiket admin.'**
+  String get msgErrLoadAdminSupportCases;
+
+  /// No description provided for @msgErrCreateModelRelease.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal merilis model.'**
+  String get msgErrCreateModelRelease;
+
+  /// No description provided for @msgErrCreateRulesetRelease.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal merilis ruleset.'**
+  String get msgErrCreateRulesetRelease;
+
+  /// No description provided for @msgErrCreateNetworkRelease.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal merilis ruleset jaringan.'**
+  String get msgErrCreateNetworkRelease;
+
+  /// No description provided for @msgErrEmergencyKeyRequired.
+  ///
+  /// In id, this message translates to:
+  /// **'Kunci darurat wajib diisi.'**
+  String get msgErrEmergencyKeyRequired;
 }
 
 class _AppLocalizationsDelegate
