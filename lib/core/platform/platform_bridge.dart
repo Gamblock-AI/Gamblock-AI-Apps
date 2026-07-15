@@ -11,6 +11,13 @@ import 'package:flutter/services.dart';
 /// MissingPluginException escape to the caller — catch it here.
 class PlatformBridge {
   static const _channel = MethodChannel('com.gamblock/protection');
+  static const _eventChannel = EventChannel('com.gamblock/intervention');
+
+  /// Listen for intervention events from native platform
+  /// The native service (Windows/Android) sends an event when a block occurs
+  static Stream<void> onInterventionTriggered() {
+    return _eventChannel.receiveBroadcastStream().map((_) {});
+  }
 
   /// Check if Gamblock service is running (Windows) or
   /// Accessibility Service is enabled (Android)
@@ -83,6 +90,28 @@ class PlatformBridge {
   static Future<bool> enableAntiUninstall() async {
     try {
       final result = await _channel.invokeMethod<bool>('enableAntiUninstall');
+      return result ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Disable anti-uninstall protection (requires approved accountability request)
+  static Future<bool> disableAntiUninstall() async {
+    try {
+      final result = await _channel.invokeMethod<bool>('disableAntiUninstall');
+      return result ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Pause protection temporarily (requires approved accountability request)
+  static Future<bool> pauseProtection(int durationMinutes) async {
+    try {
+      final result = await _channel.invokeMethod<bool>('pauseProtection', {
+        'duration_minutes': durationMinutes,
+      });
       return result ?? false;
     } catch (_) {
       return false;

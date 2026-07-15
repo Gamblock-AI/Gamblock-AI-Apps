@@ -186,7 +186,8 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen> {
               ),
             ),
             onPressed: () => launchUrl(
-              Uri.parse('https://gamblock-ai.vercel.app/education'),
+              Uri.parse('https://gamblock-ai.vercel.app/id/post-intervention?source=pattern_interrupt'),
+              mode: LaunchMode.externalApplication,
             ),
             child: Text(
               AppLocalizations.of(context)!.patternContinuePsychoeducation,

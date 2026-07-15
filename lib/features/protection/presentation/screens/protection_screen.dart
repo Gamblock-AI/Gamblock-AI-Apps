@@ -47,6 +47,15 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
     try {
       final status = await repo.fetchStatus();
       final summary = await repo.fetchSummary();
+      
+      // Auto-apply approved actions
+      final requests = await repo.fetchPendingApprovals();
+      for (final req in requests) {
+        if (req.status == 'approved' || req.status == 'Partner notified') {
+          await repo.applyApprovedAction(req);
+        }
+      }
+
       setState(() {
         _status = status;
         _summary = summary;

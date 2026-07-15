@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/theme/app_theme.dart';
 import '../core/auth/auth_state.dart';
 import '../core/network/api_client.dart';
+import '../core/platform/platform_bridge.dart';
 import 'router.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -15,10 +17,24 @@ class GamblockApp extends ConsumerStatefulWidget {
 }
 
 class _GamblockAppState extends ConsumerState<GamblockApp> {
+  StreamSubscription? _interventionSub;
+
   @override
   void initState() {
     super.initState();
     ApiClient.init();
+    
+    // Listen for native detection triggers to handoff to Pattern Interrupt
+    _interventionSub = PlatformBridge.onInterventionTriggered().listen((_) {
+      final router = ref.read(routerProvider);
+      router.go('/pattern-interrupt');
+    });
+  }
+
+  @override
+  void dispose() {
+    _interventionSub?.cancel();
+    super.dispose();
   }
 
   @override
