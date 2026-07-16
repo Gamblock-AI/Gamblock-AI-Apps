@@ -37,6 +37,25 @@ class AppConfig {
     return v.isNotEmpty ? v : 'https://gamblock-ai.vercel.app';
   }
 
+  /// Public web dashboard base URL used for recovery hand-offs.
+  static String get webBaseUrl {
+    final v = _env('WEB_BASE_URL');
+    return v.isNotEmpty ? v : 'https://gamblock-ai.vercel.app';
+  }
+
+  static Uri webUri(
+    String path, {
+    Map<String, String> queryParameters = const {},
+  }) {
+    final base = Uri.parse(
+      webBaseUrl.endsWith('/') ? webBaseUrl : '$webBaseUrl/',
+    );
+    final resolved = base.resolve(path.replaceFirst(RegExp(r'^/'), ''));
+    return resolved.replace(
+      queryParameters: queryParameters.isEmpty ? null : queryParameters,
+    );
+  }
+
   /// Raw APP_ENV value from `.env` (e.g. "development", "production").
   static String get appEnv => _env('APP_ENV');
 

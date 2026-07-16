@@ -47,7 +47,9 @@ a repository via a Riverpod provider. See `AGENTS.md` for the full rules.
 
 Copy `.env.example` to `.env` and set `API_BASE_URL` for your target
 (`http://10.0.2.2:8080` for the Android emulator, `http://localhost:8080` for
-Windows). `.env` is gitignored and holds configuration only — never secrets.
+Windows). Set `WEB_BASE_URL` to the locale-aware Next.js origin used for
+education and the post-intervention handoff. `.env` is gitignored and holds
+configuration only — never secrets.
 
 ### `core/platform/` — the protection layer
 
@@ -61,6 +63,9 @@ Windows). `.env` is gitignored and holds configuration only — never secrets.
 - `local_notification_scheduler.dart` — supporting daily reminder trigger. NOTE:
   in-process `Timer`; full reliability needs `flutter_local_notifications`.
 - `offline_queue.dart` — supporting pending-request queue, flushes on reconnect.
+  It also coalesces allowed client events into UTC daily totals and sends only
+  completed days through `/v1/client/aggregate-events` with idempotency keys;
+  it never stores or sends browsing context.
 - `asset_downloader.dart` — downloads Pattern Interrupt assets on first launch.
 
 ## Native
@@ -71,6 +76,11 @@ Windows). `.env` is gitignored and holds configuration only — never secrets.
   LocalSystem service and authenticated loopback WebSocket. It is not included
   in the current runner CMake target, so the extension-to-service flow is not
   yet end-to-end active.
+
+The active Pattern Interrupt route records a privacy-safe daily
+`intervention_shown` aggregate and can open the web grounding route with only
+the locale and `source=pattern_interrupt`. Settings education links use the
+same configured web origin.
 
 ## Validate
 

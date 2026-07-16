@@ -39,6 +39,13 @@ class AppMessages {
         return loc.msgErrUpdateDevice;
       case 'heartbeat_failed':
         return loc.msgErrHeartbeat;
+      case 'dashboard_summary_failed':
+      case 'protection_status_failed':
+      case 'progress_snapshot_failed':
+      case 'aggregate_event_rejected':
+      case 'profile_not_found':
+      case 'profile_update_failed':
+        return loc.msgErrGeneric;
       case 'partner_email_required':
         return loc.msgErrPartnerEmailRequired;
       case 'fetch_partners_failed':
@@ -129,6 +136,10 @@ class AppMessages {
         return loc.msgErrCreateNetworkRelease;
       case 'release_not_found':
         return loc.msgErrReleaseNotFound;
+      case 'release_validation_failed':
+      case 'artifact_unavailable':
+      case 'portal_overview_failed':
+        return loc.msgErrGeneric;
       case 'generate_key_failed':
         return loc.msgErrCreateEmergencyKey;
       case 'emergency_key_required':

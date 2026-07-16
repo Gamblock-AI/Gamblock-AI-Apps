@@ -44,6 +44,9 @@ Future<void> _initPlatformServices() async {
 
   // Flush offline queue if any pending requests (PRD §6.3 offline reliability)
   await _safe(OfflineQueue.flush);
+  await _safe(() async {
+    await OfflineQueue.flushCompletedDailyAggregates();
+  });
 }
 
 /// Runs [action] and swallows exceptions, logging them to the debug console.

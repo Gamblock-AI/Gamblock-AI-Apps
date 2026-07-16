@@ -5,6 +5,7 @@ import '../core/theme/app_theme.dart';
 import '../core/auth/auth_state.dart';
 import '../core/network/api_client.dart';
 import '../core/platform/platform_bridge.dart';
+import '../core/platform/offline_queue.dart';
 import 'router.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -23,9 +24,11 @@ class _GamblockAppState extends ConsumerState<GamblockApp> {
   void initState() {
     super.initState();
     ApiClient.init();
-    
+
     // Listen for native detection triggers to handoff to Pattern Interrupt
     _interventionSub = PlatformBridge.onInterventionTriggered().listen((_) {
+      unawaited(OfflineQueue.recordDailyAggregate('intervention_shown'));
+      unawaited(OfflineQueue.flushCompletedDailyAggregates());
       final router = ref.read(routerProvider);
       router.go('/pattern-interrupt');
     });

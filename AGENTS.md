@@ -1,6 +1,6 @@
 # Gamblock-AI Flutter Client Agent Rules
 
-Context version: `2026-07-15.2`
+Context version: `2026-07-16.4`
 
 This standalone repository contains the Android and Windows protection client.
 Read `docs/ai/README.md` before changing behavior; it distinguishes working
@@ -16,6 +16,11 @@ capabilities from stubs and target architecture.
   Windows hardening uses SCM recovery; Android uses Accessibility Service.
 - The client may send aggregate events only. Journal/error catalog contracts
   must stay aligned with the backend and website.
+- `WEB_BASE_URL` is the only web-origin source for education and recovery
+  handoffs. Pattern Interrupt may send only locale plus the fixed source
+  category—never detected context.
+- Offline aggregate rows contain only an allowlisted category, UTC date,
+  bounded count, optional owned device ID, and deterministic idempotency key.
 
 ## Start and finish
 

@@ -1,6 +1,6 @@
 # Flutter Client AI Context
 
-Context version: `2026-07-15.2`
+Context version: `2026-07-16.4`
 
 ## Product capsule
 
@@ -23,10 +23,10 @@ the device; the backend receives aggregate events only.
 |---|---|---|
 | Auth/onboarding/dashboard/recovery UI and data layers | Implemented prototype | repository and widget tests cover selected paths |
 | Model integration contract | Stub, not wired | `AIInferenceStub` has no loading/classification call path |
-| Pattern Interrupt screen | Implemented UI | native detection-to-screen trigger still needs end-to-end proof |
+| Pattern Interrupt screen and web handoff | Implemented runtime path | app listens to the native event, opens the intervention screen, records only a daily safe aggregate, and can launch the configured privacy-safe web route; real-device detection proof remains required |
 | Android protection bridge | Prototype | platform calls are best-effort and require device validation |
 | Windows service/WebSocket | Stub, not built | service source is absent from runner CMake target |
-| Offline queue/reminder/asset helpers | Prototype | background reliability is not fully platform-scheduled |
+| Offline queue/reminder/asset helpers | Prototype | completed UTC days are sent as allowlisted idempotent aggregate events; background reliability is not fully platform-scheduled |
 
 Target architecture in comments or proposal documents does not change these
 states. Update the table only with code, wiring, and verification evidence.

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../core/config/app_config.dart';
 import '../../core/auth/auth_state.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/brand_widgets.dart';
@@ -116,7 +117,9 @@ class SettingsScreen extends ConsumerWidget {
               AppLocalizations.of(context)!.settingsOpenPsychoeducation,
             ),
             onTap: () => launchUrl(
-              Uri.parse('https://gamblock-ai.vercel.app/education'),
+              AppConfig.webUri(
+                '${Localizations.localeOf(context).languageCode}/education',
+              ),
             ),
           ),
           const Divider(height: 1),

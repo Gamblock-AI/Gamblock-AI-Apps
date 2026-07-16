@@ -1,6 +1,7 @@
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/config/app_config.dart';
 import '../../../../core/theme/app_colors.dart';
 
 /// Pattern Interrupt — dark cinematic intervention screen.
@@ -186,7 +187,10 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen> {
               ),
             ),
             onPressed: () => launchUrl(
-              Uri.parse('https://gamblock-ai.vercel.app/id/post-intervention?source=pattern_interrupt'),
+              AppConfig.webUri(
+                '${Localizations.localeOf(context).languageCode}/post-intervention',
+                queryParameters: const {'source': 'pattern_interrupt'},
+              ),
               mode: LaunchMode.externalApplication,
             ),
             child: Text(

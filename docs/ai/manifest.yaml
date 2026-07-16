@@ -1,5 +1,5 @@
 schema_version: 1
-context_version: 2026-07-15.2
+context_version: 2026-07-16.4
 component: flutter
 contracts:
   proposal_authority: 1
@@ -8,6 +8,7 @@ contracts:
   privacy_boundary: 1
   websocket_loopback: 1
   api_error_catalog: 1
+  client_daily_aggregate: 1
 canonical_instruction: AGENTS.md
 proposal_requirements:
   - PKM-PLAT-001
