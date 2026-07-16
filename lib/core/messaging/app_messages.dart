@@ -35,6 +35,9 @@ class AppMessages {
         return loc.msgErrLogout;
       case 'device_create_failed':
         return loc.msgErrCreateDevice;
+      case 'device_id_required':
+      case 'client_instance_required':
+        return loc.msgErrCreateDevice;
       case 'device_update_failed':
         return loc.msgErrUpdateDevice;
       case 'heartbeat_failed':
@@ -45,7 +48,16 @@ class AppMessages {
       case 'aggregate_event_rejected':
       case 'profile_not_found':
       case 'profile_update_failed':
+      case 'password_update_failed':
+      case 'analytics_period_invalid':
+      case 'protection_analytics_failed':
         return loc.msgErrGeneric;
+      case 'password_validation_failed':
+        return loc.msgErrPasswordValidation;
+      case 'current_password_invalid':
+        return loc.msgErrCurrentPasswordInvalid;
+      case 'password_reuse_not_allowed':
+        return loc.msgErrPasswordReuse;
       case 'partner_email_required':
         return loc.msgErrPartnerEmailRequired;
       case 'fetch_partners_failed':
@@ -68,6 +80,8 @@ class AppMessages {
         return loc.msgErrApproveRequest;
       case 'approval_deny_failed':
         return loc.msgErrRejectRequest;
+      case 'approval_apply_failed':
+        return loc.msgErrSubmitRequest;
       case 'name_required':
         return loc.msgErrGroupNameRequired;
       case 'create_org_failed':
@@ -142,6 +156,10 @@ class AppMessages {
         return loc.msgErrGeneric;
       case 'generate_key_failed':
         return loc.msgErrCreateEmergencyKey;
+      case 'emergency_request_failed':
+      case 'emergency_request_not_found':
+      case 'emergency_review_failed':
+        return loc.msgErrCreateEmergencyKey;
       case 'emergency_key_required':
         return loc.msgErrEmergencyKeyRequired;
       case 'invalid_key':
@@ -164,10 +182,10 @@ class AppMessages {
       return error.toString();
     }
 
+    if (code != null) return forCode(context, code);
     if (backendMessage != null && backendMessage.trim().isNotEmpty) {
       return backendMessage;
     }
-    if (code != null) return forCode(context, code);
     if (status != null) return _statusMessage(context, status);
     return generic(context);
   }

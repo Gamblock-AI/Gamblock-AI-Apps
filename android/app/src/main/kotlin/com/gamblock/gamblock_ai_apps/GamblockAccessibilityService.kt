@@ -2,178 +2,276 @@ package com.gamblock.gamblock_ai_apps
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
-import androidx.core.app.NotificationCompat
+import java.util.ArrayDeque
+import java.util.concurrent.Executors
 
-/**
- * Gamblock Accessibility Service
- * - Prevents app uninstall/modification
- * - Monitors package installs for gambling apps
- * - Prevents force-stop of Gamblock
- */
 class GamblockAccessibilityService : AccessibilityService() {
-
     companion object {
         const val CHANNEL_ID = "gamblock_protection"
         const val NOTIFICATION_ID = 1001
+        private val supportedBrowsers = setOf(
+            "com.android.chrome",
+            "com.microsoft.emmx",
+        )
+        private val settingsPackages = setOf(
+            "com.android.settings",
+            "com.google.android.packageinstaller",
+            "com.android.packageinstaller",
+        )
+        private val urlResourceIds = listOf(
+            "com.android.chrome:id/url_bar",
+            "com.microsoft.emmx:id/url_bar",
+            "com.microsoft.emmx:id/location_bar_edit_text",
+        )
     }
+
+    private val worker = Executors.newSingleThreadExecutor()
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private lateinit var classifier: HybridClassifier
+    private lateinit var aggregateStore: DailyAggregateStore
+    private lateinit var stateStore: ProtectionStateStore
+    private lateinit var overlay: PatternInterruptOverlay
+    private lateinit var artifactUpdater: ArtifactUpdater
+    private var lastSignature = 0
+    private var lastDecisionAt = 0L
+    private var pendingScan: Runnable? = null
 
     override fun onServiceConnected() {
         super.onServiceConnected()
-        val info = AccessibilityServiceInfo().apply {
+        serviceInfo = AccessibilityServiceInfo().apply {
             eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED or
-                         AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED or
-                         AccessibilityEvent.TYPE_VIEW_CLICKED
+                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED or
+                AccessibilityEvent.TYPE_VIEW_CLICKED
             feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC
-            notificationTimeout = 100
+            notificationTimeout = 250
             flags = AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or
-                    AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
+                AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
         }
-        serviceInfo = info
-        showPersistentNotification()
+        classifier = HybridClassifier(applicationContext)
+        aggregateStore = DailyAggregateStore(applicationContext)
+        stateStore = ProtectionStateStore(applicationContext)
+        overlay = PatternInterruptOverlay(this, NativeConfig.webBaseUrl(this))
+        artifactUpdater = ArtifactUpdater(applicationContext, classifier, aggregateStore)
+        if (classifier.load()) {
+            stateStore.setStatus("active")
+        } else {
+            stateStore.setStatus("degraded", "artifact_invalid")
+        }
+        HealthNotificationPreferences.show(this)
+        NativeEventBus.emit(snapshotEvent())
+        scheduleArtifactUpdate()
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null) return
-
-        when (event.eventType) {
-            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
-                // Check if user is trying to open app settings to uninstall
-                checkUninstallAttempt(event)
-                // Check opened app for gambling
-                checkGamblingApp(event)
-            }
-            AccessibilityEvent.TYPE_VIEW_CLICKED -> {
-                // Intercept clicks on "Uninstall" / "Force Stop" buttons
-                interceptDangerousClicks(event)
-            }
-        }
-    }
-
-    private fun checkUninstallAttempt(event: AccessibilityEvent) {
         val packageName = event.packageName?.toString() ?: return
-        // Block access to Settings > Apps for Gamblock and partner apps
-        if (packageName == "com.android.settings" ||
-            packageName == "com.google.android.packageinstaller") {
-            // Monitor for our package in uninstall screens
-            val root = rootInActiveWindow ?: return
-            findAndBlockDangerousButtons(root)
+        if (packageName in settingsPackages) {
+            inspectTamperScreen()
+            return
         }
+        if (packageName !in supportedBrowsers) return
+        scheduleBrowserScan(event)
     }
 
-    private fun findAndBlockDangerousButtons(node: AccessibilityNodeInfo) {
-        val dangerousTexts = listOf("Uninstall", "Force stop", "Clear data", "Disable")
-        for (dangerous in dangerousTexts) {
-            val buttons = node.findAccessibilityNodeInfosByText(dangerous)
-            for (button in buttons) {
-                // Check if this button targets Gamblock
-                val parent = button.parent
-                if (parent != null) {
-                    val contentDesc = parent.contentDescription?.toString() ?: ""
-                    if (contentDesc.contains("Gamblock", true) ||
-                        contentDesc.contains("gamblock", true)) {
-                        // Block the action and show warning
-                        button.isClickable = false
-                        button.isEnabled = false
-                        showBlockNotification("Tindakan '$dangerous' diblokir. Hubungi Kepala grup Anda.")
+    private fun scheduleBrowserScan(event: AccessibilityEvent) {
+        if (stateStore.activeGrant() != null) {
+            stateStore.setStatus("paused")
+            NativeEventBus.emit(snapshotEvent())
+            return
+        }
+        pendingScan?.let(mainHandler::removeCallbacks)
+        val runnable = Runnable {
+            val input = extractSignals(event, rootInActiveWindow)
+            if (input == null) {
+                stateStore.setStatus("degraded", "signal_unavailable")
+                NativeEventBus.emit(snapshotEvent())
+                return@Runnable
+            }
+            worker.execute {
+                val result = classifier.classify(input)
+                val signature = listOf(input.url, input.title, input.headings, input.anchorTexts).hashCode()
+                val now = System.currentTimeMillis()
+                if (signature == lastSignature && now - lastDecisionAt < 2500) {
+                    return@execute
+                }
+                lastSignature = signature
+                lastDecisionAt = now
+                stateStore.setStatus("active")
+                stateStore.setLastEventNow()
+                if (result.decision == "block") {
+                    aggregateStore.increment("block_count_sync")
+                    aggregateStore.increment("intervention_shown")
+                    mainHandler.post {
                         performGlobalAction(GLOBAL_ACTION_BACK)
-                        return
+                        overlay.showIntervention()
+                        NativeEventBus.emit(
+                            mapOf(
+                                "type" to "intervention_shown",
+                                "reason_code" to result.reasonCode,
+                                "model_version" to result.modelVersion,
+                                "ruleset_version" to result.rulesetVersion,
+                                "native_overlay" to true,
+                            ),
+                        )
                     }
+                } else {
+                    NativeEventBus.emit(snapshotEvent())
                 }
             }
         }
+        pendingScan = runnable
+        mainHandler.postDelayed(runnable, 500)
     }
 
-    private fun checkGamblingApp(event: AccessibilityEvent) {
-        val packageName = event.packageName?.toString() ?: return
-        val pm = packageManager
-
-        try {
-            val appInfo = pm.getApplicationInfo(packageName, 0)
-            val appName = pm.getApplicationLabel(appInfo).toString()
-
-            if (isGamblingApp(packageName, appName)) {
-                // Immediately close the gambling app
-                performGlobalAction(GLOBAL_ACTION_BACK)
-                performGlobalAction(GLOBAL_ACTION_HOME)
-
-                // Show Pattern Interrupt
-                val intent = Intent(this, MainActivity::class.java).apply {
-                    putExtra("pattern_interrupt", true)
-                    putExtra("blocked_package", packageName)
-                    putExtra("blocked_app", appName)
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                }
-                startActivity(intent)
+    private fun extractSignals(
+        event: AccessibilityEvent,
+        root: AccessibilityNodeInfo?,
+    ): ClassificationInput? {
+        if (root == null) return null
+        var url = ""
+        for (resourceId in urlResourceIds) {
+            val node = root.findAccessibilityNodeInfosByViewId(resourceId).firstOrNull()
+            val value = node?.text?.toString()?.trim().orEmpty()
+            if (value.isNotEmpty()) {
+                url = value
+                break
             }
-        } catch (e: PackageManager.NameNotFoundException) {
-            // Package not installed — ignore
         }
-    }
-
-    private fun isGamblingApp(packageName: String, appName: String): Boolean {
-        val gamblingKeywords = listOf(
-            "slot", "casino", "poker", "judi", "togel", "betting",
-            "sportbook", "bandar", "domino", "ceme", "gaple",
-            "sbobet", "maxbet", "ioncasino", "pragmatic"
+        val headings = mutableListOf<String>()
+        val anchors = mutableListOf<String>()
+        var fallbackEditable = ""
+        val queue = ArrayDeque<AccessibilityNodeInfo>()
+        queue.add(root)
+        var visited = 0
+        while (queue.isNotEmpty() && visited < 500) {
+            val node = queue.removeFirst()
+            visited++
+            val text = (node.text?.toString() ?: node.contentDescription?.toString() ?: "")
+                .trim()
+                .take(256)
+            if (fallbackEditable.isEmpty() && node.isEditable && text.length <= 2048) {
+                fallbackEditable = text
+            }
+            if (text.isNotEmpty()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && node.isHeading && headings.size < 32) {
+                    headings.add(text)
+                }
+                if ((node.isClickable || node.isFocusable) && anchors.size < 64) {
+                    anchors.add(text)
+                }
+            }
+            for (index in 0 until node.childCount) {
+                node.getChild(index)?.let(queue::add)
+            }
+        }
+        if (url.isEmpty() && looksLikeUrl(fallbackEditable)) url = fallbackEditable
+        val title = (
+            event.contentDescription?.toString()
+                ?: event.text.firstOrNull()?.toString()
+                ?: if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) root.paneTitle?.toString() else null
+                ?: ""
+            ).take(512)
+        if (url.isEmpty() && title.isEmpty() && headings.isEmpty() && anchors.isEmpty()) {
+            return null
+        }
+        return ClassificationInput(
+            url = url,
+            title = title,
+            headings = headings,
+            anchorTexts = anchors,
         )
-        val lower = (packageName + appName).lowercase()
-        return gamblingKeywords.any { lower.contains(it) }
     }
 
-    private fun interceptDangerousClicks(event: AccessibilityEvent) {
-        val source = event.source ?: return
-        val text = source.text?.toString() ?: ""
-        val desc = source.contentDescription?.toString() ?: ""
-
-        if (text.contains("Uninstall", true) || desc.contains("Uninstall", true) ||
-            text.contains("Force stop", true) || desc.contains("Force stop", true)) {
-            source.isClickable = false
-            showBlockNotification("Tindakan ini memerlukan izin Kepala grup.")
+    private fun inspectTamperScreen() {
+        val root = rootInActiveWindow ?: return
+        val texts = mutableListOf<String>()
+        val queue = ArrayDeque<AccessibilityNodeInfo>()
+        queue.add(root)
+        var visited = 0
+        while (queue.isNotEmpty() && visited < 300) {
+            val node = queue.removeFirst()
+            visited++
+            node.text?.toString()?.takeIf(String::isNotBlank)?.let(texts::add)
+            node.contentDescription?.toString()?.takeIf(String::isNotBlank)?.let(texts::add)
+            for (index in 0 until node.childCount) {
+                node.getChild(index)?.let(queue::add)
+            }
         }
+        val combined = texts.joinToString(" ").lowercase()
+        val targetsGamblock = combined.contains("gamblock") || combined.contains(packageName.lowercase())
+        val removalAttempt = listOf(
+            "uninstall",
+            "copot",
+            "hapus aplikasi",
+        ).any(combined::contains)
+        val dangerous = listOf(
+            "uninstall",
+            "copot",
+            "hapus aplikasi",
+            "force stop",
+            "paksa berhenti",
+            "disable",
+            "nonaktifkan",
+            "accessibility",
+            "aksesibilitas",
+        ).any(combined::contains)
+        if (!targetsGamblock || !dangerous) return
+        if (stateStore.activeGrantAllowsSettingsAction(removalAttempt)) return
+        aggregateStore.increment("tamper_detected")
+        performGlobalAction(GLOBAL_ACTION_BACK)
+        overlay.showTamperWarning()
+        NativeEventBus.emit(mapOf("type" to "approval_required"))
     }
 
-    private fun showPersistentNotification() {
-        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID, "Gamblock Protection",
-                NotificationManager.IMPORTANCE_LOW
-            ).apply { description = "Perlindungan aktif" }
-            manager.createNotificationChannel(channel)
+    private fun scheduleArtifactUpdate() {
+        worker.execute {
+            if (!artifactUpdater.check(NativeConfig.apiBaseUrl(this))) {
+                stateStore.setStatus("degraded", "artifact_update_failed")
+            }
+            NativeEventBus.emit(snapshotEvent())
         }
-
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Gamblock AI Aktif")
-            .setContentText("Perlindungan judi online berjalan")
-            .setSmallIcon(android.R.drawable.ic_lock_lock)
-            .setOngoing(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .build()
-
-        startForeground(NOTIFICATION_ID, notification)
+        mainHandler.postDelayed(::scheduleArtifactUpdate, 24 * 60 * 60 * 1000L)
     }
 
-    private fun showBlockNotification(message: String) {
-        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Gamblock AI")
-            .setContentText(message)
-            .setSmallIcon(android.R.drawable.ic_dialog_alert)
-            .setAutoCancel(true)
-            .build()
-        manager.notify(NOTIFICATION_ID + 1, notification)
+    private fun snapshotEvent(): Map<String, Any?> {
+        return mapOf(
+            "type" to "protection_status",
+            "platform" to "android",
+            "status" to stateStore.status(),
+            "service_running" to true,
+            "sensor_status" to "connected",
+            "permission_status" to "granted",
+            "model_version" to classifier.modelVersion,
+            "ruleset_version" to classifier.rulesetVersion,
+            "degraded_reason_code" to stateStore.degradedReason(),
+            "last_event_at" to stateStore.lastEventAt(),
+        )
     }
 
-    override fun onInterrupt() {}
+    private fun looksLikeUrl(value: String): Boolean {
+        return value.startsWith("http://") ||
+            value.startsWith("https://") ||
+            (value.contains('.') && !value.contains(' '))
+    }
+
+    override fun onInterrupt() {
+        stateStore.setStatus("degraded", "accessibility_interrupted")
+        NativeEventBus.emit(snapshotEvent())
+    }
+
+    override fun onDestroy() {
+        pendingScan?.let(mainHandler::removeCallbacks)
+        mainHandler.removeCallbacksAndMessages(null)
+        overlay.dismiss()
+        worker.shutdownNow()
+        aggregateStore.increment("permission_revoked")
+        stateStore.setStatus("inactive", "accessibility_disabled")
+        NativeEventBus.emit(snapshotEvent())
+        super.onDestroy()
+    }
 }

@@ -5,7 +5,9 @@ import 'package:gamblock_ai_apps/core/widgets/skeleton_box.dart';
 void main() {
   testWidgets('SkeletonBox renders and pumps without error', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(home: Scaffold(body: const SkeletonBox(width: 100, height: 20))),
+      MaterialApp(
+        home: Scaffold(body: const SkeletonBox(width: 100, height: 20)),
+      ),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 600));

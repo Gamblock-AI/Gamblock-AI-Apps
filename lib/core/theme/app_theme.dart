@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 import 'app_text.dart';
 
@@ -7,11 +6,13 @@ import 'app_text.dart';
 class AppTheme {
   AppTheme._();
 
-  /// Plus Jakarta Sans over the brand text scale (matches the web).
-  static TextTheme _brandedText(Color onSurface) =>
-      GoogleFonts.plusJakartaSansTextTheme(
-        AppText.textTheme,
-      ).apply(bodyColor: onSurface, displayColor: onSurface);
+  /// Prefer the brand family when installed and use safe platform fallbacks.
+  /// The app never downloads fonts at runtime, so protection UI stays offline.
+  static TextTheme _brandedText(Color onSurface) => AppText.textTheme.apply(
+    fontFamily: 'Plus Jakarta Sans',
+    bodyColor: onSurface,
+    displayColor: onSurface,
+  );
 
   static ThemeData get light {
     final scheme = AppColors.lightScheme;

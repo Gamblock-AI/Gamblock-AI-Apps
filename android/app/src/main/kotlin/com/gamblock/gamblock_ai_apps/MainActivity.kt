@@ -1,73 +1,195 @@
 package com.gamblock.gamblock_ai_apps
 
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.Manifest
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import android.content.pm.PackageManager
 import android.os.Build
-import android.os.PowerManager
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import org.json.JSONObject
+import java.util.concurrent.Executors
 
 class MainActivity : FlutterActivity() {
-    private val CHANNEL = "com.gamblock/protection"
+    companion object {
+        private const val METHOD_CHANNEL = "com.gamblock/protection"
+        private const val EVENT_CHANNEL = "com.gamblock/intervention"
+    }
+
+    private val worker = Executors.newSingleThreadExecutor()
+    private lateinit var classifier: HybridClassifier
+    private lateinit var aggregates: DailyAggregateStore
+    private lateinit var stateStore: ProtectionStateStore
+    private var eventSink: EventChannel.EventSink? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
+        classifier = HybridClassifier(applicationContext).also { it.load() }
+        aggregates = DailyAggregateStore(applicationContext)
+        stateStore = ProtectionStateStore(applicationContext)
+
+        EventChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            EVENT_CHANNEL,
+        ).setStreamHandler(object : EventChannel.StreamHandler {
+            override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
+                eventSink = events
+                NativeEventBus.add(events)
+            }
+
+            override fun onCancel(arguments: Any?) {
+                NativeEventBus.remove(eventSink)
+                eventSink = null
+            }
+        })
+
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            METHOD_CHANNEL,
+        ).setMethodCallHandler { call, result ->
             when (call.method) {
-                "isServiceRunning" -> result.success(isAccessibilityEnabled())
-                "isAccessibilityEnabled" -> result.success(isAccessibilityEnabled())
-                "requestAccessibility" -> {
+                "getProtectionSnapshot" -> result.success(snapshot())
+                "openPlatformSetup" -> {
                     startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
                     result.success(true)
                 }
-                "hasOverlayPermission" -> result.success(
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                        Settings.canDrawOverlays(this)
-                    else true
-                )
-                "requestOverlayPermission" -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                            Uri.parse("package:$packageName")))
+                "runLocalSelfTest" -> background(result) {
+                    classifier.runSelfTest().toMap()
+                }
+                "checkArtifactUpdates" -> background(result) {
+                    val baseUrl = call.argument<String>("base_url")
+                        ?: NativeConfig.apiBaseUrl(this)
+                    val passed = ArtifactUpdater(this, classifier, aggregates).check(baseUrl)
+                    mapOf("checked" to passed)
+                }
+                "setHealthNotifications" -> {
+                    val enabled = call.argument<Boolean>("enabled") == true
+                    HealthNotificationPreferences.setEnabled(this, enabled)
+                    if (enabled) {
+                        requestNotificationPermissionIfNeeded()
+                        HealthNotificationPreferences.show(this)
+                    } else {
+                        val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+                        manager.cancel(GamblockAccessibilityService.NOTIFICATION_ID)
                     }
                     result.success(true)
                 }
-                "enableAntiUninstall" -> {
-                    // Exempt from battery optimization to prevent background kill
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-                        if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-                            startActivity(Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                                Uri.parse("package:$packageName")))
-                        }
+                "setDeviceId" -> {
+                    stateStore.setDeviceId(call.argument<String>("device_id").orEmpty())
+                    result.success(null)
+                }
+                "drainDailyAggregates" -> result.success(aggregates.completedDays())
+                "getCurrentDailyAggregates" -> result.success(aggregates.currentDay())
+                "ackDailyAggregates" -> {
+                    aggregates.acknowledge(call.argument<List<String>>("keys") ?: emptyList())
+                    result.success(null)
+                }
+                "storeProtectionGrant" -> {
+                    val grant = call.argument<Map<String, Any?>>("grant")
+                    if (grant == null) {
+                        result.success(false)
+                    } else {
+                        result.success(stateStore.storeGrant(JSONObject(grant)))
                     }
-                    result.success(true)
                 }
-                "startWebSocket" -> {
-                    // WebSocket IPC only on Windows — not applicable on Android
-                    result.success(false)
-                }
-                "heartbeat" -> {
-                    result.success(true)
-                }
+                "getPairingToken", "rotatePairingToken" -> result.success(null)
                 else -> result.notImplemented()
             }
         }
     }
 
-    private fun isAccessibilityEnabled(): Boolean {
-        val am = getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-        val services = am.getEnabledAccessibilityServiceList(
-            AccessibilityServiceInfo.FEEDBACK_ALL_MASK
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (intent.getBooleanExtra("open_approval", false)) {
+            NativeEventBus.emit(mapOf("type" to "approval_required"))
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (intent.getBooleanExtra("open_approval", false)) {
+            NativeEventBus.emit(mapOf("type" to "approval_required"))
+            intent.removeExtra("open_approval")
+        }
+    }
+
+    override fun onDestroy() {
+        NativeEventBus.remove(eventSink)
+        worker.shutdownNow()
+        super.onDestroy()
+    }
+
+    private fun snapshot(): Map<String, Any?> {
+        val enabled = isAccessibilityEnabled()
+        val grant = stateStore.activeGrant()
+        val status = when {
+            !enabled -> "inactive"
+            grant != null -> "paused"
+            else -> stateStore.status()
+        }
+        return mapOf(
+            "platform" to "android",
+            "status" to status,
+            "service_running" to enabled,
+            "sensor_status" to if (enabled) "connected" else "disconnected",
+            "permission_status" to if (enabled) "granted" else "revoked",
+            "model_version" to classifier.modelVersion,
+            "ruleset_version" to classifier.rulesetVersion,
+            "degraded_reason_code" to if (enabled) stateStore.degradedReason() else "accessibility_disabled",
+            "last_event_at" to stateStore.lastEventAt(),
         )
-        return services.any {
+    }
+
+    private fun isAccessibilityEnabled(): Boolean {
+        val manager = getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+        return manager.getEnabledAccessibilityServiceList(
+            AccessibilityServiceInfo.FEEDBACK_ALL_MASK,
+        ).any {
             it.resolveInfo.serviceInfo.packageName == packageName &&
-            it.resolveInfo.serviceInfo.name.contains("GamblockAccessibilityService")
+                it.resolveInfo.serviceInfo.name.contains("GamblockAccessibilityService")
+        }
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                2001,
+            )
+        }
+    }
+
+    private fun background(
+        result: MethodChannel.Result,
+        action: () -> Any?,
+    ) {
+        worker.execute {
+            try {
+                val value = action()
+                runOnUiThread { result.success(value) }
+            } catch (error: Exception) {
+                runOnUiThread {
+                    result.error(
+                        error.message ?: "native_error",
+                        "Native protection action failed",
+                        null,
+                    )
+                }
+            }
         }
     }
 }

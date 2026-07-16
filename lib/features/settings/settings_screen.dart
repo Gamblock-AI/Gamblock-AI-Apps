@@ -1,169 +1,193 @@
-import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../core/config/app_config.dart';
-import '../../core/auth/auth_state.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/widgets/brand_widgets.dart';
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
-class SettingsScreen extends ConsumerWidget {
+import '../../core/auth/auth_state.dart';
+import '../../core/config/app_config.dart';
+import '../../core/feedback/feedback.dart';
+import '../../core/messaging/app_messages.dart';
+import '../../core/platform/platform_bridge.dart';
+import '../../core/settings/app_settings.dart';
+import '../../core/theme/app_colors.dart';
+import 'presentation/widgets/edit_profile_dialog.dart';
+import 'presentation/widgets/logout_confirmation_dialog.dart';
+import 'presentation/widgets/password_change_dialog.dart';
+import 'presentation/widgets/settings_about_section.dart';
+import 'presentation/widgets/settings_account_section.dart';
+import 'presentation/widgets/settings_preferences_section.dart';
+import 'presentation/widgets/settings_profile_card.dart';
+import 'presentation/widgets/windows_settings_section.dart';
+
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  ProtectionSnapshot _snapshot = ProtectionSnapshot.fallback;
+  String? _pairingToken;
+
+  @override
+  void initState() {
+    super.initState();
+    Future<void>.microtask(_loadNativeInfo);
+  }
+
+  Future<void> _loadNativeInfo() async {
+    final values = await Future.wait<Object?>([
+      PlatformBridge.getProtectionSnapshot(),
+      if (Platform.isWindows)
+        PlatformBridge.getPairingToken()
+      else
+        Future<String?>.value(),
+    ]);
+    if (!mounted) return;
+    setState(() {
+      _snapshot = values[0] as ProtectionSnapshot;
+      _pairingToken = values[1] as String?;
+    });
+  }
+
+  Future<void> _editProfile() async {
+    final auth = ref.read(authProvider);
+    final value = await showEditProfileDialog(
+      context,
+      displayName: auth.displayName,
+    );
+    if (value == null || value.isEmpty || !mounted) return;
+    try {
+      await ref.read(authProvider.notifier).updateDisplayName(value);
+      if (mounted) {
+        AppFeedback.success(
+          context,
+          AppLocalizations.of(context)!.settingsProfileUpdated,
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        AppFeedback.error(context, AppMessages.friendlyMessage(context, error));
+      }
+    }
+  }
+
+  Future<void> _changePassword() async {
+    final passwordChange = await showPasswordChangeDialog(context);
+    if (passwordChange == null || !mounted) return;
+    try {
+      await ref
+          .read(authProvider.notifier)
+          .updatePassword(
+            currentPassword: passwordChange.currentPassword,
+            newPassword: passwordChange.newPassword,
+          );
+      if (mounted) {
+        AppFeedback.success(
+          context,
+          AppLocalizations.of(context)!.settingsPasswordUpdated,
+        );
+        context.go('/login');
+      }
+    } catch (error) {
+      if (mounted) {
+        AppFeedback.error(context, AppMessages.friendlyMessage(context, error));
+      }
+    }
+  }
+
+  Future<void> _logout() async {
+    if (!await showLogoutConfirmationDialog(context)) return;
+    await ref.read(authProvider.notifier).logout();
+    if (mounted) context.go('/login');
+  }
+
+  Future<void> _copyPairingToken() async {
+    final pairingToken = _pairingToken;
+    if (pairingToken == null) return;
+    await Clipboard.setData(ClipboardData(text: pairingToken));
+    if (mounted) {
+      AppFeedback.success(context, AppLocalizations.of(context)!.copied);
+    }
+  }
+
+  Future<void> _rotatePairingToken() async {
+    final token = await PlatformBridge.rotatePairingToken();
+    if (mounted) setState(() => _pairingToken = token);
+  }
+
+  Future<void> _setHealthNotifications(bool enabled) async {
+    await ref
+        .read(appSettingsProvider.notifier)
+        .setHealthNotifications(enabled);
+    await PlatformBridge.setHealthNotifications(enabled);
+  }
+
+  Future<void> _openWebPath(String path) {
+    return launchUrl(
+      AppConfig.webUri('${Localizations.localeOf(context).languageCode}/$path'),
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final auth = ref.watch(authProvider);
-
+    final settings = ref.watch(appSettingsProvider);
     return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.settingsTitle)),
+      appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: ListView(
-        padding: const EdgeInsets.only(bottom: 24),
+        padding: const EdgeInsets.only(bottom: 32),
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: EyebrowPill(
-              label: AppLocalizations.of(context)!.settingsAccountPreferences,
-              color: AppColors.navy,
-            ),
+          if (auth.isAuthenticated) SettingsProfileCard(auth: auth),
+          SettingsAccountSection(
+            auth: auth,
+            onEditProfile: _editProfile,
+            onChangePassword: _changePassword,
+            onManagePartner: () => context.go('/accountability'),
+            onLogin: () => context.go('/login'),
           ),
-          // Profile
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 28,
-                      backgroundColor: AppColors.navy.withValues(alpha: 0.1),
-                      child: Text(
-                        (auth.displayName ?? '?').substring(0, 1).toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.navy,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            auth.displayName ?? 'Pengguna',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(color: AppColors.navy),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            auth.email ?? '',
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  color: AppColors.navy.withValues(alpha: 0.5),
-                                ),
-                          ),
-                          const SizedBox(height: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.sage.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              auth.role == 'partner'
-                                  ? AppLocalizations.of(context)!.roleKepala
-                                  : AppLocalizations.of(context)!.roleMember,
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.sage,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+          SettingsPreferencesSection(
+            locale: settings.locale,
+            hapticsEnabled: settings.hapticsEnabled,
+            healthNotificationsEnabled: settings.healthNotificationsEnabled,
+            showHealthNotifications: Platform.isAndroid,
+            onLocaleChanged: (locale) =>
+                ref.read(appSettingsProvider.notifier).setLocale(locale),
+            onHapticsChanged: (enabled) =>
+                ref.read(appSettingsProvider.notifier).setHaptics(enabled),
+            onHealthNotificationsChanged: _setHealthNotifications,
+          ),
+          if (Platform.isWindows) ...[
+            WindowsSettingsSection(
+              pairingToken: _pairingToken,
+              onCopyToken: _copyPairingToken,
+              onRotateToken: _rotatePairingToken,
+            ),
+          ],
+          SettingsAboutSection(
+            snapshot: _snapshot,
+            onOpenPrivacy: () => _openWebPath('privacy'),
+            onOpenHelp: () => _openWebPath('help'),
+          ),
+          if (auth.isAuthenticated) ...[
+            const Divider(height: 24),
+            ListTile(
+              minTileHeight: 56,
+              leading: const Icon(Icons.logout, color: AppColors.crimson),
+              title: Text(
+                l10n.settingsLogout,
+                style: const TextStyle(color: AppColors.crimson),
               ),
+              onTap: _logout,
             ),
-          ),
-
-          const Divider(height: 1),
-          ListTile(
-            leading: Icon(Icons.people, color: AppColors.navy),
-            title: Text(
-              AppLocalizations.of(context)!.settingsAccountabilityPartner,
-            ),
-            subtitle: Text(AppLocalizations.of(context)!.settingsManagePartner),
-            trailing: Icon(Icons.chevron_right),
-          ),
-          const Divider(height: 1),
-          ListTile(
-            leading: Icon(Icons.notifications, color: AppColors.navy),
-            title: Text('Notifikasi'),
-            trailing: Switch(value: true, onChanged: null),
-          ),
-          const Divider(height: 1),
-          ListTile(
-            leading: const Icon(Icons.language, color: AppColors.navy),
-            title: Text(
-              AppLocalizations.of(context)!.settingsOpenPsychoeducation,
-            ),
-            onTap: () => launchUrl(
-              AppConfig.webUri(
-                '${Localizations.localeOf(context).languageCode}/education',
-              ),
-            ),
-          ),
-          const Divider(height: 1),
-          ListTile(
-            leading: Icon(Icons.info, color: AppColors.navy),
-            title: Text(AppLocalizations.of(context)!.settingsAboutApp),
-            subtitle: Text(AppLocalizations.of(context)!.settingsAppVersion),
-          ),
-          const Divider(height: 1),
-          ListTile(
-            leading: const Icon(Icons.logout, color: AppColors.crimson),
-            title: Text(
-              AppLocalizations.of(context)!.settingsLogout,
-              style: TextStyle(color: AppColors.crimson),
-            ),
-            onTap: () async {
-              final confirm = await showDialog<bool>(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: Text(AppLocalizations.of(context)!.settingsLogout),
-                  content: Text(
-                    AppLocalizations.of(context)!.settingsLogoutConfirm,
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx, false),
-                      child: Text(AppLocalizations.of(context)!.cancel),
-                    ),
-                    FilledButton(
-                      onPressed: () => Navigator.pop(ctx, true),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.crimson,
-                      ),
-                      child: Text(AppLocalizations.of(context)!.settingsLogout),
-                    ),
-                  ],
-                ),
-              );
-              if (confirm == true) {
-                await ref.read(authProvider.notifier).logout();
-                if (context.mounted) context.go('/login');
-              }
-            },
-          ),
+          ],
         ],
       ),
     );

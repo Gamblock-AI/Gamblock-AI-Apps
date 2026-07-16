@@ -1,0 +1,19 @@
+{
+  "contract_version": "hybrid-v1",
+  "version": "dummy-rules-v1",
+  "strong_url_patterns": [
+    "judi",
+    "togel",
+    "casino",
+    "sportsbook",
+    "slot-gacor"
+  ],
+  "medium_url_patterns": [
+    "bet",
+    "jackpot",
+    "pragmatic",
+    "rtp-slot"
+  ],
+  "strong_score": 0.95,
+  "medium_score": 0.65
+}

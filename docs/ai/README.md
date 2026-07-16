@@ -1,6 +1,6 @@
 # Flutter Client AI Context
 
-Context version: `2026-07-16.4`
+Context version: `2026-07-16.5`
 
 ## Product capsule
 
@@ -21,15 +21,25 @@ the device; the backend receives aggregate events only.
 
 | Area | State | Evidence/limit |
 |---|---|---|
-| Auth/onboarding/dashboard/recovery UI and data layers | Implemented prototype | repository and widget tests cover selected paths |
-| Model integration contract | Stub, not wired | `AIInferenceStub` has no loading/classification call path |
-| Pattern Interrupt screen and web handoff | Implemented runtime path | app listens to the native event, opens the intervention screen, records only a daily safe aggregate, and can launch the configured privacy-safe web route; real-device detection proof remains required |
-| Android protection bridge | Prototype | platform calls are best-effort and require device validation |
-| Windows service/WebSocket | Stub, not built | service source is absent from runner CMake target |
-| Offline queue/reminder/asset helpers | Prototype | completed UTC days are sent as allowlisted idempotent aggregate events; background reliability is not fully platform-scheduled |
+| Auth/device/setup/settings | Implemented code-complete prototype | session refresh is single-flight; device registration is stable-instance upsert; password/profile, locale, haptics, notifications, setup, and artifact health are wired |
+| Protection/analytics/accountability UI | Implemented code-complete prototype | native health is authoritative; analytics are 7/30-day aggregate-only; removal requests start in the native app and grants are device-bound |
+| Hybrid-v1 local classifier | Implemented dummy prototype | Android and portable Windows core load versioned rules + synthetic LR weights and pass committed fixtures; artifact is explicitly untrained/unevaluated |
+| Pattern Interrupt and recovery handoff | Implemented code path | seven-second native/Flutter paths, reduced motion, offline grounding/help, and browsing-data-free web handoff are wired; device evidence remains required |
+| Android protection runtime | Implemented code-complete prototype | active manifest service, Chrome/Edge extraction, local decision, Back/overlay, settings friction, Keystore grant, aggregate sync, and artifact checks; analyzer passes, Android compile/device proof remains |
+| Windows service + user-session agent | Implemented code-complete prototype | separate CMake service target, authenticated loopback WebSocket, DPAPI state, logon-SID pipe, Flutter bridge, SendInput action, SCM recovery, scripts, and portable classifier fixture; Windows compile/VM proof remains |
+| Release scaffolding | Implemented | tag CI requires Android release signing and Windows Authenticode inputs; no debug-signing fallback |
 
 Target architecture in comments or proposal documents does not change these
 states. Update the table only with code, wiring, and verification evidence.
+
+Windows service implementation is organized by responsibility in
+`windows/service/`: runtime lifecycle, WebSocket transport/handler, named-pipe
+handler, artifact updater, local state, user-agent launcher, and small support
+modules. The Flutter runner mirrors that split in `native_protection_*.{cpp,h}`
+for codec, channels, pipe transport, events, and settings monitoring. The
+split does not change the loopback or Flutter pipe contracts. Pipe operations
+are cancellable during shutdown, and the service joins WebSocket workers before
+tearing down Winsock.
 
 Proposal traceability: this client owns `PKM-PLAT-001`, `PKM-PLAT-002`,
 `PKM-PLAT-003`, `PKM-AI-001`, `PKM-AI-002`, `PKM-AI-003`, `PKM-AI-004`,
@@ -60,4 +70,5 @@ backend and website catalog updates. Payloads must remain aggregate-only.
 
 Update this file when wiring, native build inclusion, model status, commands,
 or architecture changes. Shared invariant changes require an umbrella
-context-version bump.
+context-version bump. Completion means code-complete prototype, not evaluated
+model, real-device proof, signed release, or production readiness.

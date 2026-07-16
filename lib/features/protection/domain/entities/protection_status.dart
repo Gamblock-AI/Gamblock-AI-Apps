@@ -1,29 +1,27 @@
-/// Runtime protection status reported by the backend client endpoint.
 class ProtectionStatus {
-  final String mode;
-  final String runtimeStatus;
-  final String rulesetVersion;
-  final String modelVersion;
-  final String lastSync;
-
   const ProtectionStatus({
-    required this.mode,
-    required this.runtimeStatus,
+    required this.platform,
+    required this.status,
+    required this.serviceRunning,
+    required this.sensorStatus,
+    required this.permissionStatus,
     required this.rulesetVersion,
     required this.modelVersion,
-    required this.lastSync,
+    this.degradedReasonCode,
+    this.lastEventAt,
   });
 
-  bool get isActive => mode == 'Active';
+  final String platform;
+  final String status;
+  final bool serviceRunning;
+  final String sensorStatus;
+  final String permissionStatus;
+  final String rulesetVersion;
+  final String modelVersion;
+  final String? degradedReasonCode;
+  final DateTime? lastEventAt;
 
-  factory ProtectionStatus.fromJson(Map<String, dynamic> json) {
-    return ProtectionStatus(
-      mode: json['mode']?.toString() ?? 'Active',
-      runtimeStatus:
-          json['runtime_status']?.toString() ?? 'Local runtime ready',
-      rulesetVersion: json['ruleset_version']?.toString() ?? '',
-      modelVersion: json['model_version']?.toString() ?? '',
-      lastSync: json['last_sync']?.toString() ?? '',
-    );
-  }
+  bool get isActive => status == 'active';
+  bool get isPaused => status == 'paused';
+  bool get isDegraded => status == 'degraded';
 }

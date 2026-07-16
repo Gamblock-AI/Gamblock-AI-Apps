@@ -7,7 +7,11 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: EmptyState(icon: Icons.inbox, title: 'Belum ada data', hint: 'Coba lagi nanti'),
+          body: EmptyState(
+            icon: Icons.inbox,
+            title: 'Belum ada data',
+            hint: 'Coba lagi nanti',
+          ),
         ),
       ),
     );
@@ -18,7 +22,11 @@ void main() {
 
   testWidgets('EmptyState renders without hint', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(home: Scaffold(body: EmptyState(icon: Icons.inbox, title: 'Kosong'))),
+      MaterialApp(
+        home: Scaffold(
+          body: EmptyState(icon: Icons.inbox, title: 'Kosong'),
+        ),
+      ),
     );
     expect(find.text('Kosong'), findsOneWidget);
   });

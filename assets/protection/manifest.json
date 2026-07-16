@@ -1,0 +1,17 @@
+{
+  "contract_version": "hybrid-v1",
+  "model": {
+    "version": "dummy-lr-v1",
+    "path": "dummy-lr-v1.json",
+    "sha256": "b4088a9729fd422b23c7b68ea3e50d0aef576d3cd7921351b1e25ce285d6c808"
+  },
+  "ruleset": {
+    "version": "dummy-rules-v1",
+    "path": "dummy-rules-v1.json",
+    "sha256": "a0b2500b72d6a497b67dd27432fc4d4c62567fca5104a38a8178c02ba6d903b3"
+  },
+  "fixtures": {
+    "path": "hybrid-v1-fixtures.json",
+    "sha256": "c6f089ba5d762b7f7643a5fde91aa68cf241ad6ff2d6209c8d3dee337f04ae99"
+  }
+}

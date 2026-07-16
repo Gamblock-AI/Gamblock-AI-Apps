@@ -14,6 +14,8 @@ class ApiClient {
 
   static late final Dio _dio;
   static bool _initialized = false;
+  static Future<bool>? _refreshInFlight;
+  static Future<void> Function()? onSessionExpired;
 
   /// Initialize the Dio instance with interceptors. Must be called once after
   /// `AppConfig` is available (i.e. after `dotenv.load()` in main).
@@ -37,8 +39,14 @@ class ApiClient {
           handler.next(options);
         },
         onError: (error, handler) async {
-          if (error.response?.statusCode == 401) {
-            final refreshed = await _tryRefresh();
+          final alreadyRetried =
+              error.requestOptions.extra['auth_retried'] == true;
+          final isRefreshRequest =
+              error.requestOptions.path == '/v1/auth/refresh';
+          if (error.response?.statusCode == 401 &&
+              !alreadyRetried &&
+              !isRefreshRequest) {
+            final refreshed = await _refreshOnce();
             if (refreshed) {
               final retryResponse = await _retryWithNewToken(
                 error.requestOptions,
@@ -46,6 +54,8 @@ class ApiClient {
               handler.resolve(retryResponse);
               return;
             }
+            await clearTokens();
+            await onSessionExpired?.call();
           }
           handler.next(error);
         },
@@ -62,6 +72,15 @@ class ApiClient {
   }
 
   static String get baseUrl => AppConfig.apiBaseUrl;
+
+  static Future<bool> _refreshOnce() {
+    final existing = _refreshInFlight;
+    if (existing != null) return existing;
+    final future = _tryRefresh();
+    _refreshInFlight = future;
+    future.whenComplete(() => _refreshInFlight = null);
+    return future;
+  }
 
   static Future<bool> _tryRefresh() async {
     try {
@@ -90,6 +109,9 @@ class ApiClient {
     final opts = Options(
       method: requestOptions.method,
       headers: {...requestOptions.headers, 'Authorization': 'Bearer $token'},
+      contentType: requestOptions.contentType,
+      responseType: requestOptions.responseType,
+      extra: {...requestOptions.extra, 'auth_retried': true},
     );
     return _dio.request(
       requestOptions.path,
@@ -111,5 +133,9 @@ class ApiClient {
 
   static Future<String?> getAccessToken() async {
     return _storage.read(key: _accessTokenKey);
+  }
+
+  static Future<String?> getRefreshToken() async {
+    return _storage.read(key: _refreshTokenKey);
   }
 }

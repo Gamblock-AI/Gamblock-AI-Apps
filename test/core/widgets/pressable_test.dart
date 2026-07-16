@@ -8,10 +8,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: Pressable(
-            onTap: () => tapped++,
-            child: const Text('Tekan'),
-          ),
+          body: Pressable(onTap: () => tapped++, child: const Text('Tekan')),
         ),
       ),
     );
@@ -22,7 +19,9 @@ void main() {
 
   testWidgets('Pressable renders child', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(home: Scaffold(body: Pressable(child: const Text('A')))),
+      MaterialApp(
+        home: Scaffold(body: Pressable(child: const Text('A'))),
+      ),
     );
     expect(find.text('A'), findsOneWidget);
   });

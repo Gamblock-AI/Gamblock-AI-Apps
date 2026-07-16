@@ -1,17 +1,19 @@
-import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
+
 import '../core/feedback/haptics.dart';
 import '../core/theme/app_colors.dart';
 
 class AppShell extends StatelessWidget {
-  final Widget child;
   const AppShell({super.key, required this.child});
+
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
-    final index = _getIndex(location);
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: child,
       bottomNavigationBar: Container(
@@ -21,34 +23,38 @@ class AppShell extends StatelessWidget {
           ),
         ),
         child: NavigationBar(
-          selectedIndex: index,
-          onDestinationSelected: (i) {
+          selectedIndex: _index(location),
+          onDestinationSelected: (index) {
             Haptics.selection();
-            _navigate(context, i);
+            context.go(
+              const [
+                '/protection',
+                '/analytics',
+                '/accountability',
+                '/settings',
+              ][index],
+            );
           },
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          elevation: 0,
-          height: 68,
           destinations: [
             NavigationDestination(
-              icon: Icon(Icons.shield_outlined),
-              selectedIcon: Icon(Icons.shield),
-              label: 'Proteksi',
+              icon: const Icon(Icons.shield_outlined),
+              selectedIcon: const Icon(Icons.shield),
+              label: l10n.protectionTitle,
             ),
             NavigationDestination(
-              icon: Icon(Icons.dashboard_outlined),
-              selectedIcon: Icon(Icons.dashboard),
-              label: AppLocalizations.of(context)!.dashboardTitle,
+              icon: const Icon(Icons.insights_outlined),
+              selectedIcon: const Icon(Icons.insights),
+              label: l10n.analyticsTitle,
             ),
             NavigationDestination(
-              icon: Icon(Icons.self_improvement_outlined),
-              selectedIcon: Icon(Icons.self_improvement),
-              label: AppLocalizations.of(context)!.recoveryTitle,
+              icon: const Icon(Icons.people_outline),
+              selectedIcon: const Icon(Icons.people),
+              label: l10n.partnerTitle,
             ),
             NavigationDestination(
-              icon: Icon(Icons.settings_outlined),
-              selectedIcon: Icon(Icons.settings),
-              label: AppLocalizations.of(context)!.settingsTitle,
+              icon: const Icon(Icons.settings_outlined),
+              selectedIcon: const Icon(Icons.settings),
+              label: l10n.settingsTitle,
             ),
           ],
         ),
@@ -56,15 +62,10 @@ class AppShell extends StatelessWidget {
     );
   }
 
-  int _getIndex(String path) {
-    if (path.startsWith('/dashboard')) return 1;
-    if (path.startsWith('/recovery')) return 2;
+  int _index(String path) {
+    if (path.startsWith('/analytics')) return 1;
+    if (path.startsWith('/accountability')) return 2;
     if (path.startsWith('/settings')) return 3;
     return 0;
-  }
-
-  void _navigate(BuildContext context, int index) {
-    final routes = ['/protection', '/dashboard', '/recovery', '/settings'];
-    context.go(routes[index]);
   }
 }

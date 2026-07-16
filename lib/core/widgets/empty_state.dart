@@ -7,12 +7,16 @@ class EmptyState extends StatelessWidget {
   final IconData icon;
   final String title;
   final String? hint;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   const EmptyState({
     super.key,
     required this.icon,
     required this.title,
     this.hint,
+    this.actionLabel,
+    this.onAction,
   });
 
   @override
@@ -50,6 +54,10 @@ class EmptyState extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
+          ],
+          if (actionLabel != null && onAction != null) ...[
+            const SizedBox(height: 16),
+            OutlinedButton(onPressed: onAction, child: Text(actionLabel!)),
           ],
         ],
       ),

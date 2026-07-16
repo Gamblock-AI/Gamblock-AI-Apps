@@ -31,12 +31,6 @@ class AppConfig {
     return v.isNotEmpty ? v : 'http://10.0.2.2:8080';
   }
 
-  /// Base URL for dynamic asset downloads (Pattern Interrupt media).
-  static String get assetBaseUrl {
-    final v = _env('ASSET_BASE_URL');
-    return v.isNotEmpty ? v : 'https://gamblock-ai.vercel.app';
-  }
-
   /// Public web dashboard base URL used for recovery hand-offs.
   static String get webBaseUrl {
     final v = _env('WEB_BASE_URL');

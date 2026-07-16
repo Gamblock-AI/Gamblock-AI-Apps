@@ -1,6 +1,6 @@
 # Gamblock-AI Flutter Client Agent Rules
 
-Context version: `2026-07-16.4`
+Context version: `2026-07-16.5`
 
 This standalone repository contains the Android and Windows protection client.
 Read `docs/ai/README.md` before changing behavior; it distinguishes working
@@ -68,12 +68,19 @@ Do not hardcode URLs in features or call Dio from presentation code.
 
 ## Current native and AI status
 
-- `ai_inference_stub.dart` defines the threshold-0.72 model contract, but model
-  loading/classification is not wired into the app. Do not claim live inference
-  until calls, artifact loading, and tests prove it.
-- `windows/runner/gamblock_service.cpp` is a service/protocol prototype and is
-  not part of the current runner CMake target. Do not describe the loopback
-  WebSocket or SCM service as end-to-end active.
+- `assets/protection/` is a wired Hybrid-v1 dummy artifact with synthetic,
+  explicitly untrained/unevaluated Logistic Regression weights. Android and
+  Windows implement its rule + BoW fusion contract; do not present it as
+  measured model accuracy.
+- Android native source is wired through the active manifest and Method/Event
+  Channels for Chrome/Edge sensing, classification, intervention, grant state,
+  and aggregates. Real-device coverage, accessibility, lifecycle, and
+  performance evidence are still required.
+- Windows uses `windows/service/` for the LocalSystem authority and the
+  small `windows/runner/native_protection_*.{cpp,h}` modules for the
+  user-session agent.
+  Source/CMake/install/release wiring is present; a Windows build and VM/device
+  trace are still required before calling it runtime-verified.
 - Any WebSocket shape change must be coordinated with the browser extension
   implementation/tests/README without moving blocking authority into it.
 
@@ -82,7 +89,8 @@ Logistic Regression, real-time local blocking, a 5–10 second Pattern Interrupt
 a privacy-safe web recovery handoff, and partner-controlled removal. Existing
 UI/contracts do not by themselves satisfy the platform, AI, blocking,
 interruption, or accountability proposal requirements
-until wired and evidenced on the active Android/Windows runtimes.
+until wired and evidenced on the active Android/Windows runtimes. The current
+handoff label is code-complete prototype, not evaluated/release-ready.
 
 ## Messaging and interaction
 

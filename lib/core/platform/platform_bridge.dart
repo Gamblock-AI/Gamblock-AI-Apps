@@ -1,127 +1,150 @@
 import 'package:flutter/services.dart';
 
-/// Platform bridge — communicates with the native Android Accessibility
-/// Service and the Windows Service via the `com.gamblock/protection`
-/// MethodChannel (PRD §3.2: anti-uninstall via Accessibility Service on
-/// Android and a Windows Service on desktop).
-///
-/// CONTRACT: every method here must tolerate a missing native handler
-/// (returns false / no-op) so the Flutter UI launches even when the
-/// native side is absent or the platform is unsupported. Do not let a
-/// MissingPluginException escape to the caller — catch it here.
+import '../config/app_config.dart';
+import 'platform_models.dart';
+
+export 'platform_models.dart';
+
 class PlatformBridge {
+  PlatformBridge._();
+
   static const _channel = MethodChannel('com.gamblock/protection');
   static const _eventChannel = EventChannel('com.gamblock/intervention');
 
-  /// Listen for intervention events from native platform
-  /// The native service (Windows/Android) sends an event when a block occurs
-  static Stream<void> onInterventionTriggered() {
-    return _eventChannel.receiveBroadcastStream().map((_) {});
+  static Stream<NativeProtectionEvent> events() {
+    return _eventChannel
+        .receiveBroadcastStream()
+        .map(NativeProtectionEvent.fromDynamic)
+        .handleError((_) {});
   }
 
-  /// Check if Gamblock service is running (Windows) or
-  /// Accessibility Service is enabled (Android)
-  static Future<bool> isServiceRunning() async {
-    try {
-      final result = await _channel.invokeMethod<bool>('isServiceRunning');
-      return result ?? false;
-    } catch (_) {
-      return false;
-    }
-  }
+  static Stream<NativeProtectionEvent> interventionEvents() =>
+      events().where((event) => event.type == 'intervention_shown');
 
-  /// Request Accessibility Service permission (Android)
-  static Future<bool> requestAccessibilityPermission() async {
+  static Future<ProtectionSnapshot> getProtectionSnapshot() async {
     try {
-      final result = await _channel.invokeMethod<bool>('requestAccessibility');
-      return result ?? false;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  /// Check if Accessibility Service is enabled
-  static Future<bool> isAccessibilityEnabled() async {
-    try {
-      final result = await _channel.invokeMethod<bool>(
-        'isAccessibilityEnabled',
+      final result = await _channel.invokeMethod<Map<Object?, Object?>>(
+        'getProtectionSnapshot',
       );
-      return result ?? false;
-    } catch (_) {
-      return false;
+      return result == null
+          ? ProtectionSnapshot.fallback
+          : ProtectionSnapshot.fromMap(result);
+    } on MissingPluginException {
+      return ProtectionSnapshot.fallback;
+    } on PlatformException {
+      return ProtectionSnapshot.fallback;
     }
   }
 
-  /// Check if overlay permission is granted (Android)
-  static Future<bool> hasOverlayPermission() async {
-    try {
-      final result = await _channel.invokeMethod<bool>('hasOverlayPermission');
-      return result ?? false;
-    } catch (_) {
-      return false;
-    }
-  }
+  static Future<bool> openPlatformSetup() => _boolMethod('openPlatformSetup');
 
-  /// Request overlay permission (Android)
-  static Future<bool> requestOverlayPermission() async {
+  static Future<Map<String, dynamic>> runLocalSelfTest() async {
     try {
-      final result = await _channel.invokeMethod<bool>(
-        'requestOverlayPermission',
+      final result = await _channel.invokeMethod<Map<Object?, Object?>>(
+        'runLocalSelfTest',
       );
-      return result ?? false;
+      return result == null ? const {} : Map<String, dynamic>.from(result);
     } catch (_) {
-      return false;
+      return const {
+        'passed': false,
+        'reason_code': 'native_bridge_unavailable',
+      };
     }
   }
 
-  /// Start local WebSocket server for browser extension IPC (Windows only)
-  static Future<bool> startWebSocketServer({int port = 9090}) async {
-    try {
-      final result = await _channel.invokeMethod<bool>('startWebSocket', {
-        'port': port,
-      });
-      return result ?? false;
-    } catch (_) {
-      return false;
-    }
-  }
+  static Future<bool> checkArtifactUpdates() => _mapMethod(
+    'checkArtifactUpdates',
+    {'base_url': AppConfig.apiBaseUrl},
+  ).then((result) => result['checked'] == true);
 
-  /// Enable anti-uninstall protection
-  static Future<bool> enableAntiUninstall() async {
-    try {
-      final result = await _channel.invokeMethod<bool>('enableAntiUninstall');
-      return result ?? false;
-    } catch (_) {
-      return false;
-    }
-  }
+  static Future<bool> setHealthNotifications(bool enabled) =>
+      _boolMethodWithArguments('setHealthNotifications', {'enabled': enabled});
 
-  /// Disable anti-uninstall protection (requires approved accountability request)
-  static Future<bool> disableAntiUninstall() async {
+  static Future<void> setDeviceId(String deviceId) async {
     try {
-      final result = await _channel.invokeMethod<bool>('disableAntiUninstall');
-      return result ?? false;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  /// Pause protection temporarily (requires approved accountability request)
-  static Future<bool> pauseProtection(int durationMinutes) async {
-    try {
-      final result = await _channel.invokeMethod<bool>('pauseProtection', {
-        'duration_minutes': durationMinutes,
-      });
-      return result ?? false;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  /// Send heartbeat to keep alive
-  static Future<void> sendHeartbeat() async {
-    try {
-      await _channel.invokeMethod('heartbeat');
+      await _channel.invokeMethod<void>('setDeviceId', {'device_id': deviceId});
     } catch (_) {}
+  }
+
+  static Future<List<NativeDailyAggregate>> drainDailyAggregates() async {
+    return _aggregateMethod('drainDailyAggregates');
+  }
+
+  static Future<List<NativeDailyAggregate>> getCurrentDailyAggregates() async {
+    return _aggregateMethod('getCurrentDailyAggregates');
+  }
+
+  static Future<List<NativeDailyAggregate>> _aggregateMethod(
+    String method,
+  ) async {
+    try {
+      final result = await _channel.invokeMethod<List<Object?>>(method);
+      return (result ?? const [])
+          .whereType<Map<Object?, Object?>>()
+          .map(NativeDailyAggregate.fromMap)
+          .where(
+            (item) =>
+                item.key.isNotEmpty &&
+                item.date.isNotEmpty &&
+                item.eventType.isNotEmpty &&
+                item.count >= 0,
+          )
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  static Future<void> ackDailyAggregates(List<String> keys) async {
+    if (keys.isEmpty) return;
+    try {
+      await _channel.invokeMethod<void>('ackDailyAggregates', {'keys': keys});
+    } catch (_) {}
+  }
+
+  static Future<bool> storeProtectionGrant(Map<String, dynamic> grant) {
+    return _boolMethodWithArguments('storeProtectionGrant', {'grant': grant});
+  }
+
+  static Future<String?> getPairingToken() async {
+    try {
+      return await _channel.invokeMethod<String>('getPairingToken');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<String?> rotatePairingToken() async {
+    try {
+      return await _channel.invokeMethod<String>('rotatePairingToken');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<bool> _boolMethod(String method) async {
+    return _boolMethodWithArguments(method, const {});
+  }
+
+  static Future<bool> _boolMethodWithArguments(
+    String method,
+    Map<String, dynamic> arguments,
+  ) async {
+    try {
+      return await _channel.invokeMethod<bool>(method, arguments) ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<Map<String, dynamic>> _mapMethod(
+    String method,
+    Map<String, dynamic> arguments,
+  ) async {
+    final result = await _channel.invokeMethod<Map<Object?, Object?>>(
+      method,
+      arguments,
+    );
+    return result == null ? const {} : Map<String, dynamic>.from(result);
   }
 }

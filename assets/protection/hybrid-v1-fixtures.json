@@ -1,0 +1,50 @@
+[
+  {
+    "name": "explicit gambling url",
+    "url": "https://contoh-judi.invalid/slot-gacor",
+    "title": "",
+    "headings": [],
+    "anchorTexts": [],
+    "expected": "block"
+  },
+  {
+    "name": "dom-only gambling",
+    "url": "https://dynamic.invalid/",
+    "title": "Bonus jackpot hari ini",
+    "headings": ["Main slot gacor dan casino"],
+    "anchorTexts": ["Deposit sekarang", "Taruhan langsung"],
+    "expected": "block"
+  },
+  {
+    "name": "benign university",
+    "url": "https://kampus.ac.id/penelitian",
+    "title": "Portal penelitian universitas",
+    "headings": ["Pendidikan dan beasiswa"],
+    "anchorTexts": ["Jurnal research"],
+    "expected": "allow"
+  },
+  {
+    "name": "compromised education domain",
+    "url": "https://kampus.ac.id/berita",
+    "title": "Casino jackpot bonus",
+    "headings": ["Judi slot deposit"],
+    "anchorTexts": ["Taruhan sekarang"],
+    "expected": "block"
+  },
+  {
+    "name": "english gambling",
+    "url": "https://dynamic.invalid/",
+    "title": "Online casino betting jackpot",
+    "headings": ["Sportsbook bonus"],
+    "anchorTexts": ["Deposit to play"],
+    "expected": "block"
+  },
+  {
+    "name": "empty input",
+    "url": "",
+    "title": "",
+    "headings": [],
+    "anchorTexts": [],
+    "expected": "allow"
+  }
+]

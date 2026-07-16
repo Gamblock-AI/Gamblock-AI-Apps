@@ -629,7 +629,7 @@ abstract class AppLocalizations {
   /// No description provided for @introCtaDesc.
   ///
   /// In id, this message translates to:
-  /// **'aplikasi gratis, 100% privat, dirancang oleh dan untuk mahasiswa indonesia. putuskan siklus kecanduan hari ini.'**
+  /// **'prototipe berprinsip privasi yang dirancang untuk membantu mahasiswa Indonesia mengambil jeda dan memilih langkah konstruktif.'**
   String get introCtaDesc;
 
   /// No description provided for @introCrisisSubtitle.
@@ -761,7 +761,7 @@ abstract class AppLocalizations {
   /// No description provided for @authRegisterAndContinue.
   ///
   /// In id, this message translates to:
-  /// **'Buat Akun & Lanjut ke Grup'**
+  /// **'Buat Akun & Lanjutkan'**
   String get authRegisterAndContinue;
 
   /// No description provided for @roleLecturerPartner.
@@ -773,7 +773,7 @@ abstract class AppLocalizations {
   /// No description provided for @authRegisterDesc.
   ///
   /// In id, this message translates to:
-  /// **'100% gratis & privat — dirancang untuk mahasiswa Indonesia.'**
+  /// **'Prototipe berprinsip privasi yang dirancang untuk mahasiswa Indonesia.'**
   String get authRegisterDesc;
 
   /// No description provided for @authHasAccount.
@@ -1195,6 +1195,888 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Kunci darurat wajib diisi.'**
   String get msgErrEmergencyKeyRequired;
+
+  /// No description provided for @msgErrPasswordValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'The new password must contain at least 8 characters.'**
+  String get msgErrPasswordValidation;
+
+  /// No description provided for @msgErrCurrentPasswordInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'The current password is incorrect.'**
+  String get msgErrCurrentPasswordInvalid;
+
+  /// No description provided for @msgErrPasswordReuse.
+  ///
+  /// In en, this message translates to:
+  /// **'The new password must differ from the current password.'**
+  String get msgErrPasswordReuse;
+
+  /// No description provided for @protectionTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Proteksi'**
+  String get protectionTitle;
+
+  /// No description provided for @analyticsTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Analitik'**
+  String get analyticsTitle;
+
+  /// No description provided for @partnerTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Pendamping'**
+  String get partnerTitle;
+
+  /// No description provided for @retry.
+  ///
+  /// In id, this message translates to:
+  /// **'Coba lagi'**
+  String get retry;
+
+  /// No description provided for @refresh.
+  ///
+  /// In id, this message translates to:
+  /// **'Muat ulang'**
+  String get refresh;
+
+  /// No description provided for @copy.
+  ///
+  /// In id, this message translates to:
+  /// **'Salin'**
+  String get copy;
+
+  /// No description provided for @copied.
+  ///
+  /// In id, this message translates to:
+  /// **'Tersalin'**
+  String get copied;
+
+  /// No description provided for @close.
+  ///
+  /// In id, this message translates to:
+  /// **'Tutup'**
+  String get close;
+
+  /// No description provided for @analyticsSignInTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Masuk untuk melihat analitik'**
+  String get analyticsSignInTitle;
+
+  /// No description provided for @analyticsSignInBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Analitik hanya berisi hitungan agregat perangkat dan tidak memuat URL atau riwayat penjelajahan.'**
+  String get analyticsSignInBody;
+
+  /// No description provided for @analyticsSevenDays.
+  ///
+  /// In id, this message translates to:
+  /// **'7 hari'**
+  String get analyticsSevenDays;
+
+  /// No description provided for @analyticsThirtyDays.
+  ///
+  /// In id, this message translates to:
+  /// **'30 hari'**
+  String get analyticsThirtyDays;
+
+  /// No description provided for @analyticsErrorTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Analitik belum dapat dimuat'**
+  String get analyticsErrorTitle;
+
+  /// No description provided for @analyticsPrivacyNote.
+  ///
+  /// In id, this message translates to:
+  /// **'Hanya hitungan harian yang ditampilkan. URL, domain, judul halaman, dan teks DOM tidak disimpan atau dikirim.'**
+  String get analyticsPrivacyNote;
+
+  /// No description provided for @analyticsDataSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed-day counts are synchronized to your account.'**
+  String get analyticsDataSynced;
+
+  /// No description provided for @analyticsDataLocalOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'The backend is unavailable or data is insufficient; this view uses available local counts.'**
+  String get analyticsDataLocalOnly;
+
+  /// No description provided for @analyticsBlocked.
+  ///
+  /// In id, this message translates to:
+  /// **'Konten diblokir'**
+  String get analyticsBlocked;
+
+  /// No description provided for @analyticsInterventions.
+  ///
+  /// In id, this message translates to:
+  /// **'Intervensi'**
+  String get analyticsInterventions;
+
+  /// No description provided for @analyticsTamper.
+  ///
+  /// In id, this message translates to:
+  /// **'Upaya perubahan'**
+  String get analyticsTamper;
+
+  /// No description provided for @analyticsPermission.
+  ///
+  /// In id, this message translates to:
+  /// **'Izin dicabut'**
+  String get analyticsPermission;
+
+  /// No description provided for @partnerSignInTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Masuk untuk mengelola pendamping'**
+  String get partnerSignInTitle;
+
+  /// No description provided for @partnerSignInBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Hubungan pendamping dan permintaan persetujuan disimpan pada akun Anda.'**
+  String get partnerSignInBody;
+
+  /// No description provided for @partnerErrorTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Data pendamping belum dapat dimuat'**
+  String get partnerErrorTitle;
+
+  /// No description provided for @partnerInviteCreated.
+  ///
+  /// In id, this message translates to:
+  /// **'Undangan pendamping berhasil dibuat.'**
+  String get partnerInviteCreated;
+
+  /// No description provided for @partnerNone.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada pendamping aktif'**
+  String get partnerNone;
+
+  /// No description provided for @partnerNoneBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Undang satu orang tepercaya. Pendamping tidak dapat melihat URL, riwayat penjelajahan, atau catatan pemulihan pribadi.'**
+  String get partnerNoneBody;
+
+  /// No description provided for @partnerActiveBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Pendamping aktif dapat menyetujui perubahan proteksi untuk perangkat yang terdaftar.'**
+  String get partnerActiveBody;
+
+  /// No description provided for @partnerEmailLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Email pendamping'**
+  String get partnerEmailLabel;
+
+  /// No description provided for @partnerEmailHelp.
+  ///
+  /// In id, this message translates to:
+  /// **'Gunakan email orang tepercaya yang memahami dan menyetujui peran ini.'**
+  String get partnerEmailHelp;
+
+  /// No description provided for @partnerInviteAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Buat undangan'**
+  String get partnerInviteAction;
+
+  /// No description provided for @partnerInviteLink.
+  ///
+  /// In id, this message translates to:
+  /// **'Tautan undangan'**
+  String get partnerInviteLink;
+
+  /// No description provided for @partnerInviteCopied.
+  ///
+  /// In id, this message translates to:
+  /// **'Tautan undangan tersalin.'**
+  String get partnerInviteCopied;
+
+  /// No description provided for @partnerRequestHistory.
+  ///
+  /// In id, this message translates to:
+  /// **'Riwayat permintaan'**
+  String get partnerRequestHistory;
+
+  /// No description provided for @partnerNoRequests.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada permintaan'**
+  String get partnerNoRequests;
+
+  /// No description provided for @partnerNoRequestsBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Permintaan perubahan proteksi dari perangkat akan muncul di sini.'**
+  String get partnerNoRequestsBody;
+
+  /// No description provided for @partnerManageAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Kelola pendamping'**
+  String get partnerManageAction;
+
+  /// No description provided for @protectionSetupAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Setup platform'**
+  String get protectionSetupAction;
+
+  /// No description provided for @selfTestAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Jalankan self-test'**
+  String get selfTestAction;
+
+  /// No description provided for @selfTestPassed.
+  ///
+  /// In id, this message translates to:
+  /// **'Self-test lokal berhasil'**
+  String get selfTestPassed;
+
+  /// No description provided for @selfTestFailed.
+  ///
+  /// In id, this message translates to:
+  /// **'Self-test lokal gagal'**
+  String get selfTestFailed;
+
+  /// No description provided for @selfTestFixtureBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Classifier dummy, ruleset, dan jalur Pattern Interrupt siap digunakan.'**
+  String get selfTestFixtureBody;
+
+  /// No description provided for @protectionSyncError.
+  ///
+  /// In id, this message translates to:
+  /// **'Status akun belum dapat disinkronkan'**
+  String get protectionSyncError;
+
+  /// No description provided for @protectionAccountabilityTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Persetujuan perubahan proteksi'**
+  String get protectionAccountabilityTitle;
+
+  /// No description provided for @protectionSignInTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Proteksi lokal tetap berjalan'**
+  String get protectionSignInTitle;
+
+  /// No description provided for @protectionSignInBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Masuk untuk mendaftarkan perangkat, menyinkronkan agregat, dan meminta persetujuan pendamping.'**
+  String get protectionSignInBody;
+
+  /// No description provided for @deviceRegistrationMissing.
+  ///
+  /// In id, this message translates to:
+  /// **'Perangkat belum terdaftar'**
+  String get deviceRegistrationMissing;
+
+  /// No description provided for @deviceRegistrationMissingBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesaikan setup perangkat sebelum membuat permintaan persetujuan.'**
+  String get deviceRegistrationMissingBody;
+
+  /// No description provided for @protectionStatusActive.
+  ///
+  /// In id, this message translates to:
+  /// **'Proteksi aktif'**
+  String get protectionStatusActive;
+
+  /// No description provided for @protectionStatusPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Protection paused by a grant'**
+  String get protectionStatusPaused;
+
+  /// No description provided for @protectionStatusDegraded.
+  ///
+  /// In id, this message translates to:
+  /// **'Proteksi terdegradasi'**
+  String get protectionStatusDegraded;
+
+  /// No description provided for @protectionStatusInactive.
+  ///
+  /// In id, this message translates to:
+  /// **'Proteksi tidak aktif'**
+  String get protectionStatusInactive;
+
+  /// No description provided for @protectionStatusLocal.
+  ///
+  /// In id, this message translates to:
+  /// **'Keputusan dan intervensi berjalan lokal pada perangkat.'**
+  String get protectionStatusLocal;
+
+  /// No description provided for @protectionServiceLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Service'**
+  String get protectionServiceLabel;
+
+  /// No description provided for @protectionSensorLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Sensor'**
+  String get protectionSensorLabel;
+
+  /// No description provided for @protectionPermissionLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Izin'**
+  String get protectionPermissionLabel;
+
+  /// No description provided for @protectionArtifactLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Model dan ruleset'**
+  String get protectionArtifactLabel;
+
+  /// No description provided for @statusConnected.
+  ///
+  /// In id, this message translates to:
+  /// **'Terhubung'**
+  String get statusConnected;
+
+  /// No description provided for @statusDisconnected.
+  ///
+  /// In id, this message translates to:
+  /// **'Terputus'**
+  String get statusDisconnected;
+
+  /// No description provided for @protectionPartnerRequired.
+  ///
+  /// In id, this message translates to:
+  /// **'Hubungkan pendamping sebelum meminta perubahan proteksi.'**
+  String get protectionPartnerRequired;
+
+  /// No description provided for @protectionRequestPending.
+  ///
+  /// In id, this message translates to:
+  /// **'Permintaan sedang menunggu keputusan pendamping.'**
+  String get protectionRequestPending;
+
+  /// No description provided for @protectionRequestApproved.
+  ///
+  /// In id, this message translates to:
+  /// **'Permintaan telah disetujui dan siap diterapkan.'**
+  String get protectionRequestApproved;
+
+  /// No description provided for @protectionActionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Requested change'**
+  String get protectionActionLabel;
+
+  /// No description provided for @protectionPartnerReady.
+  ///
+  /// In id, this message translates to:
+  /// **'Pendamping aktif. Perubahan proteksi dapat diminta dari perangkat ini.'**
+  String get protectionPartnerReady;
+
+  /// No description provided for @protectionApplyApproval.
+  ///
+  /// In id, this message translates to:
+  /// **'Terapkan persetujuan'**
+  String get protectionApplyApproval;
+
+  /// No description provided for @protectionRequestAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Minta perubahan proteksi'**
+  String get protectionRequestAction;
+
+  /// No description provided for @protectionApprovalApplied.
+  ///
+  /// In id, this message translates to:
+  /// **'Persetujuan diterapkan pada perangkat.'**
+  String get protectionApprovalApplied;
+
+  /// No description provided for @protectionApprovalDialogTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Minta perubahan proteksi'**
+  String get protectionApprovalDialogTitle;
+
+  /// No description provided for @protectionApprovalDialogBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Permintaan terikat pada perangkat dan harus disetujui pendamping aktif. Proteksi tetap berjalan sampai grant diterapkan.'**
+  String get protectionApprovalDialogBody;
+
+  /// No description provided for @protectionPauseAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Jeda'**
+  String get protectionPauseAction;
+
+  /// No description provided for @protectionDisableAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Nonaktifkan'**
+  String get protectionDisableAction;
+
+  /// No description provided for @protectionUninstallAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Copot'**
+  String get protectionUninstallAction;
+
+  /// No description provided for @protectionDurationLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Durasi jeda'**
+  String get protectionDurationLabel;
+
+  /// No description provided for @minutesCount.
+  ///
+  /// In id, this message translates to:
+  /// **'{minutes} menit'**
+  String minutesCount(int minutes);
+
+  /// No description provided for @protectionReasonLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Alasan perubahan'**
+  String get protectionReasonLabel;
+
+  /// No description provided for @protectionReasonHelp.
+  ///
+  /// In id, this message translates to:
+  /// **'Alasan ini dibagikan kepada pendamping, tanpa data penjelajahan.'**
+  String get protectionReasonHelp;
+
+  /// No description provided for @emergencyTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Pemulihan darurat'**
+  String get emergencyTitle;
+
+  /// No description provided for @emergencyBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Gunakan hanya saat pendamping tidak tersedia atau perangkat terkunci dalam kondisi yang aman untuk dipulihkan.'**
+  String get emergencyBody;
+
+  /// No description provided for @emergencyStatus.
+  ///
+  /// In id, this message translates to:
+  /// **'Status permintaan darurat: {status}'**
+  String emergencyStatus(String status);
+
+  /// No description provided for @emergencyRequestAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Minta pemulihan'**
+  String get emergencyRequestAction;
+
+  /// No description provided for @emergencyEnterKeyAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Masukkan kunci'**
+  String get emergencyEnterKeyAction;
+
+  /// No description provided for @emergencyRequestCreated.
+  ///
+  /// In id, this message translates to:
+  /// **'Permintaan pemulihan darurat berhasil dibuat.'**
+  String get emergencyRequestCreated;
+
+  /// No description provided for @emergencyKeyTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Masukkan kunci darurat'**
+  String get emergencyKeyTitle;
+
+  /// No description provided for @emergencyKeyLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Kunci satu-kali-pakai'**
+  String get emergencyKeyLabel;
+
+  /// No description provided for @emergencyKeyHelp.
+  ///
+  /// In id, this message translates to:
+  /// **'Kunci diterbitkan setelah ditinjau dua admin platform berbeda, terikat pada perangkat ini, dan berlaku 24 jam.'**
+  String get emergencyKeyHelp;
+
+  /// No description provided for @emergencyKeyApplied.
+  ///
+  /// In id, this message translates to:
+  /// **'Grant darurat diterapkan selama 10 menit.'**
+  String get emergencyKeyApplied;
+
+  /// No description provided for @setupTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Setup perangkat'**
+  String get setupTitle;
+
+  /// No description provided for @setupIntro.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesaikan checklist ini agar status proteksi ditampilkan secara jujur dan setiap izin diberikan dengan persetujuan Anda.'**
+  String get setupIntro;
+
+  /// No description provided for @setupPrivacyTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Pahami batas privasi'**
+  String get setupPrivacyTitle;
+
+  /// No description provided for @setupPrivacyBody.
+  ///
+  /// In id, this message translates to:
+  /// **'URL dan teks halaman hanya diproses lokal. Backend menerima hitungan agregat saja.'**
+  String get setupPrivacyBody;
+
+  /// No description provided for @setupAccountTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Hubungkan akun'**
+  String get setupAccountTitle;
+
+  /// No description provided for @setupAccountBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Akun diperlukan untuk registrasi perangkat, pendamping, dan sinkronisasi agregat.'**
+  String get setupAccountBody;
+
+  /// No description provided for @setupAccountReady.
+  ///
+  /// In id, this message translates to:
+  /// **'Akun telah terhubung.'**
+  String get setupAccountReady;
+
+  /// No description provided for @setupDeviceTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Daftarkan perangkat'**
+  String get setupDeviceTitle;
+
+  /// No description provided for @setupDeviceBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Perangkat harus memiliki ID akun yang stabil sebelum membuat permintaan persetujuan.'**
+  String get setupDeviceBody;
+
+  /// No description provided for @setupDeviceReady.
+  ///
+  /// In id, this message translates to:
+  /// **'Perangkat terdaftar sebagai {deviceId}.'**
+  String setupDeviceReady(String deviceId);
+
+  /// No description provided for @setupDeviceAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Daftarkan perangkat'**
+  String get setupDeviceAction;
+
+  /// No description provided for @setupDeviceRegistered.
+  ///
+  /// In id, this message translates to:
+  /// **'Perangkat berhasil didaftarkan.'**
+  String get setupDeviceRegistered;
+
+  /// No description provided for @setupPlatformTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Aktifkan proteksi platform'**
+  String get setupPlatformTitle;
+
+  /// No description provided for @setupPlatformBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Android memerlukan Accessibility Service. Windows memerlukan service dan user-session agent.'**
+  String get setupPlatformBody;
+
+  /// No description provided for @setupPlatformReady.
+  ///
+  /// In id, this message translates to:
+  /// **'Runtime proteksi platform aktif.'**
+  String get setupPlatformReady;
+
+  /// No description provided for @setupPlatformAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka pengaturan platform'**
+  String get setupPlatformAction;
+
+  /// No description provided for @setupSelfTestTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Verifikasi classifier dummy'**
+  String get setupSelfTestTitle;
+
+  /// No description provided for @setupSelfTestBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Self-test menggunakan fixture sintetis dan tidak mengirim konten halaman.'**
+  String get setupSelfTestBody;
+
+  /// No description provided for @setupFinishAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka status proteksi'**
+  String get setupFinishAction;
+
+  /// No description provided for @setupLimitations.
+  ///
+  /// In id, this message translates to:
+  /// **'Sideload normal memberikan friksi, bukan perlindungan uninstall absolut. Administrator perangkat tetap memiliki kendali OS.'**
+  String get setupLimitations;
+
+  /// No description provided for @settingsAccountSection.
+  ///
+  /// In id, this message translates to:
+  /// **'Akun'**
+  String get settingsAccountSection;
+
+  /// No description provided for @settingsPreferencesSection.
+  ///
+  /// In id, this message translates to:
+  /// **'Preferensi'**
+  String get settingsPreferencesSection;
+
+  /// No description provided for @settingsWindowsSection.
+  ///
+  /// In id, this message translates to:
+  /// **'Windows dan ekstensi'**
+  String get settingsWindowsSection;
+
+  /// No description provided for @settingsAboutSection.
+  ///
+  /// In id, this message translates to:
+  /// **'Tentang dan bantuan'**
+  String get settingsAboutSection;
+
+  /// No description provided for @settingsUserFallback.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengguna'**
+  String get settingsUserFallback;
+
+  /// No description provided for @settingsEditProfile.
+  ///
+  /// In id, this message translates to:
+  /// **'Ubah nama profil'**
+  String get settingsEditProfile;
+
+  /// No description provided for @settingsProfileUpdated.
+  ///
+  /// In id, this message translates to:
+  /// **'Profil berhasil diperbarui.'**
+  String get settingsProfileUpdated;
+
+  /// No description provided for @settingsChangePassword.
+  ///
+  /// In id, this message translates to:
+  /// **'Ubah kata sandi'**
+  String get settingsChangePassword;
+
+  /// No description provided for @settingsCurrentPassword.
+  ///
+  /// In id, this message translates to:
+  /// **'Kata sandi saat ini'**
+  String get settingsCurrentPassword;
+
+  /// No description provided for @settingsNewPassword.
+  ///
+  /// In id, this message translates to:
+  /// **'Kata sandi baru'**
+  String get settingsNewPassword;
+
+  /// No description provided for @settingsConfirmPassword.
+  ///
+  /// In id, this message translates to:
+  /// **'Ulangi kata sandi baru'**
+  String get settingsConfirmPassword;
+
+  /// No description provided for @settingsPasswordMismatch.
+  ///
+  /// In id, this message translates to:
+  /// **'Kata sandi baru minimal 8 karakter dan harus sama.'**
+  String get settingsPasswordMismatch;
+
+  /// No description provided for @settingsPasswordUpdated.
+  ///
+  /// In id, this message translates to:
+  /// **'Kata sandi diperbarui. Silakan masuk kembali.'**
+  String get settingsPasswordUpdated;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In id, this message translates to:
+  /// **'Bahasa aplikasi'**
+  String get settingsLanguage;
+
+  /// No description provided for @languageId.
+  ///
+  /// In id, this message translates to:
+  /// **'Bahasa Indonesia'**
+  String get languageId;
+
+  /// No description provided for @languageEn.
+  ///
+  /// In id, this message translates to:
+  /// **'English'**
+  String get languageEn;
+
+  /// No description provided for @settingsHaptics.
+  ///
+  /// In id, this message translates to:
+  /// **'Umpan balik getar'**
+  String get settingsHaptics;
+
+  /// No description provided for @settingsHealthNotifications.
+  ///
+  /// In id, this message translates to:
+  /// **'Notifikasi kesehatan proteksi'**
+  String get settingsHealthNotifications;
+
+  /// No description provided for @settingsHealthNotificationsBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Notifikasi hanya memuat status service atau izin, tanpa data situs.'**
+  String get settingsHealthNotificationsBody;
+
+  /// No description provided for @settingsPairingToken.
+  ///
+  /// In id, this message translates to:
+  /// **'Token pairing ekstensi'**
+  String get settingsPairingToken;
+
+  /// No description provided for @settingsPairingUnavailable.
+  ///
+  /// In id, this message translates to:
+  /// **'Service Windows belum terhubung.'**
+  String get settingsPairingUnavailable;
+
+  /// No description provided for @settingsRotatePairing.
+  ///
+  /// In id, this message translates to:
+  /// **'Rotasi token pairing'**
+  String get settingsRotatePairing;
+
+  /// No description provided for @settingsArtifacts.
+  ///
+  /// In id, this message translates to:
+  /// **'Artefak proteksi lokal'**
+  String get settingsArtifacts;
+
+  /// No description provided for @settingsPrivacy.
+  ///
+  /// In id, this message translates to:
+  /// **'Kebijakan privasi'**
+  String get settingsPrivacy;
+
+  /// No description provided for @settingsHelp.
+  ///
+  /// In id, this message translates to:
+  /// **'Pusat bantuan'**
+  String get settingsHelp;
+
+  /// No description provided for @recoveryWebTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Pemulihan tersedia di website'**
+  String get recoveryWebTitle;
+
+  /// No description provided for @recoveryWebBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Jurnal, check-in, misi, dan psikoedukasi tetap berada di website agar aplikasi ini fokus pada proteksi perangkat.'**
+  String get recoveryWebBody;
+
+  /// No description provided for @recoveryWebAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka pemulihan web'**
+  String get recoveryWebAction;
+
+  /// No description provided for @backToProtection.
+  ///
+  /// In id, this message translates to:
+  /// **'Kembali ke proteksi'**
+  String get backToProtection;
+
+  /// No description provided for @patternInterruptTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Ambil jeda sebelum melanjutkan'**
+  String get patternInterruptTitle;
+
+  /// No description provided for @patternBreatheLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Animasi napas perlahan'**
+  String get patternBreatheLabel;
+
+  /// No description provided for @patternSecondsRemaining.
+  ///
+  /// In id, this message translates to:
+  /// **'{seconds} detik tersisa'**
+  String patternSecondsRemaining(int seconds);
+
+  /// No description provided for @patternReady.
+  ///
+  /// In id, this message translates to:
+  /// **'Jeda selesai. Pilih langkah berikutnya.'**
+  String get patternReady;
+
+  /// No description provided for @patternGroundingAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Latihan grounding offline'**
+  String get patternGroundingAction;
+
+  /// No description provided for @patternHelpAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Butuh bantuan'**
+  String get patternHelpAction;
+
+  /// No description provided for @patternLaterAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Kembali ke proteksi'**
+  String get patternLaterAction;
+
+  /// No description provided for @patternGroundingTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Perhatikan lima hal di sekitar Anda'**
+  String get patternGroundingTitle;
+
+  /// No description provided for @patternGroundingBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Sebutkan lima hal yang terlihat, empat yang terasa, tiga yang terdengar, dua yang tercium, dan satu hal yang ingin Anda lindungi hari ini.'**
+  String get patternGroundingBody;
+
+  /// No description provided for @patternReturnProtection.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesai dan kembali'**
+  String get patternReturnProtection;
 }
 
 class _AppLocalizationsDelegate

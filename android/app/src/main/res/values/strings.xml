@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="accessibility_service_description">Gamblock AI menggunakan Accessibility Service untuk mencegah penghapusan aplikasi secara sepihak dan mendeteksi aplikasi judi online. Data diproses 100% lokal di perangkat Anda.</string>
+    <string name="accessibility_service_description">Gamblock AI membaca URL bar, judul, heading, dan teks tautan yang diizinkan pada Chrome dan Edge untuk klasifikasi lokal. Service juga memberi friksi aman pada perubahan proteksi. URL dan teks halaman tidak pernah dikirim ke backend.</string>
 </resources>
