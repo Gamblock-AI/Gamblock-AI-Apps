@@ -173,7 +173,7 @@ class GamblockAccessibilityService : AccessibilityService() {
         val title = (
             event.contentDescription?.toString()
                 ?: event.text.firstOrNull()?.toString()
-                ?: if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) root.paneTitle?.toString() else null
+                ?: (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) root.paneTitle?.toString() else null)
                 ?: ""
             ).take(512)
         if (url.isEmpty() && title.isEmpty() && headings.isEmpty() && anchors.isEmpty()) {

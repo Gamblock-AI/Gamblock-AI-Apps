@@ -15,6 +15,7 @@ import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import org.json.JSONArray
 import org.json.JSONObject
 import java.util.concurrent.Executors
 
@@ -62,7 +63,7 @@ class MainActivity : FlutterActivity() {
                     result.success(true)
                 }
                 "runLocalSelfTest" -> background(result) {
-                    classifier.runSelfTest().toMap()
+                    jsonToFlutter(classifier.runSelfTest())
                 }
                 "checkArtifactUpdates" -> background(result) {
                     val baseUrl = call.argument<String>("base_url")
@@ -171,6 +172,13 @@ class MainActivity : FlutterActivity() {
                 2001,
             )
         }
+    }
+
+    private fun jsonToFlutter(value: Any?): Any? = when (value) {
+        is JSONObject -> value.keys().asSequence().associateWith { jsonToFlutter(value.opt(it)) }
+        is JSONArray -> (0 until value.length()).map { jsonToFlutter(value.opt(it)) }
+        JSONObject.NULL -> null
+        else -> value
     }
 
     private fun background(

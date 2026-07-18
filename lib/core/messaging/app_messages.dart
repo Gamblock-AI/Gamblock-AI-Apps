@@ -114,6 +114,13 @@ class AppMessages {
         return loc.msgErrLoadPsychoeducation;
       case 'module_not_found':
         return loc.msgErrModuleNotFound;
+      case 'education_conflict':
+        return loc.msgErrDataConflict;
+      case 'education_validation_failed':
+      case 'education_media_invalid':
+        return loc.msgErrInvalidRequest;
+      case 'education_media_not_found':
+        return loc.msgErrModuleNotFound;
       case 'text_required':
         return loc.msgErrTextRequired;
       case 'token_required':

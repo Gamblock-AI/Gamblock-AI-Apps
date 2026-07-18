@@ -1,6 +1,6 @@
 # Gamblock-AI Flutter Client Agent Rules
 
-Context version: `2026-07-16.5`
+Context version: `2026-07-18.3`
 
 This standalone repository contains the Android and Windows protection client.
 Read `docs/ai/README.md` before changing behavior; it distinguishes working

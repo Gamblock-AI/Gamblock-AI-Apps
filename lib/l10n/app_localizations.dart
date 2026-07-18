@@ -1198,20 +1198,20 @@ abstract class AppLocalizations {
 
   /// No description provided for @msgErrPasswordValidation.
   ///
-  /// In en, this message translates to:
-  /// **'The new password must contain at least 8 characters.'**
+  /// In id, this message translates to:
+  /// **'Kata sandi baru minimal 8 karakter.'**
   String get msgErrPasswordValidation;
 
   /// No description provided for @msgErrCurrentPasswordInvalid.
   ///
-  /// In en, this message translates to:
-  /// **'The current password is incorrect.'**
+  /// In id, this message translates to:
+  /// **'Kata sandi saat ini tidak benar.'**
   String get msgErrCurrentPasswordInvalid;
 
   /// No description provided for @msgErrPasswordReuse.
   ///
-  /// In en, this message translates to:
-  /// **'The new password must differ from the current password.'**
+  /// In id, this message translates to:
+  /// **'Kata sandi baru harus berbeda dari kata sandi saat ini.'**
   String get msgErrPasswordReuse;
 
   /// No description provided for @protectionTitle.
@@ -1300,14 +1300,14 @@ abstract class AppLocalizations {
 
   /// No description provided for @analyticsDataSynced.
   ///
-  /// In en, this message translates to:
-  /// **'Completed-day counts are synchronized to your account.'**
+  /// In id, this message translates to:
+  /// **'Hitungan hari yang selesai sudah disinkronkan ke akun Anda.'**
   String get analyticsDataSynced;
 
   /// No description provided for @analyticsDataLocalOnly.
   ///
-  /// In en, this message translates to:
-  /// **'The backend is unavailable or data is insufficient; this view uses available local counts.'**
+  /// In id, this message translates to:
+  /// **'Backend tidak tersedia atau data belum cukup; tampilan ini memakai hitungan lokal yang tersedia.'**
   String get analyticsDataLocalOnly;
 
   /// No description provided for @analyticsBlocked.
@@ -1504,8 +1504,8 @@ abstract class AppLocalizations {
 
   /// No description provided for @protectionStatusPaused.
   ///
-  /// In en, this message translates to:
-  /// **'Protection paused by a grant'**
+  /// In id, this message translates to:
+  /// **'Proteksi dijeda oleh grant'**
   String get protectionStatusPaused;
 
   /// No description provided for @protectionStatusDegraded.
@@ -1582,8 +1582,8 @@ abstract class AppLocalizations {
 
   /// No description provided for @protectionActionLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Requested change'**
+  /// In id, this message translates to:
+  /// **'Perubahan yang diminta'**
   String get protectionActionLabel;
 
   /// No description provided for @protectionPartnerReady.
@@ -1805,7 +1805,7 @@ abstract class AppLocalizations {
   /// No description provided for @setupPlatformBody.
   ///
   /// In id, this message translates to:
-  /// **'Android memerlukan Accessibility Service. Windows memerlukan service dan user-session agent.'**
+  /// **'Android memerlukan Accessibility Service. Windows memerlukan service, user-session agent, serta ekstensi Chrome/Edge yang dipasangkan dengan token lokal.'**
   String get setupPlatformBody;
 
   /// No description provided for @setupPlatformReady.

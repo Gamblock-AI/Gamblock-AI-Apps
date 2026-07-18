@@ -22,6 +22,7 @@ DioException _dioErr({String? code, String? message, int? status}) {
 
 Widget buildTestApp(WidgetBuilder builder) {
   return MaterialApp(
+    locale: const Locale('id'),
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     home: Builder(builder: builder),
