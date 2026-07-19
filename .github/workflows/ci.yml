@@ -110,7 +110,88 @@ jobs:
           name: release-windows-development
           path: gamblock-ai-windows-development.zip
 
-  production_android:
+  production_debug_android:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.9'
+          cache: true
+
+      - name: Create public production configuration
+        env:
+          API_BASE_URL: ${{ vars.PROD_API_BASE_URL }}
+          WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}
+          GOOGLE_WEB_CLIENT_ID: ${{ vars.GOOGLE_WEB_CLIENT_ID }}
+          GOOGLE_WINDOWS_CLIENT_ID: ${{ vars.GOOGLE_WINDOWS_CLIENT_ID }}
+        run: |
+          test -n "$API_BASE_URL"
+          test -n "$WEB_BASE_URL"
+          test -n "$GOOGLE_WEB_CLIENT_ID"
+          test -n "$GOOGLE_WINDOWS_CLIENT_ID"
+          printf '%s\n' \
+            'APP_ENV=production' \
+            "API_BASE_URL=$API_BASE_URL" \
+            "WEB_BASE_URL=$WEB_BASE_URL" \
+            "GOOGLE_WEB_CLIENT_ID=$GOOGLE_WEB_CLIENT_ID" \
+            "GOOGLE_WINDOWS_CLIENT_ID=$GOOGLE_WINDOWS_CLIENT_ID" > .env
+
+      - run: flutter pub get
+      - name: Build debug-signed Android APK with production configuration
+        run: flutter build apk --debug
+      - name: Prepare fixed-name production debug Android asset
+        run: cp build/app/outputs/flutter-apk/app-debug.apk gamblock-ai-android-production-debug.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-android-production-debug
+          path: gamblock-ai-android-production-debug.apk
+
+  production_debug_windows:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.9'
+          cache: true
+
+      - name: Create public production configuration
+        shell: pwsh
+        env:
+          API_BASE_URL: ${{ vars.PROD_API_BASE_URL }}
+          WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}
+          GOOGLE_WEB_CLIENT_ID: ${{ vars.GOOGLE_WEB_CLIENT_ID }}
+          GOOGLE_WINDOWS_CLIENT_ID: ${{ vars.GOOGLE_WINDOWS_CLIENT_ID }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:API_BASE_URL)) { throw "PROD_API_BASE_URL is required" }
+          if ([string]::IsNullOrWhiteSpace($env:WEB_BASE_URL)) { throw "WEB_BASE_URL is required" }
+          if ([string]::IsNullOrWhiteSpace($env:GOOGLE_WEB_CLIENT_ID)) { throw "GOOGLE_WEB_CLIENT_ID is required" }
+          if ([string]::IsNullOrWhiteSpace($env:GOOGLE_WINDOWS_CLIENT_ID)) { throw "GOOGLE_WINDOWS_CLIENT_ID is required" }
+          @"
+          APP_ENV=production
+          API_BASE_URL=$env:API_BASE_URL
+          WEB_BASE_URL=$env:WEB_BASE_URL
+          GOOGLE_WEB_CLIENT_ID=$env:GOOGLE_WEB_CLIENT_ID
+          GOOGLE_WINDOWS_CLIENT_ID=$env:GOOGLE_WINDOWS_CLIENT_ID
+          "@ | Set-Content -Encoding utf8NoBOM .env
+
+      - run: flutter pub get
+      - name: Build unsigned Windows debug bundle with production configuration
+        run: flutter build windows --debug
+      - name: Prepare fixed-name production debug Windows asset
+        shell: pwsh
+        run: Compress-Archive -Path "build\windows\x64\runner\Debug\*" -DestinationPath "gamblock-ai-windows-production-debug.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-windows-production-debug
+          path: gamblock-ai-windows-production-debug.zip
+
+  signed_production_android:
     needs: test
     if: >-
       github.event_name == 'push' &&
@@ -169,7 +250,7 @@ jobs:
           name: release-android-production
           path: gamblock-ai-android-production.apk
 
-  production_windows:
+  signed_production_windows:
     needs: test
     if: >-
       github.event_name == 'push' &&
@@ -242,8 +323,10 @@ jobs:
       - test
       - development_android
       - development_windows
-      - production_android
-      - production_windows
+      - production_debug_android
+      - production_debug_windows
+      - signed_production_android
+      - signed_production_windows
     if: >-
       always() &&
       github.event_name == 'push' &&
@@ -251,8 +334,10 @@ jobs:
       needs.test.result == 'success' &&
       needs.development_android.result == 'success' &&
       needs.development_windows.result == 'success' &&
-      (needs.production_android.result == 'success' || needs.production_android.result == 'skipped') &&
-      (needs.production_windows.result == 'success' || needs.production_windows.result == 'skipped')
+      needs.production_debug_android.result == 'success' &&
+      needs.production_debug_windows.result == 'success' &&
+      (needs.signed_production_android.result == 'success' || needs.signed_production_android.result == 'skipped') &&
+      (needs.signed_production_windows.result == 'success' || needs.signed_production_windows.result == 'skipped')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -277,18 +362,20 @@ jobs:
             gh release edit latest \
               --target "$GITHUB_SHA" \
               --title "Gamblock-AI latest ($GITHUB_SHA)" \
-              --notes "Automated development snapshot for commit $GITHUB_SHA. Production assets appear only when signed release jobs are enabled."
+              --notes "Automated snapshot for commit $GITHUB_SHA. Production-config debug assets are not store-signed releases; signed production assets appear only when signing jobs are enabled."
           else
             gh release create latest \
               --target "$GITHUB_SHA" \
               --title "Gamblock-AI latest ($GITHUB_SHA)" \
-              --notes "Automated development snapshot for commit $GITHUB_SHA. Production assets appear only when signed release jobs are enabled." \
+              --notes "Automated snapshot for commit $GITHUB_SHA. Production-config debug assets are not store-signed releases; signed production assets appear only when signing jobs are enabled." \
               --latest
           fi
 
           for asset in \
             gamblock-ai-android-development.apk \
             gamblock-ai-windows-development.zip \
+            gamblock-ai-android-production-debug.apk \
+            gamblock-ai-windows-production-debug.zip \
             gamblock-ai-android-production.apk \
             gamblock-ai-windows-production.zip; do
             gh release delete-asset latest "$asset" --yes >/dev/null 2>&1 || true

@@ -159,11 +159,14 @@ checks. The portable Windows Hybrid-v2 fixture can also be compiled directly
 from `windows/protection/hybrid_classifier_test.cpp`.
 
 Every successful `main` commit force-updates one mutable `latest` GitHub
-release. It replaces fixed-name development Android debug APK and Windows debug
-ZIP assets using the configured development API and production website URL.
-Concurrent older runs are cancelled so the newest commit wins.
+release. It replaces fixed-name development Android/Windows debug assets and
+separate `production-debug` assets. The latter use
+`APP_ENV=production`, `https://api.gamblock-ai.com`, and
+`https://gamblock-ai.com`, so they remain usable for production integration
+before signing material exists. Concurrent older runs are cancelled so the
+newest commit wins.
 
-Production Android and Windows jobs use the production API URL but remain
-disabled until `ENABLE_PRODUCTION_RELEASE=true` and the real Android keystore
-and Windows code-signing PFX secrets exist. They do not fall back to debug
-signing, and unsigned assets are never labeled production.
+Signed production Android and Windows jobs remain disabled until
+`ENABLE_PRODUCTION_RELEASE=true` and the real Android keystore and Windows
+code-signing PFX secrets exist. They do not silently fall back to debug
+signing; production-config debug assets stay explicitly labeled debug.

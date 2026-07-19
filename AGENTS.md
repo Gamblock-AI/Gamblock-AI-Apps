@@ -127,9 +127,10 @@ external services.
 
 - Do not edit `.env`, credentials, keystores, generated build output, or
   platform dependency caches.
-- The mutable `latest` release may always contain fixed-name development debug
-  Android/Windows assets. Production assets require
+- The mutable `latest` release always contains fixed-name development debug
+  assets plus clearly named `production-debug` assets that use public
+  production URLs. Signed production assets additionally require
   `ENABLE_PRODUCTION_RELEASE=true` and successful platform signing; never
-  relabel an unsigned artifact as production.
+  present a debug/unsigned artifact as signed or store a secret in client config.
 - Do not deploy, publish, sign releases, push, or change secrets without
   explicit user authorization.
