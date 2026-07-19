@@ -728,6 +728,30 @@ abstract class AppLocalizations {
   /// **'Password'**
   String get authPassword;
 
+  /// No description provided for @authEmailInvalid.
+  ///
+  /// In id, this message translates to:
+  /// **'Masukkan alamat email yang valid.'**
+  String get authEmailInvalid;
+
+  /// No description provided for @authPasswordRequired.
+  ///
+  /// In id, this message translates to:
+  /// **'Kata sandi wajib diisi.'**
+  String get authPasswordRequired;
+
+  /// No description provided for @authPasswordMinimum.
+  ///
+  /// In id, this message translates to:
+  /// **'Kata sandi minimal 8 karakter.'**
+  String get authPasswordMinimum;
+
+  /// No description provided for @authNameMinimum.
+  ///
+  /// In id, this message translates to:
+  /// **'Nama minimal 3 karakter.'**
+  String get authNameMinimum;
+
   /// No description provided for @authEmail.
   ///
   /// In id, this message translates to:
@@ -1199,7 +1223,7 @@ abstract class AppLocalizations {
   /// No description provided for @msgErrPasswordValidation.
   ///
   /// In id, this message translates to:
-  /// **'Kata sandi baru minimal 8 karakter.'**
+  /// **'Kata sandi saat ini dan kata sandi baru minimal 8 karakter wajib diisi.'**
   String get msgErrPasswordValidation;
 
   /// No description provided for @msgErrCurrentPasswordInvalid.
@@ -1213,6 +1237,48 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Kata sandi baru harus berbeda dari kata sandi saat ini.'**
   String get msgErrPasswordReuse;
+
+  /// No description provided for @msgErrAuthRequired.
+  ///
+  /// In id, this message translates to:
+  /// **'Sesi diperlukan. Silakan masuk terlebih dahulu.'**
+  String get msgErrAuthRequired;
+
+  /// No description provided for @msgErrForbidden.
+  ///
+  /// In id, this message translates to:
+  /// **'Anda tidak memiliki izin untuk tindakan ini.'**
+  String get msgErrForbidden;
+
+  /// No description provided for @msgErrInvalidBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Data yang dikirim tidak dapat dibaca. Periksa isian lalu coba lagi.'**
+  String get msgErrInvalidBody;
+
+  /// No description provided for @msgErrPrivacyPayloadRejected.
+  ///
+  /// In id, this message translates to:
+  /// **'Permintaan ditolak karena memuat data yang tidak boleh dikirim.'**
+  String get msgErrPrivacyPayloadRejected;
+
+  /// No description provided for @msgErrValidation.
+  ///
+  /// In id, this message translates to:
+  /// **'Periksa kembali isian yang belum sesuai.'**
+  String get msgErrValidation;
+
+  /// No description provided for @msgErrInternal.
+  ///
+  /// In id, this message translates to:
+  /// **'Terjadi kendala pada layanan. Silakan coba beberapa saat lagi.'**
+  String get msgErrInternal;
+
+  /// No description provided for @msgErrCreateAdminModule.
+  ///
+  /// In id, this message translates to:
+  /// **'Modul admin belum dapat dibuat.'**
+  String get msgErrCreateAdminModule;
 
   /// No description provided for @protectionTitle.
   ///
@@ -1963,6 +2029,18 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Ulangi kata sandi baru'**
   String get settingsConfirmPassword;
+
+  /// No description provided for @settingsShowPassword.
+  ///
+  /// In id, this message translates to:
+  /// **'Tampilkan kata sandi'**
+  String get settingsShowPassword;
+
+  /// No description provided for @settingsHidePassword.
+  ///
+  /// In id, this message translates to:
+  /// **'Sembunyikan kata sandi'**
+  String get settingsHidePassword;
 
   /// No description provided for @settingsPasswordMismatch.
   ///

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import '../config/app_config.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 class AppMessages {
@@ -13,6 +12,20 @@ class AppMessages {
     final loc = AppLocalizations.of(context)!;
     if (code == null) return loc.msgErrGeneric;
     switch (code) {
+      case 'auth_required':
+        return loc.msgErrAuthRequired;
+      case 'forbidden':
+        return loc.msgErrForbidden;
+      case 'invalid_body':
+        return loc.msgErrInvalidBody;
+      case 'privacy_payload_rejected':
+        return loc.msgErrPrivacyPayloadRejected;
+      case 'err_validation':
+        return loc.msgErrValidation;
+      case 'err_internal':
+        return loc.msgErrInternal;
+      case 'create_admin_module_failed':
+        return loc.msgErrCreateAdminModule;
       case 'email_required':
         return loc.msgErrEmailRequired;
       case 'validation_failed':
@@ -98,6 +111,7 @@ class AppMessages {
       case 'accountability_group_archive_failed':
       case 'accountability_sharing_update_failed':
       case 'accountability_leave_failed':
+      case 'accountability_leave_cancel_failed':
       case 'accountability_leave_resolve_failed':
       case 'accountability_member_remove_failed':
       case 'partner_contact_create_failed':
@@ -126,6 +140,7 @@ class AppMessages {
       case 'invalid_mission':
         return loc.msgErrInvalidMission;
       case 'mission_update_failed':
+      case 'mission_adjust_failed':
         return loc.msgErrUpdateMission;
       case 'fetch_reflections_failed':
         return loc.msgErrLoadJournal;
@@ -231,27 +246,15 @@ class AppMessages {
   }
 
   static String friendlyMessage(BuildContext context, Object error) {
-    final code = _extractCode(error);
-    final backendMessage = _extractMessage(error);
+    final code = codeOf(error);
     final status = _extractStatus(error);
 
-    if (!AppConfig.isProduction) {
-      if (code != null) {
-        return '[$code] ${backendMessage ?? forCode(context, code)}';
-      }
-      if (status != null) return 'API error: $status';
-      return error.toString();
-    }
-
     if (code != null) return forCode(context, code);
-    if (backendMessage != null && backendMessage.trim().isNotEmpty) {
-      return backendMessage;
-    }
     if (status != null) return _statusMessage(context, status);
     return generic(context);
   }
 
-  static String? _extractCode(Object error) {
+  static String? codeOf(Object error) {
     if (error is DioException) {
       final data = error.response?.data;
       if (data is Map<String, dynamic>) {
@@ -259,20 +262,6 @@ class AppMessages {
         if (err is Map<String, dynamic>) {
           final code = err['code'];
           if (code is String) return code;
-        }
-      }
-    }
-    return null;
-  }
-
-  static String? _extractMessage(Object error) {
-    if (error is DioException) {
-      final data = error.response?.data;
-      if (data is Map<String, dynamic>) {
-        final err = data['error'];
-        if (err is Map<String, dynamic>) {
-          final msg = err['message'];
-          if (msg is String) return msg;
         }
       }
     }

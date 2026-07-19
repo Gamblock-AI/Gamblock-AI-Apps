@@ -341,6 +341,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authPassword => 'Password';
 
   @override
+  String get authEmailInvalid => 'Enter a valid email address.';
+
+  @override
+  String get authPasswordRequired => 'Password is required.';
+
+  @override
+  String get authPasswordMinimum =>
+      'Password must contain at least 8 characters.';
+
+  @override
+  String get authNameMinimum => 'Name must contain at least 3 characters.';
+
+  @override
   String get authEmail => 'Email';
 
   @override
@@ -591,15 +604,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get msgErrPasswordValidation =>
-      'The new password must contain at least 8 characters.';
+      'Enter your current password and a new password of at least 8 characters.';
 
   @override
   String get msgErrCurrentPasswordInvalid =>
-      'The current password is incorrect.';
+      'Your current password is incorrect.';
 
   @override
   String get msgErrPasswordReuse =>
-      'The new password must differ from the current password.';
+      'Your new password must be different from your current password.';
+
+  @override
+  String get msgErrAuthRequired => 'Please sign in to continue.';
+
+  @override
+  String get msgErrForbidden =>
+      'You do not have permission to perform this action.';
+
+  @override
+  String get msgErrInvalidBody =>
+      'The submitted data could not be read. Review it and try again.';
+
+  @override
+  String get msgErrPrivacyPayloadRejected =>
+      'The request was rejected because it included data that must not be sent.';
+
+  @override
+  String get msgErrValidation => 'Review the fields that still need attention.';
+
+  @override
+  String get msgErrInternal =>
+      'The service encountered a problem. Please try again shortly.';
+
+  @override
+  String get msgErrCreateAdminModule =>
+      'The admin module could not be created.';
 
   @override
   String get protectionTitle => 'Protection';
@@ -1020,6 +1059,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsConfirmPassword => 'Confirm new password';
+
+  @override
+  String get settingsShowPassword => 'Show password';
+
+  @override
+  String get settingsHidePassword => 'Hide password';
 
   @override
   String get settingsPasswordMismatch =>

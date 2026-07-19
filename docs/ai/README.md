@@ -21,7 +21,7 @@ the device; the backend receives aggregate events only.
 
 | Area | State | Evidence/limit |
 |---|---|---|
-| Auth/device/setup/settings | Implemented code-complete prototype | session refresh is single-flight; device registration is stable-instance upsert; password/profile, locale, haptics, notifications, setup, and artifact health are wired |
+| Auth/device/setup/settings | Implemented code-complete prototype | session refresh is single-flight; device registration is stable-instance upsert; auth fields validate inline; password changes keep the dialog and values open for contextual server errors; localized safe messages and dismissible feedback are shared across features; profile, locale, haptics, notifications, setup, and artifact health are wired |
 | Protection/analytics/accountability UI | Implemented code-complete prototype | native health is authoritative; analytics are 7/30-day aggregate-only; registration declares the student role, group-code preview/confirm consumes the active membership contract, pause/uninstall requests use `membership_id`, and approved grants remain device-bound |
 | Hybrid-v1 local classifier | Implemented dummy prototype | Android and portable Windows core load versioned rules + synthetic LR weights and pass committed fixtures; artifact is explicitly untrained/unevaluated |
 | Pattern Interrupt and recovery handoff | Implemented code path | seven-second native/Flutter paths, reduced motion, offline grounding/help, and browsing-data-free web handoff are wired; device evidence remains required |

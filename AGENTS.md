@@ -95,9 +95,12 @@ handoff label is code-complete prototype, not evaluated/release-ready.
 ## Messaging and interaction
 
 - Add every stable backend error code to `AppMessages.forCode` and the website
-  catalog. Use localized strings, not hardcoded screen messages.
+  catalog. Use localized strings, not hardcoded screen messages. Never render
+  Dio/backend technical text or error codes to users, including development.
 - Use `AppFeedback` for action feedback and `Haptics` for meaningful tactile
-  events. Respect reduced motion and the global haptics flag.
+  events. Snackbars remain dismissible; expected form rejections should stay
+  inline and preserve entered values. Respect reduced motion and the global
+  haptics flag.
 - Use shared brand widgets for consistent loading, empty states, and presses.
 
 ## Validation policy

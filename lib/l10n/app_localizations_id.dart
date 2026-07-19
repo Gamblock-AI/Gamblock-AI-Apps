@@ -342,6 +342,18 @@ class AppLocalizationsId extends AppLocalizations {
   String get authPassword => 'Password';
 
   @override
+  String get authEmailInvalid => 'Masukkan alamat email yang valid.';
+
+  @override
+  String get authPasswordRequired => 'Kata sandi wajib diisi.';
+
+  @override
+  String get authPasswordMinimum => 'Kata sandi minimal 8 karakter.';
+
+  @override
+  String get authNameMinimum => 'Nama minimal 3 karakter.';
+
+  @override
   String get authEmail => 'Email';
 
   @override
@@ -588,7 +600,8 @@ class AppLocalizationsId extends AppLocalizations {
   String get msgErrEmergencyKeyRequired => 'Kunci darurat wajib diisi.';
 
   @override
-  String get msgErrPasswordValidation => 'Kata sandi baru minimal 8 karakter.';
+  String get msgErrPasswordValidation =>
+      'Kata sandi saat ini dan kata sandi baru minimal 8 karakter wajib diisi.';
 
   @override
   String get msgErrCurrentPasswordInvalid => 'Kata sandi saat ini tidak benar.';
@@ -596,6 +609,31 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get msgErrPasswordReuse =>
       'Kata sandi baru harus berbeda dari kata sandi saat ini.';
+
+  @override
+  String get msgErrAuthRequired =>
+      'Sesi diperlukan. Silakan masuk terlebih dahulu.';
+
+  @override
+  String get msgErrForbidden => 'Anda tidak memiliki izin untuk tindakan ini.';
+
+  @override
+  String get msgErrInvalidBody =>
+      'Data yang dikirim tidak dapat dibaca. Periksa isian lalu coba lagi.';
+
+  @override
+  String get msgErrPrivacyPayloadRejected =>
+      'Permintaan ditolak karena memuat data yang tidak boleh dikirim.';
+
+  @override
+  String get msgErrValidation => 'Periksa kembali isian yang belum sesuai.';
+
+  @override
+  String get msgErrInternal =>
+      'Terjadi kendala pada layanan. Silakan coba beberapa saat lagi.';
+
+  @override
+  String get msgErrCreateAdminModule => 'Modul admin belum dapat dibuat.';
 
   @override
   String get protectionTitle => 'Proteksi';
@@ -1015,6 +1053,12 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get settingsConfirmPassword => 'Ulangi kata sandi baru';
+
+  @override
+  String get settingsShowPassword => 'Tampilkan kata sandi';
+
+  @override
+  String get settingsHidePassword => 'Sembunyikan kata sandi';
 
   @override
   String get settingsPasswordMismatch =>

@@ -20,6 +20,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   bool _loading = false;
@@ -34,6 +35,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _submit() async {
     Haptics.medium();
+    if (!(_formKey.currentState?.validate() ?? false)) return;
     setState(() {
       _loading = true;
       _error = null;
@@ -72,18 +74,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             AuthFormError(message: _error!),
             const SizedBox(height: 16),
           ],
-          AuthInputField(
-            controller: _emailCtrl,
-            label: l10n.authEmail,
-            icon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
-          ),
-          const SizedBox(height: 14),
-          AuthInputField(
-            controller: _passCtrl,
-            label: l10n.authPassword,
-            icon: Icons.lock_outlined,
-            obscureText: true,
+          Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Column(
+              children: [
+                AuthInputField(
+                  controller: _emailCtrl,
+                  label: l10n.authEmail,
+                  icon: Icons.email_outlined,
+                  keyboardType: TextInputType.emailAddress,
+                  autofillHints: const [AutofillHints.email],
+                  textInputAction: TextInputAction.next,
+                  validator: (value) {
+                    final email = value?.trim() ?? '';
+                    if (email.isEmpty) return l10n.msgErrEmailRequired;
+                    if (!email.contains('@')) return l10n.authEmailInvalid;
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 14),
+                AuthInputField(
+                  controller: _passCtrl,
+                  label: l10n.authPassword,
+                  icon: Icons.lock_outlined,
+                  obscureText: true,
+                  autofillHints: const [AutofillHints.password],
+                  textInputAction: TextInputAction.done,
+                  validator: (value) => value == null || value.isEmpty
+                      ? l10n.authPasswordRequired
+                      : null,
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 24),
           AuthSubmitButton(

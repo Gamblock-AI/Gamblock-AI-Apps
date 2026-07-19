@@ -22,6 +22,8 @@ class AppFeedback {
             ],
           ),
           backgroundColor: AppColors.navy,
+          showCloseIcon: true,
+          closeIconColor: Colors.white,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -48,6 +50,8 @@ class AppFeedback {
             ],
           ),
           backgroundColor: AppColors.navyDark,
+          showCloseIcon: true,
+          closeIconColor: Colors.white,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -64,6 +68,8 @@ class AppFeedback {
         SnackBar(
           content: Text(message),
           backgroundColor: AppColors.navy,
+          showCloseIcon: true,
+          closeIconColor: Colors.white,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

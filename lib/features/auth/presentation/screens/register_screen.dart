@@ -20,6 +20,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
 }
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
+  final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
@@ -36,6 +37,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Future<void> _submit() async {
     Haptics.medium();
+    if (!(_formKey.currentState?.validate() ?? false)) return;
     setState(() {
       _loading = true;
       _error = null;
@@ -77,24 +79,50 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             AuthFormError(message: _error!),
             const SizedBox(height: 16),
           ],
-          AuthInputField(
-            controller: _nameCtrl,
-            label: l10n.authFullName,
-            icon: Icons.person_outline,
-          ),
-          const SizedBox(height: 14),
-          AuthInputField(
-            controller: _emailCtrl,
-            label: l10n.authEmail,
-            icon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
-          ),
-          const SizedBox(height: 14),
-          AuthInputField(
-            controller: _passCtrl,
-            label: l10n.authPassword,
-            icon: Icons.lock_outlined,
-            obscureText: true,
+          Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Column(
+              children: [
+                AuthInputField(
+                  controller: _nameCtrl,
+                  label: l10n.authFullName,
+                  icon: Icons.person_outline,
+                  autofillHints: const [AutofillHints.name],
+                  textInputAction: TextInputAction.next,
+                  validator: (value) => (value?.trim().length ?? 0) < 3
+                      ? l10n.authNameMinimum
+                      : null,
+                ),
+                const SizedBox(height: 14),
+                AuthInputField(
+                  controller: _emailCtrl,
+                  label: l10n.authEmail,
+                  icon: Icons.email_outlined,
+                  keyboardType: TextInputType.emailAddress,
+                  autofillHints: const [AutofillHints.email],
+                  textInputAction: TextInputAction.next,
+                  validator: (value) {
+                    final email = value?.trim() ?? '';
+                    if (email.isEmpty) return l10n.msgErrEmailRequired;
+                    if (!email.contains('@')) return l10n.authEmailInvalid;
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 14),
+                AuthInputField(
+                  controller: _passCtrl,
+                  label: l10n.authPassword,
+                  icon: Icons.lock_outlined,
+                  obscureText: true,
+                  autofillHints: const [AutofillHints.newPassword],
+                  textInputAction: TextInputAction.done,
+                  validator: (value) => (value?.length ?? 0) < 8
+                      ? l10n.authPasswordMinimum
+                      : null,
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 24),
           AuthSubmitButton(

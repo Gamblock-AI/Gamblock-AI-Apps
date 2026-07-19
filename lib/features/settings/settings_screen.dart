@@ -78,27 +78,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _changePassword() async {
-    final passwordChange = await showPasswordChangeDialog(context);
-    if (passwordChange == null || !mounted) return;
-    try {
-      await ref
+    final changed = await showPasswordChangeDialog(
+      context,
+      onSubmit: (passwordChange) => ref
           .read(authProvider.notifier)
           .updatePassword(
             currentPassword: passwordChange.currentPassword,
             newPassword: passwordChange.newPassword,
-          );
-      if (mounted) {
-        AppFeedback.success(
-          context,
-          AppLocalizations.of(context)!.settingsPasswordUpdated,
-        );
-        context.go('/login');
-      }
-    } catch (error) {
-      if (mounted) {
-        AppFeedback.error(context, AppMessages.friendlyMessage(context, error));
-      }
-    }
+          ),
+    );
+    if (!changed || !mounted) return;
+    AppFeedback.success(
+      context,
+      AppLocalizations.of(context)!.settingsPasswordUpdated,
+    );
+    context.go('/login');
   }
 
   Future<void> _logout() async {
