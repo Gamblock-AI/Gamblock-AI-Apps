@@ -3,9 +3,12 @@ name: Flutter CI
 on:
   push:
     branches: [main]
-    tags: ['v*']
   pull_request:
     branches: [main]
+
+concurrency:
+  group: flutter-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -26,7 +29,48 @@ jobs:
           name: flutter-coverage
           path: coverage/lcov.info
 
-  windows-debug:
+  development_android:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.9'
+          cache: true
+
+      - name: Create public development configuration
+        env:
+          API_BASE_URL: ${{ vars.DEV_API_BASE_URL }}
+          WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}
+          GOOGLE_WEB_CLIENT_ID: ${{ vars.GOOGLE_WEB_CLIENT_ID }}
+          GOOGLE_WINDOWS_CLIENT_ID: ${{ vars.GOOGLE_WINDOWS_CLIENT_ID }}
+        run: |
+          test -n "$API_BASE_URL"
+          test -n "$WEB_BASE_URL"
+          test -n "$GOOGLE_WEB_CLIENT_ID"
+          test -n "$GOOGLE_WINDOWS_CLIENT_ID"
+          printf '%s\n' \
+            'APP_ENV=development' \
+            "API_BASE_URL=$API_BASE_URL" \
+            "WEB_BASE_URL=$WEB_BASE_URL" \
+            "GOOGLE_WEB_CLIENT_ID=$GOOGLE_WEB_CLIENT_ID" \
+            "GOOGLE_WINDOWS_CLIENT_ID=$GOOGLE_WINDOWS_CLIENT_ID" > .env
+
+      - run: flutter pub get
+      - name: Build development Android APK
+        run: flutter build apk --debug
+      - name: Prepare fixed-name Android asset
+        run: cp build/app/outputs/flutter-apk/app-debug.apk gamblock-ai-android-development.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-android-development
+          path: gamblock-ai-android-development.apk
+
+  development_windows:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,32 +78,71 @@ jobs:
         with:
           flutter-version: '3.41.9'
           cache: true
+
       - name: Create public development configuration
         shell: pwsh
-        run: Copy-Item .env.example .env
-      - run: flutter pub get
-      - name: Compile Windows client and service without release signing
-        run: flutter build windows --debug
+        env:
+          API_BASE_URL: ${{ vars.DEV_API_BASE_URL }}
+          WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}
+          GOOGLE_WEB_CLIENT_ID: ${{ vars.GOOGLE_WEB_CLIENT_ID }}
+          GOOGLE_WINDOWS_CLIENT_ID: ${{ vars.GOOGLE_WINDOWS_CLIENT_ID }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:API_BASE_URL)) { throw "DEV_API_BASE_URL is required" }
+          if ([string]::IsNullOrWhiteSpace($env:WEB_BASE_URL)) { throw "WEB_BASE_URL is required" }
+          if ([string]::IsNullOrWhiteSpace($env:GOOGLE_WEB_CLIENT_ID)) { throw "GOOGLE_WEB_CLIENT_ID is required" }
+          if ([string]::IsNullOrWhiteSpace($env:GOOGLE_WINDOWS_CLIENT_ID)) { throw "GOOGLE_WINDOWS_CLIENT_ID is required" }
+          @"
+          APP_ENV=development
+          API_BASE_URL=$env:API_BASE_URL
+          WEB_BASE_URL=$env:WEB_BASE_URL
+          GOOGLE_WEB_CLIENT_ID=$env:GOOGLE_WEB_CLIENT_ID
+          GOOGLE_WINDOWS_CLIENT_ID=$env:GOOGLE_WINDOWS_CLIENT_ID
+          "@ | Set-Content -Encoding utf8NoBOM .env
 
-  release-apk:
-    # Build a release APK and attach it to a GitHub Release on version tags.
+      - run: flutter pub get
+      - name: Build development Windows bundle
+        run: flutter build windows --debug
+      - name: Prepare fixed-name Windows asset
+        shell: pwsh
+        run: Compress-Archive -Path "build\windows\x64\runner\Debug\*" -DestinationPath "gamblock-ai-windows-development.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-windows-development
+          path: gamblock-ai-windows-development.zip
+
+  production_android:
     needs: test
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      vars.ENABLE_PRODUCTION_RELEASE == 'true'
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
-
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.41.9'
           cache: true
 
-      - name: Create .env for release build
-        run: cp .env.example .env
+      - name: Create public production configuration
+        env:
+          API_BASE_URL: ${{ vars.PROD_API_BASE_URL }}
+          WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}
+          GOOGLE_WEB_CLIENT_ID: ${{ vars.GOOGLE_WEB_CLIENT_ID }}
+          GOOGLE_WINDOWS_CLIENT_ID: ${{ vars.GOOGLE_WINDOWS_CLIENT_ID }}
+        run: |
+          test -n "$API_BASE_URL"
+          test -n "$WEB_BASE_URL"
+          test -n "$GOOGLE_WEB_CLIENT_ID"
+          test -n "$GOOGLE_WINDOWS_CLIENT_ID"
+          printf '%s\n' \
+            'APP_ENV=production' \
+            "API_BASE_URL=$API_BASE_URL" \
+            "WEB_BASE_URL=$WEB_BASE_URL" \
+            "GOOGLE_WEB_CLIENT_ID=$GOOGLE_WEB_CLIENT_ID" \
+            "GOOGLE_WINDOWS_CLIENT_ID=$GOOGLE_WINDOWS_CLIENT_ID" > .env
 
-      - name: Validate Android signing secrets
+      - name: Validate and restore Android signing key
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -70,56 +153,57 @@ jobs:
           test -n "$KEYSTORE_PASSWORD"
           test -n "$KEY_ALIAS"
           test -n "$KEY_PASSWORD"
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/gamblock-release.jks"
 
-      - name: Restore Android signing key
-        env:
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-        run: printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/gamblock-release.jks"
-
-      - name: Build release APK
+      - run: flutter pub get
+      - name: Build signed production Android APK
         env:
           ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/gamblock-release.jks
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: flutter build apk --release
-
-      - name: Rename APK
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          cp build/app/outputs/flutter-apk/app-release.apk \
-             gamblock-ai-$VERSION.apk
-
-      - name: Create GitHub Release and upload APK
-        uses: softprops/action-gh-release@v2
+      - run: cp build/app/outputs/flutter-apk/app-release.apk gamblock-ai-android-production.apk
+      - uses: actions/upload-artifact@v4
         with:
-          name: Gamblock-AI ${{ github.ref_name }}
-          generate_release_notes: true
-          files: gamblock-ai-*.apk
+          name: release-android-production
+          path: gamblock-ai-android-production.apk
 
-  release-windows:
+  production_windows:
     needs: test
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      vars.ENABLE_PRODUCTION_RELEASE == 'true'
     runs-on: windows-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
-
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.41.9'
           cache: true
 
-      - name: Create .env for release build
+      - name: Create public production configuration
         shell: pwsh
-        run: Copy-Item .env.example .env
+        env:
+          API_BASE_URL: ${{ vars.PROD_API_BASE_URL }}
+          WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}
+          GOOGLE_WEB_CLIENT_ID: ${{ vars.GOOGLE_WEB_CLIENT_ID }}
+          GOOGLE_WINDOWS_CLIENT_ID: ${{ vars.GOOGLE_WINDOWS_CLIENT_ID }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:API_BASE_URL)) { throw "PROD_API_BASE_URL is required" }
+          if ([string]::IsNullOrWhiteSpace($env:WEB_BASE_URL)) { throw "WEB_BASE_URL is required" }
+          if ([string]::IsNullOrWhiteSpace($env:GOOGLE_WEB_CLIENT_ID)) { throw "GOOGLE_WEB_CLIENT_ID is required" }
+          if ([string]::IsNullOrWhiteSpace($env:GOOGLE_WINDOWS_CLIENT_ID)) { throw "GOOGLE_WINDOWS_CLIENT_ID is required" }
+          @"
+          APP_ENV=production
+          API_BASE_URL=$env:API_BASE_URL
+          WEB_BASE_URL=$env:WEB_BASE_URL
+          GOOGLE_WEB_CLIENT_ID=$env:GOOGLE_WEB_CLIENT_ID
+          GOOGLE_WINDOWS_CLIENT_ID=$env:GOOGLE_WINDOWS_CLIENT_ID
+          "@ | Set-Content -Encoding utf8NoBOM .env
 
-      - name: Build Windows client and LocalSystem service
-        shell: pwsh
-        run: flutter build windows --release
-
-      - name: Validate Windows signing secrets
+      - name: Restore Windows signing certificate
         shell: pwsh
         env:
           SIGNING_PFX_BASE64: ${{ secrets.WINDOWS_SIGNING_PFX_BASE64 }}
@@ -132,7 +216,10 @@ jobs:
             [Convert]::FromBase64String($env:SIGNING_PFX_BASE64)
           )
 
-      - name: Sign Windows executables
+      - run: flutter pub get
+      - name: Build production Windows bundle
+        run: flutter build windows --release
+      - name: Sign and package Windows executables
         shell: pwsh
         env:
           SIGNING_PFX_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PFX_PASSWORD }}
@@ -144,16 +231,66 @@ jobs:
               /p "$env:SIGNING_PFX_PASSWORD" $_.FullName
             if ($LASTEXITCODE -ne 0) { throw "Signing failed for $($_.Name)" }
           }
-
-      - name: Package Windows bundle
-        shell: pwsh
-        run: |
-          $version = "${env:GITHUB_REF_NAME}".TrimStart("v")
-          Compress-Archive `
-            -Path "build\windows\x64\runner\Release\*" `
-            -DestinationPath "gamblock-ai-windows-$version.zip"
-
-      - name: Upload Windows bundle to GitHub Release
-        uses: softprops/action-gh-release@v2
+          Compress-Archive -Path "$bundle\*" -DestinationPath "gamblock-ai-windows-production.zip"
+      - uses: actions/upload-artifact@v4
         with:
-          files: gamblock-ai-windows-*.zip
+          name: release-windows-production
+          path: gamblock-ai-windows-production.zip
+
+  release_latest:
+    needs:
+      - test
+      - development_android
+      - development_windows
+      - production_android
+      - production_windows
+    if: >-
+      always() &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.test.result == 'success' &&
+      needs.development_android.result == 'success' &&
+      needs.development_windows.result == 'success' &&
+      (needs.production_android.result == 'success' || needs.production_android.result == 'skipped') &&
+      (needs.production_windows.result == 'success' || needs.production_windows.result == 'skipped')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Force-update mutable latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git tag --force latest "$GITHUB_SHA"
+          git push origin refs/tags/latest --force
+
+          if gh release view latest >/dev/null 2>&1; then
+            gh release edit latest \
+              --target "$GITHUB_SHA" \
+              --title "Gamblock-AI latest ($GITHUB_SHA)" \
+              --notes "Automated development snapshot for commit $GITHUB_SHA. Production assets appear only when signed release jobs are enabled."
+          else
+            gh release create latest \
+              --target "$GITHUB_SHA" \
+              --title "Gamblock-AI latest ($GITHUB_SHA)" \
+              --notes "Automated development snapshot for commit $GITHUB_SHA. Production assets appear only when signed release jobs are enabled." \
+              --latest
+          fi
+
+          for asset in \
+            gamblock-ai-android-development.apk \
+            gamblock-ai-windows-development.zip \
+            gamblock-ai-android-production.apk \
+            gamblock-ai-windows-production.zip; do
+            gh release delete-asset latest "$asset" --yes >/dev/null 2>&1 || true
+          done
+          gh release upload latest release-assets/* --clobber

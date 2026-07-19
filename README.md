@@ -158,7 +158,12 @@ change before accepting the normal access/refresh session.
 checks. The portable Windows Hybrid-v2 fixture can also be compiled directly
 from `windows/protection/hybrid_classifier_test.cpp`.
 
-Tag CI requires real Android keystore secrets and a Windows code-signing PFX;
-release jobs do not fall back to debug signing.
-Every main/PR CI run also compiles a non-signing Windows debug bundle so native
-runner/service integration failures are caught before a release tag.
+Every successful `main` commit force-updates one mutable `latest` GitHub
+release. It replaces fixed-name development Android debug APK and Windows debug
+ZIP assets using the configured development API and production website URL.
+Concurrent older runs are cancelled so the newest commit wins.
+
+Production Android and Windows jobs use the production API URL but remain
+disabled until `ENABLE_PRODUCTION_RELEASE=true` and the real Android keystore
+and Windows code-signing PFX secrets exist. They do not fall back to debug
+signing, and unsigned assets are never labeled production.

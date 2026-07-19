@@ -1,6 +1,6 @@
 # Gamblock-AI Flutter Client Agent Rules
 
-Context version: `2026-07-20.3`
+Context version: `2026-07-20.4`
 
 This standalone repository contains the Android and Windows protection client.
 Read `docs/ai/README.md` before changing behavior; it distinguishes working
@@ -127,5 +127,9 @@ external services.
 
 - Do not edit `.env`, credentials, keystores, generated build output, or
   platform dependency caches.
+- The mutable `latest` release may always contain fixed-name development debug
+  Android/Windows assets. Production assets require
+  `ENABLE_PRODUCTION_RELEASE=true` and successful platform signing; never
+  relabel an unsigned artifact as production.
 - Do not deploy, publish, sign releases, push, or change secrets without
   explicit user authorization.

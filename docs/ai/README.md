@@ -1,6 +1,6 @@
 # Flutter Client AI Context
 
-Context version: `2026-07-20.3`
+Context version: `2026-07-20.4`
 
 ## Product capsule
 
@@ -27,7 +27,7 @@ the device; the backend receives aggregate events only.
 | Pattern Interrupt and recovery handoff | Implemented code path | seven-second native/Flutter paths, reduced motion, offline grounding/help, and browsing-data-free web handoff are wired; device evidence remains required |
 | Android protection runtime | Implemented code-complete prototype | active manifest service, Chrome/Edge extraction, local decision, Back/overlay, settings friction, Keystore grant, aggregate sync, and artifact checks; analyzer passes, Android compile/device proof remains |
 | Windows service + user-session agent | Implemented code-complete prototype | separate CMake service target, authenticated loopback WebSocket, DPAPI state, logon-SID pipe, Flutter bridge, SendInput action, SCM recovery, scripts, portable classifier fixture, and a non-signing Windows debug compile CI job are wired; a successful runner result and VM proof remain external evidence gates |
-| Release scaffolding | Implemented | tag CI requires Android release signing and Windows Authenticode inputs; no debug-signing fallback |
+| Release scaffolding | Implemented operational workflow | every successful `main` commit force-updates the mutable `latest` tag/release with fixed-name Android debug APK and Windows debug ZIP assets; production jobs use production URLs and run only behind `ENABLE_PRODUCTION_RELEASE=true` with Android keystore and Windows Authenticode inputs; unsigned artifacts are never labeled production |
 
 Target architecture in comments or proposal documents does not change these
 states. Update the table only with code, wiring, and verification evidence.
