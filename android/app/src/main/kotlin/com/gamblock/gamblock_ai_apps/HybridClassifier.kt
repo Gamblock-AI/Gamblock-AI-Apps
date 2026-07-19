@@ -24,20 +24,22 @@ data class ClassificationResult(
 
 class HybridClassifier(private val context: Context) {
     companion object {
-        const val CONTRACT_VERSION = "hybrid-v1"
-        const val DEFAULT_MODEL_VERSION = "dummy-lr-v1"
-        const val DEFAULT_RULESET_VERSION = "dummy-rules-v1"
-        const val MODEL_THRESHOLD = 0.72
+        const val CONTRACT_VERSION = "hybrid-v2"
+        const val DEFAULT_MODEL_VERSION = "gamblock-lr-bfafb725511a"
+        const val DEFAULT_RULESET_VERSION = "gambling-keywords-b4f2932a7647"
         private const val ASSET_ROOT = "flutter_assets/assets/protection"
     }
 
-    private var bias = -3.2
-    private var threshold = MODEL_THRESHOLD
-    private var weights = emptyMap<String, Double>()
-    private var strongPatterns = emptyList<String>()
-    private var mediumPatterns = emptyList<String>()
-    private var strongScore = 0.95
-    private var mediumScore = 0.65
+    private var model = HybridModelConfig(
+        bias = 0.0,
+        mlWeight = 0.75,
+        ruleWeight = 0.25,
+        threshold = 0.4,
+        unigramWeights = emptyMap(),
+        bigramWeights = emptyMap(),
+        urlFeatures = emptyList(),
+    )
+    private var rules = HybridRuleConfig(emptyList(), 1.0)
 
     @Volatile
     var modelVersion: String = DEFAULT_MODEL_VERSION
@@ -65,12 +67,12 @@ class HybridClassifier(private val context: Context) {
         return try {
             require(verifyBundledIntegrity())
             val model = JSONObject(
-                context.assets.open("$ASSET_ROOT/dummy-lr-v1.json")
+                context.assets.open("$ASSET_ROOT/gamblock-lr-v2.json")
                     .bufferedReader()
                     .use { it.readText() },
             )
             val rules = JSONObject(
-                context.assets.open("$ASSET_ROOT/dummy-rules-v1.json")
+                context.assets.open("$ASSET_ROOT/gamblock-rules-v2.json")
                     .bufferedReader()
                     .use { it.readText() },
             )
@@ -82,31 +84,46 @@ class HybridClassifier(private val context: Context) {
     }
 
     private fun applyArtifacts(model: JSONObject, rules: JSONObject) {
-            require(model.optString("contract_version") == CONTRACT_VERSION)
-            require(rules.optString("contract_version") == CONTRACT_VERSION)
-            bias = model.getDouble("bias")
-            threshold = model.optDouble("threshold", MODEL_THRESHOLD)
-            modelVersion = model.getString("version")
-            rulesetVersion = rules.getString("version")
-            weights = model.getJSONObject("weights").keys().asSequence().associateWith {
-                model.getJSONObject("weights").getDouble(it)
-            }
-            strongPatterns = rules.getJSONArray("strong_url_patterns").toStringList()
-            mediumPatterns = rules.getJSONArray("medium_url_patterns").toStringList()
-            strongScore = rules.optDouble("strong_score", 0.95)
-            mediumScore = rules.optDouble("medium_score", 0.65)
+        require(model.optString("contract_version") == CONTRACT_VERSION)
+        require(rules.optString("contract_version") == CONTRACT_VERSION)
+        val unigramWeights = model.getJSONObject("unigram_weights").toDoubleMap()
+        val bigramWeights = model.getJSONObject("bigram_weights").toDoubleMap()
+        val features = model.getJSONArray("url_features")
+        val urlFeatures = List(features.length()) { index ->
+            val feature = features.getJSONObject(index)
+            UrlFeatureSpec(
+                name = feature.getString("name"),
+                offset = feature.getDouble("offset"),
+                scale = feature.getDouble("scale"),
+                weight = feature.getDouble("weight"),
+            )
+        }
+        require(unigramWeights.isNotEmpty() && bigramWeights.isNotEmpty())
+        require(urlFeatures.size == 14)
+        this.model = HybridModelConfig(
+            bias = model.getDouble("bias"),
+            mlWeight = model.getDouble("ml_weight"),
+            ruleWeight = model.getDouble("rule_weight"),
+            threshold = model.getDouble("threshold"),
+            unigramWeights = unigramWeights,
+            bigramWeights = bigramWeights,
+            urlFeatures = urlFeatures,
+        )
+        this.rules = HybridRuleConfig(
+            keywords = rules.getJSONArray("keywords").toStringList(),
+            matchScore = rules.getDouble("match_score"),
+        )
+        require(this.rules.keywords.isNotEmpty())
+        modelVersion = model.getString("version")
+        rulesetVersion = rules.getString("version")
     }
 
+    @Synchronized
     fun classify(raw: ClassificationInput): ClassificationResult {
         return HybridDecisionEngine.classify(
             raw = raw,
-            bias = bias,
-            threshold = threshold,
-            weights = weights,
-            strongPatterns = strongPatterns,
-            mediumPatterns = mediumPatterns,
-            strongScore = strongScore,
-            mediumScore = mediumScore,
+            model = model,
+            rules = rules,
             modelVersion = modelVersion,
             rulesetVersion = rulesetVersion,
         )
@@ -133,7 +150,7 @@ class HybridClassifier(private val context: Context) {
     }
 
     private fun fixtureFailures(): JSONArray {
-        val fixtureText = context.assets.open("$ASSET_ROOT/hybrid-v1-fixtures.json")
+        val fixtureText = context.assets.open("$ASSET_ROOT/hybrid-v2-fixtures.json")
             .bufferedReader()
             .use { it.readText() }
         val fixtures = JSONArray(fixtureText)
@@ -156,7 +173,7 @@ class HybridClassifier(private val context: Context) {
     }
 
     private fun fixtureCount(): Int {
-        val fixtureText = context.assets.open("$ASSET_ROOT/hybrid-v1-fixtures.json")
+        val fixtureText = context.assets.open("$ASSET_ROOT/hybrid-v2-fixtures.json")
             .bufferedReader()
             .use { it.readText() }
         return JSONArray(fixtureText).length()
@@ -170,13 +187,13 @@ class HybridClassifier(private val context: Context) {
                     .use { it.readText() },
             )
             verifyAsset(
-                "$ASSET_ROOT/dummy-lr-v1.json",
+                "$ASSET_ROOT/gamblock-lr-v2.json",
                 manifest.getJSONObject("model").getString("sha256"),
             ) && verifyAsset(
-                "$ASSET_ROOT/dummy-rules-v1.json",
+                "$ASSET_ROOT/gamblock-rules-v2.json",
                 manifest.getJSONObject("ruleset").getString("sha256"),
             ) && verifyAsset(
-                "$ASSET_ROOT/hybrid-v1-fixtures.json",
+                "$ASSET_ROOT/hybrid-v2-fixtures.json",
                 manifest.getJSONObject("fixtures").getString("sha256"),
             )
         } catch (_: Exception) {
@@ -188,11 +205,20 @@ class HybridClassifier(private val context: Context) {
         val bytes = context.assets.open(path).use { it.readBytes() }
         return bytes.sha256() == expected.lowercase()
     }
-
 }
 
 private fun JSONArray.toStringList(): List<String> {
     return List(length()) { index -> optString(index) }
+}
+
+private fun JSONObject.toDoubleMap(): Map<String, Double> {
+    val values = mutableMapOf<String, Double>()
+    val iterator = keys()
+    while (iterator.hasNext()) {
+        val key = iterator.next()
+        values[key] = getDouble(key)
+    }
+    return values
 }
 
 private fun ByteArray.sha256(): String {

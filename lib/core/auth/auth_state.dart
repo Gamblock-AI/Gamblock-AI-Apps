@@ -7,6 +7,7 @@ import '../device/device_registry.dart';
 import '../network/api_client.dart';
 import '../network/api_response.dart';
 import '../platform/platform_bridge.dart';
+import '../../features/auth/data/google_auth_service.dart';
 
 const _storage = FlutterSecureStorage();
 const _userKey = 'gamblock_user';
@@ -20,6 +21,9 @@ class AuthState {
     this.role,
     this.deviceId,
     this.isLoading = true,
+    this.emailVerified = false,
+    this.passwordEnabled = false,
+    this.googleLinked = false,
   });
 
   final bool isAuthenticated;
@@ -29,6 +33,9 @@ class AuthState {
   final String? role;
   final String? deviceId;
   final bool isLoading;
+  final bool emailVerified;
+  final bool passwordEnabled;
+  final bool googleLinked;
 
   AuthState copyWith({
     bool? isAuthenticated,
@@ -38,6 +45,9 @@ class AuthState {
     String? role,
     String? deviceId,
     bool? isLoading,
+    bool? emailVerified,
+    bool? passwordEnabled,
+    bool? googleLinked,
   }) {
     return AuthState(
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
@@ -47,15 +57,20 @@ class AuthState {
       role: role ?? this.role,
       deviceId: deviceId ?? this.deviceId,
       isLoading: isLoading ?? this.isLoading,
+      emailVerified: emailVerified ?? this.emailVerified,
+      passwordEnabled: passwordEnabled ?? this.passwordEnabled,
+      googleLinked: googleLinked ?? this.googleLinked,
     );
   }
 }
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier() : super(const AuthState()) {
+  AuthNotifier(this._googleAuth) : super(const AuthState()) {
     ApiClient.onSessionExpired = _expireLocalSession;
     _init();
   }
+
+  final GoogleAuthService _googleAuth;
 
   Future<void> _init() async {
     try {
@@ -74,6 +89,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (userId == null || userId.isEmpty) {
         throw const FormatException('Stored user has no id');
       }
+      if (user['role']?.toString() != 'user') {
+        throw const FormatException('Stored user is not a student account');
+      }
       final deviceId = await DeviceRegistry.deviceIdFor(userId);
       state = AuthState(
         isAuthenticated: true,
@@ -83,6 +101,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
         displayName: user['display_name']?.toString(),
         role: user['role']?.toString(),
         deviceId: deviceId,
+        emailVerified: user['email_verified_at'] != null,
+        passwordEnabled: user['_password_enabled'] == true,
+        googleLinked: user['_google_linked'] == true,
       );
       if (deviceId != null) {
         try {
@@ -100,6 +121,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
     final response = await ApiClient.dio.post(
       '/v1/auth/login',
       data: {'email': email, 'password': password},
+    );
+    final data = ApiResponse.map(response);
+    if (data?['password_change_required'] == true) return data;
+    return _completeSession(data);
+  }
+
+  Future<Map<String, dynamic>?> completeInitialPasswordChange(
+    String token,
+    String newPassword,
+  ) async {
+    final response = await ApiClient.dio.post(
+      '/v1/auth/first-login/password',
+      data: {'token': token, 'new_password': newPassword},
     );
     return _completeSession(ApiResponse.map(response));
   }
@@ -121,6 +155,37 @@ class AuthNotifier extends StateNotifier<AuthState> {
     return _completeSession(ApiResponse.map(response));
   }
 
+  Future<Map<String, dynamic>?> loginWithGoogle() async {
+    final google = await _googleAuth.authenticate();
+    final response = await ApiClient.dio.post(
+      '/v1/auth/google',
+      data: {'id_token': google.idToken, 'nonce': google.nonce, 'role': 'user'},
+    );
+    return _completeSession(ApiResponse.map(response));
+  }
+
+  Future<void> requestPasswordReset(String email) async {
+    await ApiClient.dio.post(
+      '/v1/auth/password-reset/request',
+      data: {'email': email.trim()},
+    );
+  }
+
+  Future<void> confirmPasswordReset({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    await ApiClient.dio.post(
+      '/v1/auth/password-reset/confirm',
+      data: {
+        'email': email.trim(),
+        'code': code.trim(),
+        'new_password': newPassword,
+      },
+    );
+  }
+
   Future<Map<String, dynamic>?> _completeSession(
     Map<String, dynamic>? data,
   ) async {
@@ -133,8 +198,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
         rawUser is! Map<String, dynamic>) {
       throw const FormatException('Authentication response is incomplete');
     }
-    await ApiClient.saveTokens(accessToken, refreshToken);
     final user = Map<String, dynamic>.from(rawUser);
+    if (user['role']?.toString() != 'user') {
+      await ApiClient.clearTokens();
+      throw StateError('Aplikasi ini hanya tersedia untuk akun mahasiswa');
+    }
+    user['_password_enabled'] = data['password_enabled'] == true;
+    user['_google_linked'] = data['google_linked'] == true;
+    await ApiClient.saveTokens(accessToken, refreshToken);
     await _storage.write(key: _userKey, value: jsonEncode(user));
     final userId = user['id']?.toString() ?? '';
     String? deviceId;
@@ -158,8 +229,48 @@ class AuthNotifier extends StateNotifier<AuthState> {
       displayName: user['display_name']?.toString(),
       role: user['role']?.toString(),
       deviceId: deviceId,
+      emailVerified: user['email_verified_at'] != null,
+      passwordEnabled: user['_password_enabled'] == true,
+      googleLinked: user['_google_linked'] == true,
     );
     return user;
+  }
+
+  Future<void> refreshProfile() async {
+    final response = await ApiClient.dio.get('/v1/me');
+    final user = ApiResponse.map(response);
+    if (user == null) return;
+    if (user['role']?.toString() != 'user') {
+      await logout();
+      throw StateError('Aplikasi ini hanya tersedia untuk akun mahasiswa');
+    }
+    user['_password_enabled'] = user['password_enabled'] == true;
+    user['_google_linked'] = user['google_linked'] == true;
+    await _storage.write(key: _userKey, value: jsonEncode(user));
+    state = state.copyWith(
+      email: user['email']?.toString(),
+      displayName: user['display_name']?.toString(),
+      emailVerified: user['email_verified_at'] != null,
+      passwordEnabled: user['_password_enabled'] == true,
+      googleLinked: user['_google_linked'] == true,
+    );
+  }
+
+  Future<void> resendEmailVerification() async {
+    await ApiClient.dio.post('/v1/auth/email-verification/resend');
+  }
+
+  Future<void> linkGoogle(String currentPassword) async {
+    final google = await _googleAuth.authenticate();
+    await ApiClient.dio.post(
+      '/v1/me/google/link',
+      data: {
+        'current_password': currentPassword,
+        'id_token': google.idToken,
+        'nonce': google.nonce,
+      },
+    );
+    state = state.copyWith(googleLinked: true);
   }
 
   Future<void> updateDisplayName(String displayName) async {
@@ -169,6 +280,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
     );
     final user = ApiResponse.map(response);
     if (user == null) throw StateError('Profile response is empty');
+    user['_password_enabled'] = state.passwordEnabled;
+    user['_google_linked'] = state.googleLinked;
     await _storage.write(key: _userKey, value: jsonEncode(user));
     state = state.copyWith(displayName: user['display_name']?.toString());
   }
@@ -219,5 +332,5 @@ class AuthNotifier extends StateNotifier<AuthState> {
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier();
+  return AuthNotifier(GoogleAuthService());
 });

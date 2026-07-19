@@ -40,6 +40,21 @@ class AppMessages {
         return loc.msgErrGoogleTokenRequired;
       case 'google_verification_failed':
         return loc.msgErrGoogleVerification;
+      case 'google_link_required':
+        return loc.msgErrGoogleLinkRequired;
+      case 'google_link_failed':
+        return loc.msgErrGoogleLinkFailed;
+      case 'password_reset_invalid':
+        return loc.msgErrPasswordResetInvalid;
+      case 'password_reset_failed':
+        return loc.msgErrPasswordResetFailed;
+      case 'initial_password_change_invalid':
+      case 'email_verification_required':
+      case 'admin_accounts_fetch_failed':
+      case 'admin_account_create_failed':
+      case 'admin_account_update_failed':
+      case 'operator_invitation_retired':
+        return loc.msgErrInvalidRequest;
       case 'invalid_refresh_token':
         return loc.msgErrInvalidSession;
       case 'refresh_token_required':

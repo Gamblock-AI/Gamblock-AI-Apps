@@ -48,6 +48,25 @@ class SettingsProfileCard extends StatelessWidget {
                       color: AppColors.mutedForeground,
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      _CapabilityChip(
+                        label: auth.emailVerified
+                            ? 'Email terverifikasi'
+                            : 'Email belum terverifikasi',
+                        active: auth.emailVerified,
+                      ),
+                      _CapabilityChip(
+                        label: auth.googleLinked
+                            ? 'Google tertaut'
+                            : 'Google belum tertaut',
+                        active: auth.googleLinked,
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -56,4 +75,25 @@ class SettingsProfileCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _CapabilityChip extends StatelessWidget {
+  const _CapabilityChip({required this.label, required this.active});
+  final String label;
+  final bool active;
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+    decoration: BoxDecoration(
+      color: active ? const Color(0xFFD9F0E5) : AppColors.muted,
+      borderRadius: BorderRadius.circular(999),
+    ),
+    child: Text(
+      label,
+      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+        color: active ? const Color(0xFF1B4332) : AppColors.mutedForeground,
+        fontWeight: FontWeight.w700,
+      ),
+    ),
+  );
 }

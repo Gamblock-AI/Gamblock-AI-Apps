@@ -412,6 +412,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'Google verification failed. Try again.';
 
   @override
+  String get msgErrGoogleLinkRequired =>
+      'This account already exists. Sign in with your password, then link Google from Settings.';
+
+  @override
+  String get msgErrGoogleLinkFailed =>
+      'Google could not be linked. Use the same Google email as this account.';
+
+  @override
+  String get msgErrPasswordResetInvalid =>
+      'The recovery code is invalid, already used, or has expired.';
+
+  @override
+  String get msgErrPasswordResetFailed =>
+      'Password recovery could not be completed. Please try again.';
+
+  @override
   String get msgErrInvalidSession => 'The session is invalid. Sign in again.';
 
   @override
@@ -806,7 +822,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selfTestFixtureBody =>
-      'The dummy classifier, ruleset, and Pattern Interrupt path are ready.';
+      'The local model, ruleset, and Pattern Interrupt path passed their fixture checks.';
 
   @override
   String get protectionSyncError => 'Account status could not be synchronized';
@@ -1014,11 +1030,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setupPlatformAction => 'Open platform settings';
 
   @override
-  String get setupSelfTestTitle => 'Verify the dummy classifier';
+  String get setupSelfTestTitle => 'Verify the local model';
 
   @override
   String get setupSelfTestBody =>
-      'The self-test uses synthetic fixtures and does not upload page content.';
+      'The self-test uses local fixtures and does not upload page content.';
 
   @override
   String get setupFinishAction => 'Open protection status';

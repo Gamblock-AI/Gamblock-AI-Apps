@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-
 /// A fixed-height primary action with a consistent busy state for auth forms.
 class AuthSubmitButton extends StatelessWidget {
   const AuthSubmitButton({
@@ -19,9 +17,8 @@ class AuthSubmitButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FilledButton(
       style: FilledButton.styleFrom(
-        backgroundColor: AppColors.crimson,
         minimumSize: const Size.fromHeight(54),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
       ),
       onPressed: isLoading ? null : onPressed,
       child: isLoading

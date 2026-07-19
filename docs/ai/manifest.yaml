@@ -1,13 +1,15 @@
 schema_version: 1
-context_version: 2026-07-19.1
+context_version: 2026-07-20.3
 component: flutter
 contracts:
   proposal_authority: 1
   proposal_traceability: 1
   local_ai_lint_policy: 1
   privacy_boundary: 1
+  hybrid_artifact: 2
   websocket_loopback: 1
   api_error_catalog: 1
+  account_recovery: 1
   accountability_state: 2
   client_daily_aggregate: 1
 canonical_instruction: AGENTS.md

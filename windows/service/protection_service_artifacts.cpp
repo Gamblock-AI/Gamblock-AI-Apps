@@ -64,7 +64,7 @@ bool ProtectionService::UpdateArtifacts(const std::string& base_url) {
 
   const auto bundled = ExecutableDirectory() / L"data" / L"flutter_assets" /
                        L"assets" / L"protection";
-  const auto fixture = bundled / L"hybrid-v1-fixtures.json";
+  const auto fixture = bundled / L"hybrid-v2-fixtures.json";
   const std::string fixture_sha = Sha256File(fixture);
   if (fixture_sha.empty()) return false;
 
@@ -86,7 +86,7 @@ bool ProtectionService::UpdateArtifacts(const std::string& base_url) {
     output.write(reinterpret_cast<const char*>(rules->data()),
                  static_cast<std::streamsize>(rules->size()));
   }
-  std::filesystem::copy_file(fixture, stage / L"hybrid-v1-fixtures.json",
+  std::filesystem::copy_file(fixture, stage / L"hybrid-v2-fixtures.json",
                              std::filesystem::copy_options::overwrite_existing,
                              error);
   if (error) return false;
@@ -97,14 +97,14 @@ bool ProtectionService::UpdateArtifacts(const std::string& base_url) {
       JsonString(rules_metadata, "version").value_or("unknown");
   std::ofstream manifest(stage / L"manifest.json", std::ios::trunc);
   manifest << "{\n"
-           << "  \"contract_version\": \"hybrid-v1\",\n"
+           << "  \"contract_version\": \"hybrid-v2\",\n"
            << "  \"model\": {\"version\": \"" << EscapeJson(model_version)
            << "\", \"path\": \"model.json\", \"sha256\": \"" << model_sha
            << "\"},\n"
            << "  \"ruleset\": {\"version\": \"" << EscapeJson(rules_version)
            << "\", \"path\": \"rules.json\", \"sha256\": \"" << rules_sha
            << "\"},\n"
-           << "  \"fixtures\": {\"path\": \"hybrid-v1-fixtures.json\", "
+           << "  \"fixtures\": {\"path\": \"hybrid-v2-fixtures.json\", "
               "\"sha256\": \"" << fixture_sha << "\"}\n"
            << "}\n";
   manifest.close();

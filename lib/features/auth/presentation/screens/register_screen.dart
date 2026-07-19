@@ -51,10 +51,31 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             _nameCtrl.text.trim(),
           );
       if (user != null && mounted) {
-        context.go('/setup');
+        context.go('/dashboard');
       }
     } catch (e) {
-      setState(() => _error = AppMessages.friendlyMessage(context, e));
+      if (mounted) {
+        setState(() => _error = AppMessages.friendlyMessage(context, e));
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _googleRegister() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final user = await ref.read(authProvider.notifier).loginWithGoogle();
+      if (user != null && mounted) {
+        context.go('/dashboard');
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() => _error = AppMessages.friendlyMessage(context, error));
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -129,6 +150,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             label: l10n.authRegister,
             isLoading: _loading,
             onPressed: _submit,
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: _loading ? null : _googleRegister,
+            icon: const Icon(Icons.login_rounded),
+            label: const Text('Daftar dengan Google'),
           ),
           const SizedBox(height: 16),
           AuthSwitchPrompt(

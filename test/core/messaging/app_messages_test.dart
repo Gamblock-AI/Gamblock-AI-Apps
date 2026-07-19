@@ -85,7 +85,7 @@ void main() {
           return const SizedBox();
         }),
       );
-      expect(msg, contains('invalid_credentials'));
+      expect(msg, 'Email atau kata sandi salah. Silakan periksa kembali.');
     });
   });
 
@@ -101,7 +101,7 @@ void main() {
           return const SizedBox();
         }),
       );
-      expect(msg, contains('join_failed'));
+      expect(msg, 'Kode grup tidak valid. Coba lagi.');
     });
   });
 

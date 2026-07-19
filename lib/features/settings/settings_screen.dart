@@ -95,6 +95,46 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     context.go('/login');
   }
 
+  Future<void> _linkGoogle() async {
+    final controller = TextEditingController();
+    final password = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Tautkan akun Google'),
+        content: TextField(
+          controller: controller,
+          obscureText: true,
+          autofillHints: const [AutofillHints.password],
+          decoration: const InputDecoration(labelText: 'Kata sandi saat ini'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, controller.text),
+            child: const Text('Lanjutkan'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (password == null || password.isEmpty || !mounted) {
+      return;
+    }
+    try {
+      await ref.read(authProvider.notifier).linkGoogle(password);
+      if (mounted) {
+        AppFeedback.success(context, 'Akun Google berhasil ditautkan.');
+      }
+    } catch (error) {
+      if (mounted) {
+        AppFeedback.error(context, AppMessages.friendlyMessage(context, error));
+      }
+    }
+  }
+
   Future<void> _logout() async {
     if (!await showLogoutConfirmationDialog(context)) return;
     await ref.read(authProvider.notifier).logout();
@@ -122,11 +162,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     await PlatformBridge.setHealthNotifications(enabled);
   }
 
-  Future<void> _openWebPath(String path) {
-    return launchUrl(
+  Future<void> _openWebPath(String path) async {
+    final opened = await launchUrl(
       AppConfig.webUri('${Localizations.localeOf(context).languageCode}/$path'),
       mode: LaunchMode.externalApplication,
     );
+    if (!opened && mounted) {
+      AppFeedback.error(context, 'Halaman belum dapat dibuka. Coba lagi.');
+    }
   }
 
   @override
@@ -146,6 +189,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onChangePassword: _changePassword,
             onManagePartner: () => context.go('/accountability'),
             onLogin: () => context.go('/login'),
+            onLinkGoogle: _linkGoogle,
           ),
           SettingsPreferencesSection(
             locale: settings.locale,

@@ -53,6 +53,10 @@ class AppConfig {
   /// Raw APP_ENV value from `.env` (e.g. "development", "production").
   static String get appEnv => _env('APP_ENV');
 
+  static String get googleWebClientId => _env('GOOGLE_WEB_CLIENT_ID');
+
+  static String get googleWindowsClientId => _env('GOOGLE_WINDOWS_CLIENT_ID');
+
   /// Whether the app runs in production. Gates user-facing messages: production
   /// shows friendly, non-leaking text; development shows technical detail.
   ///

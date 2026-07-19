@@ -7,6 +7,7 @@ import '../core/auth/auth_state.dart';
 import '../core/platform/platform_bridge.dart';
 import '../core/settings/app_settings.dart';
 import 'router.dart';
+import '../features/intro/data/onboarding_state.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
@@ -17,12 +18,14 @@ class GamblockApp extends ConsumerStatefulWidget {
   ConsumerState<GamblockApp> createState() => _GamblockAppState();
 }
 
-class _GamblockAppState extends ConsumerState<GamblockApp> {
+class _GamblockAppState extends ConsumerState<GamblockApp>
+    with WidgetsBindingObserver {
   StreamSubscription? _interventionSub;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _interventionSub = PlatformBridge.events().listen((event) {
       final router = ref.read(routerProvider);
       if (event.type == 'intervention_shown') {
@@ -30,15 +33,24 @@ class _GamblockAppState extends ConsumerState<GamblockApp> {
           router.go('/pattern-interrupt');
         }
       } else if (event.type == 'approval_required') {
-        router.go('/protection');
+        router.go('/dashboard');
       }
     });
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _interventionSub?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed &&
+        ref.read(authProvider).isAuthenticated) {
+      ref.read(authProvider.notifier).refreshProfile().catchError((_) {});
+    }
   }
 
   @override
@@ -46,6 +58,7 @@ class _GamblockAppState extends ConsumerState<GamblockApp> {
     final router = ref.watch(routerProvider);
     final authState = ref.watch(authProvider);
     final settings = ref.watch(appSettingsProvider);
+    final onboarding = ref.watch(onboardingProvider);
 
     final localizationsDelegates = const [
       AppLocalizations.delegate,
@@ -56,7 +69,7 @@ class _GamblockAppState extends ConsumerState<GamblockApp> {
 
     final supportedLocales = const [Locale('id', ''), Locale('en', '')];
 
-    if (authState.isLoading || settings.isLoading) {
+    if (authState.isLoading || settings.isLoading || onboarding.isLoading) {
       return MaterialApp(
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,

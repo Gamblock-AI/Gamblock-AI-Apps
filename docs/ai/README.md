@@ -1,6 +1,6 @@
 # Flutter Client AI Context
 
-Context version: `2026-07-19.1`
+Context version: `2026-07-20.3`
 
 ## Product capsule
 
@@ -21,12 +21,12 @@ the device; the backend receives aggregate events only.
 
 | Area | State | Evidence/limit |
 |---|---|---|
-| Auth/device/setup/settings | Implemented code-complete prototype | session refresh is single-flight; device registration is stable-instance upsert; auth fields validate inline; password changes keep the dialog and values open for contextual server errors; localized safe messages and dismissible feedback are shared across features; profile, locale, haptics, notifications, setup, and artifact health are wired |
-| Protection/analytics/accountability UI | Implemented code-complete prototype | native health is authoritative; analytics are 7/30-day aggregate-only; registration declares the student role, group-code preview/confirm consumes the active membership contract, pause/uninstall requests use `membership_id`, and approved grants remain device-bound |
-| Hybrid-v1 local classifier | Implemented dummy prototype | Android and portable Windows core load versioned rules + synthetic LR weights and pass committed fixtures; artifact is explicitly untrained/unevaluated |
+| Auth/device/setup/settings | Implemented code-complete prototype with external configuration gates | persisted three-step onboarding routes guest students to login/register and authenticated students to `/dashboard`; password visibility/autofill, native 12-character email-code reset, email-verification refresh/resend, role rejection before token persistence, capability-aware Settings, and Google login/link code paths are wired. Android has the official provider plugin and still needs real OAuth client/signing configuration; Windows uses loopback state/nonce/PKCE and needs VM evidence. |
+| Dashboard/analytics/accountability UI | Implemented code-complete prototype | bottom navigation adapts to a Windows/tablet rail; the dashboard uses truthful local health and setup state; analytics are 7/30-day aggregate-only; students control four aggregate-sharing categories, normal/unsafe exit and cancellation, approval cancellation/application, group preview/confirm, and device-bound grants. No browsing or journal detail is added. |
+| Hybrid-v2 local classifier | Implemented trained-artifact prototype; not evaluated | supplied ONNX graph is reproducibly exported without unpickling into 5,664 unigram + 4,336 bigram weights, 14 scaled URL features, LR bias/weights, `0.75/0.25` fusion, and threshold `0.4`; Android and Windows native authorities load the same hashed artifact/rules/fixtures. Supplied metrics remain unverified because dataset card, split/training source, FPR slices, and preprocessing-parity evidence are absent |
 | Pattern Interrupt and recovery handoff | Implemented code path | seven-second native/Flutter paths, reduced motion, offline grounding/help, and browsing-data-free web handoff are wired; device evidence remains required |
 | Android protection runtime | Implemented code-complete prototype | active manifest service, Chrome/Edge extraction, local decision, Back/overlay, settings friction, Keystore grant, aggregate sync, and artifact checks; analyzer passes, Android compile/device proof remains |
-| Windows service + user-session agent | Implemented code-complete prototype | separate CMake service target, authenticated loopback WebSocket, DPAPI state, logon-SID pipe, Flutter bridge, SendInput action, SCM recovery, scripts, and portable classifier fixture; Windows compile/VM proof remains |
+| Windows service + user-session agent | Implemented code-complete prototype | separate CMake service target, authenticated loopback WebSocket, DPAPI state, logon-SID pipe, Flutter bridge, SendInput action, SCM recovery, scripts, portable classifier fixture, and a non-signing Windows debug compile CI job are wired; a successful runner result and VM proof remain external evidence gates |
 | Release scaffolding | Implemented | tag CI requires Android release signing and Windows Authenticode inputs; no debug-signing fallback |
 
 Target architecture in comments or proposal documents does not change these
@@ -51,6 +51,10 @@ decision/block, a 5–10 second Pattern Interrupt, and a browsing-data-free
 recovery handoff.
 
 ## Default AI validation
+
+The Flutter client accepts only the `user` account role. Admin-provisioned
+student accounts can complete the backend's purpose-specific, ten-minute
+first-login password-change exchange before the normal session is stored.
 
 Run `./scripts/verify.sh` (`flutter analyze` only). When context changed, also
 run `./scripts/verify-ai-context.sh`. Dependency installation, tests, Android/

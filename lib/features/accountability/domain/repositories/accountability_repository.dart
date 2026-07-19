@@ -13,6 +13,16 @@ abstract class AccountabilityRepository {
     required int durationMinutes,
   });
   Future<void> cancelApproval(String requestId);
+  Future<void> updateSharing(
+    String membershipId,
+    AccountabilitySharing sharing,
+  );
+  Future<void> requestLeave(
+    String membershipId, {
+    required String kind,
+    required String reason,
+  });
+  Future<void> cancelLeave(String requestId);
   Future<void> applyApproval({
     required String requestId,
     required String deviceId,

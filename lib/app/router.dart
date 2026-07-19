@@ -8,6 +8,8 @@ import '../features/analytics/presentation/screens/analytics_screen.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/register_screen.dart';
 import '../features/intro/presentation/screens/intro_screen.dart';
+import '../features/intro/data/onboarding_state.dart';
+import '../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../features/pattern_interrupt/presentation/screens/pattern_interrupt_screen.dart';
 import '../features/protection/presentation/screens/protection_screen.dart';
 import '../features/recovery/presentation/screens/recovery_handoff_screen.dart';
@@ -41,22 +43,47 @@ Page<void> _page({required LocalKey key, required Widget child}) {
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
+  final onboarding = ref.watch(onboardingProvider);
 
   return GoRouter(
-    initialLocation: '/protection',
+    initialLocation: '/',
     redirect: (context, state) {
       final path = state.uri.path;
-      if (path == '/dashboard') return '/analytics';
-      if (path == '/onboarding' || path == '/onboarding/create-group') {
-        return '/setup';
+      if (authState.isLoading || onboarding.isLoading) return null;
+      if (path == '/') {
+        if (!onboarding.isCompleted) return '/intro';
+        return authState.isAuthenticated ? '/dashboard' : '/login';
       }
-      if (authState.isLoading) return null;
+      if (path == '/protection') return '/dashboard';
+      if (path == '/onboarding' || path == '/onboarding/create-group') {
+        return '/intro';
+      }
       final authEntry =
-          path == '/login' || path == '/register' || path == '/intro';
-      if (authState.isAuthenticated && authEntry) return '/protection';
+          path == '/login' || path == '/register' || path == '/forgot-password';
+      if (!onboarding.isCompleted && path != '/intro') {
+        return '/intro';
+      }
+      if (authState.isAuthenticated && (authEntry || path == '/intro')) {
+        return '/dashboard';
+      }
+      final publicPath =
+          authEntry ||
+          path == '/intro' ||
+          path == '/pattern-interrupt' ||
+          path == '/recovery';
+      if (!authState.isAuthenticated && !publicPath) {
+        return '/login';
+      }
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/',
+        pageBuilder: (_, state) => _page(
+          key: state.pageKey,
+          child: const Scaffold(body: SizedBox.shrink()),
+        ),
+      ),
       GoRoute(
         path: '/intro',
         pageBuilder: (_, state) =>
@@ -71,6 +98,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/register',
         pageBuilder: (_, state) =>
             _page(key: state.pageKey, child: const RegisterScreen()),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        pageBuilder: (_, state) =>
+            _page(key: state.pageKey, child: const ForgotPasswordScreen()),
       ),
       GoRoute(
         path: '/setup',
@@ -91,7 +123,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, __, child) => AppShell(child: child),
         routes: [
           GoRoute(
-            path: '/protection',
+            path: '/dashboard',
             pageBuilder: (_, state) =>
                 _page(key: state.pageKey, child: const ProtectionScreen()),
           ),

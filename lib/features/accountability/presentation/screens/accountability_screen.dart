@@ -128,6 +128,169 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
     }
   }
 
+  Future<void> _manageSharing(AccountabilityMembership membership) async {
+    var draft = membership.sharing;
+    final saved = await showDialog<AccountabilitySharing>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Data agregat yang dibagikan'),
+          content: SizedBox(
+            width: 420,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SwitchListTile(
+                  title: const Text('Kesehatan perlindungan'),
+                  subtitle: const Text(
+                    'Status aktif, degradasi, dan izin — tanpa URL.',
+                  ),
+                  value: draft.protectionHealth,
+                  onChanged: (value) => setDialogState(
+                    () => draft = draft.copyWith(protectionHealth: value),
+                  ),
+                ),
+                SwitchListTile(
+                  title: const Text('Aktivitas perlindungan'),
+                  subtitle: const Text(
+                    'Hitungan blokir dan intervensi agregat.',
+                  ),
+                  value: draft.protectionActivity,
+                  onChanged: (value) => setDialogState(
+                    () => draft = draft.copyWith(protectionActivity: value),
+                  ),
+                ),
+                SwitchListTile(
+                  title: const Text('Keterlibatan pemulihan'),
+                  subtitle: const Text(
+                    'Ringkasan partisipasi, bukan isi jurnal atau mood.',
+                  ),
+                  value: draft.recoveryEngagement,
+                  onChanged: (value) => setDialogState(
+                    () => draft = draft.copyWith(recoveryEngagement: value),
+                  ),
+                ),
+                SwitchListTile(
+                  title: const Text('Progres edukasi'),
+                  value: draft.educationProgress,
+                  onChanged: (value) => setDialogState(
+                    () => draft = draft.copyWith(educationProgress: value),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Buang perubahan'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, draft),
+              child: const Text('Simpan'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (saved == null || !mounted) return;
+    await _runAction(
+      () => ref
+          .read(accountabilityRepositoryProvider)
+          .updateSharing(membership.id, saved),
+      'Preferensi berbagi diperbarui.',
+    );
+  }
+
+  Future<void> _requestLeave(
+    AccountabilityMembership membership,
+    String kind,
+  ) async {
+    final reasonController = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(
+          kind == 'unsafe'
+              ? 'Keluar karena situasi tidak aman'
+              : 'Ajukan keluar dari pendampingan',
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              kind == 'unsafe'
+                  ? 'Berbagi data segera dihentikan dan permintaan normal yang tertunda dibatalkan.'
+                  : 'Pendamping memiliki waktu hingga 72 jam untuk meninjau permintaan.',
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: reasonController,
+              maxLength: 500,
+              maxLines: 3,
+              decoration: const InputDecoration(labelText: 'Alasan (opsional)'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Kirim permintaan'),
+          ),
+        ],
+      ),
+    );
+    final reason = reasonController.text;
+    reasonController.dispose();
+    if (confirmed != true || !mounted) return;
+    await _runAction(
+      () => ref
+          .read(accountabilityRepositoryProvider)
+          .requestLeave(membership.id, kind: kind, reason: reason),
+      'Permintaan keluar dikirim.',
+    );
+  }
+
+  Future<void> _cancelLeave(AccountabilityExitRequest request) async {
+    await _runAction(
+      () => ref.read(accountabilityRepositoryProvider).cancelLeave(request.id),
+      'Permintaan keluar dibatalkan.',
+    );
+  }
+
+  Future<void> _cancelApproval(ApprovalRequest request) async {
+    await _runAction(
+      () =>
+          ref.read(accountabilityRepositoryProvider).cancelApproval(request.id),
+      'Permintaan persetujuan dibatalkan.',
+    );
+  }
+
+  Future<void> _runAction(
+    Future<void> Function() action,
+    String success,
+  ) async {
+    setState(() => _loading = true);
+    try {
+      await action();
+      if (mounted) {
+        AppFeedback.success(context, success);
+      }
+      await _load();
+    } catch (error) {
+      if (mounted) {
+        AppFeedback.error(context, AppMessages.friendlyMessage(context, error));
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -170,6 +333,71 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
               )
             else ...[
               PartnerStatusCard(membership: membership),
+              if (membership != null) ...[
+                const SizedBox(height: 16),
+                Card(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        minTileHeight: 64,
+                        leading: const Icon(Icons.privacy_tip_outlined),
+                        title: const Text('Privasi berbagi'),
+                        subtitle: const Text(
+                          'Atur jenis ringkasan agregat yang dapat dilihat pendamping.',
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: _loading
+                            ? null
+                            : () => _manageSharing(membership),
+                      ),
+                      const Divider(),
+                      if (_overview?.pendingExitRequest case final exit?)
+                        ListTile(
+                          minTileHeight: 64,
+                          leading: const Icon(Icons.schedule_outlined),
+                          title: const Text(
+                            'Permintaan keluar sedang ditinjau',
+                          ),
+                          subtitle: const Text(
+                            'Anda dapat membatalkan permintaan normal selama masih tertunda.',
+                          ),
+                          trailing: exit.canCancel
+                              ? TextButton(
+                                  onPressed: _loading
+                                      ? null
+                                      : () => _cancelLeave(exit),
+                                  child: const Text('Batalkan'),
+                                )
+                              : null,
+                        )
+                      else
+                        ListTile(
+                          minTileHeight: 64,
+                          leading: const Icon(Icons.logout_outlined),
+                          title: const Text('Keluar dari pendampingan'),
+                          subtitle: const Text(
+                            'Pilih alur normal atau hentikan berbagi segera bila situasi tidak aman.',
+                          ),
+                          trailing: PopupMenuButton<String>(
+                            enabled: !_loading,
+                            onSelected: (kind) =>
+                                _requestLeave(membership, kind),
+                            itemBuilder: (_) => const [
+                              PopupMenuItem(
+                                value: 'normal',
+                                child: Text('Ajukan keluar normal'),
+                              ),
+                              PopupMenuItem(
+                                value: 'unsafe',
+                                child: Text('Situasi tidak aman'),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
               if (membership == null) ...[
                 const SizedBox(height: 16),
                 Card(
@@ -236,7 +464,10 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                 ],
               ],
               const SizedBox(height: 24),
-              ApprovalRequestHistory(requests: _requests),
+              ApprovalRequestHistory(
+                requests: _requests,
+                onCancel: _cancelApproval,
+              ),
             ],
           ],
         ),

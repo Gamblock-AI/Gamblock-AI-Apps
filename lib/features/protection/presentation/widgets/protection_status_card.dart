@@ -90,8 +90,8 @@ class ProtectionStatusCard extends StatelessWidget {
               _statusLine(
                 context,
                 l10n.protectionArtifactLabel,
-                '${status?.modelVersion ?? 'dummy-lr-v1'} · '
-                '${status?.rulesetVersion ?? 'dummy-rules-v1'}',
+                '${status?.modelVersion ?? 'gamblock-lr-bfafb725511a'} · '
+                '${status?.rulesetVersion ?? 'gambling-keywords-b4f2932a7647'}',
               ),
             ],
           ),

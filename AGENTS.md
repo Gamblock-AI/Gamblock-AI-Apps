@@ -1,6 +1,6 @@
 # Gamblock-AI Flutter Client Agent Rules
 
-Context version: `2026-07-19.1`
+Context version: `2026-07-20.3`
 
 This standalone repository contains the Android and Windows protection client.
 Read `docs/ai/README.md` before changing behavior; it distinguishes working
@@ -68,10 +68,10 @@ Do not hardcode URLs in features or call Dio from presentation code.
 
 ## Current native and AI status
 
-- `assets/protection/` is a wired Hybrid-v1 dummy artifact with synthetic,
-  explicitly untrained/unevaluated Logistic Regression weights. Android and
-  Windows implement its rule + BoW fusion contract; do not present it as
-  measured model accuracy.
+- `assets/protection/` is a wired Hybrid-v2 artifact exported from the supplied
+  ONNX graph. Android and Windows implement the same rule + unigram/bigram BoW
+  + scaled URL-feature + Logistic Regression fusion contract. It is trained
+  but not evaluated by project evidence; supplied metrics remain unverified.
 - Android native source is wired through the active manifest and Method/Event
   Channels for Chrome/Edge sensing, classification, intervention, grant state,
   and aggregates. Real-device coverage, accessibility, lifecycle, and

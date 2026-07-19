@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <iostream>
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   if (argc != 3) {
     std::cerr << "usage: hybrid_classifier_test <model> <rules>\n";
     return 2;
@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
       {},
   });
   assert(explicit_url.block);
-  assert(explicit_url.reason_code == "strong_url_rule");
+  assert(explicit_url.reason_code == "hybrid_keyword_match");
 
   const auto dom_only = classifier.Classify({
       "https://dynamic.invalid/",
@@ -40,6 +40,6 @@ int main(int argc, char** argv) {
 
   const auto empty = classifier.Classify({"", "", {}, {}});
   assert(!empty.block);
-  std::cout << "hybrid-v1 fixtures passed\n";
+  std::cout << "hybrid-v2 fixtures passed\n";
   return 0;
 }

@@ -13,6 +13,7 @@ class SettingsAccountSection extends StatelessWidget {
     required this.onChangePassword,
     required this.onManagePartner,
     required this.onLogin,
+    required this.onLinkGoogle,
   });
 
   final AuthState auth;
@@ -20,6 +21,7 @@ class SettingsAccountSection extends StatelessWidget {
   final VoidCallback onChangePassword;
   final VoidCallback onManagePartner;
   final VoidCallback onLogin;
+  final VoidCallback onLinkGoogle;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +36,16 @@ class SettingsAccountSection extends StatelessWidget {
             title: Text(l10n.settingsEditProfile),
             onTap: onEditProfile,
           ),
+          if (!auth.googleLinked && auth.passwordEnabled)
+            ListTile(
+              minTileHeight: 56,
+              leading: const Icon(Icons.add_link_rounded),
+              title: const Text('Tautkan akun Google'),
+              subtitle: const Text(
+                'Gunakan email Google yang sama dengan akun ini.',
+              ),
+              onTap: onLinkGoogle,
+            ),
           ListTile(
             minTileHeight: 56,
             leading: const Icon(Icons.password),

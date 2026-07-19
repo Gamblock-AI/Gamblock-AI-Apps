@@ -154,7 +154,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
             ),
           const SizedBox(height: 8),
           FilledButton.icon(
-            onPressed: () => context.go('/protection'),
+            onPressed: () => context.go('/dashboard'),
             icon: const Icon(Icons.shield_outlined),
             label: Text(l10n.setupFinishAction),
           ),

@@ -10,6 +10,7 @@ class Pressable extends StatefulWidget {
   final VoidCallback? onTap;
   final double scaleDown;
   final bool haptic;
+  final String? semanticLabel;
 
   const Pressable({
     super.key,
@@ -17,6 +18,7 @@ class Pressable extends StatefulWidget {
     this.onTap,
     this.scaleDown = 0.96,
     this.haptic = true,
+    this.semanticLabel,
   });
 
   @override
@@ -48,7 +50,9 @@ class _PressableState extends State<Pressable>
   }
 
   void _handleTapDown(TapDownDetails _) {
-    if (widget.onTap != null) _controller.forward();
+    if (widget.onTap != null && !MediaQuery.disableAnimationsOf(context)) {
+      _controller.forward();
+    }
   }
 
   void _handleTapUp(TapUpDetails _) {
@@ -66,12 +70,23 @@ class _PressableState extends State<Pressable>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: _handleTapDown,
-      onTapUp: _handleTapUp,
-      onTapCancel: _handleTapCancel,
-      onTap: _handleTap,
-      child: ScaleTransition(scale: _scale, child: widget.child),
+    return Semantics(
+      button: widget.onTap != null,
+      enabled: widget.onTap != null,
+      label: widget.semanticLabel,
+      child: MouseRegion(
+        cursor: widget.onTap == null
+            ? MouseCursor.defer
+            : SystemMouseCursors.click,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTapDown: _handleTapDown,
+          onTapUp: _handleTapUp,
+          onTapCancel: _handleTapCancel,
+          onTap: widget.onTap == null ? null : _handleTap,
+          child: ScaleTransition(scale: _scale, child: widget.child),
+        ),
+      ),
     );
   }
 }

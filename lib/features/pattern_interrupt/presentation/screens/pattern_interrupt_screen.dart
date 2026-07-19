@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/feedback/feedback.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -58,7 +59,7 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
   }
 
   Future<void> _openWeb(String path) async {
-    await launchUrl(
+    final opened = await launchUrl(
       AppConfig.webUri(
         '${Localizations.localeOf(context).languageCode}/$path',
         queryParameters: path == 'post-intervention'
@@ -67,6 +68,12 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
       ),
       mode: LaunchMode.externalApplication,
     );
+    if (!opened && mounted) {
+      AppFeedback.error(
+        context,
+        'Halaman bantuan belum dapat dibuka. Coba lagi.',
+      );
+    }
   }
 
   @override
@@ -89,7 +96,7 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
                       : const Duration(milliseconds: 220),
                   child: _groundingOpen
                       ? PatternGroundingPanel(
-                          onReturnToProtection: () => context.go('/protection'),
+                          onReturnToProtection: () => context.go('/dashboard'),
                         )
                       : PatternInterruptPanel(
                           breathingAnimation: _breathingController,
@@ -99,7 +106,7 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
                           onOpenGrounding: () =>
                               setState(() => _groundingOpen = true),
                           onOpenHelp: () => _openWeb('help'),
-                          onLater: () => context.go('/protection'),
+                          onLater: () => context.go('/dashboard'),
                         ),
                 ),
               ),

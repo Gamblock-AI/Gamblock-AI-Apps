@@ -5,27 +5,31 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class HybridDecisionEngineTest {
-    private val weights = mapOf(
-        "judi" to 2.4,
-        "slot" to 2.0,
-        "casino" to 2.0,
-        "taruhan" to 1.8,
-        "universitas" to -1.2,
-        "penelitian" to -1.0,
+    private val model = HybridModelConfig(
+        bias = -1.0,
+        mlWeight = 0.75,
+        ruleWeight = 0.25,
+        threshold = 0.4,
+        unigramWeights = mapOf(
+            "judi" to 2.4,
+            "slot" to 2.0,
+            "casino" to 2.0,
+            "taruhan" to 1.8,
+            "universitas" to -1.2,
+            "penelitian" to -1.0,
+        ),
+        bigramWeights = mapOf("slot online" to 1.2),
+        urlFeatures = emptyList(),
     )
+    private val rules = HybridRuleConfig(listOf("judi", "slot online"), 1.0)
 
     private fun classify(input: ClassificationInput): ClassificationResult {
         return HybridDecisionEngine.classify(
             raw = input,
-            bias = -3.2,
-            threshold = 0.72,
-            weights = weights,
-            strongPatterns = listOf("judi", "slot-gacor"),
-            mediumPatterns = listOf("bet"),
-            strongScore = 0.95,
-            mediumScore = 0.65,
-            modelVersion = "dummy-lr-v1",
-            rulesetVersion = "dummy-rules-v1",
+            model = model,
+            rules = rules,
+            modelVersion = "gamblock-lr-test",
+            rulesetVersion = "gambling-keywords-test",
         )
     }
 
@@ -40,7 +44,7 @@ class HybridDecisionEngineTest {
             ),
         )
         assertEquals("block", result.decision)
-        assertEquals("strong_url_rule", result.reasonCode)
+        assertEquals("hybrid_keyword_match", result.reasonCode)
     }
 
     @Test
@@ -54,7 +58,7 @@ class HybridDecisionEngineTest {
             ),
         )
         assertEquals("block", result.decision)
-        assertTrue(result.modelScore >= 0.72)
+        assertTrue(result.modelScore >= 0.5)
     }
 
     @Test

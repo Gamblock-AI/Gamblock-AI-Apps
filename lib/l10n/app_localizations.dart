@@ -860,6 +860,30 @@ abstract class AppLocalizations {
   /// **'Verifikasi Google gagal. Silakan coba lagi.'**
   String get msgErrGoogleVerification;
 
+  /// No description provided for @msgErrGoogleLinkRequired.
+  ///
+  /// In id, this message translates to:
+  /// **'Akun ini sudah terdaftar. Masuk dengan kata sandi lalu tautkan Google dari Pengaturan.'**
+  String get msgErrGoogleLinkRequired;
+
+  /// No description provided for @msgErrGoogleLinkFailed.
+  ///
+  /// In id, this message translates to:
+  /// **'Akun Google belum dapat ditautkan. Pastikan email Google sama dengan email akun.'**
+  String get msgErrGoogleLinkFailed;
+
+  /// No description provided for @msgErrPasswordResetInvalid.
+  ///
+  /// In id, this message translates to:
+  /// **'Kode pemulihan tidak valid, sudah digunakan, atau telah kedaluwarsa.'**
+  String get msgErrPasswordResetInvalid;
+
+  /// No description provided for @msgErrPasswordResetFailed.
+  ///
+  /// In id, this message translates to:
+  /// **'Pemulihan kata sandi belum dapat diproses. Silakan coba lagi.'**
+  String get msgErrPasswordResetFailed;
+
   /// No description provided for @msgErrInvalidSession.
   ///
   /// In id, this message translates to:
@@ -1577,7 +1601,7 @@ abstract class AppLocalizations {
   /// No description provided for @selfTestFixtureBody.
   ///
   /// In id, this message translates to:
-  /// **'Classifier dummy, ruleset, dan jalur Pattern Interrupt siap digunakan.'**
+  /// **'Model lokal, ruleset, dan jalur Pattern Interrupt lolos pemeriksaan fixture.'**
   String get selfTestFixtureBody;
 
   /// No description provided for @protectionSyncError.
@@ -1943,13 +1967,13 @@ abstract class AppLocalizations {
   /// No description provided for @setupSelfTestTitle.
   ///
   /// In id, this message translates to:
-  /// **'Verifikasi classifier dummy'**
+  /// **'Verifikasi model lokal'**
   String get setupSelfTestTitle;
 
   /// No description provided for @setupSelfTestBody.
   ///
   /// In id, this message translates to:
-  /// **'Self-test menggunakan fixture sintetis dan tidak mengirim konten halaman.'**
+  /// **'Self-test menggunakan fixture lokal dan tidak mengirim konten halaman.'**
   String get setupSelfTestBody;
 
   /// No description provided for @setupFinishAction.

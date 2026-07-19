@@ -20,6 +20,18 @@ class AccountabilityRepositoryImpl implements AccountabilityRepository {
     final group = groups is List && groups.isNotEmpty && groups.first is Map
         ? Map<String, dynamic>.from(groups.first as Map)
         : null;
+    final exits = data['exit_requests'];
+    AccountabilityExitRequest? pendingExit;
+    if (exits is List) {
+      for (final item in exits) {
+        if (item is Map && item['status'] == 'pending') {
+          pendingExit = AccountabilityExitRequest.fromJson(
+            Map<String, dynamic>.from(item),
+          );
+          break;
+        }
+      }
+    }
     return AccountabilityOverview(
       activeMembership: membership is Map
           ? AccountabilityMembership.fromWorkspace(
@@ -27,6 +39,7 @@ class AccountabilityRepositoryImpl implements AccountabilityRepository {
               group,
             )
           : null,
+      pendingExitRequest: pendingExit,
     );
   }
 
@@ -80,6 +93,34 @@ class AccountabilityRepositoryImpl implements AccountabilityRepository {
   @override
   Future<void> cancelApproval(String requestId) async {
     await _dio.post('/v1/approval-requests/$requestId/cancel');
+  }
+
+  @override
+  Future<void> updateSharing(
+    String membershipId,
+    AccountabilitySharing sharing,
+  ) async {
+    await _dio.patch(
+      '/v1/accountability/memberships/$membershipId/sharing',
+      data: sharing.toJson(),
+    );
+  }
+
+  @override
+  Future<void> requestLeave(
+    String membershipId, {
+    required String kind,
+    required String reason,
+  }) async {
+    await _dio.post(
+      '/v1/accountability/memberships/$membershipId/leave',
+      data: {'kind': kind, 'reason': reason.trim()},
+    );
+  }
+
+  @override
+  Future<void> cancelLeave(String requestId) async {
+    await _dio.post('/v1/accountability/exit-requests/$requestId/cancel');
   }
 
   @override

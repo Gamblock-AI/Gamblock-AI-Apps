@@ -412,6 +412,22 @@ class AppLocalizationsId extends AppLocalizations {
       'Verifikasi Google gagal. Silakan coba lagi.';
 
   @override
+  String get msgErrGoogleLinkRequired =>
+      'Akun ini sudah terdaftar. Masuk dengan kata sandi lalu tautkan Google dari Pengaturan.';
+
+  @override
+  String get msgErrGoogleLinkFailed =>
+      'Akun Google belum dapat ditautkan. Pastikan email Google sama dengan email akun.';
+
+  @override
+  String get msgErrPasswordResetInvalid =>
+      'Kode pemulihan tidak valid, sudah digunakan, atau telah kedaluwarsa.';
+
+  @override
+  String get msgErrPasswordResetFailed =>
+      'Pemulihan kata sandi belum dapat diproses. Silakan coba lagi.';
+
+  @override
   String get msgErrInvalidSession => 'Sesi tidak valid. Silakan masuk kembali.';
 
   @override
@@ -801,7 +817,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get selfTestFixtureBody =>
-      'Classifier dummy, ruleset, dan jalur Pattern Interrupt siap digunakan.';
+      'Model lokal, ruleset, dan jalur Pattern Interrupt lolos pemeriksaan fixture.';
 
   @override
   String get protectionSyncError => 'Status akun belum dapat disinkronkan';
@@ -1008,11 +1024,11 @@ class AppLocalizationsId extends AppLocalizations {
   String get setupPlatformAction => 'Buka pengaturan platform';
 
   @override
-  String get setupSelfTestTitle => 'Verifikasi classifier dummy';
+  String get setupSelfTestTitle => 'Verifikasi model lokal';
 
   @override
   String get setupSelfTestBody =>
-      'Self-test menggunakan fixture sintetis dan tidak mengirim konten halaman.';
+      'Self-test menggunakan fixture lokal dan tidak mengirim konten halaman.';
 
   @override
   String get setupFinishAction => 'Buka status proteksi';

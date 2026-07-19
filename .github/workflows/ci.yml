@@ -26,6 +26,21 @@ jobs:
           name: flutter-coverage
           path: coverage/lcov.info
 
+  windows-debug:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.9'
+          cache: true
+      - name: Create public development configuration
+        shell: pwsh
+        run: Copy-Item .env.example .env
+      - run: flutter pub get
+      - name: Compile Windows client and service without release signing
+        run: flutter build windows --debug
+
   release-apk:
     # Build a release APK and attach it to a GitHub Release on version tags.
     needs: test

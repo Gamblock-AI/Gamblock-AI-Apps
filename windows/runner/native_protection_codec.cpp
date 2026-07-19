@@ -82,9 +82,11 @@ flutter::EncodableMap SnapshotMap(const std::string& json) {
       {flutter::EncodableValue("permission_status"),
        flutter::EncodableValue(JsonString(json, "permission_status", "unknown"))},
       {flutter::EncodableValue("model_version"),
-       flutter::EncodableValue(JsonString(json, "model_version", "dummy-lr-v1"))},
+       flutter::EncodableValue(JsonString(
+           json, "model_version", "gamblock-lr-bfafb725511a"))},
       {flutter::EncodableValue("ruleset_version"),
-       flutter::EncodableValue(JsonString(json, "ruleset_version", "dummy-rules-v1"))},
+       flutter::EncodableValue(JsonString(
+           json, "ruleset_version", "gambling-keywords-b4f2932a7647"))},
   };
   const std::string degraded_reason = JsonString(json, "degraded_reason_code");
   if (!degraded_reason.empty()) {

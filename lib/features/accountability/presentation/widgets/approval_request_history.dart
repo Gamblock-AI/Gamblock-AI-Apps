@@ -7,9 +7,14 @@ import '../../domain/entities/accountability_models.dart';
 
 /// Renders the local user's server-backed approval-request history.
 class ApprovalRequestHistory extends StatelessWidget {
-  const ApprovalRequestHistory({super.key, required this.requests});
+  const ApprovalRequestHistory({
+    super.key,
+    required this.requests,
+    this.onCancel,
+  });
 
   final List<ApprovalRequest> requests;
+  final ValueChanged<ApprovalRequest>? onCancel;
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +58,12 @@ class ApprovalRequestHistory extends StatelessWidget {
                         ? request.statusLabel
                         : '${request.statusLabel} · ${request.reason}',
                   ),
+                  trailing: request.isPending && onCancel != null
+                      ? TextButton(
+                          onPressed: () => onCancel!(request),
+                          child: Text(l10n.cancel),
+                        )
+                      : null,
                 ),
               ),
             ),

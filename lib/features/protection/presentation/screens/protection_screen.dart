@@ -158,7 +158,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
     final auth = ref.watch(authProvider);
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.protectionTitle),
+        title: Text(l10n.dashboardTitle),
         actions: [
           IconButton(
             tooltip: l10n.refresh,

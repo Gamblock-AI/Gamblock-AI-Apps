@@ -34,8 +34,11 @@ class ProtectionSnapshot {
       serviceRunning: map['service_running'] == true,
       sensorStatus: map['sensor_status']?.toString() ?? 'disconnected',
       permissionStatus: map['permission_status']?.toString() ?? 'unknown',
-      modelVersion: map['model_version']?.toString() ?? 'dummy-lr-v1',
-      rulesetVersion: map['ruleset_version']?.toString() ?? 'dummy-rules-v1',
+      modelVersion:
+          map['model_version']?.toString() ?? 'gamblock-lr-bfafb725511a',
+      rulesetVersion:
+          map['ruleset_version']?.toString() ??
+          'gambling-keywords-b4f2932a7647',
       degradedReasonCode: map['degraded_reason_code']?.toString(),
       lastEventAt: lastEvent == null ? null : DateTime.tryParse(lastEvent),
     );
@@ -47,8 +50,8 @@ class ProtectionSnapshot {
     serviceRunning: false,
     sensorStatus: 'disconnected',
     permissionStatus: 'unknown',
-    modelVersion: 'dummy-lr-v1',
-    rulesetVersion: 'dummy-rules-v1',
+    modelVersion: 'gamblock-lr-bfafb725511a',
+    rulesetVersion: 'gambling-keywords-b4f2932a7647',
     degradedReasonCode: 'native_bridge_unavailable',
   );
 }

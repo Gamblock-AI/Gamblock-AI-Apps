@@ -1,37 +1,46 @@
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/brand_helpers.dart';
 import '../../../../core/widgets/mesh_background.dart';
 import '../widgets/hero_slide.dart';
-import '../widgets/crisis_slide.dart';
 import '../widgets/how_it_works_slide.dart';
-import '../widgets/features_slide.dart';
 import '../widgets/cta_slide.dart';
+import '../../data/onboarding_state.dart';
 
 /// Light intro flow mirroring the web landing page (pastel mesh + brand accents).
-class IntroScreen extends StatefulWidget {
+class IntroScreen extends ConsumerStatefulWidget {
   const IntroScreen({super.key});
 
   @override
-  State<IntroScreen> createState() => _IntroScreenState();
+  ConsumerState<IntroScreen> createState() => _IntroScreenState();
 }
 
-class _IntroScreenState extends State<IntroScreen> {
+class _IntroScreenState extends ConsumerState<IntroScreen> {
   final _ctrl = PageController();
   int _page = 0;
 
-  static const _pages = 5;
+  static const _pages = 3;
+
+  Future<void> _finish() async {
+    await ref.read(onboardingProvider.notifier).complete();
+    if (mounted) context.go('/login');
+  }
 
   void _next() {
     if (_page < _pages - 1) {
-      _ctrl.nextPage(
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeOutCubic,
-      );
+      if (MediaQuery.disableAnimationsOf(context)) {
+        _ctrl.jumpToPage(_page + 1);
+      } else {
+        _ctrl.nextPage(
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.easeOutCubic,
+        );
+      }
     } else {
-      context.go('/login');
+      _finish();
     }
   }
 
@@ -51,19 +60,13 @@ class _IntroScreenState extends State<IntroScreen> {
               PageView(
                 controller: _ctrl,
                 onPageChanged: (i) => setState(() => _page = i),
-                children: const [
-                  HeroSlide(),
-                  CrisisSlide(),
-                  HowItWorksSlide(),
-                  FeaturesSlide(),
-                  CtaSlide(),
-                ],
+                children: const [HeroSlide(), HowItWorksSlide(), CtaSlide()],
               ),
               Positioned(
                 top: 12,
                 right: 12,
                 child: TextButton(
-                  onPressed: () => context.go('/login'),
+                  onPressed: _finish,
                   child: Text(
                     'Lewati',
                     style: TextStyle(
@@ -86,7 +89,9 @@ class _IntroScreenState extends State<IntroScreen> {
                       children: List.generate(_pages, (i) {
                         final active = i == _page;
                         return AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
+                          duration: MediaQuery.disableAnimationsOf(context)
+                              ? Duration.zero
+                              : const Duration(milliseconds: 250),
                           margin: const EdgeInsets.symmetric(horizontal: 4),
                           width: active ? 28 : 8,
                           height: 8,

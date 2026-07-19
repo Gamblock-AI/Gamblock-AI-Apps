@@ -5,6 +5,7 @@ class AccountabilityMembership {
     required this.groupName,
     required this.partnerName,
     required this.status,
+    required this.sharing,
   });
 
   final String id;
@@ -12,6 +13,7 @@ class AccountabilityMembership {
   final String groupName;
   final String partnerName;
   final String status;
+  final AccountabilitySharing sharing;
 
   bool get isActive => status == 'active';
 
@@ -25,14 +27,81 @@ class AccountabilityMembership {
       groupName: group?['name']?.toString() ?? '',
       partnerName: group?['owner_name']?.toString() ?? '',
       status: membership['status']?.toString() ?? 'active',
+      sharing: AccountabilitySharing.fromJson(
+        membership['sharing'] is Map
+            ? Map<String, dynamic>.from(membership['sharing'] as Map)
+            : const {},
+      ),
     );
   }
 }
 
+class AccountabilitySharing {
+  const AccountabilitySharing({
+    this.protectionHealth = true,
+    this.protectionActivity = true,
+    this.recoveryEngagement = true,
+    this.educationProgress = true,
+  });
+  final bool protectionHealth;
+  final bool protectionActivity;
+  final bool recoveryEngagement;
+  final bool educationProgress;
+
+  factory AccountabilitySharing.fromJson(Map<String, dynamic> json) =>
+      AccountabilitySharing(
+        protectionHealth: json['protection_health'] == true,
+        protectionActivity: json['protection_activity'] == true,
+        recoveryEngagement: json['recovery_engagement'] == true,
+        educationProgress: json['education_progress'] == true,
+      );
+
+  Map<String, dynamic> toJson() => {
+    'protection_health': protectionHealth,
+    'protection_activity': protectionActivity,
+    'recovery_engagement': recoveryEngagement,
+    'education_progress': educationProgress,
+  };
+
+  AccountabilitySharing copyWith({
+    bool? protectionHealth,
+    bool? protectionActivity,
+    bool? recoveryEngagement,
+    bool? educationProgress,
+  }) => AccountabilitySharing(
+    protectionHealth: protectionHealth ?? this.protectionHealth,
+    protectionActivity: protectionActivity ?? this.protectionActivity,
+    recoveryEngagement: recoveryEngagement ?? this.recoveryEngagement,
+    educationProgress: educationProgress ?? this.educationProgress,
+  );
+}
+
+class AccountabilityExitRequest {
+  const AccountabilityExitRequest({
+    required this.id,
+    required this.kind,
+    required this.status,
+  });
+  final String id;
+  final String kind;
+  final String status;
+  bool get canCancel => kind == 'normal' && status == 'pending';
+  factory AccountabilityExitRequest.fromJson(Map<String, dynamic> json) =>
+      AccountabilityExitRequest(
+        id: json['id']?.toString() ?? '',
+        kind: json['kind']?.toString() ?? '',
+        status: json['status']?.toString() ?? '',
+      );
+}
+
 class AccountabilityOverview {
-  const AccountabilityOverview({required this.activeMembership});
+  const AccountabilityOverview({
+    required this.activeMembership,
+    this.pendingExitRequest,
+  });
 
   final AccountabilityMembership? activeMembership;
+  final AccountabilityExitRequest? pendingExitRequest;
 }
 
 class AccountabilityGroupPreview {

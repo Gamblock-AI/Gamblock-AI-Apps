@@ -4,8 +4,9 @@ Android and Windows client for local gambling-content protection, Pattern
 Interrupt, social accountability, and privacy-safe protection analytics.
 
 The current result is a **code-complete prototype**. It includes the product
-flows and native runtime wiring, but it is not yet a trained/evaluated AI model
-or a release-readiness claim. Android real-device validation, Windows signed-VM
+flows and native runtime wiring. A supplied trained model is integrated, but
+its reported metrics are not yet reproducible evaluation evidence or a
+release-readiness claim. Android real-device validation, Windows signed-VM
 validation, accessibility review, performance profiling, and model evaluation
 remain required.
 
@@ -18,19 +19,22 @@ flutter run
 ```
 
 Flutter `3.41.9` is pinned through `.fvmrc` and CI. Configure
-`API_BASE_URL` and `WEB_BASE_URL` in `.env`; the file contains public client
-configuration only and is never committed.
+`API_BASE_URL`, `WEB_BASE_URL`, `GOOGLE_WEB_CLIENT_ID`, and
+`GOOGLE_WINDOWS_CLIENT_ID` in `.env`; the file contains public client
+configuration only and is never committed. Android also requires the OAuth
+client signing/SHA registration in Google Cloud. Never place an OAuth client
+secret in the app.
 
 ## Product surfaces
 
 The app uses four predictable top-level destinations:
 
-- **Protection** — truthful native health, setup, self-test, approval grants,
+- **Dashboard** — truthful native health, optional setup, self-test, approval grants,
   and device-bound emergency recovery.
 - **Analytics** — 7/30-day aggregate counters only; no site timeline, URL,
   title, DOM, or inferred risk score.
 - **Partner** — consented relationship lifecycle, invitations, request status,
-  and history.
+  aggregate-sharing consent, normal/unsafe exit, cancellation, and history.
 - **Settings** — account/password, locale, haptics, health notifications,
   pairing, artifact versions, privacy/help, and logout.
 
@@ -39,26 +43,40 @@ works offline with a grounding option, and hands off to the website with only
 locale and `source=pattern_interrupt`. The longer recovery journey remains on
 the website and is not duplicated in Flutter.
 
-## Hybrid-v1 dummy model
+## Hybrid-v2 local model
 
-`assets/protection/` contains the versioned synthetic prototype:
+`assets/protection/` contains the versioned portable runtime artifacts:
 
-- `dummy-rules-v1.json` — strong and medium URL rules;
-- `dummy-lr-v1.json` — synthetic Bag-of-Words Logistic Regression weights;
-- `hybrid-v1-fixtures.json` — deterministic allow/block fixtures;
+- `gamblock-lr-v2.json` — exact float32 Bag-of-Words, URL scaler, and Logistic
+  Regression coefficients exported from the supplied ONNX graph;
+- `gamblock-rules-v2.json` — supplied gambling keywords and source hash;
+- `hybrid-v2-fixtures.json` — deterministic allow/block fixtures;
 - `manifest.json` — contract and SHA-256 integrity metadata.
 
-Both Android and Windows implement the same bounded fusion policy:
+`scripts/export_onnx_linear_model.py` performs the reproducible conversion with
+the system protobuf compiler and never loads the unsafe pickle artifact. Both
+Android and Windows implement the same bounded fusion policy:
+
+```sh
+python3 scripts/export_onnx_linear_model.py \
+  --onnx ../models/gamblock_logistic_regression.onnx \
+  --metadata ../models/gamblock_hybrid_metadata.json \
+  --keywords ../models/gambling_keywords.json \
+  --model-output assets/protection/gamblock-lr-v2.json \
+  --rules-output assets/protection/gamblock-rules-v2.json
+```
 
 1. normalize and bound supported URL/title/heading/anchor inputs;
-2. evaluate URL rules;
-3. count BoW tokens with a maximum contribution of three per token;
-4. compute the Logistic Regression sigmoid;
-5. block on a strong rule, model threshold `0.72`, or the documented hybrid
-   combination.
+2. compute the 14 ordered URL features and keyword rule locally;
+3. count the exported 5,664 unigrams and 4,336 bigrams;
+4. apply the exported StandardScaler values and Logistic Regression sigmoid;
+5. compute `0.75 × model_probability + 0.25 × rule_score` and block at `0.4`.
 
-The artifact is explicitly marked `trained: false` and `evaluated: false`.
-Replace it only through a governed dataset/training/evaluation workflow.
+The artifact is marked `trained: true` and `evaluated: false`. Its supplied
+accuracy/precision/recall/F1 values are retained only as unverified metadata:
+the dataset card, split manifest, training source, FPR slices, and preprocessing
+parity evidence are still missing. Replace it only through the governed
+dataset/training/evaluation workflow.
 
 ## Android runtime
 
@@ -83,7 +101,7 @@ or critical-process behavior.
 The Windows build contains two native processes:
 
 - `gamblock_ai_service.exe` — LocalSystem SCM service with normal recovery,
-  authenticated `127.0.0.1:9090` WebSocket, Hybrid-v1 classification,
+  authenticated `127.0.0.1:9090` WebSocket, Hybrid-v2 classification,
   machine-DPAPI pairing/grants, and aggregate counters;
 - `gamblock_ai_apps.exe` — user-session Flutter agent that connects through a
   logon-SID-restricted named pipe, performs supported `SendInput` navigation,
@@ -114,10 +132,20 @@ The client uses:
   request APIs;
 - one-time approval application to a specific device;
 - user-created, device-bound emergency requests reviewed by two distinct
-  platform administrators;
+  administrators;
 - daily aggregate event sync and 7/30-day aggregate analytics.
 
 Raw browsing inputs never enter these APIs.
+
+Authentication starts with a persisted three-step onboarding, then
+login/register, then `/dashboard`. Password recovery uses a non-enumerating
+email request and a single-use 12-character code. Android Google sign-in uses
+the official provider plugin; Windows opens the installed-app OAuth flow in the
+system browser and validates loopback state, nonce, and PKCE before sending
+only the ID token to the backend. Provider access/refresh tokens are discarded.
+The client remains `user`-only. If an admin-provisioned student signs in with a
+temporary password, the login screen completes the required first-password
+change before accepting the normal access/refresh session.
 
 ## Validate
 
@@ -127,8 +155,10 @@ Raw browsing inputs never enter these APIs.
 ```
 
 `verify.sh` runs `flutter analyze`. Unit tests and platform builds are explicit
-checks. The portable Windows Hybrid-v1 fixture can also be compiled directly
+checks. The portable Windows Hybrid-v2 fixture can also be compiled directly
 from `windows/protection/hybrid_classifier_test.cpp`.
 
 Tag CI requires real Android keystore secrets and a Windows code-signing PFX;
 release jobs do not fall back to debug signing.
+Every main/PR CI run also compiles a non-signing Windows debug bundle so native
+runner/service integration failures are caught before a release tag.

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/auth/auth_state.dart';
@@ -9,6 +10,7 @@ import '../../domain/entities/protection_status.dart';
 import 'protection_accountability_section.dart';
 import 'protection_actions.dart';
 import 'protection_status_card.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Scrollable Protection content, kept separate from native state orchestration.
 class ProtectionScreenBody extends StatelessWidget {
@@ -61,6 +63,12 @@ class ProtectionScreenBody extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
+          _DashboardHero(auth: auth, status: status, onOpenSetup: onOpenSetup),
+          const SizedBox(height: 16),
+          if (auth.isAuthenticated && !auth.emailVerified) ...[
+            const _VerificationNotice(),
+            const SizedBox(height: 16),
+          ],
           if (isLoading && status == null)
             const Center(
               child: Padding(
@@ -103,6 +111,115 @@ class ProtectionScreenBody extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _DashboardHero extends StatelessWidget {
+  const _DashboardHero({
+    required this.auth,
+    required this.status,
+    required this.onOpenSetup,
+  });
+  final AuthState auth;
+  final ProtectionStatus? status;
+  final VoidCallback onOpenSetup;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = auth.displayName?.trim().split(' ').first;
+    final active = status?.isActive == true;
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: AppColors.navyGradient,
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Halo${name?.isNotEmpty == true ? ', $name' : ''}',
+            style: Theme.of(
+              context,
+            ).textTheme.labelLarge?.copyWith(color: AppColors.skyLight),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            active
+                ? 'Perlindungan perangkat aktif'
+                : 'Selesaikan perlindungan perangkat',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Analisis tetap di perangkat. Server hanya menerima hitungan agregat perlindungan.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.white.withValues(alpha: .78),
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 18),
+          SizedBox(
+            width: 220,
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: AppColors.navy,
+              ),
+              onPressed: onOpenSetup,
+              icon: const Icon(Icons.tune_rounded),
+              label: const Text('Periksa setup'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VerificationNotice extends ConsumerWidget {
+  const _VerificationNotice();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Card(
+      color: AppColors.azure,
+      child: ListTile(
+        minTileHeight: 72,
+        leading: const Icon(
+          Icons.mark_email_unread_outlined,
+          color: AppColors.navy,
+        ),
+        title: const Text('Verifikasi email Anda'),
+        subtitle: const Text(
+          'Diperlukan untuk fitur pendamping dan pemulihan akun.',
+        ),
+        trailing: TextButton(
+          onPressed: () async {
+            try {
+              await ref.read(authProvider.notifier).resendEmailVerification();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Email verifikasi dikirim.')),
+                );
+              }
+            } catch (error) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(AppMessages.friendlyMessage(context, error)),
+                  ),
+                );
+              }
+            }
+          },
+          child: const Text('Kirim ulang'),
+        ),
       ),
     );
   }

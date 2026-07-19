@@ -4,7 +4,7 @@ add_library(gamblock_hybrid STATIC
 apply_standard_settings(gamblock_hybrid)
 target_include_directories(gamblock_hybrid PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 
-option(GAMBLOCK_BUILD_NATIVE_TESTS "Build portable Hybrid-v1 fixture tests" OFF)
+option(GAMBLOCK_BUILD_NATIVE_TESTS "Build portable Hybrid-v2 fixture tests" OFF)
 if(GAMBLOCK_BUILD_NATIVE_TESTS)
   enable_testing()
   add_executable(gamblock_hybrid_test "hybrid_classifier_test.cpp")
@@ -13,7 +13,7 @@ if(GAMBLOCK_BUILD_NATIVE_TESTS)
   add_test(
     NAME gamblock_hybrid_fixtures
     COMMAND gamblock_hybrid_test
-      "${CMAKE_SOURCE_DIR}/../assets/protection/dummy-lr-v1.json"
-      "${CMAKE_SOURCE_DIR}/../assets/protection/dummy-rules-v1.json"
+      "${CMAKE_SOURCE_DIR}/../assets/protection/gamblock-lr-v2.json"
+      "${CMAKE_SOURCE_DIR}/../assets/protection/gamblock-rules-v2.json"
   )
 endif()

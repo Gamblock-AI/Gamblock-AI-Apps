@@ -54,7 +54,7 @@ class AppTheme {
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: AppColors.crimson),
+        style: TextButton.styleFrom(foregroundColor: AppColors.navy),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -85,7 +85,7 @@ class AppTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.surface,
-        indicatorColor: AppColors.crimson.withValues(alpha: 0.12),
+        indicatorColor: AppColors.sky.withValues(alpha: 0.22),
         elevation: 0,
         height: 68,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
@@ -93,13 +93,13 @@ class AppTheme {
           return TextStyle(
             fontSize: 12,
             fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-            color: selected ? AppColors.crimson : AppColors.mutedForeground,
+            color: selected ? AppColors.navy : AppColors.mutedForeground,
           );
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return IconThemeData(
-            color: selected ? AppColors.crimson : AppColors.mutedForeground,
+            color: selected ? AppColors.navy : AppColors.mutedForeground,
             size: 24,
           );
         }),

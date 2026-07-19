@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/feedback/feedback.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/config/app_config.dart';
@@ -46,18 +47,26 @@ class RecoveryHandoffScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 22),
                     FilledButton.icon(
-                      onPressed: () => launchUrl(
-                        AppConfig.webUri(
-                          '${Localizations.localeOf(context).languageCode}/recovery',
-                        ),
-                        mode: LaunchMode.externalApplication,
-                      ),
+                      onPressed: () async {
+                        final opened = await launchUrl(
+                          AppConfig.webUri(
+                            '${Localizations.localeOf(context).languageCode}/recovery',
+                          ),
+                          mode: LaunchMode.externalApplication,
+                        );
+                        if (!opened && context.mounted) {
+                          AppFeedback.error(
+                            context,
+                            'Halaman pemulihan belum dapat dibuka. Coba lagi.',
+                          );
+                        }
+                      },
                       icon: const Icon(Icons.open_in_new),
                       label: Text(l10n.recoveryWebAction),
                     ),
                     const SizedBox(height: 10),
                     TextButton(
-                      onPressed: () => context.go('/protection'),
+                      onPressed: () => context.go('/dashboard'),
                       child: Text(l10n.backToProtection),
                     ),
                   ],
