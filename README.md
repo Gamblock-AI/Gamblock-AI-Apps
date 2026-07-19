@@ -110,7 +110,8 @@ The client uses:
 
 - device registration/upsert by stable client instance ID;
 - profile and password update;
-- partner/invitation and approval request APIs;
+- group membership workspace, code preview/join, and membership-bound approval
+  request APIs;
 - one-time approval application to a specific device;
 - user-created, device-bound emergency requests reviewed by two distinct
   platform administrators;

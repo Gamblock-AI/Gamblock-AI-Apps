@@ -11,7 +11,7 @@ class ProtectionAccountabilitySection extends StatelessWidget {
   const ProtectionAccountabilitySection({
     super.key,
     required this.auth,
-    required this.partners,
+    required this.accountability,
     required this.requests,
     required this.emergencyRequest,
     required this.isLoading,
@@ -25,7 +25,7 @@ class ProtectionAccountabilitySection extends StatelessWidget {
   });
 
   final AuthState auth;
-  final PartnerOverview? partners;
+  final AccountabilityOverview? accountability;
   final List<ApprovalRequest> requests;
   final EmergencyRequest? emergencyRequest;
   final bool isLoading;
@@ -66,7 +66,7 @@ class ProtectionAccountabilitySection extends StatelessWidget {
           )
         else
           ProtectionAccountabilityCard(
-            partners: partners,
+            accountability: accountability,
             requests: requests,
             emergencyRequest: emergencyRequest,
             isLoading: isLoading,

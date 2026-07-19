@@ -8,7 +8,7 @@ import '../../../accountability/domain/entities/accountability_models.dart';
 class ProtectionAccountabilityCard extends StatelessWidget {
   const ProtectionAccountabilityCard({
     super.key,
-    required this.partners,
+    required this.accountability,
     required this.requests,
     required this.emergencyRequest,
     required this.isLoading,
@@ -19,7 +19,7 @@ class ProtectionAccountabilityCard extends StatelessWidget {
     required this.onEnterEmergencyKey,
   });
 
-  final PartnerOverview? partners;
+  final AccountabilityOverview? accountability;
   final List<ApprovalRequest> requests;
   final EmergencyRequest? emergencyRequest;
   final bool isLoading;
@@ -32,7 +32,7 @@ class ProtectionAccountabilityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final partner = partners?.activePartner;
+    final membership = accountability?.activeMembership;
     final pending = requests.where((request) => request.isPending).firstOrNull;
     final approved = requests.where((request) => request.canApply).firstOrNull;
     final requestInProgress =
@@ -47,12 +47,12 @@ class ProtectionAccountabilityCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              partner?.email ?? l10n.partnerNone,
+              membership?.partnerName ?? l10n.partnerNone,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 6),
             Text(
-              partner == null
+              membership == null
                   ? l10n.protectionPartnerRequired
                   : pending != null
                   ? l10n.protectionRequestPending
@@ -72,7 +72,7 @@ class ProtectionAccountabilityCard extends StatelessWidget {
               )
             else
               FilledButton.icon(
-                onPressed: partner == null || pending != null || isLoading
+                onPressed: membership == null || pending != null || isLoading
                     ? null
                     : onRequestApproval,
                 icon: const Icon(Icons.lock_clock_outlined),

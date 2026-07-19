@@ -19,7 +19,7 @@ class ProtectionScreenBody extends StatelessWidget {
     required this.status,
     required this.error,
     required this.auth,
-    required this.partners,
+    required this.accountability,
     required this.requests,
     required this.emergencyRequest,
     required this.onRefresh,
@@ -39,7 +39,7 @@ class ProtectionScreenBody extends StatelessWidget {
   final ProtectionStatus? status;
   final Object? error;
   final AuthState auth;
-  final PartnerOverview? partners;
+  final AccountabilityOverview? accountability;
   final List<ApprovalRequest> requests;
   final EmergencyRequest? emergencyRequest;
   final Future<void> Function() onRefresh;
@@ -89,7 +89,7 @@ class ProtectionScreenBody extends StatelessWidget {
             const SizedBox(height: 24),
             ProtectionAccountabilitySection(
               auth: auth,
-              partners: partners,
+              accountability: accountability,
               requests: requests,
               emergencyRequest: emergencyRequest,
               isLoading: isActionLoading,

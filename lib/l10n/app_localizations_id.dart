@@ -679,7 +679,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get partnerNoneBody =>
-      'Undang satu orang tepercaya. Pendamping tidak dapat melihat URL, riwayat penjelajahan, atau catatan pemulihan pribadi.';
+      'Masukkan kode dari pendamping tepercaya. Pendamping tidak dapat melihat URL, riwayat penjelajahan, atau catatan pemulihan pribadi.';
 
   @override
   String get partnerActiveBody =>
@@ -712,7 +712,42 @@ class AppLocalizationsId extends AppLocalizations {
       'Permintaan perubahan proteksi dari perangkat akan muncul di sini.';
 
   @override
-  String get partnerManageAction => 'Kelola pendamping';
+  String get partnerManageAction => 'Kelola grup pendamping';
+
+  @override
+  String get accountabilityJoinTitle => 'Hubungkan pendamping dengan kode grup';
+
+  @override
+  String get accountabilityJoinBody =>
+      'Tinjau nama grup dan pendamping sebelum bergabung. Satu akun hanya dapat memiliki satu grup aktif.';
+
+  @override
+  String get accountabilityPreviewAction => 'Tinjau grup';
+
+  @override
+  String accountabilityManagedBy(String name) {
+    return 'Dikelola oleh $name';
+  }
+
+  @override
+  String get accountabilityJoinConfirmTitle => 'Bergabung ke grup ini?';
+
+  @override
+  String accountabilityJoinConfirmBody(String name) {
+    return '$name akan menjadi pendamping Anda. Ringkasan agregat awal dapat Anda matikan dari portal web kapan saja.';
+  }
+
+  @override
+  String get accountabilityJoinAction => 'Konfirmasi dan bergabung';
+
+  @override
+  String get accountabilityJoinSuccess =>
+      'Grup akuntabilitas berhasil dihubungkan.';
+
+  @override
+  String accountabilityActiveGroup(String name) {
+    return 'Terhubung melalui grup $name. Pendamping hanya menerima agregat yang Anda izinkan.';
+  }
 
   @override
   String get protectionSetupAction => 'Setup platform';

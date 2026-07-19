@@ -6,14 +6,14 @@ import '../../domain/entities/accountability_models.dart';
 
 /// Summarises whether the current account has an active accountability partner.
 class PartnerStatusCard extends StatelessWidget {
-  const PartnerStatusCard({super.key, required this.partner});
+  const PartnerStatusCard({super.key, required this.membership});
 
-  final PartnerLink? partner;
+  final AccountabilityMembership? membership;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final hasPartner = partner != null;
+    final hasPartner = membership != null;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -29,7 +29,7 @@ class PartnerStatusCard extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    partner?.email ?? l10n.partnerNone,
+                    membership?.partnerName ?? l10n.partnerNone,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
@@ -37,7 +37,9 @@ class PartnerStatusCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              hasPartner ? l10n.partnerActiveBody : l10n.partnerNoneBody,
+              hasPartner
+                  ? l10n.accountabilityActiveGroup(membership?.groupName ?? '')
+                  : l10n.partnerNoneBody,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: AppColors.mutedForeground,
               ),

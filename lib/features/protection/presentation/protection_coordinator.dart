@@ -38,12 +38,12 @@ class ProtectionCoordinator {
       }
       final accountability = _ref.read(accountabilityRepositoryProvider);
       final results = await Future.wait<Object?>([
-        accountability.fetchPartners(),
+        accountability.fetchWorkspace(),
         accountability.fetchApprovalRequests(),
         accountability.currentEmergency(auth.deviceId!),
       ]);
       return ProtectionAccountabilityData(
-        partners: results[0] as PartnerOverview,
+        accountability: results[0] as AccountabilityOverview,
         requests: (results[1] as List<ApprovalRequest>)
             .where((request) => request.deviceId == auth.deviceId)
             .toList(),
@@ -64,7 +64,7 @@ class ProtectionCoordinator {
 
   Future<void> requestApproval({
     required String deviceId,
-    required String partnerLinkId,
+    required String membershipId,
     required String action,
     required String reason,
     required int durationMinutes,
@@ -73,7 +73,7 @@ class ProtectionCoordinator {
         .read(accountabilityRepositoryProvider)
         .requestApproval(
           deviceId: deviceId,
-          partnerLinkId: partnerLinkId,
+          membershipId: membershipId,
           action: action,
           reason: reason,
           durationMinutes: durationMinutes,
@@ -107,13 +107,13 @@ class ProtectionCoordinator {
 
 class ProtectionAccountabilityData {
   const ProtectionAccountabilityData({
-    this.partners,
+    this.accountability,
     this.requests = const [],
     this.emergencyRequest,
     this.error,
   });
 
-  final PartnerOverview? partners;
+  final AccountabilityOverview? accountability;
   final List<ApprovalRequest> requests;
   final EmergencyRequest? emergencyRequest;
   final Object? error;

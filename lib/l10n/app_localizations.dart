@@ -1367,7 +1367,7 @@ abstract class AppLocalizations {
   /// No description provided for @partnerNoneBody.
   ///
   /// In id, this message translates to:
-  /// **'Undang satu orang tepercaya. Pendamping tidak dapat melihat URL, riwayat penjelajahan, atau catatan pemulihan pribadi.'**
+  /// **'Masukkan kode dari pendamping tepercaya. Pendamping tidak dapat melihat URL, riwayat penjelajahan, atau catatan pemulihan pribadi.'**
   String get partnerNoneBody;
 
   /// No description provided for @partnerActiveBody.
@@ -1427,8 +1427,62 @@ abstract class AppLocalizations {
   /// No description provided for @partnerManageAction.
   ///
   /// In id, this message translates to:
-  /// **'Kelola pendamping'**
+  /// **'Kelola grup pendamping'**
   String get partnerManageAction;
+
+  /// No description provided for @accountabilityJoinTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Hubungkan pendamping dengan kode grup'**
+  String get accountabilityJoinTitle;
+
+  /// No description provided for @accountabilityJoinBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Tinjau nama grup dan pendamping sebelum bergabung. Satu akun hanya dapat memiliki satu grup aktif.'**
+  String get accountabilityJoinBody;
+
+  /// No description provided for @accountabilityPreviewAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Tinjau grup'**
+  String get accountabilityPreviewAction;
+
+  /// No description provided for @accountabilityManagedBy.
+  ///
+  /// In id, this message translates to:
+  /// **'Dikelola oleh {name}'**
+  String accountabilityManagedBy(String name);
+
+  /// No description provided for @accountabilityJoinConfirmTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Bergabung ke grup ini?'**
+  String get accountabilityJoinConfirmTitle;
+
+  /// No description provided for @accountabilityJoinConfirmBody.
+  ///
+  /// In id, this message translates to:
+  /// **'{name} akan menjadi pendamping Anda. Ringkasan agregat awal dapat Anda matikan dari portal web kapan saja.'**
+  String accountabilityJoinConfirmBody(String name);
+
+  /// No description provided for @accountabilityJoinAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Konfirmasi dan bergabung'**
+  String get accountabilityJoinAction;
+
+  /// No description provided for @accountabilityJoinSuccess.
+  ///
+  /// In id, this message translates to:
+  /// **'Grup akuntabilitas berhasil dihubungkan.'**
+  String get accountabilityJoinSuccess;
+
+  /// No description provided for @accountabilityActiveGroup.
+  ///
+  /// In id, this message translates to:
+  /// **'Terhubung melalui grup {name}. Pendamping hanya menerima agregat yang Anda izinkan.'**
+  String accountabilityActiveGroup(String name);
 
   /// No description provided for @protectionSetupAction.
   ///

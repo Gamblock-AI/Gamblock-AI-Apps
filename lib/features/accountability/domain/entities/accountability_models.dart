@@ -1,40 +1,68 @@
-class PartnerLink {
-  const PartnerLink({
+class AccountabilityMembership {
+  const AccountabilityMembership({
     required this.id,
-    required this.email,
+    required this.groupId,
+    required this.groupName,
+    required this.partnerName,
     required this.status,
-    required this.relationshipRole,
   });
 
   final String id;
-  final String email;
+  final String groupId;
+  final String groupName;
+  final String partnerName;
   final String status;
-  final String relationshipRole;
 
   bool get isActive => status == 'active';
 
-  factory PartnerLink.fromJson(Map<String, dynamic> json) {
-    return PartnerLink(
-      id: json['id']?.toString() ?? '',
-      email: json['partner_email']?.toString() ?? '',
-      status: json['status']?.toString() ?? 'invited',
-      relationshipRole: json['relationship_role']?.toString() ?? 'owner',
+  factory AccountabilityMembership.fromWorkspace(
+    Map<String, dynamic> membership,
+    Map<String, dynamic>? group,
+  ) {
+    return AccountabilityMembership(
+      id: membership['id']?.toString() ?? '',
+      groupId: membership['group_id']?.toString() ?? '',
+      groupName: group?['name']?.toString() ?? '',
+      partnerName: group?['owner_name']?.toString() ?? '',
+      status: membership['status']?.toString() ?? 'active',
     );
   }
 }
 
-class PartnerOverview {
-  const PartnerOverview({required this.activePartner, required this.items});
+class AccountabilityOverview {
+  const AccountabilityOverview({required this.activeMembership});
 
-  final PartnerLink? activePartner;
-  final List<PartnerLink> items;
+  final AccountabilityMembership? activeMembership;
+}
+
+class AccountabilityGroupPreview {
+  const AccountabilityGroupPreview({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.partnerName,
+  });
+
+  final String id;
+  final String name;
+  final String description;
+  final String partnerName;
+
+  factory AccountabilityGroupPreview.fromJson(Map<String, dynamic> json) {
+    return AccountabilityGroupPreview(
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      partnerName: json['owner_name']?.toString() ?? '',
+    );
+  }
 }
 
 class ApprovalRequest {
   const ApprovalRequest({
     required this.id,
     required this.deviceId,
-    required this.partnerLinkId,
+    required this.membershipId,
     required this.action,
     required this.actionLabel,
     required this.status,
@@ -48,7 +76,7 @@ class ApprovalRequest {
 
   final String id;
   final String deviceId;
-  final String partnerLinkId;
+  final String membershipId;
   final String action;
   final String actionLabel;
   final String status;
@@ -68,7 +96,7 @@ class ApprovalRequest {
     return ApprovalRequest(
       id: json['id']?.toString() ?? '',
       deviceId: json['device_id']?.toString() ?? '',
-      partnerLinkId: json['partner_link_id']?.toString() ?? '',
+      membershipId: json['membership_id']?.toString() ?? '',
       action: json['action']?.toString() ?? '',
       actionLabel: json['action_label']?.toString() ?? '',
       status: json['status']?.toString() ?? 'pending',
@@ -82,18 +110,6 @@ class ApprovalRequest {
       grantExpiresAt: parse('grant_expires_at'),
     );
   }
-}
-
-class PartnerInvitation {
-  const PartnerInvitation({
-    required this.id,
-    required this.status,
-    required this.inviteUrl,
-  });
-
-  final String id;
-  final String status;
-  final String inviteUrl;
 }
 
 class EmergencyRequest {

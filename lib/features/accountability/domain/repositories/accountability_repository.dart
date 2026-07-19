@@ -1,13 +1,13 @@
 import '../entities/accountability_models.dart';
 
 abstract class AccountabilityRepository {
-  Future<PartnerOverview> fetchPartners();
+  Future<AccountabilityOverview> fetchWorkspace();
   Future<List<ApprovalRequest>> fetchApprovalRequests();
-  Future<PartnerInvitation> invitePartner(String email);
-  Future<void> revokePartner(String partnerLinkId);
+  Future<AccountabilityGroupPreview> previewGroup(String code);
+  Future<AccountabilityOverview> joinGroup(String code);
   Future<ApprovalRequest> requestApproval({
     required String deviceId,
-    required String partnerLinkId,
+    required String membershipId,
     required String action,
     required String reason,
     required int durationMinutes,

@@ -211,7 +211,7 @@
   "partnerErrorTitle": "Partner data could not be loaded",
   "partnerInviteCreated": "The partner invitation was created.",
   "partnerNone": "No active partner",
-  "partnerNoneBody": "Invite one trusted person. Partners cannot see URLs, browsing history, or private recovery notes.",
+  "partnerNoneBody": "Enter a code from a trusted partner. Partners cannot see URLs, browsing history, or private recovery notes.",
   "partnerActiveBody": "The active partner can approve protection changes for registered devices.",
   "partnerEmailLabel": "Partner email",
   "partnerEmailHelp": "Use the email of a trusted person who understands and accepts this role.",
@@ -221,7 +221,25 @@
   "partnerRequestHistory": "Request history",
   "partnerNoRequests": "No requests yet",
   "partnerNoRequestsBody": "Protection-change requests from the device will appear here.",
-  "partnerManageAction": "Manage partner",
+  "partnerManageAction": "Manage partner group",
+  "accountabilityJoinTitle": "Connect a partner with a group code",
+  "accountabilityJoinBody": "Review the group and partner name before joining. One account can only have one active group.",
+  "accountabilityPreviewAction": "Review group",
+  "accountabilityManagedBy": "Managed by {name}",
+  "@accountabilityManagedBy": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "accountabilityJoinConfirmTitle": "Join this group?",
+  "accountabilityJoinConfirmBody": "{name} will become your partner. You can disable each initial aggregate category from the web portal at any time.",
+  "@accountabilityJoinConfirmBody": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "accountabilityJoinAction": "Confirm and join",
+  "accountabilityJoinSuccess": "The accountability group is connected.",
+  "accountabilityActiveGroup": "Connected through {name}. Your partner only receives aggregates you allow.",
+  "@accountabilityActiveGroup": {
+    "placeholders": {"name": {"type": "String"}}
+  },
   "protectionSetupAction": "Platform setup",
   "selfTestAction": "Run self-test",
   "selfTestPassed": "Local self-test passed",

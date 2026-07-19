@@ -683,7 +683,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get partnerNoneBody =>
-      'Invite one trusted person. Partners cannot see URLs, browsing history, or private recovery notes.';
+      'Enter a code from a trusted partner. Partners cannot see URLs, browsing history, or private recovery notes.';
 
   @override
   String get partnerActiveBody =>
@@ -716,7 +716,42 @@ class AppLocalizationsEn extends AppLocalizations {
       'Protection-change requests from the device will appear here.';
 
   @override
-  String get partnerManageAction => 'Manage partner';
+  String get partnerManageAction => 'Manage partner group';
+
+  @override
+  String get accountabilityJoinTitle => 'Connect a partner with a group code';
+
+  @override
+  String get accountabilityJoinBody =>
+      'Review the group and partner name before joining. One account can only have one active group.';
+
+  @override
+  String get accountabilityPreviewAction => 'Review group';
+
+  @override
+  String accountabilityManagedBy(String name) {
+    return 'Managed by $name';
+  }
+
+  @override
+  String get accountabilityJoinConfirmTitle => 'Join this group?';
+
+  @override
+  String accountabilityJoinConfirmBody(String name) {
+    return '$name will become your partner. You can disable each initial aggregate category from the web portal at any time.';
+  }
+
+  @override
+  String get accountabilityJoinAction => 'Confirm and join';
+
+  @override
+  String get accountabilityJoinSuccess =>
+      'The accountability group is connected.';
+
+  @override
+  String accountabilityActiveGroup(String name) {
+    return 'Connected through $name. Your partner only receives aggregates you allow.';
+  }
 
   @override
   String get protectionSetupAction => 'Platform setup';

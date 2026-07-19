@@ -111,7 +111,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
   ) async {
     final response = await ApiClient.dio.post(
       '/v1/auth/register',
-      data: {'email': email, 'password': password, 'name': name},
+      data: {
+        'email': email,
+        'password': password,
+        'name': name,
+        'role': 'user',
+      },
     );
     return _completeSession(ApiResponse.map(response));
   }

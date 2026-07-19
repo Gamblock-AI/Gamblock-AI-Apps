@@ -33,6 +33,11 @@ class AppMessages {
         return loc.msgErrSessionExpired;
       case 'logout_failed':
         return loc.msgErrLogout;
+      case 'email_verification_failed':
+      case 'email_verification_delivery_failed':
+      case 'phone_verification_failed':
+      case 'recent_auth_required':
+        return loc.msgErrInvalidRequest;
       case 'device_create_failed':
         return loc.msgErrCreateDevice;
       case 'device_id_required':
@@ -82,6 +87,22 @@ class AppMessages {
         return loc.msgErrRejectRequest;
       case 'approval_apply_failed':
         return loc.msgErrSubmitRequest;
+      case 'accountability_workspace_failed':
+        return loc.msgErrLoadPartner;
+      case 'accountability_group_create_failed':
+        return loc.msgErrCreateGroup;
+      case 'accountability_code_invalid':
+      case 'accountability_join_failed':
+        return loc.msgErrInvalidGroupCodeSpecific;
+      case 'accountability_code_rotate_failed':
+      case 'accountability_group_archive_failed':
+      case 'accountability_sharing_update_failed':
+      case 'accountability_leave_failed':
+      case 'accountability_leave_resolve_failed':
+      case 'accountability_member_remove_failed':
+      case 'partner_contact_create_failed':
+      case 'partner_contact_transition_failed':
+        return loc.msgErrInvalidRequest;
       case 'name_required':
         return loc.msgErrGroupNameRequired;
       case 'create_org_failed':
@@ -109,6 +130,7 @@ class AppMessages {
       case 'fetch_reflections_failed':
         return loc.msgErrLoadJournal;
       case 'reflection_create_failed':
+      case 'reflection_update_failed':
         return loc.msgErrSaveJournal;
       case 'fetch_modules_failed':
         return loc.msgErrLoadPsychoeducation;
@@ -137,9 +159,28 @@ class AppMessages {
         return loc.msgErrSendTicket;
       case 'summary_required':
         return loc.msgErrSummaryRequired;
+      case 'support_case_not_found':
+      case 'support_reply_failed':
+      case 'support_transition_failed':
+      case 'support_claim_failed':
+      case 'support_release_failed':
+        return loc.msgErrLoadTicket;
+      case 'recovery_records_failed':
+      case 'recovery_record_save_failed':
+      case 'recovery_practice_fetch_failed':
+      case 'recovery_practice_invalid':
+      case 'recovery_space_fetch_failed':
+      case 'recovery_space_update_failed':
+      case 'weekly_review_fetch_failed':
+      case 'weekly_review_save_failed':
+        return loc.msgErrSaveJournal;
       case 'fetch_data_requests_failed':
         return loc.msgErrLoadDataRequest;
       case 'data_request_failed':
+      case 'data_request_retry_failed':
+      case 'data_request_reject_failed':
+      case 'data_export_unavailable':
+      case 'account_deletion_failed':
         return loc.msgErrSubmitDataRequest;
       case 'type_required':
         return loc.msgErrTypeRequired;
@@ -149,6 +190,19 @@ class AppMessages {
         return loc.msgErrLoadAdminModelReleases;
       case 'fetch_admin_support_cases_failed':
         return loc.msgErrLoadAdminSupportCases;
+      case 'fetch_admin_releases_failed':
+      case 'admin_overview_failed':
+      case 'site_social_links_failed':
+      case 'audit_events_failed':
+      case 'operators_fetch_failed':
+      case 'operator_invite_failed':
+      case 'operator_update_failed':
+      case 'operator_invitation_revoke_failed':
+      case 'operator_invitation_invalid':
+      case 'operator_invitation_accept_failed':
+      case 'release_rollout_create_failed':
+      case 'release_rollout_transition_failed':
+        return loc.msgErrGeneric;
       case 'create_model_release_failed':
         return loc.msgErrCreateModelRelease;
       case 'create_ruleset_release_failed':

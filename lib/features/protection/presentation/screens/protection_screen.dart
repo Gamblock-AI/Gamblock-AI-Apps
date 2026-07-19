@@ -23,7 +23,7 @@ class ProtectionScreen extends ConsumerStatefulWidget {
 
 class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
   ProtectionStatus? _status;
-  PartnerOverview? _partners;
+  AccountabilityOverview? _accountability;
   List<ApprovalRequest> _requests = const [];
   EmergencyRequest? _emergencyRequest;
   Object? _error;
@@ -60,7 +60,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
     ).loadAccountability(ref.read(authProvider));
     if (!mounted) return;
     setState(() {
-      _partners = accountability.partners;
+      _accountability = accountability.accountability;
       _requests = accountability.requests;
       _emergencyRequest = accountability.emergencyRequest;
       _error = accountability.error;
@@ -83,8 +83,8 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
 
   Future<void> _requestApproval() async {
     final auth = ref.read(authProvider);
-    final partner = _partners?.activePartner;
-    if (auth.deviceId == null || partner == null) return;
+    final membership = _accountability?.activeMembership;
+    if (auth.deviceId == null || membership == null) return;
     final draft = await showDialog<ApprovalDraft>(
       context: context,
       builder: (_) => const ApprovalRequestDialog(),
@@ -93,7 +93,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
     await _runAccountabilityAction(
       () => ProtectionCoordinator(ref).requestApproval(
         deviceId: auth.deviceId!,
-        partnerLinkId: partner.id,
+        membershipId: membership.id,
         action: draft.action,
         reason: draft.reason,
         durationMinutes: draft.durationMinutes,
@@ -173,7 +173,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
         status: _status,
         error: _error,
         auth: auth,
-        partners: _partners,
+        accountability: _accountability,
         requests: _requests,
         emergencyRequest: _emergencyRequest,
         onRefresh: _load,

@@ -54,10 +54,6 @@ class _ApprovalRequestDialogState extends State<ApprovalRequestDialog> {
                   child: Text(l10n.protectionPauseAction),
                 ),
                 DropdownMenuItem(
-                  value: 'disable_protection',
-                  child: Text(l10n.protectionDisableAction),
-                ),
-                DropdownMenuItem(
                   value: 'uninstall_detected',
                   child: Text(l10n.protectionUninstallAction),
                 ),

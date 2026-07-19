@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
@@ -11,8 +10,6 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../data/providers.dart';
 import '../../domain/entities/accountability_models.dart';
 import '../widgets/approval_request_history.dart';
-import '../widgets/partner_invite_form.dart';
-import '../widgets/partner_invite_link_card.dart';
 import '../widgets/partner_status_card.dart';
 
 class AccountabilityScreen extends ConsumerStatefulWidget {
@@ -24,12 +21,12 @@ class AccountabilityScreen extends ConsumerStatefulWidget {
 }
 
 class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
-  final _emailController = TextEditingController();
+  final _codeController = TextEditingController();
   bool _loading = false;
   Object? _error;
-  PartnerOverview? _partners;
+  AccountabilityOverview? _overview;
+  AccountabilityGroupPreview? _preview;
   List<ApprovalRequest> _requests = const [];
-  String? _inviteUrl;
 
   @override
   void initState() {
@@ -39,7 +36,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _codeController.dispose();
     super.dispose();
   }
 
@@ -52,12 +49,12 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
     try {
       final repository = ref.read(accountabilityRepositoryProvider);
       final values = await Future.wait<Object>([
-        repository.fetchPartners(),
+        repository.fetchWorkspace(),
         repository.fetchApprovalRequests(),
       ]);
       if (!mounted) return;
       setState(() {
-        _partners = values[0] as PartnerOverview;
+        _overview = values[0] as AccountabilityOverview;
         _requests = values[1] as List<ApprovalRequest>;
       });
     } catch (error) {
@@ -67,21 +64,18 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
     }
   }
 
-  Future<void> _invite() async {
-    final email = _emailController.text.trim();
-    if (email.isEmpty) return;
-    setState(() => _loading = true);
+  Future<void> _previewGroup() async {
+    final code = _codeController.text.trim();
+    if (code.isEmpty) return;
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
-      final invite = await ref
+      final preview = await ref
           .read(accountabilityRepositoryProvider)
-          .invitePartner(email);
-      if (!mounted) return;
-      setState(() => _inviteUrl = invite.inviteUrl);
-      AppFeedback.success(
-        context,
-        AppLocalizations.of(context)!.partnerInviteCreated,
-      );
-      await _load();
+          .previewGroup(code);
+      if (mounted) setState(() => _preview = preview);
     } catch (error) {
       if (mounted) {
         AppFeedback.error(context, AppMessages.friendlyMessage(context, error));
@@ -91,15 +85,46 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
     }
   }
 
-  Future<void> _copyInviteUrl() async {
-    final inviteUrl = _inviteUrl;
-    if (inviteUrl == null) return;
-    await Clipboard.setData(ClipboardData(text: inviteUrl));
-    if (mounted) {
-      AppFeedback.success(
-        context,
-        AppLocalizations.of(context)!.partnerInviteCopied,
-      );
+  Future<void> _joinGroup() async {
+    final preview = _preview;
+    if (preview == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.accountabilityJoinConfirmTitle),
+        content: Text(l10n.accountabilityJoinConfirmBody(preview.partnerName)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.accountabilityJoinAction),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() => _loading = true);
+    try {
+      final result = await ref
+          .read(accountabilityRepositoryProvider)
+          .joinGroup(_codeController.text);
+      if (!mounted) return;
+      setState(() {
+        _overview = result;
+        _preview = null;
+        _codeController.clear();
+      });
+      AppFeedback.success(context, l10n.accountabilityJoinSuccess);
+    } catch (error) {
+      if (mounted) {
+        AppFeedback.error(context, AppMessages.friendlyMessage(context, error));
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -120,7 +145,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
       );
     }
 
-    final active = _partners?.activePartner;
+    final membership = _overview?.activeMembership;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.partnerTitle)),
       body: RefreshIndicator(
@@ -128,7 +153,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
           children: [
-            if (_loading && _partners == null)
+            if (_loading && _overview == null)
               const Center(
                 child: Padding(
                   padding: EdgeInsets.all(32),
@@ -144,21 +169,71 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                 onAction: _load,
               )
             else ...[
-              PartnerStatusCard(partner: active),
-              if (active == null) ...[
+              PartnerStatusCard(membership: membership),
+              if (membership == null) ...[
                 const SizedBox(height: 16),
-                PartnerInviteForm(
-                  emailController: _emailController,
-                  isLoading: _loading,
-                  onInvite: _invite,
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          l10n.accountabilityJoinTitle,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(l10n.accountabilityJoinBody),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: _codeController,
+                          textCapitalization: TextCapitalization.characters,
+                          autocorrect: false,
+                          maxLength: 12,
+                          decoration: InputDecoration(
+                            labelText: l10n.onboardingGroupCode,
+                            hintText: 'ABCD234567',
+                          ),
+                        ),
+                        FilledButton(
+                          onPressed: _loading ? null : _previewGroup,
+                          child: Text(l10n.accountabilityPreviewAction),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ],
-              if (_inviteUrl != null && _inviteUrl!.isNotEmpty) ...[
-                const SizedBox(height: 16),
-                PartnerInviteLinkCard(
-                  inviteUrl: _inviteUrl!,
-                  onCopy: _copyInviteUrl,
-                ),
+                if (_preview case final preview?) ...[
+                  const SizedBox(height: 16),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            preview.name,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            l10n.accountabilityManagedBy(preview.partnerName),
+                          ),
+                          if (preview.description.isNotEmpty) ...[
+                            const SizedBox(height: 10),
+                            Text(preview.description),
+                          ],
+                          const SizedBox(height: 16),
+                          FilledButton.icon(
+                            onPressed: _loading ? null : _joinGroup,
+                            icon: const Icon(Icons.verified_user_outlined),
+                            label: Text(l10n.accountabilityJoinAction),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ],
               const SizedBox(height: 24),
               ApprovalRequestHistory(requests: _requests),

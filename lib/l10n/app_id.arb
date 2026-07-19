@@ -211,7 +211,7 @@
   "partnerErrorTitle": "Data pendamping belum dapat dimuat",
   "partnerInviteCreated": "Undangan pendamping berhasil dibuat.",
   "partnerNone": "Belum ada pendamping aktif",
-  "partnerNoneBody": "Undang satu orang tepercaya. Pendamping tidak dapat melihat URL, riwayat penjelajahan, atau catatan pemulihan pribadi.",
+  "partnerNoneBody": "Masukkan kode dari pendamping tepercaya. Pendamping tidak dapat melihat URL, riwayat penjelajahan, atau catatan pemulihan pribadi.",
   "partnerActiveBody": "Pendamping aktif dapat menyetujui perubahan proteksi untuk perangkat yang terdaftar.",
   "partnerEmailLabel": "Email pendamping",
   "partnerEmailHelp": "Gunakan email orang tepercaya yang memahami dan menyetujui peran ini.",
@@ -221,7 +221,25 @@
   "partnerRequestHistory": "Riwayat permintaan",
   "partnerNoRequests": "Belum ada permintaan",
   "partnerNoRequestsBody": "Permintaan perubahan proteksi dari perangkat akan muncul di sini.",
-  "partnerManageAction": "Kelola pendamping",
+  "partnerManageAction": "Kelola grup pendamping",
+  "accountabilityJoinTitle": "Hubungkan pendamping dengan kode grup",
+  "accountabilityJoinBody": "Tinjau nama grup dan pendamping sebelum bergabung. Satu akun hanya dapat memiliki satu grup aktif.",
+  "accountabilityPreviewAction": "Tinjau grup",
+  "accountabilityManagedBy": "Dikelola oleh {name}",
+  "@accountabilityManagedBy": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "accountabilityJoinConfirmTitle": "Bergabung ke grup ini?",
+  "accountabilityJoinConfirmBody": "{name} akan menjadi pendamping Anda. Ringkasan agregat awal dapat Anda matikan dari portal web kapan saja.",
+  "@accountabilityJoinConfirmBody": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "accountabilityJoinAction": "Konfirmasi dan bergabung",
+  "accountabilityJoinSuccess": "Grup akuntabilitas berhasil dihubungkan.",
+  "accountabilityActiveGroup": "Terhubung melalui grup {name}. Pendamping hanya menerima agregat yang Anda izinkan.",
+  "@accountabilityActiveGroup": {
+    "placeholders": {"name": {"type": "String"}}
+  },
   "protectionSetupAction": "Setup platform",
   "selfTestAction": "Jalankan self-test",
   "selfTestPassed": "Self-test lokal berhasil",

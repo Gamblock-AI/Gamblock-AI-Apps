@@ -12,19 +12,21 @@ class AccountabilityRepositoryImpl implements AccountabilityRepository {
   final Dio _dio;
 
   @override
-  Future<PartnerOverview> fetchPartners() async {
-    final response = await _dio.get('/v1/partners');
+  Future<AccountabilityOverview> fetchWorkspace() async {
+    final response = await _dio.get('/v1/accountability/workspace');
     final data = ApiResponse.map(response) ?? const {};
-    final items = (data['items'] as List? ?? const [])
-        .whereType<Map>()
-        .map((item) => PartnerLink.fromJson(Map<String, dynamic>.from(item)))
-        .toList();
-    final active = data['active_partner'];
-    return PartnerOverview(
-      activePartner: active is Map
-          ? PartnerLink.fromJson(Map<String, dynamic>.from(active))
-          : items.where((item) => item.isActive).firstOrNull,
-      items: items,
+    final membership = data['membership'];
+    final groups = data['groups'];
+    final group = groups is List && groups.isNotEmpty && groups.first is Map
+        ? Map<String, dynamic>.from(groups.first as Map)
+        : null;
+    return AccountabilityOverview(
+      activeMembership: membership is Map
+          ? AccountabilityMembership.fromWorkspace(
+              Map<String, dynamic>.from(membership),
+              group,
+            )
+          : null,
     );
   }
 
@@ -35,28 +37,29 @@ class AccountabilityRepositoryImpl implements AccountabilityRepository {
   }
 
   @override
-  Future<PartnerInvitation> invitePartner(String email) async {
+  Future<AccountabilityGroupPreview> previewGroup(String code) async {
     final response = await _dio.post(
-      '/v1/partners/invitations',
-      data: {'email': email.trim()},
+      '/v1/accountability/groups/preview',
+      data: {'code': code.trim().toUpperCase()},
     );
-    final data = ApiResponse.map(response) ?? const {};
-    return PartnerInvitation(
-      id: data['id']?.toString() ?? '',
-      status: data['status']?.toString() ?? 'invited',
-      inviteUrl: data['invite_url']?.toString() ?? '',
+    return AccountabilityGroupPreview.fromJson(
+      ApiResponse.map(response) ?? const {},
     );
   }
 
   @override
-  Future<void> revokePartner(String partnerLinkId) async {
-    await _dio.post('/v1/partners/$partnerLinkId/revoke');
+  Future<AccountabilityOverview> joinGroup(String code) async {
+    await _dio.post(
+      '/v1/accountability/groups/join',
+      data: {'code': code.trim().toUpperCase(), 'confirmed': true},
+    );
+    return fetchWorkspace();
   }
 
   @override
   Future<ApprovalRequest> requestApproval({
     required String deviceId,
-    required String partnerLinkId,
+    required String membershipId,
     required String action,
     required String reason,
     required int durationMinutes,
@@ -65,7 +68,7 @@ class AccountabilityRepositoryImpl implements AccountabilityRepository {
       '/v1/approval-requests',
       data: {
         'device_id': deviceId,
-        'partner_link_id': partnerLinkId,
+        'membership_id': membershipId,
         'action': action,
         'reason': reason.trim(),
         'requested_duration_minutes': durationMinutes,

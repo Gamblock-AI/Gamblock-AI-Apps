@@ -1,6 +1,6 @@
 # Flutter Client AI Context
 
-Context version: `2026-07-18.3`
+Context version: `2026-07-19.1`
 
 ## Product capsule
 
@@ -22,7 +22,7 @@ the device; the backend receives aggregate events only.
 | Area | State | Evidence/limit |
 |---|---|---|
 | Auth/device/setup/settings | Implemented code-complete prototype | session refresh is single-flight; device registration is stable-instance upsert; password/profile, locale, haptics, notifications, setup, and artifact health are wired |
-| Protection/analytics/accountability UI | Implemented code-complete prototype | native health is authoritative; analytics are 7/30-day aggregate-only; removal requests start in the native app and grants are device-bound |
+| Protection/analytics/accountability UI | Implemented code-complete prototype | native health is authoritative; analytics are 7/30-day aggregate-only; registration declares the student role, group-code preview/confirm consumes the active membership contract, pause/uninstall requests use `membership_id`, and approved grants remain device-bound |
 | Hybrid-v1 local classifier | Implemented dummy prototype | Android and portable Windows core load versioned rules + synthetic LR weights and pass committed fixtures; artifact is explicitly untrained/unevaluated |
 | Pattern Interrupt and recovery handoff | Implemented code path | seven-second native/Flutter paths, reduced motion, offline grounding/help, and browsing-data-free web handoff are wired; device evidence remains required |
 | Android protection runtime | Implemented code-complete prototype | active manifest service, Chrome/Edge extraction, local decision, Back/overlay, settings friction, Keystore grant, aggregate sync, and artifact checks; analyzer passes, Android compile/device proof remains |
