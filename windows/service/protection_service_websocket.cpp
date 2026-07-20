@@ -103,11 +103,15 @@ void ProtectionService::HandleWebSocketClient(SOCKET client) {
   }
   std::string upgraded = *upgrade;
   std::transform(upgraded.begin(), upgraded.end(), upgraded.begin(),
-                 [](unsigned char value) { return std::tolower(value); });
+                 [](unsigned char value) -> char {
+                   return static_cast<char>(std::tolower(value));
+                 });
   std::string connection_value = *connection_header;
   std::transform(connection_value.begin(), connection_value.end(),
                  connection_value.begin(),
-                 [](unsigned char value) { return std::tolower(value); });
+                 [](unsigned char value) -> char {
+                   return static_cast<char>(std::tolower(value));
+                 });
   if (upgraded != "websocket" ||
       connection_value.find("upgrade") == std::string::npos) {
     close_client();

@@ -229,7 +229,7 @@ bool WriteProtected(const std::filesystem::path& path,
 std::optional<std::string> ReadProtected(const std::filesystem::path& path) {
   std::ifstream file(path, std::ios::binary);
   if (!file) return std::nullopt;
-  std::vector<BYTE> bytes(std::istreambuf_iterator<char>(file),
+  std::vector<BYTE> bytes((std::istreambuf_iterator<char>(file)),
                           std::istreambuf_iterator<char>());
   DATA_BLOB input{static_cast<DWORD>(bytes.size()), bytes.data()};
   DATA_BLOB output{};
