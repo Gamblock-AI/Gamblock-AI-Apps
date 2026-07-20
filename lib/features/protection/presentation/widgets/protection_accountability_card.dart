@@ -4,7 +4,7 @@ import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../accountability/domain/entities/accountability_models.dart';
 
-/// Keeps partner approval and emergency access actions together on Protection.
+/// Keeps partner approval and emergency access actions together in a compact layout.
 class ProtectionAccountabilityCard extends StatelessWidget {
   const ProtectionAccountabilityCard({
     super.key,
@@ -40,91 +40,302 @@ class ProtectionAccountabilityCard extends StatelessWidget {
         emergencyRequest?.status == 'reviewed' ||
         emergencyRequest?.status == 'approved';
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              membership?.partnerName ?? l10n.partnerNone,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 6),
-            Text(
-              membership == null
-                  ? l10n.protectionPartnerRequired
-                  : pending != null
-                  ? l10n.protectionRequestPending
-                  : approved != null
-                  ? l10n.protectionRequestApproved
-                  : l10n.protectionPartnerReady,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.mutedForeground,
-              ),
-            ),
-            const SizedBox(height: 16),
-            if (approved != null)
-              FilledButton.icon(
-                onPressed: isLoading ? null : () => onApplyApproval(approved),
-                icon: const Icon(Icons.check_circle_outline),
-                label: Text(l10n.protectionApplyApproval),
-              )
-            else
-              FilledButton.icon(
-                onPressed: membership == null || pending != null || isLoading
-                    ? null
-                    : onRequestApproval,
-                icon: const Icon(Icons.lock_clock_outlined),
-                label: Text(
-                  pending == null
-                      ? l10n.protectionRequestAction
-                      : l10n.protectionRequestPending,
+    final hasPartner = membership != null;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.8)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Partner Header Row
+          Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: (hasPartner ? AppColors.navy : AppColors.mutedForeground)
+                      .withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: Icon(
+                  Icons.people_alt_outlined,
+                  color: hasPartner ? AppColors.navy : AppColors.mutedForeground,
+                  size: 20,
                 ),
               ),
-            const SizedBox(height: 10),
-            OutlinedButton.icon(
-              onPressed: onManagePartner,
-              icon: const Icon(Icons.people_outline),
-              label: Text(l10n.partnerManageAction),
-            ),
-            const Divider(height: 28),
-            Text(
-              l10n.emergencyTitle,
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: 6),
-            Text(
-              emergencyRequest == null
-                  ? l10n.emergencyBody
-                  : l10n.emergencyStatus(emergencyRequest!.status),
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.mutedForeground),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      membership?.partnerName ?? l10n.partnerNone,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.navy,
+                          ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      membership == null
+                          ? l10n.protectionPartnerRequired
+                          : pending != null
+                              ? l10n.protectionRequestPending
+                              : approved != null
+                                  ? l10n.protectionRequestApproved
+                                  : l10n.protectionPartnerReady,
+                      style: const TextStyle(
+                        color: AppColors.mutedForeground,
+                        fontSize: 11,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Side-by-Side Action Buttons for Partner Approval
+          Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 40,
+                  child: approved != null
+                      ? FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.sage,
+                            padding: const EdgeInsets.symmetric(horizontal: 6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: isLoading
+                              ? null
+                              : () => onApplyApproval(approved),
+                          icon: const Icon(Icons.check_circle_outline, size: 14),
+                          label: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              l10n.protectionApplyApproval,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        )
+                      : FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.navy,
+                            padding: const EdgeInsets.symmetric(horizontal: 6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed:
+                              membership == null || pending != null || isLoading
+                                  ? null
+                                  : onRequestApproval,
+                          icon: const Icon(Icons.lock_clock_outlined, size: 14),
+                          label: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              pending == null
+                                  ? l10n.protectionRequestAction
+                                  : l10n.protectionRequestPending,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: SizedBox(
+                  height: 40,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      foregroundColor: AppColors.navy,
+                      side: BorderSide(
+                          color: AppColors.border.withValues(alpha: 0.8)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: onManagePartner,
+                    icon: const Icon(Icons.person_search_outlined, size: 14),
+                    label: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        l10n.partnerManageAction,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Divider(height: 1),
+          ),
+
+          // Emergency Section Header
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppColors.crimson.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: const Icon(
+                  Icons.key_outlined,
+                  color: AppColors.crimson,
+                  size: 16,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.emergencyTitle,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.navy,
+                          ),
+                    ),
+                    Text(
+                      emergencyRequest == null
+                          ? l10n.emergencyBody
+                          : l10n.emergencyStatus(
+                              _formatEmergencyStatus(
+                                  context, emergencyRequest!.status),
+                            ),
+                      style: const TextStyle(
+                        color: AppColors.mutedForeground,
+                        fontSize: 10,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+
+          // Side-by-Side Action Buttons for Emergency
+          Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 38,
                   child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      foregroundColor: AppColors.navy,
+                      side: BorderSide(
+                          color: AppColors.border.withValues(alpha: 0.8)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                     onPressed: isLoading || requestInProgress
                         ? null
                         : onRequestEmergency,
-                    child: Text(l10n.emergencyRequestAction),
+                    child: Text(
+                      l10n.emergencyRequestAction,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 11, fontWeight: FontWeight.w600),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
-                const SizedBox(width: 10),
-                Expanded(
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: SizedBox(
+                  height: 38,
                   child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      foregroundColor: AppColors.navy,
+                      side: BorderSide(
+                          color: AppColors.border.withValues(alpha: 0.8)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                     onPressed: isLoading ? null : onEnterEmergencyKey,
-                    child: Text(l10n.emergencyEnterKeyAction),
+                    child: Text(
+                      l10n.emergencyEnterKeyAction,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 11, fontWeight: FontWeight.w600),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
+  }
+}
+
+String _formatEmergencyStatus(BuildContext context, String status) {
+  final isId = Localizations.localeOf(context).languageCode == 'id';
+  switch (status.toLowerCase()) {
+    case 'pending':
+      return isId ? 'menunggu' : 'pending';
+    case 'reviewed':
+      return isId ? 'dalam tinjauan' : 'reviewed';
+    case 'approved':
+      return isId ? 'disetujui' : 'approved';
+    case 'rejected':
+    case 'denied':
+      return isId ? 'ditolak' : 'rejected';
+    case 'expired':
+      return isId ? 'kedaluwarsa' : 'expired';
+    default:
+      return status
+          .split('_')
+          .where((w) => w.isNotEmpty)
+          .map((w) => '${w[0].toUpperCase()}${w.substring(1)}')
+          .join(' ');
   }
 }

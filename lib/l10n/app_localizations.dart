@@ -179,8 +179,44 @@ abstract class AppLocalizations {
   /// No description provided for @settingsAccountabilityPartner.
   ///
   /// In id, this message translates to:
-  /// **'Accountability Partner'**
+  /// **'Pendamping Akuntabilitas'**
   String get settingsAccountabilityPartner;
+
+  /// No description provided for @settingsEmailVerified.
+  ///
+  /// In id, this message translates to:
+  /// **'Email terverifikasi'**
+  String get settingsEmailVerified;
+
+  /// No description provided for @settingsEmailUnverified.
+  ///
+  /// In id, this message translates to:
+  /// **'Email belum terverifikasi'**
+  String get settingsEmailUnverified;
+
+  /// No description provided for @settingsGoogleLinked.
+  ///
+  /// In id, this message translates to:
+  /// **'Google tertaut'**
+  String get settingsGoogleLinked;
+
+  /// No description provided for @settingsGoogleUnlinked.
+  ///
+  /// In id, this message translates to:
+  /// **'Google belum tertaut'**
+  String get settingsGoogleUnlinked;
+
+  /// No description provided for @settingsLinkGoogle.
+  ///
+  /// In id, this message translates to:
+  /// **'Tautkan akun Google'**
+  String get settingsLinkGoogle;
+
+  /// No description provided for @settingsLinkGoogleDesc.
+  ///
+  /// In id, this message translates to:
+  /// **'Gunakan email Google yang sama dengan akun ini.'**
+  String get settingsLinkGoogleDesc;
 
   /// No description provided for @cancel.
   ///
@@ -233,7 +269,7 @@ abstract class AppLocalizations {
   /// No description provided for @protectionActiveTitle.
   ///
   /// In id, this message translates to:
-  /// **'Perlindungan Aktif'**
+  /// **'Perlindungan perangkat aktif'**
   String get protectionActiveTitle;
 
   /// No description provided for @protectionActiveDays.
@@ -467,7 +503,7 @@ abstract class AppLocalizations {
   /// No description provided for @patternBreatheDesc.
   ///
   /// In id, this message translates to:
-  /// **'Tarik napas dalam-dalam.\\nDorongan ini akan lewat.'**
+  /// **'Tarik napas dalam-dalam.\nDorongan ini akan lewat.'**
   String get patternBreatheDesc;
 
   /// No description provided for @patternContinuePsychoeducation.
@@ -485,7 +521,7 @@ abstract class AppLocalizations {
   /// No description provided for @patternInterruptSuccess.
   ///
   /// In id, this message translates to:
-  /// **'Dorongan berhasil\\ndiputus.'**
+  /// **'Dorongan berhasil\ndiputus.'**
   String get patternInterruptSuccess;
 
   /// No description provided for @patternInterruptActive.
@@ -521,7 +557,7 @@ abstract class AppLocalizations {
   /// No description provided for @introHeroTitle.
   ///
   /// In id, this message translates to:
-  /// **'putuskan siklus\\njudi online.'**
+  /// **'putuskan siklus\njudi online.'**
   String get introHeroTitle;
 
   /// No description provided for @introHeroDesc.
@@ -533,7 +569,7 @@ abstract class AppLocalizations {
   /// No description provided for @introAiShield.
   ///
   /// In id, this message translates to:
-  /// **'on-device ai shield'**
+  /// **'perlindungan AI di perangkat'**
   String get introAiShield;
 
   /// No description provided for @introHowItWorksStep1.
@@ -575,7 +611,7 @@ abstract class AppLocalizations {
   /// No description provided for @introHowItWorksTitle.
   ///
   /// In id, this message translates to:
-  /// **'tiga langkah\\nmenuju kendali diri.'**
+  /// **'tiga langkah\nmenuju kendali diri.'**
   String get introHowItWorksTitle;
 
   /// No description provided for @introHowItWorksSubtitle.
@@ -593,7 +629,7 @@ abstract class AppLocalizations {
   /// No description provided for @introFeaturesTitle.
   ///
   /// In id, this message translates to:
-  /// **'ekosistem yang\\nmendukung kepulihan.'**
+  /// **'ekosistem yang\nmendukung kepulihan.'**
   String get introFeaturesTitle;
 
   /// No description provided for @introFeature3.
@@ -617,7 +653,7 @@ abstract class AppLocalizations {
   /// No description provided for @introCtaTitle.
   ///
   /// In id, this message translates to:
-  /// **'ambil kendali atas\\nhidup anda, sekarang.'**
+  /// **'ambil kendali atas\nhidup anda, sekarang.'**
   String get introCtaTitle;
 
   /// No description provided for @introCtaBtn.
@@ -659,7 +695,7 @@ abstract class AppLocalizations {
   /// No description provided for @introCrisisTitle.
   ///
   /// In id, this message translates to:
-  /// **'judi online bukan hiburan.\\nini krisis generasi.'**
+  /// **'judi online bukan hiburan.\nini krisis generasi.'**
   String get introCrisisTitle;
 
   /// No description provided for @introCrisisSource.
@@ -695,7 +731,7 @@ abstract class AppLocalizations {
   /// No description provided for @authWelcomeBack.
   ///
   /// In id, this message translates to:
-  /// **'Selamat datang\\nkembali.'**
+  /// **'Selamat datang kembali.'**
   String get authWelcomeBack;
 
   /// No description provided for @authRegister.
@@ -721,6 +757,24 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Masuk'**
   String get authLoginBtn;
+
+  /// No description provided for @authForgotPassword.
+  ///
+  /// In id, this message translates to:
+  /// **'Lupa kata sandi?'**
+  String get authForgotPassword;
+
+  /// No description provided for @authContinueWithGoogle.
+  ///
+  /// In id, this message translates to:
+  /// **'Lanjutkan dengan Google'**
+  String get authContinueWithGoogle;
+
+  /// No description provided for @authRegisterWithGoogle.
+  ///
+  /// In id, this message translates to:
+  /// **'Daftar dengan Google'**
+  String get authRegisterWithGoogle;
 
   /// No description provided for @authPassword.
   ///
@@ -767,7 +821,7 @@ abstract class AppLocalizations {
   /// No description provided for @authCreateAccountTitle.
   ///
   /// In id, this message translates to:
-  /// **'Buat akun\\nbaru.'**
+  /// **'Buat akun baru.'**
   String get authCreateAccountTitle;
 
   /// No description provided for @authRegisterAs.
@@ -1424,6 +1478,90 @@ abstract class AppLocalizations {
   /// **'Izin dicabut'**
   String get analyticsPermission;
 
+  /// No description provided for @analyticsSummaryTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Ringkasan Perlindungan'**
+  String get analyticsSummaryTitle;
+
+  /// No description provided for @analyticsSummaryDesc.
+  ///
+  /// In id, this message translates to:
+  /// **'Pantau tren pemblokiran otomatis, intervensi perilaku, dan statistik proteksi lokal.'**
+  String get analyticsSummaryDesc;
+
+  /// No description provided for @analyticsChartTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Tren Aktivitas Proteksi'**
+  String get analyticsChartTitle;
+
+  /// No description provided for @analytics7Days.
+  ///
+  /// In id, this message translates to:
+  /// **'7 Hari Terakhir'**
+  String get analytics7Days;
+
+  /// No description provided for @analytics30Days.
+  ///
+  /// In id, this message translates to:
+  /// **'30 Hari Terakhir'**
+  String get analytics30Days;
+
+  /// No description provided for @analyticsLegendBlocked.
+  ///
+  /// In id, this message translates to:
+  /// **'Blokir'**
+  String get analyticsLegendBlocked;
+
+  /// No description provided for @analyticsLegendInterventions.
+  ///
+  /// In id, this message translates to:
+  /// **'Intervensi'**
+  String get analyticsLegendInterventions;
+
+  /// No description provided for @analyticsNoActivityTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum Ada Aktivitas Terdeteksi'**
+  String get analyticsNoActivityTitle;
+
+  /// No description provided for @analyticsNoActivityDesc.
+  ///
+  /// In id, this message translates to:
+  /// **'Grafik akan terisi otomatis saat terjadi pemblokiran atau intervensi.'**
+  String get analyticsNoActivityDesc;
+
+  /// No description provided for @analyticsPrivacySectionTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Jaminan Privasi & Keamanan Data'**
+  String get analyticsPrivacySectionTitle;
+
+  /// No description provided for @analyticsOnDeviceTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'100% On-Device AI'**
+  String get analyticsOnDeviceTitle;
+
+  /// No description provided for @analyticsOnDeviceDesc.
+  ///
+  /// In id, this message translates to:
+  /// **'Semua proses klasifikasi dan deteksi berjalan secara lokal pada perangkat Anda.'**
+  String get analyticsOnDeviceDesc;
+
+  /// No description provided for @analyticsNoBrowsingHistoryTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Tanpa Riwayat Penelusuran'**
+  String get analyticsNoBrowsingHistoryTitle;
+
+  /// No description provided for @analyticsNoBrowsingHistoryDesc.
+  ///
+  /// In id, this message translates to:
+  /// **'URL, domain, judul halaman, dan konten DOM tidak pernah disimpan atau dikirim ke server.'**
+  String get analyticsNoBrowsingHistoryDesc;
+
   /// No description provided for @partnerSignInTitle.
   ///
   /// In id, this message translates to:
@@ -1517,7 +1655,7 @@ abstract class AppLocalizations {
   /// No description provided for @partnerManageAction.
   ///
   /// In id, this message translates to:
-  /// **'Kelola grup pendamping'**
+  /// **'Kelola pendamping'**
   String get partnerManageAction;
 
   /// No description provided for @accountabilityJoinTitle.
@@ -1604,6 +1742,42 @@ abstract class AppLocalizations {
   /// **'Model lokal, ruleset, dan jalur Pattern Interrupt lolos pemeriksaan fixture.'**
   String get selfTestFixtureBody;
 
+  /// No description provided for @selfTestNativeUnavailable.
+  ///
+  /// In id, this message translates to:
+  /// **'Layanan proteksi native belum tersedia di perangkat ini.'**
+  String get selfTestNativeUnavailable;
+
+  /// No description provided for @selfTestIntegrityFailed.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal memvalidasi integritas artefak proteksi lokal.'**
+  String get selfTestIntegrityFailed;
+
+  /// No description provided for @selfTestFixtureMismatch.
+  ///
+  /// In id, this message translates to:
+  /// **'Hasil klasifikasi fixture lokal tidak sesuai dengan ekspektasi AI.'**
+  String get selfTestFixtureMismatch;
+
+  /// No description provided for @selfTestArtifactInvalid.
+  ///
+  /// In id, this message translates to:
+  /// **'File model AI atau ruleset proteksi lokal tidak valid.'**
+  String get selfTestArtifactInvalid;
+
+  /// No description provided for @selfTestSensorDisconnected.
+  ///
+  /// In id, this message translates to:
+  /// **'Ekstensi sensor proteksi browser tidak terhubung.'**
+  String get selfTestSensorDisconnected;
+
+  /// No description provided for @selfTestAccessibilityMissing.
+  ///
+  /// In id, this message translates to:
+  /// **'Izin Layanan Aksesibilitas Android belum diberikan.'**
+  String get selfTestAccessibilityMissing;
+
   /// No description provided for @protectionSyncError.
   ///
   /// In id, this message translates to:
@@ -1615,6 +1789,30 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Persetujuan perubahan proteksi'**
   String get protectionAccountabilityTitle;
+
+  /// No description provided for @dashboardHello.
+  ///
+  /// In id, this message translates to:
+  /// **'Halo, {name}'**
+  String dashboardHello(String name);
+
+  /// No description provided for @dashboardHelloGuest.
+  ///
+  /// In id, this message translates to:
+  /// **'Halo'**
+  String get dashboardHelloGuest;
+
+  /// No description provided for @protectionInactiveTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesaikan perlindungan perangkat'**
+  String get protectionInactiveTitle;
+
+  /// No description provided for @protectionOnDevicePrivacyDesc.
+  ///
+  /// In id, this message translates to:
+  /// **'Analisis tetap di perangkat. Server hanya menerima hitungan agregat perlindungan.'**
+  String get protectionOnDevicePrivacyDesc;
 
   /// No description provided for @protectionSignInTitle.
   ///
@@ -1715,7 +1913,7 @@ abstract class AppLocalizations {
   /// No description provided for @protectionRequestPending.
   ///
   /// In id, this message translates to:
-  /// **'Permintaan sedang menunggu keputusan pendamping.'**
+  /// **'Menunggu persetujuan'**
   String get protectionRequestPending;
 
   /// No description provided for @protectionRequestApproved.
@@ -1739,13 +1937,13 @@ abstract class AppLocalizations {
   /// No description provided for @protectionApplyApproval.
   ///
   /// In id, this message translates to:
-  /// **'Terapkan persetujuan'**
+  /// **'Terapkan izin'**
   String get protectionApplyApproval;
 
   /// No description provided for @protectionRequestAction.
   ///
   /// In id, this message translates to:
-  /// **'Minta perubahan proteksi'**
+  /// **'Ajukan perubahan'**
   String get protectionRequestAction;
 
   /// No description provided for @protectionApprovalApplied.
@@ -2233,6 +2431,72 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Selesai dan kembali'**
   String get patternReturnProtection;
+
+  /// No description provided for @partnerSharingPrivacy.
+  ///
+  /// In id, this message translates to:
+  /// **'Privasi Berbagi'**
+  String get partnerSharingPrivacy;
+
+  /// No description provided for @partnerSharingDesc.
+  ///
+  /// In id, this message translates to:
+  /// **'Atur jenis ringkasan agregat yang dapat dilihat pendamping.'**
+  String get partnerSharingDesc;
+
+  /// No description provided for @partnerLeaveSection.
+  ///
+  /// In id, this message translates to:
+  /// **'Keluar dari Pendampingan'**
+  String get partnerLeaveSection;
+
+  /// No description provided for @partnerLeaveNormal.
+  ///
+  /// In id, this message translates to:
+  /// **'Ajukan keluar normal'**
+  String get partnerLeaveNormal;
+
+  /// No description provided for @partnerLeaveUnsafe.
+  ///
+  /// In id, this message translates to:
+  /// **'Situasi tidak aman'**
+  String get partnerLeaveUnsafe;
+
+  /// No description provided for @verifyEmailTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Verifikasi email Anda'**
+  String get verifyEmailTitle;
+
+  /// No description provided for @verifyEmailSent.
+  ///
+  /// In id, this message translates to:
+  /// **'Email verifikasi telah dikirim.'**
+  String get verifyEmailSent;
+
+  /// No description provided for @resendEmail.
+  ///
+  /// In id, this message translates to:
+  /// **'Kirim ulang'**
+  String get resendEmail;
+
+  /// No description provided for @checkSetupAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Periksa setup'**
+  String get checkSetupAction;
+
+  /// No description provided for @linkGoogleTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Tautkan akun Google'**
+  String get linkGoogleTitle;
+
+  /// No description provided for @continueAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Lanjutkan'**
+  String get continueAction;
 }
 
 class _AppLocalizationsDelegate

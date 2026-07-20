@@ -22,11 +22,32 @@ class ApprovalRequestHistory extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n.partnerRequestHistory,
-          style: Theme.of(context).textTheme.titleMedium,
+        Row(
+          children: [
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: AppColors.navy.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.history_rounded,
+                size: 16,
+                color: AppColors.navy,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              l10n.partnerRequestHistory,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.navy,
+                  ),
+            ),
+          ],
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         if (requests.isEmpty)
           EmptyState(
             icon: Icons.inbox_outlined,
@@ -37,33 +58,87 @@ class ApprovalRequestHistory extends StatelessWidget {
           for (final request in requests)
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
-              child: Card(
-                child: ListTile(
-                  minTileHeight: 72,
-                  leading: Icon(
-                    request.status == 'approved'
-                        ? Icons.check_circle_outline
-                        : request.status == 'denied'
-                        ? Icons.cancel_outlined
-                        : Icons.schedule,
-                    color: request.status == 'approved'
-                        ? AppColors.sage
-                        : request.status == 'denied'
-                        ? AppColors.crimson
-                        : AppColors.amber,
-                  ),
-                  title: Text(request.actionLabel),
-                  subtitle: Text(
-                    request.reason.isEmpty
-                        ? request.statusLabel
-                        : '${request.statusLabel} · ${request.reason}',
-                  ),
-                  trailing: request.isPending && onCancel != null
-                      ? TextButton(
-                          onPressed: () => onCancel!(request),
-                          child: Text(l10n.cancel),
-                        )
-                      : null,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                      color: AppColors.border.withValues(alpha: 0.8)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.02),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: (request.status == 'approved'
+                                ? AppColors.sage
+                                : request.status == 'denied'
+                                    ? AppColors.crimson
+                                    : AppColors.amber)
+                            .withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(11),
+                      ),
+                      child: Icon(
+                        request.status == 'approved'
+                            ? Icons.check_circle_rounded
+                            : request.status == 'denied'
+                                ? Icons.cancel_rounded
+                                : Icons.schedule_rounded,
+                        color: request.status == 'approved'
+                            ? AppColors.sage
+                            : request.status == 'denied'
+                                ? AppColors.crimson
+                                : AppColors.amber,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            request.actionLabel,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.navy,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            request.reason.isEmpty
+                                ? request.statusLabel
+                                : '${request.statusLabel} · ${request.reason}',
+                            style: const TextStyle(
+                              color: AppColors.mutedForeground,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (request.isPending && onCancel != null)
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.crimson,
+                          textStyle: const TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w700),
+                        ),
+                        onPressed: () => onCancel!(request),
+                        child: Text(l10n.cancel),
+                      ),
+                  ],
                 ),
               ),
             ),

@@ -7,22 +7,25 @@ import '../../../../core/widgets/eyebrow_pill.dart';
 class AuthScreenHeader extends StatelessWidget {
   const AuthScreenHeader({
     super.key,
-    required this.eyebrow,
+    this.eyebrow,
     required this.title,
     required this.description,
   });
 
-  final String eyebrow;
+  final String? eyebrow;
   final String title;
   final String description;
 
   @override
   Widget build(BuildContext context) {
+    final showEyebrow = eyebrow != null && eyebrow!.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        EyebrowPill(label: eyebrow, color: AppColors.crimson),
-        const SizedBox(height: 14),
+        if (showEyebrow) ...[
+          EyebrowPill(label: eyebrow!, color: AppColors.crimson),
+          const SizedBox(height: 14),
+        ],
         Text(
           title,
           style: Theme.of(context).textTheme.displaySmall?.copyWith(

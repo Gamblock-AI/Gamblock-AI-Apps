@@ -122,58 +122,84 @@ class _DashboardHero extends StatelessWidget {
     required this.status,
     required this.onOpenSetup,
   });
+
   final AuthState auth;
   final ProtectionStatus? status;
   final VoidCallback onOpenSetup;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final name = auth.displayName?.trim().split(' ').first;
     final active = status?.isActive == true;
+    final greeting = name?.isNotEmpty == true
+        ? l10n.dashboardHello(name!)
+        : l10n.dashboardHelloGuest;
+
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: AppColors.navyGradient,
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.navy.withValues(alpha: 0.25),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Halo${name?.isNotEmpty == true ? ', $name' : ''}',
-            style: Theme.of(
-              context,
-            ).textTheme.labelLarge?.copyWith(color: AppColors.skyLight),
+            greeting,
+            style: const TextStyle(
+              color: AppColors.skyLight,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.2,
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             active
-                ? 'Perlindungan perangkat aktif'
-                : 'Selesaikan perlindungan perangkat',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
-            ),
+                ? l10n.protectionActiveTitle
+                : l10n.protectionInactiveTitle,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  height: 1.15,
+                ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Analisis tetap di perangkat. Server hanya menerima hitungan agregat perlindungan.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.white.withValues(alpha: .78),
-              height: 1.5,
+            l10n.protectionOnDevicePrivacyDesc,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.8),
+              fontSize: 13,
+              height: 1.45,
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           SizedBox(
-            width: 220,
+            height: 38,
             child: FilledButton.icon(
               style: FilledButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: AppColors.navy,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               onPressed: onOpenSetup,
-              icon: const Icon(Icons.tune_rounded),
-              label: const Text('Periksa setup'),
+              icon: const Icon(Icons.tune_rounded, size: 17),
+              label: Text(
+                l10n.checkSetupAction,
+                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+              ),
             ),
           ),
         ],
@@ -187,6 +213,7 @@ class _VerificationNotice extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       color: AppColors.azure,
       child: ListTile(
@@ -195,7 +222,7 @@ class _VerificationNotice extends ConsumerWidget {
           Icons.mark_email_unread_outlined,
           color: AppColors.navy,
         ),
-        title: const Text('Verifikasi email Anda'),
+        title: Text(l10n.verifyEmailTitle),
         subtitle: const Text(
           'Diperlukan untuk fitur pendamping dan pemulihan akun.',
         ),
@@ -205,7 +232,7 @@ class _VerificationNotice extends ConsumerWidget {
               await ref.read(authProvider.notifier).resendEmailVerification();
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Email verifikasi dikirim.')),
+                  SnackBar(content: Text(l10n.verifyEmailSent)),
                 );
               }
             } catch (error) {
@@ -218,7 +245,7 @@ class _VerificationNotice extends ConsumerWidget {
               }
             }
           },
-          child: const Text('Kirim ulang'),
+          child: Text(l10n.resendEmail),
         ),
       ),
     );

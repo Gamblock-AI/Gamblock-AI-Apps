@@ -25,6 +25,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _emailController = TextEditingController();
   final _codeController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _submitted = false;
   bool _codeRequested = false;
   bool _loading = false;
   String? _error;
@@ -39,6 +40,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   Future<void> _submit() async {
     Haptics.medium();
+    setState(() {
+      _submitted = true;
+    });
     if (!(_formKey.currentState?.validate() ?? false)) return;
     setState(() {
       _loading = true;
@@ -48,7 +52,12 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       final auth = ref.read(authProvider.notifier);
       if (!_codeRequested) {
         await auth.requestPasswordReset(_emailController.text);
-        if (mounted) setState(() => _codeRequested = true);
+        if (mounted) {
+          setState(() {
+            _codeRequested = true;
+            _submitted = false;
+          });
+        }
       } else {
         await auth.confirmPasswordReset(
           email: _emailController.text,
@@ -99,6 +108,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   void _changeEmail() {
     setState(() {
+      _submitted = false;
       _codeRequested = false;
       _codeController.clear();
       _passwordController.clear();
@@ -115,7 +125,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           const AuthBrandLockup(),
           const SizedBox(height: 24),
           AuthScreenHeader(
-            eyebrow: 'Pemulihan akun',
             title: _codeRequested
                 ? 'Masukkan kode pemulihan'
                 : 'Lupa kata sandi?',
@@ -130,6 +139,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           ],
           Form(
             key: _formKey,
+            autovalidateMode: _submitted
+                ? AutovalidateMode.onUserInteraction
+                : AutovalidateMode.disabled,
             child: Column(
               children: [
                 AuthInputField(
@@ -147,8 +159,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       : TextInputAction.done,
                 ),
                 if (_codeRequested) ...[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  Wrap(
+                    alignment: WrapAlignment.end,
+                    spacing: 4,
                     children: [
                       TextButton(
                         onPressed: _loading ? null : _changeEmail,

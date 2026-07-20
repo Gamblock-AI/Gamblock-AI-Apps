@@ -34,7 +34,7 @@ class AppConfig {
   /// Public web dashboard base URL used for recovery hand-offs.
   static String get webBaseUrl {
     final v = _env('WEB_BASE_URL');
-    return v.isNotEmpty ? v : 'https://gamblock-ai.vercel.app';
+    return v.isNotEmpty ? v : 'https://gamblock-ai.com';
   }
 
   static Uri webUri(

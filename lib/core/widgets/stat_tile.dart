@@ -23,23 +23,30 @@ class StatTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     return SurfaceCard(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          IconChip(icon: icon, color: color, size: 40),
-          const SizedBox(height: 14),
-          Text(
-            value,
-            style: t.headlineSmall?.copyWith(
-              color: AppColors.navy,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.5,
+          IconChip(icon: icon, color: color, size: 36),
+          const SizedBox(height: 8),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: t.headlineSmall?.copyWith(
+                color: AppColors.navy,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+              ),
             ),
           ),
           const SizedBox(height: 2),
           Text(
             label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: t.bodySmall?.copyWith(color: AppColors.mutedForeground),
           ),
         ],

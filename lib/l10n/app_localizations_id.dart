@@ -49,7 +49,26 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsAboutApp => 'Tentang Aplikasi';
 
   @override
-  String get settingsAccountabilityPartner => 'Accountability Partner';
+  String get settingsAccountabilityPartner => 'Pendamping Akuntabilitas';
+
+  @override
+  String get settingsEmailVerified => 'Email terverifikasi';
+
+  @override
+  String get settingsEmailUnverified => 'Email belum terverifikasi';
+
+  @override
+  String get settingsGoogleLinked => 'Google tertaut';
+
+  @override
+  String get settingsGoogleUnlinked => 'Google belum tertaut';
+
+  @override
+  String get settingsLinkGoogle => 'Tautkan akun Google';
+
+  @override
+  String get settingsLinkGoogleDesc =>
+      'Gunakan email Google yang sama dengan akun ini.';
 
   @override
   String get cancel => 'Batal';
@@ -78,7 +97,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get protectionInactive => 'Perlindungan Nonaktif';
 
   @override
-  String get protectionActiveTitle => 'Perlindungan Aktif';
+  String get protectionActiveTitle => 'Perlindungan perangkat aktif';
 
   @override
   String get protectionActiveDays => 'Hari Aktif';
@@ -202,7 +221,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get patternBreatheDesc =>
-      'Tarik napas dalam-dalam.\\nDorongan ini akan lewat.';
+      'Tarik napas dalam-dalam.\nDorongan ini akan lewat.';
 
   @override
   String get patternContinuePsychoeducation => 'Lanjut ke Psikoedukasi';
@@ -212,7 +231,7 @@ class AppLocalizationsId extends AppLocalizations {
       'Ambil kendali. Lanjutkan ke modul pemulihan diri.';
 
   @override
-  String get patternInterruptSuccess => 'Dorongan berhasil\\ndiputus.';
+  String get patternInterruptSuccess => 'Dorongan berhasil\ndiputus.';
 
   @override
   String get patternInterruptActive => 'PATTERN INTERRUPT AKTIF';
@@ -230,14 +249,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get dashboardYourProgress => 'Perkembangan Anda.';
 
   @override
-  String get introHeroTitle => 'putuskan siklus\\njudi online.';
+  String get introHeroTitle => 'putuskan siklus\njudi online.';
 
   @override
   String get introHeroDesc =>
       'deteksi cerdas berbasis on-device ai, intervensi psikologis otomatis, dan rehabilitasi mandiri — untuk mahasiswa indonesia.';
 
   @override
-  String get introAiShield => 'on-device ai shield';
+  String get introAiShield => 'perlindungan AI di perangkat';
 
   @override
   String get introHowItWorksStep1 => 'unduh & pasang';
@@ -261,7 +280,7 @@ class AppLocalizationsId extends AppLocalizations {
       'hybrid ai menganalisis dom, bow, dan pola url di latar belakang.';
 
   @override
-  String get introHowItWorksTitle => 'tiga langkah\\nmenuju kendali diri.';
+  String get introHowItWorksTitle => 'tiga langkah\nmenuju kendali diri.';
 
   @override
   String get introHowItWorksSubtitle => 'cara kerja';
@@ -270,7 +289,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get introFeature1 => 'on-device ai & privasi';
 
   @override
-  String get introFeaturesTitle => 'ekosistem yang\\nmendukung kepulihan.';
+  String get introFeaturesTitle => 'ekosistem yang\nmendukung kepulihan.';
 
   @override
   String get introFeature3 => 'accountability partner';
@@ -282,7 +301,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get introFeature4 => 'pattern interrupt visual';
 
   @override
-  String get introCtaTitle => 'ambil kendali atas\\nhidup anda, sekarang.';
+  String get introCtaTitle => 'ambil kendali atas\nhidup anda, sekarang.';
 
   @override
   String get introCtaBtn => 'unduh sekarang';
@@ -305,7 +324,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get introCrisisTitle =>
-      'judi online bukan hiburan.\\nini krisis generasi.';
+      'judi online bukan hiburan.\nini krisis generasi.';
 
   @override
   String get introCrisisSource => '(PPATK 2026 · Kemkomdigi 2025)';
@@ -324,7 +343,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get introStartBtn => 'Mulai Sekarang';
 
   @override
-  String get authWelcomeBack => 'Selamat datang\\nkembali.';
+  String get authWelcomeBack => 'Selamat datang kembali.';
 
   @override
   String get authRegister => 'Daftar';
@@ -337,6 +356,15 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get authLoginBtn => 'Masuk';
+
+  @override
+  String get authForgotPassword => 'Lupa kata sandi?';
+
+  @override
+  String get authContinueWithGoogle => 'Lanjutkan dengan Google';
+
+  @override
+  String get authRegisterWithGoogle => 'Daftar dengan Google';
 
   @override
   String get authPassword => 'Password';
@@ -360,7 +388,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get authLoginDesc => 'Masuk untuk melanjutkan perlindungan Anda.';
 
   @override
-  String get authCreateAccountTitle => 'Buat akun\\nbaru.';
+  String get authCreateAccountTitle => 'Buat akun baru.';
 
   @override
   String get authRegisterAs => 'Saya mendaftar sebagai';
@@ -716,6 +744,52 @@ class AppLocalizationsId extends AppLocalizations {
   String get analyticsPermission => 'Izin dicabut';
 
   @override
+  String get analyticsSummaryTitle => 'Ringkasan Perlindungan';
+
+  @override
+  String get analyticsSummaryDesc =>
+      'Pantau tren pemblokiran otomatis, intervensi perilaku, dan statistik proteksi lokal.';
+
+  @override
+  String get analyticsChartTitle => 'Tren Aktivitas Proteksi';
+
+  @override
+  String get analytics7Days => '7 Hari Terakhir';
+
+  @override
+  String get analytics30Days => '30 Hari Terakhir';
+
+  @override
+  String get analyticsLegendBlocked => 'Blokir';
+
+  @override
+  String get analyticsLegendInterventions => 'Intervensi';
+
+  @override
+  String get analyticsNoActivityTitle => 'Belum Ada Aktivitas Terdeteksi';
+
+  @override
+  String get analyticsNoActivityDesc =>
+      'Grafik akan terisi otomatis saat terjadi pemblokiran atau intervensi.';
+
+  @override
+  String get analyticsPrivacySectionTitle => 'Jaminan Privasi & Keamanan Data';
+
+  @override
+  String get analyticsOnDeviceTitle => '100% On-Device AI';
+
+  @override
+  String get analyticsOnDeviceDesc =>
+      'Semua proses klasifikasi dan deteksi berjalan secara lokal pada perangkat Anda.';
+
+  @override
+  String get analyticsNoBrowsingHistoryTitle => 'Tanpa Riwayat Penelusuran';
+
+  @override
+  String get analyticsNoBrowsingHistoryDesc =>
+      'URL, domain, judul halaman, dan konten DOM tidak pernah disimpan atau dikirim ke server.';
+
+  @override
   String get partnerSignInTitle => 'Masuk untuk mengelola pendamping';
 
   @override
@@ -766,7 +840,7 @@ class AppLocalizationsId extends AppLocalizations {
       'Permintaan perubahan proteksi dari perangkat akan muncul di sini.';
 
   @override
-  String get partnerManageAction => 'Kelola grup pendamping';
+  String get partnerManageAction => 'Kelola pendamping';
 
   @override
   String get accountabilityJoinTitle => 'Hubungkan pendamping dengan kode grup';
@@ -820,10 +894,49 @@ class AppLocalizationsId extends AppLocalizations {
       'Model lokal, ruleset, dan jalur Pattern Interrupt lolos pemeriksaan fixture.';
 
   @override
+  String get selfTestNativeUnavailable =>
+      'Layanan proteksi native belum tersedia di perangkat ini.';
+
+  @override
+  String get selfTestIntegrityFailed =>
+      'Gagal memvalidasi integritas artefak proteksi lokal.';
+
+  @override
+  String get selfTestFixtureMismatch =>
+      'Hasil klasifikasi fixture lokal tidak sesuai dengan ekspektasi AI.';
+
+  @override
+  String get selfTestArtifactInvalid =>
+      'File model AI atau ruleset proteksi lokal tidak valid.';
+
+  @override
+  String get selfTestSensorDisconnected =>
+      'Ekstensi sensor proteksi browser tidak terhubung.';
+
+  @override
+  String get selfTestAccessibilityMissing =>
+      'Izin Layanan Aksesibilitas Android belum diberikan.';
+
+  @override
   String get protectionSyncError => 'Status akun belum dapat disinkronkan';
 
   @override
   String get protectionAccountabilityTitle => 'Persetujuan perubahan proteksi';
+
+  @override
+  String dashboardHello(String name) {
+    return 'Halo, $name';
+  }
+
+  @override
+  String get dashboardHelloGuest => 'Halo';
+
+  @override
+  String get protectionInactiveTitle => 'Selesaikan perlindungan perangkat';
+
+  @override
+  String get protectionOnDevicePrivacyDesc =>
+      'Analisis tetap di perangkat. Server hanya menerima hitungan agregat perlindungan.';
 
   @override
   String get protectionSignInTitle => 'Proteksi lokal tetap berjalan';
@@ -878,8 +991,7 @@ class AppLocalizationsId extends AppLocalizations {
       'Hubungkan pendamping sebelum meminta perubahan proteksi.';
 
   @override
-  String get protectionRequestPending =>
-      'Permintaan sedang menunggu keputusan pendamping.';
+  String get protectionRequestPending => 'Menunggu persetujuan';
 
   @override
   String get protectionRequestApproved =>
@@ -893,10 +1005,10 @@ class AppLocalizationsId extends AppLocalizations {
       'Pendamping aktif. Perubahan proteksi dapat diminta dari perangkat ini.';
 
   @override
-  String get protectionApplyApproval => 'Terapkan persetujuan';
+  String get protectionApplyApproval => 'Terapkan izin';
 
   @override
-  String get protectionRequestAction => 'Minta perubahan proteksi';
+  String get protectionRequestAction => 'Ajukan perubahan';
 
   @override
   String get protectionApprovalApplied =>
@@ -1166,4 +1278,38 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get patternReturnProtection => 'Selesai dan kembali';
+
+  @override
+  String get partnerSharingPrivacy => 'Privasi Berbagi';
+
+  @override
+  String get partnerSharingDesc =>
+      'Atur jenis ringkasan agregat yang dapat dilihat pendamping.';
+
+  @override
+  String get partnerLeaveSection => 'Keluar dari Pendampingan';
+
+  @override
+  String get partnerLeaveNormal => 'Ajukan keluar normal';
+
+  @override
+  String get partnerLeaveUnsafe => 'Situasi tidak aman';
+
+  @override
+  String get verifyEmailTitle => 'Verifikasi email Anda';
+
+  @override
+  String get verifyEmailSent => 'Email verifikasi telah dikirim.';
+
+  @override
+  String get resendEmail => 'Kirim ulang';
+
+  @override
+  String get checkSetupAction => 'Periksa setup';
+
+  @override
+  String get linkGoogleTitle => 'Tautkan akun Google';
+
+  @override
+  String get continueAction => 'Lanjutkan';
 }

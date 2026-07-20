@@ -60,13 +60,26 @@ class PatternInterruptPanel extends StatelessWidget {
         Semantics(
           liveRegion: true,
           label: l10n.patternSecondsRemaining(secondsRemaining),
-          child: Text(
-            ready
-                ? l10n.patternReady
-                : l10n.patternSecondsRemaining(secondsRemaining),
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.skyLight,
-              fontFeatures: const [FontFeature.tabularFigures()],
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: Text(
+              ready
+                  ? l10n.patternReady
+                  : l10n.patternSecondsRemaining(secondsRemaining),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: AppColors.skyLight,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
             ),
           ),
         ),

@@ -41,13 +41,46 @@ Page<void> _page({required LocalKey key, required Widget child}) {
   );
 }
 
+class RouterNotifier extends ChangeNotifier {
+  RouterNotifier(this._ref) {
+    _ref.listen<AuthState>(
+      authProvider,
+      (previous, next) {
+        if (previous == null ||
+            previous.isAuthenticated != next.isAuthenticated ||
+            previous.isLoading != next.isLoading) {
+          notifyListeners();
+        }
+      },
+    );
+    _ref.listen<OnboardingState>(
+      onboardingProvider,
+      (previous, next) {
+        if (previous == null ||
+            previous.isCompleted != next.isCompleted ||
+            previous.isLoading != next.isLoading) {
+          notifyListeners();
+        }
+      },
+    );
+  }
+
+  final Ref _ref;
+}
+
+final routerNotifierProvider = Provider<RouterNotifier>((ref) {
+  return RouterNotifier(ref);
+});
+
 final routerProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authProvider);
-  final onboarding = ref.watch(onboardingProvider);
+  final notifier = ref.watch(routerNotifierProvider);
 
   return GoRouter(
+    refreshListenable: notifier,
     initialLocation: '/',
     redirect: (context, state) {
+      final authState = ref.read(authProvider);
+      final onboarding = ref.read(onboardingProvider);
       final path = state.uri.path;
       if (authState.isLoading || onboarding.isLoading) return null;
       if (path == '/') {

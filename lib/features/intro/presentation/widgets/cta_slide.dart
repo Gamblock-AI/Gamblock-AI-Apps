@@ -16,7 +16,7 @@ class CtaSlide extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 40),
-          Image.asset('assets/images/gami.webp', height: 180),
+          Image.asset('assets/images/gami-cta.webp', height: 180),
           const SizedBox(height: 24),
           EyebrowPill(
             label: AppLocalizations.of(context)!.introCtaBtn,

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/feedback/haptics.dart';
 import '../../../../core/messaging/app_messages.dart';
 import '../../../../core/auth/auth_state.dart';
+import '../../../../core/widgets/google_logo_icon.dart';
 import '../widgets/auth_brand_lockup.dart';
 import '../widgets/auth_form_error.dart';
 import '../widgets/auth_input_field.dart';
@@ -23,6 +24,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+  bool _submitted = false;
   bool _loading = false;
   String? _error;
   String? _passwordChangeToken;
@@ -36,6 +38,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _submit() async {
     Haptics.medium();
+    setState(() {
+      _submitted = true;
+    });
     if (!(_formKey.currentState?.validate() ?? false)) return;
     setState(() {
       _loading = true;
@@ -49,6 +54,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         setState(() {
           _passwordChangeToken = user?['password_change_token']?.toString();
           _passCtrl.clear();
+          _submitted = false;
         });
       } else if (user != null && mounted) {
         context.go('/dashboard');
@@ -64,6 +70,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _submitInitialPassword() async {
     final token = _passwordChangeToken;
+    setState(() {
+      _submitted = true;
+    });
+    if (!(_formKey.currentState?.validate() ?? false)) return;
     if (token == null || _passCtrl.text.length < 8) {
       setState(() => _error = 'Kata sandi baru minimal 8 karakter.');
       return;
@@ -116,7 +126,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           const AuthBrandLockup(),
           const SizedBox(height: 24),
           AuthScreenHeader(
-            eyebrow: l10n.authLoginAgain,
             title: _passwordChangeToken == null
                 ? l10n.authWelcomeBack
                 : 'Buat kata sandi baru',
@@ -131,7 +140,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ],
           Form(
             key: _formKey,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
+            autovalidateMode: _submitted
+                ? AutovalidateMode.onUserInteraction
+                : AutovalidateMode.disabled,
             child: Column(
               children: [
                 if (_passwordChangeToken == null)
@@ -182,7 +193,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 onPressed: _loading
                     ? null
                     : () => context.go('/forgot-password'),
-                child: const Text('Lupa kata sandi?'),
+                child: Text(l10n.authForgotPassword),
               ),
             ),
           const SizedBox(height: 8),
@@ -199,8 +210,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           if (_passwordChangeToken == null)
             OutlinedButton.icon(
               onPressed: _loading ? null : _googleLogin,
-              icon: const Icon(Icons.login_rounded),
-              label: const Text('Lanjutkan dengan Google'),
+              icon: const GoogleLogoIcon(size: 20),
+              label: Text(l10n.authContinueWithGoogle),
             ),
           if (_passwordChangeToken == null) const SizedBox(height: 16),
           if (_passwordChangeToken == null)

@@ -12,7 +12,7 @@ object NativeConfig {
     fun webBaseUrl(context: Context): String {
         return readFlutterEnv(context)["WEB_BASE_URL"]
             ?.takeIf { it.startsWith("https://") || it.startsWith("http://") }
-            ?: "https://gamblock-ai.vercel.app"
+            ?: "https://gamblock-ai.com"
     }
 
     private fun readFlutterEnv(context: Context): Map<String, String> {

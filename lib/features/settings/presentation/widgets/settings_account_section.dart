@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/auth/auth_state.dart';
-import '../../../../core/widgets/app_section_label.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Account actions that vary between authenticated and anonymous sessions.
 class SettingsAccountSection extends StatelessWidget {
@@ -27,45 +27,126 @@ class SettingsAccountSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppSectionLabel(title: l10n.settingsAccountSection),
-        if (auth.isAuthenticated) ...[
-          ListTile(
-            minTileHeight: 56,
-            leading: const Icon(Icons.person_outline),
-            title: Text(l10n.settingsEditProfile),
-            onTap: onEditProfile,
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8, top: 16),
+          child: Text(
+            l10n.settingsAccountSection.toUpperCase(),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.mutedForeground,
+                  letterSpacing: 1.1,
+                ),
           ),
-          if (!auth.googleLinked && auth.passwordEnabled)
-            ListTile(
-              minTileHeight: 56,
-              leading: const Icon(Icons.add_link_rounded),
-              title: const Text('Tautkan akun Google'),
-              subtitle: const Text(
-                'Gunakan email Google yang sama dengan akun ini.',
-              ),
-              onTap: onLinkGoogle,
-            ),
-          ListTile(
-            minTileHeight: 56,
-            leading: const Icon(Icons.password),
-            title: Text(l10n.settingsChangePassword),
-            onTap: onChangePassword,
+        ),
+        Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
-          ListTile(
-            minTileHeight: 56,
-            leading: const Icon(Icons.people_outline),
-            title: Text(l10n.settingsAccountabilityPartner),
-            onTap: onManagePartner,
+          child: Column(
+            children: [
+              if (auth.isAuthenticated) ...[
+                _settingsTile(
+                  context,
+                  icon: Icons.person_outline_rounded,
+                  iconColor: const Color(0xFF3B82F6),
+                  title: l10n.settingsEditProfile,
+                  onTap: onEditProfile,
+                ),
+                if (!auth.googleLinked && auth.passwordEnabled) ...[
+                  Divider(
+                    height: 1,
+                    indent: 54,
+                    color: AppColors.border.withValues(alpha: 0.5),
+                  ),
+                  _settingsTile(
+                    context,
+                    icon: Icons.add_link_rounded,
+                    iconColor: const Color(0xFFEA4335),
+                    title: l10n.settingsLinkGoogle,
+                    subtitle: l10n.settingsLinkGoogleDesc,
+                    onTap: onLinkGoogle,
+                  ),
+                ],
+                Divider(
+                  height: 1,
+                  indent: 54,
+                  color: AppColors.border.withValues(alpha: 0.5),
+                ),
+                _settingsTile(
+                  context,
+                  icon: Icons.lock_outline_rounded,
+                  iconColor: const Color(0xFFA855F7),
+                  title: l10n.settingsChangePassword,
+                  onTap: onChangePassword,
+                ),
+                Divider(
+                  height: 1,
+                  indent: 54,
+                  color: AppColors.border.withValues(alpha: 0.5),
+                ),
+                _settingsTile(
+                  context,
+                  icon: Icons.people_outline_rounded,
+                  iconColor: const Color(0xFF10B981),
+                  title: l10n.settingsAccountabilityPartner,
+                  onTap: onManagePartner,
+                ),
+              ] else
+                _settingsTile(
+                  context,
+                  icon: Icons.login_rounded,
+                  iconColor: AppColors.navy,
+                  title: l10n.authLoginBtn,
+                  onTap: onLogin,
+                ),
+            ],
           ),
-        ] else
-          ListTile(
-            minTileHeight: 56,
-            leading: const Icon(Icons.login),
-            title: Text(l10n.authLoginBtn),
-            onTap: onLogin,
-          ),
+        ),
       ],
+    );
+  }
+
+  Widget _settingsTile(
+    BuildContext context, {
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    String? subtitle,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      minTileHeight: 60,
+      onTap: onTap,
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: iconColor.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(icon, size: 20, color: iconColor),
+      ),
+      title: Text(
+        title,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: AppColors.navy,
+            ),
+      ),
+      subtitle: subtitle != null
+          ? Text(
+              subtitle,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.mutedForeground,
+                    fontSize: 11,
+                  ),
+            )
+          : null,
+      trailing: const Icon(
+        Icons.chevron_right_rounded,
+        color: AppColors.mutedForeground,
+      ),
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/device/aggregate_sync.dart';
 import '../../../../core/messaging/app_messages.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../data/providers.dart';
 import '../../domain/entities/protection_analytics.dart';
@@ -71,11 +72,39 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.analyticsTitle)),
+      appBar: AppBar(
+        titleSpacing: 16,
+        title: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: AppColors.navy.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: const Icon(
+                Icons.auto_graph_rounded,
+                size: 18,
+                color: AppColors.navy,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              l10n.analyticsTitle,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.navy,
+                    letterSpacing: -0.5,
+                  ),
+            ),
+          ],
+        ),
+      ),
       body: RefreshIndicator(
         onRefresh: _load,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
           children: [
             AnalyticsPeriodSelector(
               selectedDays: _days,
@@ -84,7 +113,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                 _load();
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
             if (_loading && _analytics == null)
               const Center(
                 child: Padding(
@@ -111,14 +140,92 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                       permissionRevoked: 0,
                     ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
               ProtectionTrendChart(days: _analytics?.daily ?? const []),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               AnalyticsDataStateNotice(dataState: _analytics?.dataState),
+              const SizedBox(height: 14),
+              _buildPrivacyInfoSection(context),
             ],
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPrivacyInfoSection(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.analyticsPrivacySectionTitle,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: AppColors.navy,
+              ),
+        ),
+        const SizedBox(height: 10),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                _privacyInfoRow(
+                  context,
+                  icon: Icons.shield_outlined,
+                  title: l10n.analyticsOnDeviceTitle,
+                  description: l10n.analyticsOnDeviceDesc,
+                ),
+                const Divider(height: 24),
+                _privacyInfoRow(
+                  context,
+                  icon: Icons.lock_outline,
+                  title: l10n.analyticsNoBrowsingHistoryTitle,
+                  description: l10n.analyticsNoBrowsingHistoryDesc,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _privacyInfoRow(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String description,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 22, color: AppColors.navy),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.navy,
+                    ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                description,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.mutedForeground,
+                      height: 1.4,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

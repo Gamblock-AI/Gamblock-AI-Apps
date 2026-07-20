@@ -6,6 +6,7 @@ import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/feedback/feedback.dart';
 import '../../../../core/messaging/app_messages.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../accountability/domain/entities/accountability_models.dart';
 import '../../domain/entities/protection_status.dart';
 import '../protection_coordinator.dart';
@@ -21,7 +22,7 @@ class ProtectionScreen extends ConsumerStatefulWidget {
   ConsumerState<ProtectionScreen> createState() => _ProtectionScreenState();
 }
 
-class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
+class _ProtectionScreenState extends ConsumerState<ProtectionScreen> with WidgetsBindingObserver {
   ProtectionStatus? _status;
   AccountabilityOverview? _accountability;
   List<ApprovalRequest> _requests = const [];
@@ -33,7 +34,21 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     Future<void>.microtask(_load);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _load();
+    }
   }
 
   Future<void> _load() async {
@@ -158,13 +173,40 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> {
     final auth = ref.watch(authProvider);
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.dashboardTitle),
+        titleSpacing: 16,
+        title: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: AppColors.navy.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: Icon(
+                Icons.shield_rounded,
+                size: 18,
+                color: AppColors.navy,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              l10n.dashboardTitle,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.navy,
+                    letterSpacing: -0.5,
+                  ),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             tooltip: l10n.refresh,
             onPressed: _loading ? null : _load,
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: ProtectionScreenBody(

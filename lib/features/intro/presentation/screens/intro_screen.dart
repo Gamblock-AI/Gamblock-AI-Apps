@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/brand_helpers.dart';
+import '../../../../core/widgets/language_toggle_button.dart';
 import '../../../../core/widgets/mesh_background.dart';
 import '../widgets/hero_slide.dart';
 import '../widgets/how_it_works_slide.dart';
@@ -62,14 +63,21 @@ class _IntroScreenState extends ConsumerState<IntroScreen> {
                 onPageChanged: (i) => setState(() => _page = i),
                 children: const [HeroSlide(), HowItWorksSlide(), CtaSlide()],
               ),
+              const Positioned(
+                top: 12,
+                left: 16,
+                child: LanguageToggleButton(),
+              ),
               Positioned(
                 top: 12,
                 right: 12,
                 child: TextButton(
                   onPressed: _finish,
                   child: Text(
-                    'Lewati',
-                    style: TextStyle(
+                    Localizations.localeOf(context).languageCode == 'id'
+                        ? 'Lewati'
+                        : 'Skip',
+                    style: const TextStyle(
                       color: AppColors.mutedForeground,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,

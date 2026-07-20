@@ -17,28 +17,58 @@ class PatternBreathingOrb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      label: semanticsLabel,
-      child: AnimatedBuilder(
-        animation: animation,
-        builder: (context, child) {
-          final scale = disableAnimations
-              ? 1.0
-              : 0.86 + (animation.value * 0.14);
-          return Transform.scale(scale: scale, child: child);
-        },
-        child: Container(
-          width: 172,
-          height: 172,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.sky.withValues(alpha: 0.12),
-            border: Border.all(
-              color: AppColors.skyLight.withValues(alpha: 0.65),
-              width: 2,
-            ),
-          ),
-          child: const Icon(Icons.air, size: 64, color: AppColors.skyLight),
+    return RepaintBoundary(
+      child: Semantics(
+        label: semanticsLabel,
+        child: AnimatedBuilder(
+          animation: animation,
+          builder: (context, child) {
+            final scale = disableAnimations
+                ? 1.0
+                : 0.86 + (animation.value * 0.14);
+            return Transform.scale(
+              scale: scale,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.skyLight.withValues(alpha: 0.05 + (animation.value * 0.05)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.skyLight.withValues(alpha: 0.15 * animation.value),
+                          blurRadius: 40 + (20 * animation.value),
+                          spreadRadius: 10 + (10 * animation.value),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: 160,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          AppColors.skyLight.withValues(alpha: 0.8),
+                          AppColors.sky.withValues(alpha: 0.2),
+                        ],
+                        stops: const [0.2, 1.0],
+                      ),
+                      border: Border.all(
+                        color: AppColors.skyLight.withValues(alpha: 0.5),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: const Icon(Icons.self_improvement, size: 64, color: Colors.white),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );

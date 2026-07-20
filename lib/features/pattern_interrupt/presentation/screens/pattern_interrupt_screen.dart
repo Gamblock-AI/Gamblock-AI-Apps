@@ -5,7 +5,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/feedback/feedback.dart';
 
 import '../../../../core/config/app_config.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../widgets/pattern_grounding_panel.dart';
 import '../widgets/pattern_interrupt_panel.dart';
 
@@ -83,31 +82,43 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
     return PopScope(
       canPop: ready,
       child: Scaffold(
-        backgroundColor: AppColors.navyDark,
-        body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 520),
-                child: AnimatedSwitcher(
-                  duration: disableAnimations
-                      ? Duration.zero
-                      : const Duration(milliseconds: 220),
-                  child: _groundingOpen
-                      ? PatternGroundingPanel(
-                          onReturnToProtection: () => context.go('/dashboard'),
-                        )
-                      : PatternInterruptPanel(
-                          breathingAnimation: _breathingController,
-                          disableAnimations: disableAnimations,
-                          secondsRemaining: _remaining,
-                          onContinue: () => _openWeb('post-intervention'),
-                          onOpenGrounding: () =>
-                              setState(() => _groundingOpen = true),
-                          onOpenHelp: () => _openWeb('help'),
-                          onLater: () => context.go('/dashboard'),
-                        ),
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFF0F172A),
+                Color(0xFF1E1B4B),
+                Color(0xFF09090B),
+              ],
+            ),
+          ),
+          child: SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 520),
+                  child: AnimatedSwitcher(
+                    duration: disableAnimations
+                        ? Duration.zero
+                        : const Duration(milliseconds: 220),
+                    child: _groundingOpen
+                        ? PatternGroundingPanel(
+                            onReturnToProtection: () => context.go('/dashboard'),
+                          )
+                        : PatternInterruptPanel(
+                            breathingAnimation: _breathingController,
+                            disableAnimations: disableAnimations,
+                            secondsRemaining: _remaining,
+                            onContinue: () => _openWeb('post-intervention'),
+                            onOpenGrounding: () =>
+                                setState(() => _groundingOpen = true),
+                            onOpenHelp: () => _openWeb('help'),
+                            onLater: () => context.go('/dashboard'),
+                          ),
+                  ),
                 ),
               ),
             ),

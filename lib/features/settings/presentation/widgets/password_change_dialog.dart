@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/messaging/app_messages.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class PasswordChange {
   const PasswordChange({
@@ -103,90 +104,185 @@ class _PasswordChangeDialogState extends State<_PasswordChangeDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return AlertDialog(
-      title: Text(l10n.settingsChangePassword),
-      content: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 380),
+        padding: const EdgeInsets.all(18),
+        child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (_formError != null) ...[
-                Semantics(
-                  liveRegion: true,
-                  child: Text(
-                    _formError!,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
+              Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(13),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.lock_rounded,
+                      size: 22,
+                      color: Colors.white,
                     ),
                   ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      l10n.settingsChangePassword,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.navy,
+                            letterSpacing: -0.3,
+                          ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Form(
+                key: _formKey,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_formError != null) ...[
+                      Semantics(
+                        liveRegion: true,
+                        child: Text(
+                          _formError!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                    _passwordField(
+                      controller: _current,
+                      focusNode: _currentFocus,
+                      label: l10n.settingsCurrentPassword,
+                      show: _showCurrent,
+                      serverError: _currentServerError,
+                      autofillHints: const [AutofillHints.password],
+                      onToggle: () => setState(() => _showCurrent = !_showCurrent),
+                      validator: (value) => value == null || value.isEmpty
+                          ? l10n.msgErrPasswordValidation
+                          : null,
+                    ),
+                    const SizedBox(height: 10),
+                    _passwordField(
+                      controller: _next,
+                      focusNode: _nextFocus,
+                      label: l10n.settingsNewPassword,
+                      show: _showNext,
+                      serverError: _nextServerError,
+                      autofillHints: const [AutofillHints.newPassword],
+                      onToggle: () => setState(() => _showNext = !_showNext),
+                      validator: (value) {
+                        if (value == null || value.length < 8) {
+                          return l10n.settingsPasswordMismatch;
+                        }
+                        if (value == _current.text) {
+                          return l10n.msgErrPasswordReuse;
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    _passwordField(
+                      controller: _confirmation,
+                      label: l10n.settingsConfirmPassword,
+                      show: _showConfirmation,
+                      autofillHints: const [AutofillHints.newPassword],
+                      onToggle: () =>
+                          setState(() => _showConfirmation = !_showConfirmation),
+                      validator: (value) =>
+                          value != _next.text ? l10n.settingsPasswordMismatch : null,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-              ],
-              _passwordField(
-                controller: _current,
-                focusNode: _currentFocus,
-                label: l10n.settingsCurrentPassword,
-                show: _showCurrent,
-                serverError: _currentServerError,
-                autofillHints: const [AutofillHints.password],
-                onToggle: () => setState(() => _showCurrent = !_showCurrent),
-                validator: (value) => value == null || value.isEmpty
-                    ? l10n.msgErrPasswordValidation
-                    : null,
               ),
-              const SizedBox(height: 12),
-              _passwordField(
-                controller: _next,
-                focusNode: _nextFocus,
-                label: l10n.settingsNewPassword,
-                show: _showNext,
-                serverError: _nextServerError,
-                autofillHints: const [AutofillHints.newPassword],
-                onToggle: () => setState(() => _showNext = !_showNext),
-                validator: (value) {
-                  if (value == null || value.length < 8) {
-                    return l10n.settingsPasswordMismatch;
-                  }
-                  if (value == _current.text) {
-                    return l10n.msgErrPasswordReuse;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              _passwordField(
-                controller: _confirmation,
-                label: l10n.settingsConfirmPassword,
-                show: _showConfirmation,
-                autofillHints: const [AutofillHints.newPassword],
-                onToggle: () =>
-                    setState(() => _showConfirmation = !_showConfirmation),
-                validator: (value) =>
-                    value != _next.text ? l10n.settingsPasswordMismatch : null,
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 42,
+                      child: FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFFF1F5F9),
+                          foregroundColor: AppColors.navy,
+                          elevation: 0,
+                          padding: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: _submitting
+                            ? null
+                            : () => Navigator.of(context).pop(false),
+                        child: Text(
+                          l10n.cancel,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 13),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: SizedBox(
+                      height: 42,
+                      child: FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.navy,
+                          elevation: 0,
+                          padding: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: _submitting ? null : _submit,
+                        child: _submitting
+                            ? const SizedBox.square(
+                                dimension: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(
+                                l10n.save,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w700, fontSize: 13),
+                              ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: _submitting
-              ? null
-              : () => Navigator.of(context).pop(false),
-          child: Text(l10n.cancel),
-        ),
-        FilledButton(
-          onPressed: _submitting ? null : _submit,
-          child: _submitting
-              ? const SizedBox.square(
-                  dimension: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : Text(l10n.save),
-        ),
-      ],
     );
   }
 
@@ -218,10 +314,24 @@ class _PasswordChangeDialogState extends State<_PasswordChangeDialog> {
       },
       decoration: InputDecoration(
         labelText: label,
+        isDense: true,
+        filled: true,
+        fillColor: const Color(0xFFF8FAFC),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.navy, width: 1.5),
+        ),
         suffixIcon: IconButton(
           tooltip: show ? l10n.settingsHidePassword : l10n.settingsShowPassword,
           onPressed: onToggle,
-          icon: Icon(show ? Icons.visibility_off : Icons.visibility),
+          icon: Icon(show ? Icons.visibility_off : Icons.visibility,
+              size: 18, color: AppColors.mutedForeground),
         ),
       ),
     );

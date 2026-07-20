@@ -35,9 +35,30 @@ class PatternGroundingPanel extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 28),
-        FilledButton(
-          onPressed: onReturnToProtection,
-          child: Text(l10n.patternReturnProtection),
+        Container(
+          height: 52,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: const LinearGradient(
+              colors: [AppColors.sky, Color(0xFF0284C7)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            onPressed: onReturnToProtection,
+            child: Text(
+              l10n.patternReturnProtection,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+            ),
+          ),
         ),
       ],
     );

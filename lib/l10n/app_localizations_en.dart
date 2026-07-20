@@ -52,6 +52,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAccountabilityPartner => 'Accountability Partner';
 
   @override
+  String get settingsEmailVerified => 'Email verified';
+
+  @override
+  String get settingsEmailUnverified => 'Email not verified';
+
+  @override
+  String get settingsGoogleLinked => 'Google linked';
+
+  @override
+  String get settingsGoogleUnlinked => 'Google unlinked';
+
+  @override
+  String get settingsLinkGoogle => 'Link Google account';
+
+  @override
+  String get settingsLinkGoogleDesc =>
+      'Use the same Google email as this account.';
+
+  @override
   String get cancel => 'Cancel';
 
   @override
@@ -78,7 +97,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get protectionInactive => 'Perlindungan Nonaktif';
 
   @override
-  String get protectionActiveTitle => 'Perlindungan Aktif';
+  String get protectionActiveTitle => 'Device protection active';
 
   @override
   String get protectionActiveDays => 'Hari Aktif';
@@ -200,7 +219,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingGroupNameHint => 'Contoh: Kelas TI-2024A';
 
   @override
-  String get patternBreatheDesc => 'Take a slow breath.\\nThis urge will pass.';
+  String get patternBreatheDesc => 'Take a slow breath.\nThis urge will pass.';
 
   @override
   String get patternContinuePsychoeducation => 'Continue to psychoeducation';
@@ -210,7 +229,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Ambil kendali. Lanjutkan ke modul pemulihan diri.';
 
   @override
-  String get patternInterruptSuccess => 'Dorongan berhasil\\ndiputus.';
+  String get patternInterruptSuccess => 'Dorongan berhasil\ndiputus.';
 
   @override
   String get patternInterruptActive => 'PATTERN INTERRUPT AKTIF';
@@ -228,14 +247,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardYourProgress => 'Perkembangan Anda.';
 
   @override
-  String get introHeroTitle => 'break the cycle of\\nonline gambling.';
+  String get introHeroTitle => 'break the cycle of\nonline gambling.';
 
   @override
   String get introHeroDesc =>
       'on-device intelligent detection, timely behavioral intervention, and a self-regulation journey for university students.';
 
   @override
-  String get introAiShield => 'on-device ai shield';
+  String get introAiShield => 'On-device AI Shield';
 
   @override
   String get introHowItWorksStep1 => 'download & install';
@@ -259,7 +278,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Hybrid AI analyzes bounded URL and DOM signals on your device.';
 
   @override
-  String get introHowItWorksTitle => 'three steps toward\\nmore control.';
+  String get introHowItWorksTitle => 'three steps toward\nmore control.';
 
   @override
   String get introHowItWorksSubtitle => 'how it works';
@@ -268,7 +287,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get introFeature1 => 'on-device AI & privacy';
 
   @override
-  String get introFeaturesTitle => 'an ecosystem that\\nsupports recovery.';
+  String get introFeaturesTitle => 'an ecosystem that\nsupports recovery.';
 
   @override
   String get introFeature3 => 'accountability partner';
@@ -280,7 +299,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get introFeature4 => 'accessible Pattern Interrupt';
 
   @override
-  String get introCtaTitle => 'take the next step\\ntoward control.';
+  String get introCtaTitle => 'take the next step\ntoward control.';
 
   @override
   String get introCtaBtn => 'get started';
@@ -303,7 +322,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get introCrisisTitle =>
-      'online gambling is not harmless.\\nit affects a generation.';
+      'online gambling is not harmless.\nit affects a generation.';
 
   @override
   String get introCrisisSource => '(PPATK 2026 · Kemkomdigi 2025)';
@@ -323,7 +342,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get introStartBtn => 'Get started';
 
   @override
-  String get authWelcomeBack => 'Welcome\\nback.';
+  String get authWelcomeBack => 'Welcome back.';
 
   @override
   String get authRegister => 'Register';
@@ -336,6 +355,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authLoginBtn => 'Sign in';
+
+  @override
+  String get authForgotPassword => 'Forgot password?';
+
+  @override
+  String get authContinueWithGoogle => 'Continue with Google';
+
+  @override
+  String get authRegisterWithGoogle => 'Register with Google';
 
   @override
   String get authPassword => 'Password';
@@ -360,7 +388,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authLoginDesc => 'Sign in to manage your protection account.';
 
   @override
-  String get authCreateAccountTitle => 'Create a new\\naccount.';
+  String get authCreateAccountTitle => 'Create a new account.';
 
   @override
   String get authRegisterAs => 'Saya mendaftar sebagai';
@@ -721,6 +749,53 @@ class AppLocalizationsEn extends AppLocalizations {
   String get analyticsPermission => 'Permission revoked';
 
   @override
+  String get analyticsSummaryTitle => 'Protection Summary';
+
+  @override
+  String get analyticsSummaryDesc =>
+      'Track automated blocks, behavioral interventions, and local protection statistics.';
+
+  @override
+  String get analyticsChartTitle => 'Protection Activity Trend';
+
+  @override
+  String get analytics7Days => 'Last 7 Days';
+
+  @override
+  String get analytics30Days => 'Last 30 Days';
+
+  @override
+  String get analyticsLegendBlocked => 'Blocked';
+
+  @override
+  String get analyticsLegendInterventions => 'Interventions';
+
+  @override
+  String get analyticsNoActivityTitle => 'No Activity Detected Yet';
+
+  @override
+  String get analyticsNoActivityDesc =>
+      'The chart will automatically update when blocks or interventions occur.';
+
+  @override
+  String get analyticsPrivacySectionTitle =>
+      'Privacy & Data Security Assurance';
+
+  @override
+  String get analyticsOnDeviceTitle => '100% On-Device AI';
+
+  @override
+  String get analyticsOnDeviceDesc =>
+      'All classification and detection processes run locally on your device.';
+
+  @override
+  String get analyticsNoBrowsingHistoryTitle => 'No Browsing History Stored';
+
+  @override
+  String get analyticsNoBrowsingHistoryDesc =>
+      'URLs, domains, page titles, and DOM content are never saved or sent to servers.';
+
+  @override
   String get partnerSignInTitle => 'Sign in to manage your partner';
 
   @override
@@ -771,7 +846,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Protection-change requests from the device will appear here.';
 
   @override
-  String get partnerManageAction => 'Manage partner group';
+  String get partnerManageAction => 'Manage partner';
 
   @override
   String get accountabilityJoinTitle => 'Connect a partner with a group code';
@@ -825,10 +900,49 @@ class AppLocalizationsEn extends AppLocalizations {
       'The local model, ruleset, and Pattern Interrupt path passed their fixture checks.';
 
   @override
+  String get selfTestNativeUnavailable =>
+      'Native protection service is currently unavailable on this platform.';
+
+  @override
+  String get selfTestIntegrityFailed =>
+      'Protection artifact checksum integrity validation failed.';
+
+  @override
+  String get selfTestFixtureMismatch =>
+      'Local fixture classification did not match expected AI output.';
+
+  @override
+  String get selfTestArtifactInvalid =>
+      'Local protection model or ruleset file is invalid.';
+
+  @override
+  String get selfTestSensorDisconnected =>
+      'Browser protection sensor extension is disconnected.';
+
+  @override
+  String get selfTestAccessibilityMissing =>
+      'Android Accessibility Service permission is missing.';
+
+  @override
   String get protectionSyncError => 'Account status could not be synchronized';
 
   @override
   String get protectionAccountabilityTitle => 'Protection-change approval';
+
+  @override
+  String dashboardHello(String name) {
+    return 'Hello, $name';
+  }
+
+  @override
+  String get dashboardHelloGuest => 'Hello';
+
+  @override
+  String get protectionInactiveTitle => 'Complete device protection';
+
+  @override
+  String get protectionOnDevicePrivacyDesc =>
+      'Analysis stays on-device. The server only receives aggregate protection counts.';
 
   @override
   String get protectionSignInTitle => 'Local protection continues';
@@ -883,8 +997,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Connect a partner before requesting a protection change.';
 
   @override
-  String get protectionRequestPending =>
-      'The request is waiting for your partner\'s decision.';
+  String get protectionRequestPending => 'Pending approval';
 
   @override
   String get protectionRequestApproved =>
@@ -901,7 +1014,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get protectionApplyApproval => 'Apply approval';
 
   @override
-  String get protectionRequestAction => 'Request protection change';
+  String get protectionRequestAction => 'Request change';
 
   @override
   String get protectionApprovalApplied =>
@@ -1173,4 +1286,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get patternReturnProtection => 'Finish and return';
+
+  @override
+  String get partnerSharingPrivacy => 'Sharing Privacy';
+
+  @override
+  String get partnerSharingDesc =>
+      'Manage the types of aggregate summaries visible to your partner.';
+
+  @override
+  String get partnerLeaveSection => 'Leave Accountability';
+
+  @override
+  String get partnerLeaveNormal => 'Request normal leave';
+
+  @override
+  String get partnerLeaveUnsafe => 'Unsafe situation leave';
+
+  @override
+  String get verifyEmailTitle => 'Verify your email';
+
+  @override
+  String get verifyEmailSent => 'Verification email sent.';
+
+  @override
+  String get resendEmail => 'Resend';
+
+  @override
+  String get checkSetupAction => 'Check setup';
+
+  @override
+  String get linkGoogleTitle => 'Link Google account';
+
+  @override
+  String get continueAction => 'Continue';
 }
