@@ -512,24 +512,6 @@ abstract class AppLocalizations {
   /// **'Lanjut ke Psikoedukasi'**
   String get patternContinuePsychoeducation;
 
-  /// No description provided for @patternTakeControlDesc.
-  ///
-  /// In id, this message translates to:
-  /// **'Ambil kendali. Lanjutkan ke modul pemulihan diri.'**
-  String get patternTakeControlDesc;
-
-  /// No description provided for @patternInterruptSuccess.
-  ///
-  /// In id, this message translates to:
-  /// **'Dorongan berhasil\ndiputus.'**
-  String get patternInterruptSuccess;
-
-  /// No description provided for @patternInterruptActive.
-  ///
-  /// In id, this message translates to:
-  /// **'PATTERN INTERRUPT AKTIF'**
-  String get patternInterruptActive;
-
   /// No description provided for @dashboardWeeklyTrend.
   ///
   /// In id, this message translates to:
@@ -2420,12 +2402,6 @@ abstract class AppLocalizations {
   /// **'Perhatikan lima hal di sekitar Anda'**
   String get patternGroundingTitle;
 
-  /// No description provided for @patternGroundingBody.
-  ///
-  /// In id, this message translates to:
-  /// **'Sebutkan lima hal yang terlihat, empat yang terasa, tiga yang terdengar, dua yang tercium, dan satu hal yang ingin Anda lindungi hari ini.'**
-  String get patternGroundingBody;
-
   /// No description provided for @patternReturnProtection.
   ///
   /// In id, this message translates to:
@@ -2497,6 +2473,810 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Lanjutkan'**
   String get continueAction;
+
+  /// No description provided for @authResetTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Lupa kata sandi?'**
+  String get authResetTitle;
+
+  /// No description provided for @authResetTitleCode.
+  ///
+  /// In id, this message translates to:
+  /// **'Masukkan kode pemulihan'**
+  String get authResetTitleCode;
+
+  /// No description provided for @authResetDesc.
+  ///
+  /// In id, this message translates to:
+  /// **'Masukkan email akun. Kami akan mengirim kode tanpa membagikan status pendaftaran email.'**
+  String get authResetDesc;
+
+  /// No description provided for @authResetDescCode.
+  ///
+  /// In id, this message translates to:
+  /// **'Kode 12 karakter telah dikirim bila email terdaftar. Kode berlaku 30 menit.'**
+  String get authResetDescCode;
+
+  /// No description provided for @authResetSuccess.
+  ///
+  /// In id, this message translates to:
+  /// **'Kata sandi berhasil diperbarui. Silakan masuk.'**
+  String get authResetSuccess;
+
+  /// No description provided for @authResetNewCodeRequested.
+  ///
+  /// In id, this message translates to:
+  /// **'Kode pemulihan baru telah diminta.'**
+  String get authResetNewCodeRequested;
+
+  /// No description provided for @authChangeEmail.
+  ///
+  /// In id, this message translates to:
+  /// **'Ganti email'**
+  String get authChangeEmail;
+
+  /// No description provided for @authResendCode.
+  ///
+  /// In id, this message translates to:
+  /// **'Kirim ulang kode'**
+  String get authResendCode;
+
+  /// No description provided for @authRecoveryCodeLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Kode pemulihan'**
+  String get authRecoveryCodeLabel;
+
+  /// No description provided for @authRecoveryCodeInvalid.
+  ///
+  /// In id, this message translates to:
+  /// **'Kode harus berisi 12 karakter.'**
+  String get authRecoveryCodeInvalid;
+
+  /// No description provided for @authNewPasswordLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Kata sandi baru'**
+  String get authNewPasswordLabel;
+
+  /// No description provided for @authPasswordMinChars.
+  ///
+  /// In id, this message translates to:
+  /// **'Gunakan minimal 8 karakter.'**
+  String get authPasswordMinChars;
+
+  /// No description provided for @authPasswordMinShort.
+  ///
+  /// In id, this message translates to:
+  /// **'Minimal 8 karakter'**
+  String get authPasswordMinShort;
+
+  /// No description provided for @authCreateNewPassword.
+  ///
+  /// In id, this message translates to:
+  /// **'Buat kata sandi baru'**
+  String get authCreateNewPassword;
+
+  /// No description provided for @authSendCode.
+  ///
+  /// In id, this message translates to:
+  /// **'Kirim kode'**
+  String get authSendCode;
+
+  /// No description provided for @authBackToLogin.
+  ///
+  /// In id, this message translates to:
+  /// **'Kembali ke login'**
+  String get authBackToLogin;
+
+  /// No description provided for @authTempPasswordDesc.
+  ///
+  /// In id, this message translates to:
+  /// **'Kata sandi sementara hanya berlaku untuk langkah ini.'**
+  String get authTempPasswordDesc;
+
+  /// No description provided for @authPasswordChangeMin.
+  ///
+  /// In id, this message translates to:
+  /// **'Kata sandi baru minimal 8 karakter.'**
+  String get authPasswordChangeMin;
+
+  /// No description provided for @authSaveAndLogin.
+  ///
+  /// In id, this message translates to:
+  /// **'Simpan dan masuk'**
+  String get authSaveAndLogin;
+
+  /// No description provided for @authShowPassword.
+  ///
+  /// In id, this message translates to:
+  /// **'Tampilkan kata sandi'**
+  String get authShowPassword;
+
+  /// No description provided for @authHidePassword.
+  ///
+  /// In id, this message translates to:
+  /// **'Sembunyikan kata sandi'**
+  String get authHidePassword;
+
+  /// No description provided for @introSkip.
+  ///
+  /// In id, this message translates to:
+  /// **'Lewati'**
+  String get introSkip;
+
+  /// No description provided for @introNext.
+  ///
+  /// In id, this message translates to:
+  /// **'Lanjut'**
+  String get introNext;
+
+  /// No description provided for @webPageOpenError.
+  ///
+  /// In id, this message translates to:
+  /// **'Halaman belum dapat dibuka. Coba lagi.'**
+  String get webPageOpenError;
+
+  /// No description provided for @helpPageOpenError.
+  ///
+  /// In id, this message translates to:
+  /// **'Halaman bantuan belum dapat dibuka. Coba lagi.'**
+  String get helpPageOpenError;
+
+  /// No description provided for @recoveryPageOpenError.
+  ///
+  /// In id, this message translates to:
+  /// **'Halaman pemulihan belum dapat dibuka. Coba lagi.'**
+  String get recoveryPageOpenError;
+
+  /// No description provided for @settingsGoogleLinkedSuccess.
+  ///
+  /// In id, this message translates to:
+  /// **'Akun Google berhasil ditautkan.'**
+  String get settingsGoogleLinkedSuccess;
+
+  /// No description provided for @verifyEmailBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Diperlukan untuk fitur pendamping dan pemulihan akun.'**
+  String get verifyEmailBody;
+
+  /// No description provided for @statusChipOk.
+  ///
+  /// In id, this message translates to:
+  /// **'OK'**
+  String get statusChipOk;
+
+  /// No description provided for @statusChipWarn.
+  ///
+  /// In id, this message translates to:
+  /// **'WASPADA'**
+  String get statusChipWarn;
+
+  /// No description provided for @statusChipOff.
+  ///
+  /// In id, this message translates to:
+  /// **'MATI'**
+  String get statusChipOff;
+
+  /// No description provided for @statusGranted.
+  ///
+  /// In id, this message translates to:
+  /// **'Diberikan'**
+  String get statusGranted;
+
+  /// No description provided for @statusRevoked.
+  ///
+  /// In id, this message translates to:
+  /// **'Dicabut'**
+  String get statusRevoked;
+
+  /// No description provided for @statusDisabled.
+  ///
+  /// In id, this message translates to:
+  /// **'Nonaktif'**
+  String get statusDisabled;
+
+  /// No description provided for @statusUnknown.
+  ///
+  /// In id, this message translates to:
+  /// **'Tidak diketahui'**
+  String get statusUnknown;
+
+  /// No description provided for @degradedAccessibilityDisabled.
+  ///
+  /// In id, this message translates to:
+  /// **'Aksesibilitas dinonaktifkan'**
+  String get degradedAccessibilityDisabled;
+
+  /// No description provided for @degradedAccessibilityNotGranted.
+  ///
+  /// In id, this message translates to:
+  /// **'Izin aksesibilitas belum diberikan'**
+  String get degradedAccessibilityNotGranted;
+
+  /// No description provided for @degradedServiceStopped.
+  ///
+  /// In id, this message translates to:
+  /// **'Layanan proteksi terhenti'**
+  String get degradedServiceStopped;
+
+  /// No description provided for @degradedPermissionRevoked.
+  ///
+  /// In id, this message translates to:
+  /// **'Izin sistem dicabut'**
+  String get degradedPermissionRevoked;
+
+  /// No description provided for @degradedSensorDisconnected.
+  ///
+  /// In id, this message translates to:
+  /// **'Sensor terputus'**
+  String get degradedSensorDisconnected;
+
+  /// No description provided for @protectionArtifactUnavailable.
+  ///
+  /// In id, this message translates to:
+  /// **'tidak tersedia'**
+  String get protectionArtifactUnavailable;
+
+  /// No description provided for @analyticsChartSummary.
+  ///
+  /// In id, this message translates to:
+  /// **'{blocked} diblokir, {interventions} intervensi'**
+  String analyticsChartSummary(int blocked, int interventions);
+
+  /// No description provided for @analyticsDayTooltip.
+  ///
+  /// In id, this message translates to:
+  /// **'{blocked} diblokir · {interventions} intervensi'**
+  String analyticsDayTooltip(int blocked, int interventions);
+
+  /// No description provided for @partnerPrivacyBadge.
+  ///
+  /// In id, this message translates to:
+  /// **'Privasi Terlindungi · Hanya Agregat'**
+  String get partnerPrivacyBadge;
+
+  /// No description provided for @accSharingTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Data Agregat Dibagikan'**
+  String get accSharingTitle;
+
+  /// No description provided for @accSharingSubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Atur preferensi data agregat anonim untuk pendamping.'**
+  String get accSharingSubtitle;
+
+  /// No description provided for @accShareHealthTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Kesehatan Perlindungan'**
+  String get accShareHealthTitle;
+
+  /// No description provided for @accShareHealthSubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Status aktif, degradasi, & izin (tanpa URL).'**
+  String get accShareHealthSubtitle;
+
+  /// No description provided for @accShareActivityTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Aktivitas Perlindungan'**
+  String get accShareActivityTitle;
+
+  /// No description provided for @accShareActivitySubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Hitungan pemblokiran & intervensi agregat.'**
+  String get accShareActivitySubtitle;
+
+  /// No description provided for @accShareEngagementTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Keterlibatan Pemulihan'**
+  String get accShareEngagementTitle;
+
+  /// No description provided for @accShareEngagementSubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Ringkasan partisipasi (bukan isi jurnal).'**
+  String get accShareEngagementSubtitle;
+
+  /// No description provided for @accShareEducationTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Progres Edukasi'**
+  String get accShareEducationTitle;
+
+  /// No description provided for @accShareEducationSubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Penyelesaian modul psikoedukasi harian.'**
+  String get accShareEducationSubtitle;
+
+  /// No description provided for @accSharingUpdated.
+  ///
+  /// In id, this message translates to:
+  /// **'Preferensi berbagi diperbarui.'**
+  String get accSharingUpdated;
+
+  /// No description provided for @accUnsafeExitTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Keluar Situasi Tidak Aman'**
+  String get accUnsafeExitTitle;
+
+  /// No description provided for @accNormalExitTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Ajukan Keluar Pendampingan'**
+  String get accNormalExitTitle;
+
+  /// No description provided for @accUnsafeExitDesc.
+  ///
+  /// In id, this message translates to:
+  /// **'Berbagi data segera dihentikan dan permintaan normal dibatalkan.'**
+  String get accUnsafeExitDesc;
+
+  /// No description provided for @accNormalExitDesc.
+  ///
+  /// In id, this message translates to:
+  /// **'Pendamping memiliki waktu 72 jam untuk meninjau permintaan.'**
+  String get accNormalExitDesc;
+
+  /// No description provided for @accReasonLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Alasan (opsional)'**
+  String get accReasonLabel;
+
+  /// No description provided for @accReasonHint.
+  ///
+  /// In id, this message translates to:
+  /// **'Berikan penjelasan singkat...'**
+  String get accReasonHint;
+
+  /// No description provided for @accSendRequest.
+  ///
+  /// In id, this message translates to:
+  /// **'Kirim Permintaan'**
+  String get accSendRequest;
+
+  /// No description provided for @accExitRequestSent.
+  ///
+  /// In id, this message translates to:
+  /// **'Permintaan keluar dikirim.'**
+  String get accExitRequestSent;
+
+  /// No description provided for @accExitRequestCancelled.
+  ///
+  /// In id, this message translates to:
+  /// **'Permintaan keluar dibatalkan.'**
+  String get accExitRequestCancelled;
+
+  /// No description provided for @accApprovalCancelled.
+  ///
+  /// In id, this message translates to:
+  /// **'Permintaan persetujuan dibatalkan.'**
+  String get accApprovalCancelled;
+
+  /// No description provided for @accExitPendingTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Permintaan keluar sedang ditinjau'**
+  String get accExitPendingTitle;
+
+  /// No description provided for @accExitPendingBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Anda dapat membatalkan permintaan normal selama masih tertunda.'**
+  String get accExitPendingBody;
+
+  /// No description provided for @accExitChoose.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih alur normal atau hentikan berbagi segera bila situasi tidak aman.'**
+  String get accExitChoose;
+
+  /// No description provided for @accCodeRequired.
+  ///
+  /// In id, this message translates to:
+  /// **'Masukkan kode grup terlebih dahulu.'**
+  String get accCodeRequired;
+
+  /// No description provided for @settingsRotateConfirmTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Putar token penyambungan?'**
+  String get settingsRotateConfirmTitle;
+
+  /// No description provided for @settingsRotateConfirmBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Penyambungan ekstensi browser yang ada akan langsung tidak berlaku dan perlu disambungkan ulang.'**
+  String get settingsRotateConfirmBody;
+
+  /// No description provided for @settingsRotateConfirmAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Putar token'**
+  String get settingsRotateConfirmAction;
+
+  /// No description provided for @settingsRotateSuccess.
+  ///
+  /// In id, this message translates to:
+  /// **'Token penyambungan diperbarui.'**
+  String get settingsRotateSuccess;
+
+  /// No description provided for @settingsPasswordChangedTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Kata sandi diperbarui'**
+  String get settingsPasswordChangedTitle;
+
+  /// No description provided for @settingsPasswordChangedBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Silakan masuk kembali dengan kata sandi baru.'**
+  String get settingsPasswordChangedBody;
+
+  /// No description provided for @patternWaitHint.
+  ///
+  /// In id, this message translates to:
+  /// **'Sebentar lagi — tarik napas dulu.'**
+  String get patternWaitHint;
+
+  /// No description provided for @statusPending.
+  ///
+  /// In id, this message translates to:
+  /// **'menunggu'**
+  String get statusPending;
+
+  /// No description provided for @statusReviewed.
+  ///
+  /// In id, this message translates to:
+  /// **'dalam tinjauan'**
+  String get statusReviewed;
+
+  /// No description provided for @statusApproved.
+  ///
+  /// In id, this message translates to:
+  /// **'disetujui'**
+  String get statusApproved;
+
+  /// No description provided for @statusRejected.
+  ///
+  /// In id, this message translates to:
+  /// **'ditolak'**
+  String get statusRejected;
+
+  /// No description provided for @statusExpired.
+  ///
+  /// In id, this message translates to:
+  /// **'kedaluwarsa'**
+  String get statusExpired;
+
+  /// No description provided for @missionsSectionTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Misi Harian'**
+  String get missionsSectionTitle;
+
+  /// No description provided for @missionsSectionSubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'EXP dapat diklaim setelah aktivitas terverifikasi oleh sistem.'**
+  String get missionsSectionSubtitle;
+
+  /// No description provided for @mission1.
+  ///
+  /// In id, this message translates to:
+  /// **'Jaga perlindungan aktif hari ini'**
+  String get mission1;
+
+  /// No description provided for @mission2.
+  ///
+  /// In id, this message translates to:
+  /// **'Catat satu check-in suasana hati dan dorongan'**
+  String get mission2;
+
+  /// No description provided for @mission3.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesaikan satu bagian pembelajaran'**
+  String get mission3;
+
+  /// No description provided for @mission4.
+  ///
+  /// In id, this message translates to:
+  /// **'Jaga dukungan pendamping tetap terhubung'**
+  String get mission4;
+
+  /// No description provided for @mission5.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesaikan satu modul pembelajaran'**
+  String get mission5;
+
+  /// No description provided for @missionAction1.
+  ///
+  /// In id, this message translates to:
+  /// **'Periksa proteksi'**
+  String get missionAction1;
+
+  /// No description provided for @missionAction2.
+  ///
+  /// In id, this message translates to:
+  /// **'Isi check-in di web'**
+  String get missionAction2;
+
+  /// No description provided for @missionAction3.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka pembelajaran di web'**
+  String get missionAction3;
+
+  /// No description provided for @missionAction4.
+  ///
+  /// In id, this message translates to:
+  /// **'Kelola pendamping'**
+  String get missionAction4;
+
+  /// No description provided for @missionAction5.
+  ///
+  /// In id, this message translates to:
+  /// **'Lanjutkan modul di web'**
+  String get missionAction5;
+
+  /// No description provided for @missionClaim.
+  ///
+  /// In id, this message translates to:
+  /// **'Klaim {exp} EXP'**
+  String missionClaim(int exp);
+
+  /// No description provided for @missionClaimedLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'EXP diklaim'**
+  String get missionClaimedLabel;
+
+  /// No description provided for @missionLockedLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Menunggu verifikasi'**
+  String get missionLockedLabel;
+
+  /// No description provided for @missionSkippedLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Dilewati hari ini'**
+  String get missionSkippedLabel;
+
+  /// No description provided for @missionBonusLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Bonus'**
+  String get missionBonusLabel;
+
+  /// No description provided for @missionExpReward.
+  ///
+  /// In id, this message translates to:
+  /// **'+{exp} EXP'**
+  String missionExpReward(int exp);
+
+  /// No description provided for @missionExpEarned.
+  ///
+  /// In id, this message translates to:
+  /// **'+{exp} EXP. Terima kasih sudah hadir hari ini.'**
+  String missionExpEarned(int exp);
+
+  /// No description provided for @missionLevelUp.
+  ///
+  /// In id, this message translates to:
+  /// **'Level baru terbuka. Teruskan dengan ritmemu sendiri.'**
+  String get missionLevelUp;
+
+  /// No description provided for @missionsAllDone.
+  ///
+  /// In id, this message translates to:
+  /// **'Semua misi hari ini selesai. Istirahat juga bagian dari pemulihan.'**
+  String get missionsAllDone;
+
+  /// No description provided for @levelLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Level {level}'**
+  String levelLabel(int level);
+
+  /// No description provided for @levelExpProgress.
+  ///
+  /// In id, this message translates to:
+  /// **'{progress}/{target} EXP'**
+  String levelExpProgress(int progress, int target);
+
+  /// No description provided for @levelTitle1.
+  ///
+  /// In id, this message translates to:
+  /// **'Langkah Pertama'**
+  String get levelTitle1;
+
+  /// No description provided for @levelTitle2.
+  ///
+  /// In id, this message translates to:
+  /// **'Penjaga Niat'**
+  String get levelTitle2;
+
+  /// No description provided for @levelTitle3.
+  ///
+  /// In id, this message translates to:
+  /// **'Penata Ritme'**
+  String get levelTitle3;
+
+  /// No description provided for @levelTitle4.
+  ///
+  /// In id, this message translates to:
+  /// **'Penjelajah Tenang'**
+  String get levelTitle4;
+
+  /// No description provided for @levelTitle5.
+  ///
+  /// In id, this message translates to:
+  /// **'Penjaga Fokus'**
+  String get levelTitle5;
+
+  /// No description provided for @levelTitle6.
+  ///
+  /// In id, this message translates to:
+  /// **'Pembangun Kebiasaan'**
+  String get levelTitle6;
+
+  /// No description provided for @levelTitle7.
+  ///
+  /// In id, this message translates to:
+  /// **'Sahabat Perjalanan'**
+  String get levelTitle7;
+
+  /// No description provided for @analyticsMilestoneTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Perlindunganmu bekerja'**
+  String get analyticsMilestoneTitle;
+
+  /// No description provided for @analyticsMilestoneBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Perlindungan membantumu {count} kali dalam {days} hari terakhir. Setiap jeda adalah ruang untuk memilih ulang.'**
+  String analyticsMilestoneBody(int count, int days);
+
+  /// No description provided for @patternPhaseInhale.
+  ///
+  /// In id, this message translates to:
+  /// **'Tarik napas…'**
+  String get patternPhaseInhale;
+
+  /// No description provided for @patternPhaseExhale.
+  ///
+  /// In id, this message translates to:
+  /// **'Hembuskan perlahan…'**
+  String get patternPhaseExhale;
+
+  /// No description provided for @patternPhaseStatic.
+  ///
+  /// In id, this message translates to:
+  /// **'Tarik napas perlahan, lalu hembuskan.'**
+  String get patternPhaseStatic;
+
+  /// No description provided for @groundingStep1Title.
+  ///
+  /// In id, this message translates to:
+  /// **'Lihat'**
+  String get groundingStep1Title;
+
+  /// No description provided for @groundingStep1Body.
+  ///
+  /// In id, this message translates to:
+  /// **'Sebutkan lima hal yang bisa Anda lihat di sekitar Anda.'**
+  String get groundingStep1Body;
+
+  /// No description provided for @groundingStep2Title.
+  ///
+  /// In id, this message translates to:
+  /// **'Rasakan'**
+  String get groundingStep2Title;
+
+  /// No description provided for @groundingStep2Body.
+  ///
+  /// In id, this message translates to:
+  /// **'Sebutkan empat hal yang bisa Anda sentuh atau rasakan.'**
+  String get groundingStep2Body;
+
+  /// No description provided for @groundingStep3Title.
+  ///
+  /// In id, this message translates to:
+  /// **'Dengar'**
+  String get groundingStep3Title;
+
+  /// No description provided for @groundingStep3Body.
+  ///
+  /// In id, this message translates to:
+  /// **'Sebutkan tiga suara yang bisa Anda dengar saat ini.'**
+  String get groundingStep3Body;
+
+  /// No description provided for @groundingStep4Title.
+  ///
+  /// In id, this message translates to:
+  /// **'Cium'**
+  String get groundingStep4Title;
+
+  /// No description provided for @groundingStep4Body.
+  ///
+  /// In id, this message translates to:
+  /// **'Sebutkan dua aroma yang bisa Anda cium.'**
+  String get groundingStep4Body;
+
+  /// No description provided for @groundingStep5Title.
+  ///
+  /// In id, this message translates to:
+  /// **'Lindungi'**
+  String get groundingStep5Title;
+
+  /// No description provided for @groundingStep5Body.
+  ///
+  /// In id, this message translates to:
+  /// **'Sebutkan satu hal yang ingin Anda lindungi hari ini.'**
+  String get groundingStep5Body;
+
+  /// No description provided for @groundingStepProgress.
+  ///
+  /// In id, this message translates to:
+  /// **'Langkah {current} dari {total}'**
+  String groundingStepProgress(int current, int total);
+
+  /// No description provided for @groundingNext.
+  ///
+  /// In id, this message translates to:
+  /// **'Lanjut'**
+  String get groundingNext;
+
+  /// No description provided for @groundingDone.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesai'**
+  String get groundingDone;
+
+  /// No description provided for @groundingCompleteTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Latihan selesai'**
+  String get groundingCompleteTitle;
+
+  /// No description provided for @groundingCompleteBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Anda sudah hadir sepenuhnya di momen ini. Pilih langkah berikutnya dengan tenang.'**
+  String get groundingCompleteBody;
+
+  /// No description provided for @recoveryWebEyebrow.
+  ///
+  /// In id, this message translates to:
+  /// **'lanjutkan di web'**
+  String get recoveryWebEyebrow;
+
+  /// No description provided for @introPlatformAndroid.
+  ///
+  /// In id, this message translates to:
+  /// **'android'**
+  String get introPlatformAndroid;
+
+  /// No description provided for @introPlatformWindows.
+  ///
+  /// In id, this message translates to:
+  /// **'windows'**
+  String get introPlatformWindows;
 }
 
 class _AppLocalizationsDelegate

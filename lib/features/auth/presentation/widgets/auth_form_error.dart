@@ -16,7 +16,7 @@ class AuthFormError extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: AppColors.crimson.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.crimson.withValues(alpha: 0.2)),
         ),
         child: Text(

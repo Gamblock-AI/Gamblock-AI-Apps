@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 /// Consistent labeled text field for auth credentials and profile details.
 class AuthInputField extends StatelessWidget {
@@ -92,8 +93,8 @@ class _PasswordAwareFieldState extends State<_PasswordAwareField> {
         suffixIcon: widget.obscureText
             ? IconButton(
                 tooltip: _hidden
-                    ? 'Tampilkan kata sandi'
-                    : 'Sembunyikan kata sandi',
+                    ? AppLocalizations.of(context)!.authShowPassword
+                    : AppLocalizations.of(context)!.authHidePassword,
                 onPressed: () => setState(() => _hidden = !_hidden),
                 icon: Icon(
                   _hidden

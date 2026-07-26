@@ -123,14 +123,14 @@ class _PasswordChangeDialogState extends State<_PasswordChangeDialog> {
                     height: 44,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
+                        colors: [AppColors.navyLight, AppColors.navy],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(13),
+                      borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                          color: AppColors.navyLight.withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 3),
                         ),
@@ -138,7 +138,7 @@ class _PasswordChangeDialogState extends State<_PasswordChangeDialog> {
                     ),
                     child: const Icon(
                       Icons.lock_rounded,
-                      size: 22,
+                      size: 20,
                       color: Colors.white,
                     ),
                   ),
@@ -228,7 +228,7 @@ class _PasswordChangeDialogState extends State<_PasswordChangeDialog> {
                       height: 42,
                       child: FilledButton(
                         style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFFF1F5F9),
+                          backgroundColor: AppColors.muted,
                           foregroundColor: AppColors.navy,
                           elevation: 0,
                           padding: EdgeInsets.zero,
@@ -316,12 +316,12 @@ class _PasswordChangeDialogState extends State<_PasswordChangeDialog> {
         labelText: label,
         isDense: true,
         filled: true,
-        fillColor: const Color(0xFFF8FAFC),
+        fillColor: AppColors.background,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -331,7 +331,7 @@ class _PasswordChangeDialogState extends State<_PasswordChangeDialog> {
           tooltip: show ? l10n.settingsHidePassword : l10n.settingsShowPassword,
           onPressed: onToggle,
           icon: Icon(show ? Icons.visibility_off : Icons.visibility,
-              size: 18, color: AppColors.mutedForeground),
+              size: 20, color: AppColors.mutedForeground),
         ),
       ),
     );

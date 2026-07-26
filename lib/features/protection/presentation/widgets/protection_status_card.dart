@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/glass_card.dart';
 import '../../domain/entities/protection_status.dart';
 
 /// Displays the native protection state in a compact, structured card.
@@ -37,19 +38,7 @@ class ProtectionStatusCard extends StatelessWidget {
     return Semantics(
       liveRegion: true,
       label: title,
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.border.withValues(alpha: 0.8)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
+      child: SurfaceCard(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +56,7 @@ class ProtectionStatusCard extends StatelessWidget {
                   child: Icon(
                     active ? Icons.shield_rounded : Icons.shield_outlined,
                     color: color,
-                    size: 22,
+                    size: 20,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -118,10 +107,10 @@ class ProtectionStatusCard extends StatelessWidget {
                       const SizedBox(width: 5),
                       Text(
                         active
-                            ? 'OK'
+                            ? l10n.statusChipOk
                             : degraded || paused
-                                ? 'WARN'
-                                : 'OFF',
+                                ? l10n.statusChipWarn
+                                : l10n.statusChipOff,
                         style: TextStyle(
                           color: color,
                           fontSize: 10,
@@ -176,7 +165,7 @@ class ProtectionStatusCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               decoration: BoxDecoration(
                 color: AppColors.surfaceLight.withValues(alpha: 0.7),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: AppColors.border.withValues(alpha: 0.6),
                 ),
@@ -185,14 +174,14 @@ class ProtectionStatusCard extends StatelessWidget {
                 children: [
                   const Icon(
                     Icons.memory_rounded,
-                    size: 14,
+                    size: 16,
                     color: AppColors.mutedForeground,
                   ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      '${status?.modelVersion ?? 'gamblock-lr-bfafb725511a'} · '
-                      '${status?.rulesetVersion ?? 'gambling-keywords-b4f2932a7647'}',
+                      '${status?.modelVersion ?? l10n.protectionArtifactUnavailable} · '
+                      '${status?.rulesetVersion ?? l10n.protectionArtifactUnavailable}',
                       style: TextStyle(
                         fontFamily: 'monospace',
                         fontSize: 10,
@@ -275,20 +264,18 @@ class ProtectionStatusCard extends StatelessWidget {
 
 String? _formatDegradedReason(BuildContext context, String? code) {
   if (code == null || code.isEmpty) return null;
-  final isId = Localizations.localeOf(context).languageCode == 'id';
+  final l10n = AppLocalizations.of(context)!;
   switch (code.toLowerCase()) {
     case 'accessibility_disabled':
-      return isId ? 'Aksesibilitas dinonaktifkan' : 'Accessibility disabled';
+      return l10n.degradedAccessibilityDisabled;
     case 'accessibility_not_granted':
-      return isId
-          ? 'Izin aksesibilitas belum diberikan'
-          : 'Accessibility permission not granted';
+      return l10n.degradedAccessibilityNotGranted;
     case 'service_stopped':
-      return isId ? 'Layanan proteksi terhenti' : 'Protection service stopped';
+      return l10n.degradedServiceStopped;
     case 'permission_revoked':
-      return isId ? 'Izin sistem dicabut' : 'System permission revoked';
+      return l10n.degradedPermissionRevoked;
     case 'sensor_disconnected':
-      return isId ? 'Sensor terputus' : 'Sensor disconnected';
+      return l10n.degradedSensorDisconnected;
     default:
       return code
           .split('_')
@@ -300,7 +287,6 @@ String? _formatDegradedReason(BuildContext context, String? code) {
 
 String _formatStatusValue(BuildContext context, String? value) {
   final l10n = AppLocalizations.of(context)!;
-  final isId = Localizations.localeOf(context).languageCode == 'id';
   if (value == null || value.isEmpty) return l10n.statusDisconnected;
   switch (value.toLowerCase()) {
     case 'connected':
@@ -312,15 +298,15 @@ String _formatStatusValue(BuildContext context, String? value) {
     case 'inactive':
       return l10n.statusDisconnected;
     case 'granted':
-      return isId ? 'Diberikan' : 'Granted';
+      return l10n.statusGranted;
     case 'revoked':
     case 'permission_revoked':
-      return isId ? 'Dicabut' : 'Revoked';
+      return l10n.statusRevoked;
     case 'disabled':
     case 'accessibility_disabled':
-      return isId ? 'Nonaktif' : 'Disabled';
+      return l10n.statusDisabled;
     case 'unknown':
-      return isId ? 'Tidak diketahui' : 'Unknown';
+      return l10n.statusUnknown;
     default:
       return value
           .split('_')

@@ -7,9 +7,13 @@ import '../../../../core/auth/auth_state.dart';
 import '../../../../core/feedback/feedback.dart';
 import '../../../../core/messaging/app_messages.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
+import '../../../../core/widgets/app_bar_title.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/glass_card.dart';
 import '../../data/providers.dart';
 import '../../domain/entities/accountability_models.dart';
+import '../widgets/accountability_skeleton.dart';
 import '../widgets/approval_request_history.dart';
 import '../widgets/partner_status_card.dart';
 
@@ -23,6 +27,7 @@ class AccountabilityScreen extends ConsumerStatefulWidget {
 
 class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
   final _codeController = TextEditingController();
+  String? _codeError;
   bool _loading = false;
   Object? _error;
   AccountabilityOverview? _overview;
@@ -67,10 +72,16 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
 
   Future<void> _previewGroup() async {
     final code = _codeController.text.trim();
-    if (code.isEmpty) return;
+    if (code.isEmpty) {
+      setState(
+        () => _codeError = AppLocalizations.of(context)!.accCodeRequired,
+      );
+      return;
+    }
     setState(() {
       _loading = true;
       _error = null;
+      _codeError = null;
     });
     try {
       final preview = await ref
@@ -110,14 +121,14 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                     height: 44,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
+                        colors: [AppColors.navyLight, AppColors.navy],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(13),
+                      borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                          color: AppColors.navyLight.withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 3),
                         ),
@@ -125,7 +136,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                     ),
                     child: const Icon(
                       Icons.group_add_rounded,
-                      size: 22,
+                      size: 20,
                       color: Colors.white,
                     ),
                   ),
@@ -159,7 +170,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                       height: 42,
                       child: FilledButton(
                         style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFFF1F5F9),
+                          backgroundColor: AppColors.muted,
                           foregroundColor: AppColors.navy,
                           elevation: 0,
                           padding: EdgeInsets.zero,
@@ -235,7 +246,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => Dialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(22),
           ),
           child: Container(
             constraints: const BoxConstraints(maxWidth: 380),
@@ -251,11 +262,11 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                       height: 36,
                       decoration: BoxDecoration(
                         color: AppColors.navy.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
                         Icons.share_outlined,
-                        size: 18,
+                        size: 20,
                         color: AppColors.navy,
                       ),
                     ),
@@ -265,7 +276,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Data Agregat Dibagikan',
+                            l10n.accSharingTitle,
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium
@@ -276,7 +287,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                           ),
                           const SizedBox(height: 1),
                           Text(
-                            'Atur preferensi data agregat anonim untuk pendamping.',
+                            l10n.accSharingSubtitle,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall
@@ -305,8 +316,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                       _buildSharingOptionTile(
                         context,
                         icon: Icons.health_and_safety_outlined,
-                        title: 'Kesehatan Perlindungan',
-                        subtitle: 'Status aktif, degradasi, & izin (tanpa URL).',
+                        title: l10n.accShareHealthTitle,
+                        subtitle: l10n.accShareHealthSubtitle,
                         value: draft.protectionHealth,
                         onChanged: (value) => setDialogState(
                           () => draft = draft.copyWith(protectionHealth: value),
@@ -320,8 +331,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                       _buildSharingOptionTile(
                         context,
                         icon: Icons.bar_chart_outlined,
-                        title: 'Aktivitas Perlindungan',
-                        subtitle: 'Hitungan pemblokiran & intervensi agregat.',
+                        title: l10n.accShareActivityTitle,
+                        subtitle: l10n.accShareActivitySubtitle,
                         value: draft.protectionActivity,
                         onChanged: (value) => setDialogState(
                           () => draft = draft.copyWith(protectionActivity: value),
@@ -335,8 +346,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                       _buildSharingOptionTile(
                         context,
                         icon: Icons.self_improvement_outlined,
-                        title: 'Keterlibatan Pemulihan',
-                        subtitle: 'Ringkasan partisipasi (bukan isi jurnal).',
+                        title: l10n.accShareEngagementTitle,
+                        subtitle: l10n.accShareEngagementSubtitle,
                         value: draft.recoveryEngagement,
                         onChanged: (value) => setDialogState(
                           () => draft = draft.copyWith(recoveryEngagement: value),
@@ -350,8 +361,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                       _buildSharingOptionTile(
                         context,
                         icon: Icons.school_outlined,
-                        title: 'Progres Edukasi',
-                        subtitle: 'Penyelesaian modul psikoedukasi harian.',
+                        title: l10n.accShareEducationTitle,
+                        subtitle: l10n.accShareEducationSubtitle,
                         value: draft.educationProgress,
                         onChanged: (value) => setDialogState(
                           () => draft = draft.copyWith(educationProgress: value),
@@ -420,7 +431,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
       () => ref
           .read(accountabilityRepositoryProvider)
           .updateSharing(membership.id, saved),
-      'Preferensi berbagi diperbarui.',
+      l10n.accSharingUpdated,
     );
   }
 
@@ -520,17 +531,17 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: isUnsafe
-                              ? const [Color(0xFFEF4444), Color(0xFFDC2626)]
-                              : const [Color(0xFFF59E0B), Color(0xFFD97706)],
+                              ? const [AppColors.crimsonLight, AppColors.crimson]
+                              : const [AppColors.amber, AppColors.amberDark],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(13),
+                        borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
                             color: (isUnsafe
-                                    ? const Color(0xFFEF4444)
-                                    : const Color(0xFFF59E0B))
+                                    ? AppColors.crimsonLight
+                                    : AppColors.amber)
                                 .withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
@@ -541,7 +552,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                         isUnsafe
                             ? Icons.warning_amber_rounded
                             : Icons.exit_to_app_rounded,
-                        size: 22,
+                        size: 20,
                         color: Colors.white,
                       ),
                     ),
@@ -552,8 +563,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                         children: [
                           Text(
                             isUnsafe
-                                ? 'Keluar Situasi Tidak Aman'
-                                : 'Ajukan Keluar Pendampingan',
+                                ? l10n.accUnsafeExitTitle
+                                : l10n.accNormalExitTitle,
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium
@@ -566,8 +577,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                           const SizedBox(height: 2),
                           Text(
                             isUnsafe
-                                ? 'Berbagi data segera dihentikan dan permintaan normal dibatalkan.'
-                                : 'Pendamping memiliki waktu 72 jam untuk meninjau permintaan.',
+                                ? l10n.accUnsafeExitDesc
+                                : l10n.accNormalExitDesc,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall
@@ -588,16 +599,16 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                   maxLength: 500,
                   maxLines: 2,
                   decoration: InputDecoration(
-                    labelText: 'Alasan (opsional)',
-                    hintText: 'Berikan penjelasan singkat...',
+                    labelText: l10n.accReasonLabel,
+                    hintText: l10n.accReasonHint,
                     isDense: true,
                     filled: true,
-                    fillColor: const Color(0xFFF8FAFC),
+                    fillColor: AppColors.background,
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 12),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                      borderSide: const BorderSide(color: AppColors.border),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -614,7 +625,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                         height: 42,
                         child: FilledButton(
                           style: FilledButton.styleFrom(
-                            backgroundColor: const Color(0xFFF1F5F9),
+                            backgroundColor: AppColors.muted,
                             foregroundColor: AppColors.navy,
                             elevation: 0,
                             padding: EdgeInsets.zero,
@@ -647,9 +658,9 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             ),
                           ),
                           onPressed: () => Navigator.pop(dialogContext, true),
-                          child: const Text(
-                            'Kirim Permintaan',
-                            style: TextStyle(
+                          child: Text(
+                            l10n.accSendRequest,
+                            style: const TextStyle(
                                 fontWeight: FontWeight.w700, fontSize: 13),
                           ),
                         ),
@@ -670,22 +681,24 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
       () => ref
           .read(accountabilityRepositoryProvider)
           .requestLeave(membership.id, kind: kind, reason: reason),
-      'Permintaan keluar dikirim.',
+      l10n.accExitRequestSent,
     );
   }
 
   Future<void> _cancelLeave(AccountabilityExitRequest request) async {
+    final l10n = AppLocalizations.of(context)!;
     await _runAction(
       () => ref.read(accountabilityRepositoryProvider).cancelLeave(request.id),
-      'Permintaan keluar dibatalkan.',
+      l10n.accExitRequestCancelled,
     );
   }
 
   Future<void> _cancelApproval(ApprovalRequest request) async {
+    final l10n = AppLocalizations.of(context)!;
     await _runAction(
       () =>
           ref.read(accountabilityRepositoryProvider).cancelApproval(request.id),
-      'Permintaan persetujuan dibatalkan.',
+      l10n.accApprovalCancelled,
     );
   }
 
@@ -730,45 +743,15 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 16,
-        title: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: AppColors.navy.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(9),
-              ),
-              child: const Icon(
-                Icons.group_work_rounded,
-                size: 18,
-                color: AppColors.navy,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              l10n.partnerTitle,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.navy,
-                    letterSpacing: -0.5,
-                  ),
-            ),
-          ],
-        ),
+        title: AppBarTitle(icon: Icons.group_work_rounded, title: l10n.partnerTitle),
       ),
       body: RefreshIndicator(
         onRefresh: _load,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+          padding: AppSpacing.screenPadding,
           children: [
             if (_loading && _overview == null)
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(32),
-                  child: CircularProgressIndicator(),
-                ),
-              )
+              const AccountabilitySkeleton()
             else if (_error != null)
               EmptyState(
                 icon: Icons.cloud_off,
@@ -781,20 +764,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
               PartnerStatusCard(membership: membership),
               if (membership != null) ...[
                 const SizedBox(height: 14),
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                        color: AppColors.border.withValues(alpha: 0.8)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.02),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
+                SurfaceCard(
+                  padding: EdgeInsets.zero,
                   child: Column(
                     children: [
                       ListTile(
@@ -804,12 +775,12 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                           height: 36,
                           decoration: BoxDecoration(
                             color: AppColors.navy.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(
                             Icons.privacy_tip_outlined,
                             color: AppColors.navy,
-                            size: 18,
+                            size: 20,
                           ),
                         ),
                         title: Text(
@@ -847,25 +818,25 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             height: 36,
                             decoration: BoxDecoration(
                               color: AppColors.amber.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
                               Icons.schedule_outlined,
                               color: AppColors.amber,
-                              size: 18,
+                              size: 20,
                             ),
                           ),
-                          title: const Text(
-                            'Permintaan keluar sedang ditinjau',
-                            style: TextStyle(
+                          title: Text(
+                            l10n.accExitPendingTitle,
+                            style: const TextStyle(
                               fontWeight: FontWeight.w700,
                               color: AppColors.navy,
                               fontSize: 14,
                             ),
                           ),
-                          subtitle: const Text(
-                            'Anda dapat membatalkan permintaan normal selama masih tertunda.',
-                            style: TextStyle(
+                          subtitle: Text(
+                            l10n.accExitPendingBody,
+                            style: const TextStyle(
                               color: AppColors.mutedForeground,
                               fontSize: 12,
                             ),
@@ -894,12 +865,12 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             height: 36,
                             decoration: BoxDecoration(
                               color: AppColors.crimson.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
                               Icons.logout_outlined,
                               color: AppColors.crimson,
-                              size: 18,
+                              size: 20,
                             ),
                           ),
                           title: Text(
@@ -910,9 +881,9 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                               fontSize: 14,
                             ),
                           ),
-                          subtitle: const Text(
-                            'Pilih alur normal atau hentikan berbagi segera bila situasi tidak aman.',
-                            style: TextStyle(
+                          subtitle: Text(
+                            l10n.accExitChoose,
+                            style: const TextStyle(
                               color: AppColors.mutedForeground,
                               fontSize: 12,
                             ),
@@ -928,7 +899,23 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                               ),
                               PopupMenuItem(
                                 value: 'unsafe',
-                                child: Text(l10n.partnerLeaveUnsafe),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.warning_amber_rounded,
+                                      size: 16,
+                                      color: AppColors.crimson,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      l10n.partnerLeaveUnsafe,
+                                      style: const TextStyle(
+                                        color: AppColors.crimson,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -939,21 +926,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
               ],
               if (membership == null) ...[
                 const SizedBox(height: 14),
-                Container(
+                SurfaceCard(
                   padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                        color: AppColors.border.withValues(alpha: 0.8)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.02),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -964,12 +938,12 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             height: 34,
                             decoration: BoxDecoration(
                               color: AppColors.navy.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
                               Icons.group_add_rounded,
                               color: AppColors.navy,
-                              size: 18,
+                              size: 20,
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -1001,11 +975,17 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                         textCapitalization: TextCapitalization.characters,
                         autocorrect: false,
                         maxLength: 12,
+                        onChanged: (_) {
+                          if (_codeError != null) {
+                            setState(() => _codeError = null);
+                          }
+                        },
                         decoration: InputDecoration(
                           labelText: l10n.onboardingGroupCode,
                           hintText: 'ABCD234567',
+                          errorText: _codeError,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                       ),
@@ -1016,7 +996,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                           style: FilledButton.styleFrom(
                             backgroundColor: AppColors.navy,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
                           onPressed: _loading ? null : _previewGroup,
@@ -1032,21 +1012,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                 ),
                 if (_preview case final preview?) ...[
                   const SizedBox(height: 14),
-                  Container(
+                  SurfaceCard(
                     padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                          color: AppColors.border.withValues(alpha: 0.8)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.02),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -1082,12 +1049,12 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             style: FilledButton.styleFrom(
                               backgroundColor: AppColors.sage,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(12),
                               ),
                             ),
                             onPressed: _loading ? null : _joinGroup,
                             icon: const Icon(Icons.verified_user_outlined,
-                                size: 18),
+                                size: 20),
                             label: Text(
                               l10n.accountabilityJoinAction,
                               style: const TextStyle(

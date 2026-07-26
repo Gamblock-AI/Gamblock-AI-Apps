@@ -22,7 +22,7 @@ class AnalyticsDataStateNotice extends StatelessWidget {
               isSynced
                   ? Icons.cloud_done_outlined
                   : Icons.phone_android_outlined,
-              size: 18,
+              size: 20,
               color: AppColors.mutedForeground,
             ),
             const SizedBox(width: 8),

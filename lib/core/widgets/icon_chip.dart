@@ -19,7 +19,7 @@ class IconChip extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Icon(icon, color: color, size: size * 0.5),
     );

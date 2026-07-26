@@ -75,7 +75,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
     if (!(_formKey.currentState?.validate() ?? false)) return;
     if (token == null || _passCtrl.text.length < 8) {
-      setState(() => _error = 'Kata sandi baru minimal 8 karakter.');
+      setState(
+        () => _error = AppLocalizations.of(context)!.authPasswordChangeMin,
+      );
       return;
     }
     setState(() {
@@ -128,10 +130,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           AuthScreenHeader(
             title: _passwordChangeToken == null
                 ? l10n.authWelcomeBack
-                : 'Buat kata sandi baru',
+                : l10n.authCreateNewPassword,
             description: _passwordChangeToken == null
                 ? l10n.authLoginDesc
-                : 'Kata sandi sementara hanya berlaku untuk langkah ini.',
+                : l10n.authTempPasswordDesc,
           ),
           const SizedBox(height: 32),
           if (_error != null) ...[
@@ -165,7 +167,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   controller: _passCtrl,
                   label: _passwordChangeToken == null
                       ? l10n.authPassword
-                      : 'Kata sandi baru',
+                      : l10n.authNewPasswordLabel,
                   icon: Icons.lock_outlined,
                   obscureText: true,
                   autofillHints: const [AutofillHints.password],
@@ -175,7 +177,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       return l10n.authPasswordRequired;
                     }
                     if (_passwordChangeToken != null && value.length < 8) {
-                      return 'Minimal 8 karakter';
+                      return l10n.authPasswordMinShort;
                     }
                     return null;
                   },
@@ -200,7 +202,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           AuthSubmitButton(
             label: _passwordChangeToken == null
                 ? l10n.authLoginBtn
-                : 'Simpan dan masuk',
+                : l10n.authSaveAndLogin,
             isLoading: _loading,
             onPressed: _passwordChangeToken == null
                 ? _submit

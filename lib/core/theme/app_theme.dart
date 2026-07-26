@@ -22,6 +22,12 @@ class AppTheme {
       textTheme: _brandedText(scheme.onSurface),
       scaffoldBackgroundColor: AppColors.background,
       canvasColor: AppColors.background,
+      // Subtle pointer feedback for every InkWell-based surface — this is the
+      // primary hover/focus affordance on the Windows desktop target.
+      hoverColor: AppColors.navy.withValues(alpha: 0.04),
+      focusColor: AppColors.sky.withValues(alpha: 0.18),
+      highlightColor: AppColors.navy.withValues(alpha: 0.06),
+      splashColor: AppColors.sky.withValues(alpha: 0.10),
       cardTheme: CardThemeData(
         elevation: 0,
         clipBehavior: Clip.antiAlias,
@@ -35,6 +41,7 @@ class AppTheme {
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.navy,
           foregroundColor: Colors.white,
+          overlayColor: Colors.white,
           minimumSize: const Size(double.infinity, 52),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(999),
@@ -45,6 +52,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.navy,
+          overlayColor: AppColors.navy,
           minimumSize: const Size(double.infinity, 52),
           side: const BorderSide(color: AppColors.border),
           shape: RoundedRectangleBorder(
@@ -54,7 +62,10 @@ class AppTheme {
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: AppColors.navy),
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.navy,
+          overlayColor: AppColors.navy,
+        ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -103,6 +114,43 @@ class AppTheme {
             size: 24,
           );
         }),
+      ),
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: AppColors.surface,
+        indicatorColor: AppColors.sky.withValues(alpha: 0.22),
+        elevation: 0,
+        useIndicator: true,
+        selectedLabelTextStyle: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          color: AppColors.navy,
+        ),
+        unselectedLabelTextStyle: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: AppColors.mutedForeground,
+        ),
+        selectedIconTheme: const IconThemeData(color: AppColors.navy, size: 24),
+        unselectedIconTheme: const IconThemeData(
+          color: AppColors.mutedForeground,
+          size: 24,
+        ),
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: AppColors.navy,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        color: AppColors.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: AppColors.border),
+        ),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,

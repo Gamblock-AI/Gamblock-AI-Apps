@@ -32,12 +32,12 @@ class AnalyticsPeriodSelector extends StatelessWidget {
         ButtonSegment(
           value: 7,
           label: Text(l10n.analyticsSevenDays),
-          icon: const Icon(Icons.calendar_today_rounded, size: 15),
+          icon: const Icon(Icons.calendar_today_rounded, size: 16),
         ),
         ButtonSegment(
           value: 30,
           label: Text(l10n.analyticsThirtyDays),
-          icon: const Icon(Icons.date_range_rounded, size: 15),
+          icon: const Icon(Icons.date_range_rounded, size: 16),
         ),
       ],
       selected: {selectedDays},

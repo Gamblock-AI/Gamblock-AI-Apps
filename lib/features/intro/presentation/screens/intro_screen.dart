@@ -74,9 +74,7 @@ class _IntroScreenState extends ConsumerState<IntroScreen> {
                 child: TextButton(
                   onPressed: _finish,
                   child: Text(
-                    Localizations.localeOf(context).languageCode == 'id'
-                        ? 'Lewati'
-                        : 'Skip',
+                    AppLocalizations.of(context)!.introSkip,
                     style: const TextStyle(
                       color: AppColors.mutedForeground,
                       fontSize: 13,
@@ -117,7 +115,7 @@ class _IntroScreenState extends ConsumerState<IntroScreen> {
                       context,
                       _page == _pages - 1
                           ? AppLocalizations.of(context)!.introStartBtn
-                          : 'Lanjut',
+                          : AppLocalizations.of(context)!.introNext,
                       _next,
                     ),
                   ],

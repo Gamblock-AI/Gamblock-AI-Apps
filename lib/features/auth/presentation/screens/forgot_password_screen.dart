@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
+
 import '../../../../core/auth/auth_state.dart';
+import '../../../../core/feedback/feedback.dart';
 import '../../../../core/feedback/haptics.dart';
 import '../../../../core/messaging/app_messages.dart';
 import '../widgets/auth_brand_lockup.dart';
@@ -65,10 +68,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           newPassword: _passwordController.text,
         );
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Kata sandi berhasil diperbarui. Silakan masuk.'),
-            ),
+          AppFeedback.success(
+            context,
+            AppLocalizations.of(context)!.authResetSuccess,
           );
           context.go('/login');
         }
@@ -93,8 +95,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           .read(authProvider.notifier)
           .requestPasswordReset(_emailController.text);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kode pemulihan baru telah diminta.')),
+        AppFeedback.success(
+          context,
+          AppLocalizations.of(context)!.authResetNewCodeRequested,
         );
       }
     } catch (error) {
@@ -118,19 +121,18 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AuthScreenFrame(
+      animate: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const AuthBrandLockup(),
           const SizedBox(height: 24),
           AuthScreenHeader(
-            title: _codeRequested
-                ? 'Masukkan kode pemulihan'
-                : 'Lupa kata sandi?',
-            description: _codeRequested
-                ? 'Kode 12 karakter telah dikirim bila email terdaftar. Kode berlaku 30 menit.'
-                : 'Masukkan email akun. Kami akan mengirim kode tanpa membagikan status pendaftaran email.',
+            title: _codeRequested ? l10n.authResetTitleCode : l10n.authResetTitle,
+            description:
+                _codeRequested ? l10n.authResetDescCode : l10n.authResetDesc,
           ),
           const SizedBox(height: 28),
           if (_error != null) ...[
@@ -146,14 +148,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               children: [
                 AuthInputField(
                   controller: _emailController,
-                  label: 'Email',
+                  label: l10n.authEmail,
                   icon: Icons.email_outlined,
                   enabled: !_codeRequested,
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: const [AutofillHints.email],
                   validator: (value) => (value?.contains('@') ?? false)
                       ? null
-                      : 'Masukkan email yang valid.',
+                      : l10n.authEmailInvalid,
                   textInputAction: _codeRequested
                       ? TextInputAction.next
                       : TextInputAction.done,
@@ -165,36 +167,36 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     children: [
                       TextButton(
                         onPressed: _loading ? null : _changeEmail,
-                        child: const Text('Ganti email'),
+                        child: Text(l10n.authChangeEmail),
                       ),
                       TextButton(
                         onPressed: _loading ? null : _resendCode,
-                        child: const Text('Kirim ulang kode'),
+                        child: Text(l10n.authResendCode),
                       ),
                     ],
                   ),
                   const SizedBox(height: 14),
                   AuthInputField(
                     controller: _codeController,
-                    label: 'Kode pemulihan',
+                    label: l10n.authRecoveryCodeLabel,
                     icon: Icons.password_outlined,
                     textInputAction: TextInputAction.next,
                     validator: (value) =>
                         (value?.replaceAll('-', '').trim().length == 12)
                         ? null
-                        : 'Kode harus berisi 12 karakter.',
+                        : l10n.authRecoveryCodeInvalid,
                   ),
                   const SizedBox(height: 14),
                   AuthInputField(
                     controller: _passwordController,
-                    label: 'Kata sandi baru',
+                    label: l10n.authNewPasswordLabel,
                     icon: Icons.lock_reset_outlined,
                     obscureText: true,
                     autofillHints: const [AutofillHints.newPassword],
                     textInputAction: TextInputAction.done,
                     validator: (value) => (value?.length ?? 0) >= 8
                         ? null
-                        : 'Gunakan minimal 8 karakter.',
+                        : l10n.authPasswordMinChars,
                     onFieldSubmitted: (_) => _submit(),
                   ),
                 ],
@@ -203,7 +205,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           ),
           const SizedBox(height: 24),
           AuthSubmitButton(
-            label: _codeRequested ? 'Buat kata sandi baru' : 'Kirim kode',
+            label: _codeRequested ? l10n.authCreateNewPassword : l10n.authSendCode,
             isLoading: _loading,
             onPressed: _submit,
           ),
@@ -211,7 +213,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           TextButton.icon(
             onPressed: () => context.go('/login'),
             icon: const Icon(Icons.arrow_back),
-            label: const Text('Kembali ke login'),
+            label: Text(l10n.authBackToLogin),
           ),
         ],
       ),

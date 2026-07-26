@@ -227,16 +227,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get patternContinuePsychoeducation => 'Lanjut ke Psikoedukasi';
 
   @override
-  String get patternTakeControlDesc =>
-      'Ambil kendali. Lanjutkan ke modul pemulihan diri.';
-
-  @override
-  String get patternInterruptSuccess => 'Dorongan berhasil\ndiputus.';
-
-  @override
-  String get patternInterruptActive => 'PATTERN INTERRUPT AKTIF';
-
-  @override
   String get dashboardWeeklyTrend => 'Tren Mingguan';
 
   @override
@@ -1273,10 +1263,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get patternGroundingTitle => 'Perhatikan lima hal di sekitar Anda';
 
   @override
-  String get patternGroundingBody =>
-      'Sebutkan lima hal yang terlihat, empat yang terasa, tiga yang terdengar, dua yang tercium, dan satu hal yang ingin Anda lindungi hari ini.';
-
-  @override
   String get patternReturnProtection => 'Selesai dan kembali';
 
   @override
@@ -1312,4 +1298,451 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get continueAction => 'Lanjutkan';
+
+  @override
+  String get authResetTitle => 'Lupa kata sandi?';
+
+  @override
+  String get authResetTitleCode => 'Masukkan kode pemulihan';
+
+  @override
+  String get authResetDesc =>
+      'Masukkan email akun. Kami akan mengirim kode tanpa membagikan status pendaftaran email.';
+
+  @override
+  String get authResetDescCode =>
+      'Kode 12 karakter telah dikirim bila email terdaftar. Kode berlaku 30 menit.';
+
+  @override
+  String get authResetSuccess =>
+      'Kata sandi berhasil diperbarui. Silakan masuk.';
+
+  @override
+  String get authResetNewCodeRequested => 'Kode pemulihan baru telah diminta.';
+
+  @override
+  String get authChangeEmail => 'Ganti email';
+
+  @override
+  String get authResendCode => 'Kirim ulang kode';
+
+  @override
+  String get authRecoveryCodeLabel => 'Kode pemulihan';
+
+  @override
+  String get authRecoveryCodeInvalid => 'Kode harus berisi 12 karakter.';
+
+  @override
+  String get authNewPasswordLabel => 'Kata sandi baru';
+
+  @override
+  String get authPasswordMinChars => 'Gunakan minimal 8 karakter.';
+
+  @override
+  String get authPasswordMinShort => 'Minimal 8 karakter';
+
+  @override
+  String get authCreateNewPassword => 'Buat kata sandi baru';
+
+  @override
+  String get authSendCode => 'Kirim kode';
+
+  @override
+  String get authBackToLogin => 'Kembali ke login';
+
+  @override
+  String get authTempPasswordDesc =>
+      'Kata sandi sementara hanya berlaku untuk langkah ini.';
+
+  @override
+  String get authPasswordChangeMin => 'Kata sandi baru minimal 8 karakter.';
+
+  @override
+  String get authSaveAndLogin => 'Simpan dan masuk';
+
+  @override
+  String get authShowPassword => 'Tampilkan kata sandi';
+
+  @override
+  String get authHidePassword => 'Sembunyikan kata sandi';
+
+  @override
+  String get introSkip => 'Lewati';
+
+  @override
+  String get introNext => 'Lanjut';
+
+  @override
+  String get webPageOpenError => 'Halaman belum dapat dibuka. Coba lagi.';
+
+  @override
+  String get helpPageOpenError =>
+      'Halaman bantuan belum dapat dibuka. Coba lagi.';
+
+  @override
+  String get recoveryPageOpenError =>
+      'Halaman pemulihan belum dapat dibuka. Coba lagi.';
+
+  @override
+  String get settingsGoogleLinkedSuccess => 'Akun Google berhasil ditautkan.';
+
+  @override
+  String get verifyEmailBody =>
+      'Diperlukan untuk fitur pendamping dan pemulihan akun.';
+
+  @override
+  String get statusChipOk => 'OK';
+
+  @override
+  String get statusChipWarn => 'WASPADA';
+
+  @override
+  String get statusChipOff => 'MATI';
+
+  @override
+  String get statusGranted => 'Diberikan';
+
+  @override
+  String get statusRevoked => 'Dicabut';
+
+  @override
+  String get statusDisabled => 'Nonaktif';
+
+  @override
+  String get statusUnknown => 'Tidak diketahui';
+
+  @override
+  String get degradedAccessibilityDisabled => 'Aksesibilitas dinonaktifkan';
+
+  @override
+  String get degradedAccessibilityNotGranted =>
+      'Izin aksesibilitas belum diberikan';
+
+  @override
+  String get degradedServiceStopped => 'Layanan proteksi terhenti';
+
+  @override
+  String get degradedPermissionRevoked => 'Izin sistem dicabut';
+
+  @override
+  String get degradedSensorDisconnected => 'Sensor terputus';
+
+  @override
+  String get protectionArtifactUnavailable => 'tidak tersedia';
+
+  @override
+  String analyticsChartSummary(int blocked, int interventions) {
+    return '$blocked diblokir, $interventions intervensi';
+  }
+
+  @override
+  String analyticsDayTooltip(int blocked, int interventions) {
+    return '$blocked diblokir · $interventions intervensi';
+  }
+
+  @override
+  String get partnerPrivacyBadge => 'Privasi Terlindungi · Hanya Agregat';
+
+  @override
+  String get accSharingTitle => 'Data Agregat Dibagikan';
+
+  @override
+  String get accSharingSubtitle =>
+      'Atur preferensi data agregat anonim untuk pendamping.';
+
+  @override
+  String get accShareHealthTitle => 'Kesehatan Perlindungan';
+
+  @override
+  String get accShareHealthSubtitle =>
+      'Status aktif, degradasi, & izin (tanpa URL).';
+
+  @override
+  String get accShareActivityTitle => 'Aktivitas Perlindungan';
+
+  @override
+  String get accShareActivitySubtitle =>
+      'Hitungan pemblokiran & intervensi agregat.';
+
+  @override
+  String get accShareEngagementTitle => 'Keterlibatan Pemulihan';
+
+  @override
+  String get accShareEngagementSubtitle =>
+      'Ringkasan partisipasi (bukan isi jurnal).';
+
+  @override
+  String get accShareEducationTitle => 'Progres Edukasi';
+
+  @override
+  String get accShareEducationSubtitle =>
+      'Penyelesaian modul psikoedukasi harian.';
+
+  @override
+  String get accSharingUpdated => 'Preferensi berbagi diperbarui.';
+
+  @override
+  String get accUnsafeExitTitle => 'Keluar Situasi Tidak Aman';
+
+  @override
+  String get accNormalExitTitle => 'Ajukan Keluar Pendampingan';
+
+  @override
+  String get accUnsafeExitDesc =>
+      'Berbagi data segera dihentikan dan permintaan normal dibatalkan.';
+
+  @override
+  String get accNormalExitDesc =>
+      'Pendamping memiliki waktu 72 jam untuk meninjau permintaan.';
+
+  @override
+  String get accReasonLabel => 'Alasan (opsional)';
+
+  @override
+  String get accReasonHint => 'Berikan penjelasan singkat...';
+
+  @override
+  String get accSendRequest => 'Kirim Permintaan';
+
+  @override
+  String get accExitRequestSent => 'Permintaan keluar dikirim.';
+
+  @override
+  String get accExitRequestCancelled => 'Permintaan keluar dibatalkan.';
+
+  @override
+  String get accApprovalCancelled => 'Permintaan persetujuan dibatalkan.';
+
+  @override
+  String get accExitPendingTitle => 'Permintaan keluar sedang ditinjau';
+
+  @override
+  String get accExitPendingBody =>
+      'Anda dapat membatalkan permintaan normal selama masih tertunda.';
+
+  @override
+  String get accExitChoose =>
+      'Pilih alur normal atau hentikan berbagi segera bila situasi tidak aman.';
+
+  @override
+  String get accCodeRequired => 'Masukkan kode grup terlebih dahulu.';
+
+  @override
+  String get settingsRotateConfirmTitle => 'Putar token penyambungan?';
+
+  @override
+  String get settingsRotateConfirmBody =>
+      'Penyambungan ekstensi browser yang ada akan langsung tidak berlaku dan perlu disambungkan ulang.';
+
+  @override
+  String get settingsRotateConfirmAction => 'Putar token';
+
+  @override
+  String get settingsRotateSuccess => 'Token penyambungan diperbarui.';
+
+  @override
+  String get settingsPasswordChangedTitle => 'Kata sandi diperbarui';
+
+  @override
+  String get settingsPasswordChangedBody =>
+      'Silakan masuk kembali dengan kata sandi baru.';
+
+  @override
+  String get patternWaitHint => 'Sebentar lagi — tarik napas dulu.';
+
+  @override
+  String get statusPending => 'menunggu';
+
+  @override
+  String get statusReviewed => 'dalam tinjauan';
+
+  @override
+  String get statusApproved => 'disetujui';
+
+  @override
+  String get statusRejected => 'ditolak';
+
+  @override
+  String get statusExpired => 'kedaluwarsa';
+
+  @override
+  String get missionsSectionTitle => 'Misi Harian';
+
+  @override
+  String get missionsSectionSubtitle =>
+      'EXP dapat diklaim setelah aktivitas terverifikasi oleh sistem.';
+
+  @override
+  String get mission1 => 'Jaga perlindungan aktif hari ini';
+
+  @override
+  String get mission2 => 'Catat satu check-in suasana hati dan dorongan';
+
+  @override
+  String get mission3 => 'Selesaikan satu bagian pembelajaran';
+
+  @override
+  String get mission4 => 'Jaga dukungan pendamping tetap terhubung';
+
+  @override
+  String get mission5 => 'Selesaikan satu modul pembelajaran';
+
+  @override
+  String get missionAction1 => 'Periksa proteksi';
+
+  @override
+  String get missionAction2 => 'Isi check-in di web';
+
+  @override
+  String get missionAction3 => 'Buka pembelajaran di web';
+
+  @override
+  String get missionAction4 => 'Kelola pendamping';
+
+  @override
+  String get missionAction5 => 'Lanjutkan modul di web';
+
+  @override
+  String missionClaim(int exp) {
+    return 'Klaim $exp EXP';
+  }
+
+  @override
+  String get missionClaimedLabel => 'EXP diklaim';
+
+  @override
+  String get missionLockedLabel => 'Menunggu verifikasi';
+
+  @override
+  String get missionSkippedLabel => 'Dilewati hari ini';
+
+  @override
+  String get missionBonusLabel => 'Bonus';
+
+  @override
+  String missionExpReward(int exp) {
+    return '+$exp EXP';
+  }
+
+  @override
+  String missionExpEarned(int exp) {
+    return '+$exp EXP. Terima kasih sudah hadir hari ini.';
+  }
+
+  @override
+  String get missionLevelUp =>
+      'Level baru terbuka. Teruskan dengan ritmemu sendiri.';
+
+  @override
+  String get missionsAllDone =>
+      'Semua misi hari ini selesai. Istirahat juga bagian dari pemulihan.';
+
+  @override
+  String levelLabel(int level) {
+    return 'Level $level';
+  }
+
+  @override
+  String levelExpProgress(int progress, int target) {
+    return '$progress/$target EXP';
+  }
+
+  @override
+  String get levelTitle1 => 'Langkah Pertama';
+
+  @override
+  String get levelTitle2 => 'Penjaga Niat';
+
+  @override
+  String get levelTitle3 => 'Penata Ritme';
+
+  @override
+  String get levelTitle4 => 'Penjelajah Tenang';
+
+  @override
+  String get levelTitle5 => 'Penjaga Fokus';
+
+  @override
+  String get levelTitle6 => 'Pembangun Kebiasaan';
+
+  @override
+  String get levelTitle7 => 'Sahabat Perjalanan';
+
+  @override
+  String get analyticsMilestoneTitle => 'Perlindunganmu bekerja';
+
+  @override
+  String analyticsMilestoneBody(int count, int days) {
+    return 'Perlindungan membantumu $count kali dalam $days hari terakhir. Setiap jeda adalah ruang untuk memilih ulang.';
+  }
+
+  @override
+  String get patternPhaseInhale => 'Tarik napas…';
+
+  @override
+  String get patternPhaseExhale => 'Hembuskan perlahan…';
+
+  @override
+  String get patternPhaseStatic => 'Tarik napas perlahan, lalu hembuskan.';
+
+  @override
+  String get groundingStep1Title => 'Lihat';
+
+  @override
+  String get groundingStep1Body =>
+      'Sebutkan lima hal yang bisa Anda lihat di sekitar Anda.';
+
+  @override
+  String get groundingStep2Title => 'Rasakan';
+
+  @override
+  String get groundingStep2Body =>
+      'Sebutkan empat hal yang bisa Anda sentuh atau rasakan.';
+
+  @override
+  String get groundingStep3Title => 'Dengar';
+
+  @override
+  String get groundingStep3Body =>
+      'Sebutkan tiga suara yang bisa Anda dengar saat ini.';
+
+  @override
+  String get groundingStep4Title => 'Cium';
+
+  @override
+  String get groundingStep4Body => 'Sebutkan dua aroma yang bisa Anda cium.';
+
+  @override
+  String get groundingStep5Title => 'Lindungi';
+
+  @override
+  String get groundingStep5Body =>
+      'Sebutkan satu hal yang ingin Anda lindungi hari ini.';
+
+  @override
+  String groundingStepProgress(int current, int total) {
+    return 'Langkah $current dari $total';
+  }
+
+  @override
+  String get groundingNext => 'Lanjut';
+
+  @override
+  String get groundingDone => 'Selesai';
+
+  @override
+  String get groundingCompleteTitle => 'Latihan selesai';
+
+  @override
+  String get groundingCompleteBody =>
+      'Anda sudah hadir sepenuhnya di momen ini. Pilih langkah berikutnya dengan tenang.';
+
+  @override
+  String get recoveryWebEyebrow => 'lanjutkan di web';
+
+  @override
+  String get introPlatformAndroid => 'android';
+
+  @override
+  String get introPlatformWindows => 'windows';
 }

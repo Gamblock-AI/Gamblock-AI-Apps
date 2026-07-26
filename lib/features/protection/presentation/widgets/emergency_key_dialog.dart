@@ -54,14 +54,14 @@ class _EmergencyKeyDialogState extends State<_EmergencyKeyDialog> {
                   height: 44,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
+                      colors: [AppColors.amber, AppColors.amberDark],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    borderRadius: BorderRadius.circular(13),
+                    borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
+                        color: AppColors.amber.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       ),
@@ -69,7 +69,7 @@ class _EmergencyKeyDialogState extends State<_EmergencyKeyDialog> {
                   ),
                   child: const Icon(
                     Icons.key_outlined,
-                    size: 22,
+                    size: 20,
                     color: Colors.white,
                   ),
                 ),
@@ -96,12 +96,12 @@ class _EmergencyKeyDialogState extends State<_EmergencyKeyDialog> {
                 helperText: l10n.emergencyKeyHelp,
                 isDense: true,
                 filled: true,
-                fillColor: const Color(0xFFF8FAFC),
+                fillColor: AppColors.background,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                  borderSide: const BorderSide(color: AppColors.border),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -118,7 +118,7 @@ class _EmergencyKeyDialogState extends State<_EmergencyKeyDialog> {
                     height: 42,
                     child: FilledButton(
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFFF1F5F9),
+                        backgroundColor: AppColors.muted,
                         foregroundColor: AppColors.navy,
                         elevation: 0,
                         padding: EdgeInsets.zero,

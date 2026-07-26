@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
@@ -8,9 +9,13 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../../accountability/domain/entities/accountability_models.dart';
 import '../../domain/entities/protection_status.dart';
 import 'protection_accountability_section.dart';
+import '../../../missions/presentation/widgets/daily_missions_section.dart';
+import '../../../missions/presentation/widgets/mission_level_chip.dart';
 import 'protection_actions.dart';
+import 'protection_screen_skeleton.dart';
 import 'protection_status_card.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
 
 /// Scrollable Protection content, kept separate from native state orchestration.
 class ProtectionScreenBody extends StatelessWidget {
@@ -55,34 +60,53 @@ class ProtectionScreenBody extends StatelessWidget {
   final VoidCallback onLogin;
   final VoidCallback onOpenAccountSetup;
 
+  /// Gentle staggered entrance for the main dashboard blocks; skipped
+  /// entirely (wrapper included) under reduced motion.
+  Widget _entrance(BuildContext context, int index, Widget child) {
+    if (MediaQuery.disableAnimationsOf(context)) return child;
+    return child
+        .animate(delay: (60 * index).ms)
+        .fadeIn(duration: 300.ms)
+        .slideY(begin: 0.05, end: 0, curve: Curves.easeOutCubic);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return RefreshIndicator(
       onRefresh: onRefresh,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: AppSpacing.screenPadding,
         children: [
-          _DashboardHero(auth: auth, status: status, onOpenSetup: onOpenSetup),
+          _entrance(
+            context,
+            0,
+            _DashboardHero(
+              auth: auth,
+              status: status,
+              onOpenSetup: onOpenSetup,
+              onRefresh: onRefresh,
+              refreshing: isLoading,
+            ),
+          ),
           const SizedBox(height: 16),
           if (auth.isAuthenticated && !auth.emailVerified) ...[
             const _VerificationNotice(),
             const SizedBox(height: 16),
           ],
           if (isLoading && status == null)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(40),
-                child: CircularProgressIndicator(),
-              ),
-            )
+            const ProtectionScreenSkeleton()
           else ...[
-            ProtectionStatusCard(status: status),
+            _entrance(context, 1, ProtectionStatusCard(status: status)),
             const SizedBox(height: 16),
-            ProtectionActions(
-              isLoading: isActionLoading,
-              onOpenSetup: onOpenSetup,
-              onRunSelfTest: onRunSelfTest,
+            _entrance(
+              context,
+              2,
+              ProtectionActions(
+                isLoading: isActionLoading,
+                onOpenSetup: onOpenSetup,
+                onRunSelfTest: onRunSelfTest,
+              ),
             ),
             if (error != null) ...[
               const SizedBox(height: 16),
@@ -94,6 +118,8 @@ class ProtectionScreenBody extends StatelessWidget {
                 onAction: onRefresh,
               ),
             ],
+            const SizedBox(height: 24),
+            _entrance(context, 3, const DailyMissionsSection()),
             const SizedBox(height: 24),
             ProtectionAccountabilitySection(
               auth: auth,
@@ -121,26 +147,24 @@ class _DashboardHero extends StatelessWidget {
     required this.auth,
     required this.status,
     required this.onOpenSetup,
+    required this.onRefresh,
+    required this.refreshing,
   });
 
   final AuthState auth;
   final ProtectionStatus? status;
   final VoidCallback onOpenSetup;
+  final Future<void> Function() onRefresh;
+  final bool refreshing;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final name = auth.displayName?.trim().split(' ').first;
-    final active = status?.isActive == true;
-    final greeting = name?.isNotEmpty == true
-        ? l10n.dashboardHello(name!)
-        : l10n.dashboardHelloGuest;
-
     return Container(
-      padding: const EdgeInsets.all(20),
+      clipBehavior: Clip.antiAlias,
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
       decoration: BoxDecoration(
         gradient: AppColors.navyGradient,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
             color: AppColors.navy.withValues(alpha: 0.25),
@@ -149,19 +173,67 @@ class _DashboardHero extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Text(
-            greeting,
-            style: const TextStyle(
-              color: AppColors.skyLight,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.2,
+          Positioned(
+            right: -6,
+            bottom: -10,
+            child: Opacity(
+              opacity: 0.9,
+              child: Image.asset(
+                'assets/images/gami.webp',
+                height: 88,
+                cacheWidth: 264,
+                excludeFromSemantics: true,
+              ),
             ),
           ),
-          const SizedBox(height: 10),
+          _heroContent(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _heroContent(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final name = auth.displayName?.trim().split(' ').first;
+    final active = status?.isActive == true;
+    final greeting = name?.isNotEmpty == true
+        ? l10n.dashboardHello(name!)
+        : l10n.dashboardHelloGuest;
+    final l10nRefresh = l10n.refresh;
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  greeting,
+                  style: const TextStyle(
+                    color: AppColors.skyLight,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ),
+              IconButton(
+                tooltip: l10nRefresh,
+                onPressed: refreshing ? null : () => onRefresh(),
+                visualDensity: VisualDensity.compact,
+                constraints: const BoxConstraints(
+                  minWidth: 36,
+                  minHeight: 36,
+                ),
+                iconSize: 20,
+                color: Colors.white.withValues(alpha: 0.85),
+                disabledColor: Colors.white.withValues(alpha: 0.35),
+                icon: const Icon(Icons.refresh_rounded),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
           Text(
             active
                 ? l10n.protectionActiveTitle
@@ -181,7 +253,9 @@ class _DashboardHero extends StatelessWidget {
               height: 1.45,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
+          const MissionLevelChip(),
+          const SizedBox(height: 14),
           SizedBox(
             height: 38,
             child: FilledButton.icon(
@@ -195,7 +269,7 @@ class _DashboardHero extends StatelessWidget {
                 ),
               ),
               onPressed: onOpenSetup,
-              icon: const Icon(Icons.tune_rounded, size: 17),
+              icon: const Icon(Icons.tune_rounded, size: 16),
               label: Text(
                 l10n.checkSetupAction,
                 style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
@@ -203,7 +277,6 @@ class _DashboardHero extends StatelessWidget {
             ),
           ),
         ],
-      ),
     );
   }
 }
@@ -223,8 +296,8 @@ class _VerificationNotice extends ConsumerWidget {
           color: AppColors.navy,
         ),
         title: Text(l10n.verifyEmailTitle),
-        subtitle: const Text(
-          'Diperlukan untuk fitur pendamping dan pemulihan akun.',
+        subtitle: Text(
+          l10n.verifyEmailBody,
         ),
         trailing: TextButton(
           onPressed: () async {

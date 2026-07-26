@@ -33,7 +33,7 @@ class SetupStepCard extends StatelessWidget {
                   height: 44,
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(13),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     step.isComplete ? Icons.check : step.icon,

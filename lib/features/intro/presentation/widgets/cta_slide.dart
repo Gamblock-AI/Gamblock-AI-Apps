@@ -49,7 +49,7 @@ class CtaSlide extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                'android',
+                AppLocalizations.of(context)!.introPlatformAndroid,
                 style: TextStyle(
                   color: AppColors.mutedForeground,
                   fontSize: 12,
@@ -63,7 +63,7 @@ class CtaSlide extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                'windows',
+                AppLocalizations.of(context)!.introPlatformWindows,
                 style: TextStyle(
                   color: AppColors.mutedForeground,
                   fontSize: 12,

@@ -20,12 +20,12 @@ class LanguageToggleButton extends ConsumerWidget {
           final nextLocale = isId ? const Locale('en') : const Locale('id');
           ref.read(appSettingsProvider.notifier).setLocale(nextLocale);
         },
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
           decoration: BoxDecoration(
             color: AppColors.surface.withValues(alpha: 0.95),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(22),
             border: Border.all(color: AppColors.border.withValues(alpha: 0.8)),
             boxShadow: [
               BoxShadow(
@@ -40,7 +40,7 @@ class LanguageToggleButton extends ConsumerWidget {
             children: [
               const Icon(
                 Icons.language_rounded,
-                size: 15,
+                size: 16,
                 color: AppColors.navy,
               ),
               const SizedBox(width: 5),
@@ -68,7 +68,7 @@ class LanguageToggleButton extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: active ? AppColors.navy : Colors.transparent,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         label,

@@ -28,7 +28,7 @@
   "protectionSiteBlocked": "Situs judi diblokir",
   "protectionRecentBlocks": "Blokir Terbaru",
   "protectionInactive": "Perlindungan Nonaktif",
-  "protectionActiveTitle": "Perlindungan Aktif",
+  "protectionActiveTitle": "Perlindungan perangkat aktif",
   "protectionActiveDays": "Hari Aktif",
   "protectionMobileRequest": "Pengajuan dari aplikasi mobile",
   "protectionTotalBlocks": "Total Blokir",
@@ -69,15 +69,12 @@
   "onboardingGroupNameHint": "Contoh: Kelas TI-2024A",
   "patternBreatheDesc": "Tarik napas dalam-dalam.\nDorongan ini akan lewat.",
   "patternContinuePsychoeducation": "Lanjut ke Psikoedukasi",
-  "patternTakeControlDesc": "Ambil kendali. Lanjutkan ke modul pemulihan diri.",
-  "patternInterruptSuccess": "Dorongan berhasil\ndiputus.",
-  "patternInterruptActive": "PATTERN INTERRUPT AKTIF",
   "dashboardWeeklyTrend": "Tren Mingguan",
   "dashboardAnalytics": "analitik perlindungan",
   "dashboardViewProtectionStatus": "Lihat Status Proteksi",
   "dashboardYourProgress": "Perkembangan Anda.",
   "introHeroTitle": "putuskan siklus\njudi online.",
-  "introHeroDesc": "deteksi cerdas berbasis on-device ai, intervensi psikologis otomatis, dan rehabilitasi mandiri \u2014 untuk mahasiswa indonesia.",
+  "introHeroDesc": "deteksi cerdas berbasis on-device ai, intervensi psikologis otomatis, dan rehabilitasi mandiri — untuk mahasiswa indonesia.",
   "introAiShield": "perlindungan AI di perangkat",
   "introHowItWorksStep1": "unduh & pasang",
   "introHowItWorksStep1Desc": "instal di android atau windows. gratis, tanpa kartu kredit.",
@@ -100,8 +97,8 @@
   "introCrisisStat1Desc": "konten judi ditangani sejak 2017",
   "introCrisisStat2": "12,3 jt",
   "introCrisisTitle": "judi online bukan hiburan.\nini krisis generasi.",
-  "introCrisisSource": "(PPATK 2026 \u00b7 Kemkomdigi 2025)",
-  "introCrisisDesc": "440 rb pemain usia 10\u201320 tahun dan 520 rb usia 21\u201330 tahun terlibat. mahasiswa berada di jantung krisis ini.",
+  "introCrisisSource": "(PPATK 2026 · Kemkomdigi 2025)",
+  "introCrisisDesc": "440 rb pemain usia 10–20 tahun dan 520 rb usia 21–30 tahun terlibat. mahasiswa berada di jantung krisis ini.",
   "introCrisisStat3Desc": "orang tercatat deposit judi",
   "introCrisisStat2Desc": "perputaran dana judi online 2025",
   "introStartBtn": "Mulai Sekarang",
@@ -265,18 +262,30 @@
   "accountabilityPreviewAction": "Tinjau grup",
   "accountabilityManagedBy": "Dikelola oleh {name}",
   "@accountabilityManagedBy": {
-    "placeholders": {"name": {"type": "String"}}
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "accountabilityJoinConfirmTitle": "Bergabung ke grup ini?",
   "accountabilityJoinConfirmBody": "{name} akan menjadi pendamping Anda. Ringkasan agregat awal dapat Anda matikan dari portal web kapan saja.",
   "@accountabilityJoinConfirmBody": {
-    "placeholders": {"name": {"type": "String"}}
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "accountabilityJoinAction": "Konfirmasi dan bergabung",
   "accountabilityJoinSuccess": "Grup akuntabilitas berhasil dihubungkan.",
   "accountabilityActiveGroup": "Terhubung melalui grup {name}. Pendamping hanya menerima agregat yang Anda izinkan.",
   "@accountabilityActiveGroup": {
-    "placeholders": {"name": {"type": "String"}}
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "protectionSetupAction": "Setup platform",
   "selfTestAction": "Jalankan self-test",
@@ -300,7 +309,6 @@
     }
   },
   "dashboardHelloGuest": "Halo",
-  "protectionActiveTitle": "Perlindungan perangkat aktif",
   "protectionInactiveTitle": "Selesaikan perlindungan perangkat",
   "protectionOnDevicePrivacyDesc": "Analisis tetap di perangkat. Server hanya menerima hitungan agregat perlindungan.",
   "protectionSignInTitle": "Proteksi lokal tetap berjalan",
@@ -432,7 +440,6 @@
   "patternHelpAction": "Butuh bantuan",
   "patternLaterAction": "Kembali ke proteksi",
   "patternGroundingTitle": "Perhatikan lima hal di sekitar Anda",
-  "patternGroundingBody": "Sebutkan lima hal yang terlihat, empat yang terasa, tiga yang terdengar, dua yang tercium, dan satu hal yang ingin Anda lindungi hari ini.",
   "patternReturnProtection": "Selesai dan kembali",
   "partnerSharingPrivacy": "Privasi Berbagi",
   "partnerSharingDesc": "Atur jenis ringkasan agregat yang dapat dilihat pendamping.",
@@ -444,5 +451,217 @@
   "resendEmail": "Kirim ulang",
   "checkSetupAction": "Periksa setup",
   "linkGoogleTitle": "Tautkan akun Google",
-  "continueAction": "Lanjutkan"
+  "continueAction": "Lanjutkan",
+  "authResetTitle": "Lupa kata sandi?",
+  "authResetTitleCode": "Masukkan kode pemulihan",
+  "authResetDesc": "Masukkan email akun. Kami akan mengirim kode tanpa membagikan status pendaftaran email.",
+  "authResetDescCode": "Kode 12 karakter telah dikirim bila email terdaftar. Kode berlaku 30 menit.",
+  "authResetSuccess": "Kata sandi berhasil diperbarui. Silakan masuk.",
+  "authResetNewCodeRequested": "Kode pemulihan baru telah diminta.",
+  "authChangeEmail": "Ganti email",
+  "authResendCode": "Kirim ulang kode",
+  "authRecoveryCodeLabel": "Kode pemulihan",
+  "authRecoveryCodeInvalid": "Kode harus berisi 12 karakter.",
+  "authNewPasswordLabel": "Kata sandi baru",
+  "authPasswordMinChars": "Gunakan minimal 8 karakter.",
+  "authPasswordMinShort": "Minimal 8 karakter",
+  "authCreateNewPassword": "Buat kata sandi baru",
+  "authSendCode": "Kirim kode",
+  "authBackToLogin": "Kembali ke login",
+  "authTempPasswordDesc": "Kata sandi sementara hanya berlaku untuk langkah ini.",
+  "authPasswordChangeMin": "Kata sandi baru minimal 8 karakter.",
+  "authSaveAndLogin": "Simpan dan masuk",
+  "authShowPassword": "Tampilkan kata sandi",
+  "authHidePassword": "Sembunyikan kata sandi",
+  "introSkip": "Lewati",
+  "introNext": "Lanjut",
+  "webPageOpenError": "Halaman belum dapat dibuka. Coba lagi.",
+  "helpPageOpenError": "Halaman bantuan belum dapat dibuka. Coba lagi.",
+  "recoveryPageOpenError": "Halaman pemulihan belum dapat dibuka. Coba lagi.",
+  "settingsGoogleLinkedSuccess": "Akun Google berhasil ditautkan.",
+  "verifyEmailBody": "Diperlukan untuk fitur pendamping dan pemulihan akun.",
+  "statusChipOk": "OK",
+  "statusChipWarn": "WASPADA",
+  "statusChipOff": "MATI",
+  "statusGranted": "Diberikan",
+  "statusRevoked": "Dicabut",
+  "statusDisabled": "Nonaktif",
+  "statusUnknown": "Tidak diketahui",
+  "degradedAccessibilityDisabled": "Aksesibilitas dinonaktifkan",
+  "degradedAccessibilityNotGranted": "Izin aksesibilitas belum diberikan",
+  "degradedServiceStopped": "Layanan proteksi terhenti",
+  "degradedPermissionRevoked": "Izin sistem dicabut",
+  "degradedSensorDisconnected": "Sensor terputus",
+  "protectionArtifactUnavailable": "tidak tersedia",
+  "analyticsChartSummary": "{blocked} diblokir, {interventions} intervensi",
+  "@analyticsChartSummary": {
+    "placeholders": {
+      "blocked": {
+        "type": "int"
+      },
+      "interventions": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsDayTooltip": "{blocked} diblokir · {interventions} intervensi",
+  "@analyticsDayTooltip": {
+    "placeholders": {
+      "blocked": {
+        "type": "int"
+      },
+      "interventions": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerPrivacyBadge": "Privasi Terlindungi · Hanya Agregat",
+  "accSharingTitle": "Data Agregat Dibagikan",
+  "accSharingSubtitle": "Atur preferensi data agregat anonim untuk pendamping.",
+  "accShareHealthTitle": "Kesehatan Perlindungan",
+  "accShareHealthSubtitle": "Status aktif, degradasi, & izin (tanpa URL).",
+  "accShareActivityTitle": "Aktivitas Perlindungan",
+  "accShareActivitySubtitle": "Hitungan pemblokiran & intervensi agregat.",
+  "accShareEngagementTitle": "Keterlibatan Pemulihan",
+  "accShareEngagementSubtitle": "Ringkasan partisipasi (bukan isi jurnal).",
+  "accShareEducationTitle": "Progres Edukasi",
+  "accShareEducationSubtitle": "Penyelesaian modul psikoedukasi harian.",
+  "accSharingUpdated": "Preferensi berbagi diperbarui.",
+  "accUnsafeExitTitle": "Keluar Situasi Tidak Aman",
+  "accNormalExitTitle": "Ajukan Keluar Pendampingan",
+  "accUnsafeExitDesc": "Berbagi data segera dihentikan dan permintaan normal dibatalkan.",
+  "accNormalExitDesc": "Pendamping memiliki waktu 72 jam untuk meninjau permintaan.",
+  "accReasonLabel": "Alasan (opsional)",
+  "accReasonHint": "Berikan penjelasan singkat...",
+  "accSendRequest": "Kirim Permintaan",
+  "accExitRequestSent": "Permintaan keluar dikirim.",
+  "accExitRequestCancelled": "Permintaan keluar dibatalkan.",
+  "accApprovalCancelled": "Permintaan persetujuan dibatalkan.",
+  "accExitPendingTitle": "Permintaan keluar sedang ditinjau",
+  "accExitPendingBody": "Anda dapat membatalkan permintaan normal selama masih tertunda.",
+  "accExitChoose": "Pilih alur normal atau hentikan berbagi segera bila situasi tidak aman.",
+  "accCodeRequired": "Masukkan kode grup terlebih dahulu.",
+  "settingsRotateConfirmTitle": "Putar token penyambungan?",
+  "settingsRotateConfirmBody": "Penyambungan ekstensi browser yang ada akan langsung tidak berlaku dan perlu disambungkan ulang.",
+  "settingsRotateConfirmAction": "Putar token",
+  "settingsRotateSuccess": "Token penyambungan diperbarui.",
+  "settingsPasswordChangedTitle": "Kata sandi diperbarui",
+  "settingsPasswordChangedBody": "Silakan masuk kembali dengan kata sandi baru.",
+  "patternWaitHint": "Sebentar lagi — tarik napas dulu.",
+  "statusPending": "menunggu",
+  "statusReviewed": "dalam tinjauan",
+  "statusApproved": "disetujui",
+  "statusRejected": "ditolak",
+  "statusExpired": "kedaluwarsa",
+  "missionsSectionTitle": "Misi Harian",
+  "missionsSectionSubtitle": "EXP dapat diklaim setelah aktivitas terverifikasi oleh sistem.",
+  "mission1": "Jaga perlindungan aktif hari ini",
+  "mission2": "Catat satu check-in suasana hati dan dorongan",
+  "mission3": "Selesaikan satu bagian pembelajaran",
+  "mission4": "Jaga dukungan pendamping tetap terhubung",
+  "mission5": "Selesaikan satu modul pembelajaran",
+  "missionAction1": "Periksa proteksi",
+  "missionAction2": "Isi check-in di web",
+  "missionAction3": "Buka pembelajaran di web",
+  "missionAction4": "Kelola pendamping",
+  "missionAction5": "Lanjutkan modul di web",
+  "missionClaim": "Klaim {exp} EXP",
+  "@missionClaim": {
+    "placeholders": {
+      "exp": {
+        "type": "int"
+      }
+    }
+  },
+  "missionClaimedLabel": "EXP diklaim",
+  "missionLockedLabel": "Menunggu verifikasi",
+  "missionSkippedLabel": "Dilewati hari ini",
+  "missionBonusLabel": "Bonus",
+  "missionExpReward": "+{exp} EXP",
+  "@missionExpReward": {
+    "placeholders": {
+      "exp": {
+        "type": "int"
+      }
+    }
+  },
+  "missionExpEarned": "+{exp} EXP. Terima kasih sudah hadir hari ini.",
+  "@missionExpEarned": {
+    "placeholders": {
+      "exp": {
+        "type": "int"
+      }
+    }
+  },
+  "missionLevelUp": "Level baru terbuka. Teruskan dengan ritmemu sendiri.",
+  "missionsAllDone": "Semua misi hari ini selesai. Istirahat juga bagian dari pemulihan.",
+  "levelLabel": "Level {level}",
+  "@levelLabel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "levelExpProgress": "{progress}/{target} EXP",
+  "@levelExpProgress": {
+    "placeholders": {
+      "progress": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "levelTitle1": "Langkah Pertama",
+  "levelTitle2": "Penjaga Niat",
+  "levelTitle3": "Penata Ritme",
+  "levelTitle4": "Penjelajah Tenang",
+  "levelTitle5": "Penjaga Fokus",
+  "levelTitle6": "Pembangun Kebiasaan",
+  "levelTitle7": "Sahabat Perjalanan",
+  "analyticsMilestoneTitle": "Perlindunganmu bekerja",
+  "analyticsMilestoneBody": "Perlindungan membantumu {count} kali dalam {days} hari terakhir. Setiap jeda adalah ruang untuk memilih ulang.",
+  "@analyticsMilestoneBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "patternPhaseInhale": "Tarik napas…",
+  "patternPhaseExhale": "Hembuskan perlahan…",
+  "patternPhaseStatic": "Tarik napas perlahan, lalu hembuskan.",
+  "groundingStep1Title": "Lihat",
+  "groundingStep1Body": "Sebutkan lima hal yang bisa Anda lihat di sekitar Anda.",
+  "groundingStep2Title": "Rasakan",
+  "groundingStep2Body": "Sebutkan empat hal yang bisa Anda sentuh atau rasakan.",
+  "groundingStep3Title": "Dengar",
+  "groundingStep3Body": "Sebutkan tiga suara yang bisa Anda dengar saat ini.",
+  "groundingStep4Title": "Cium",
+  "groundingStep4Body": "Sebutkan dua aroma yang bisa Anda cium.",
+  "groundingStep5Title": "Lindungi",
+  "groundingStep5Body": "Sebutkan satu hal yang ingin Anda lindungi hari ini.",
+  "groundingStepProgress": "Langkah {current} dari {total}",
+  "@groundingStepProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "groundingNext": "Lanjut",
+  "groundingDone": "Selesai",
+  "groundingCompleteTitle": "Latihan selesai",
+  "groundingCompleteBody": "Anda sudah hadir sepenuhnya di momen ini. Pilih langkah berikutnya dengan tenang.",
+  "recoveryWebEyebrow": "lanjutkan di web",
+  "introPlatformAndroid": "android",
+  "introPlatformWindows": "windows"
 }

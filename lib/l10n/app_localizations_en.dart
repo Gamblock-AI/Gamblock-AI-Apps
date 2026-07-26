@@ -225,16 +225,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get patternContinuePsychoeducation => 'Continue to psychoeducation';
 
   @override
-  String get patternTakeControlDesc =>
-      'Ambil kendali. Lanjutkan ke modul pemulihan diri.';
-
-  @override
-  String get patternInterruptSuccess => 'Dorongan berhasil\ndiputus.';
-
-  @override
-  String get patternInterruptActive => 'PATTERN INTERRUPT AKTIF';
-
-  @override
   String get dashboardWeeklyTrend => 'Tren Mingguan';
 
   @override
@@ -1281,10 +1271,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get patternGroundingTitle => 'Notice five things around you';
 
   @override
-  String get patternGroundingBody =>
-      'Name five things you can see, four you can feel, three you can hear, two you can smell, and one thing you want to protect today.';
-
-  @override
   String get patternReturnProtection => 'Finish and return';
 
   @override
@@ -1320,4 +1306,448 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get continueAction => 'Continue';
+
+  @override
+  String get authResetTitle => 'Forgot your password?';
+
+  @override
+  String get authResetTitleCode => 'Enter the recovery code';
+
+  @override
+  String get authResetDesc =>
+      'Enter your account email. We send a code without revealing whether the email is registered.';
+
+  @override
+  String get authResetDescCode =>
+      'A 12-character code was sent if the email is registered. It stays valid for 30 minutes.';
+
+  @override
+  String get authResetSuccess => 'Password updated. Please sign in.';
+
+  @override
+  String get authResetNewCodeRequested =>
+      'A new recovery code has been requested.';
+
+  @override
+  String get authChangeEmail => 'Change email';
+
+  @override
+  String get authResendCode => 'Resend code';
+
+  @override
+  String get authRecoveryCodeLabel => 'Recovery code';
+
+  @override
+  String get authRecoveryCodeInvalid => 'The code must contain 12 characters.';
+
+  @override
+  String get authNewPasswordLabel => 'New password';
+
+  @override
+  String get authPasswordMinChars => 'Use at least 8 characters.';
+
+  @override
+  String get authPasswordMinShort => 'At least 8 characters';
+
+  @override
+  String get authCreateNewPassword => 'Create a new password';
+
+  @override
+  String get authSendCode => 'Send code';
+
+  @override
+  String get authBackToLogin => 'Back to login';
+
+  @override
+  String get authTempPasswordDesc =>
+      'The temporary password only applies to this step.';
+
+  @override
+  String get authPasswordChangeMin =>
+      'The new password must be at least 8 characters.';
+
+  @override
+  String get authSaveAndLogin => 'Save and sign in';
+
+  @override
+  String get authShowPassword => 'Show password';
+
+  @override
+  String get authHidePassword => 'Hide password';
+
+  @override
+  String get introSkip => 'Skip';
+
+  @override
+  String get introNext => 'Next';
+
+  @override
+  String get webPageOpenError => 'The page could not be opened yet. Try again.';
+
+  @override
+  String get helpPageOpenError =>
+      'The help page could not be opened yet. Try again.';
+
+  @override
+  String get recoveryPageOpenError =>
+      'The recovery page could not be opened yet. Try again.';
+
+  @override
+  String get settingsGoogleLinkedSuccess => 'Google account linked.';
+
+  @override
+  String get verifyEmailBody =>
+      'Required for partner features and account recovery.';
+
+  @override
+  String get statusChipOk => 'OK';
+
+  @override
+  String get statusChipWarn => 'WARN';
+
+  @override
+  String get statusChipOff => 'OFF';
+
+  @override
+  String get statusGranted => 'Granted';
+
+  @override
+  String get statusRevoked => 'Revoked';
+
+  @override
+  String get statusDisabled => 'Disabled';
+
+  @override
+  String get statusUnknown => 'Unknown';
+
+  @override
+  String get degradedAccessibilityDisabled => 'Accessibility disabled';
+
+  @override
+  String get degradedAccessibilityNotGranted =>
+      'Accessibility permission not granted';
+
+  @override
+  String get degradedServiceStopped => 'Protection service stopped';
+
+  @override
+  String get degradedPermissionRevoked => 'System permission revoked';
+
+  @override
+  String get degradedSensorDisconnected => 'Sensor disconnected';
+
+  @override
+  String get protectionArtifactUnavailable => 'not available';
+
+  @override
+  String analyticsChartSummary(int blocked, int interventions) {
+    return '$blocked blocked, $interventions interventions';
+  }
+
+  @override
+  String analyticsDayTooltip(int blocked, int interventions) {
+    return '$blocked blocked · $interventions interventions';
+  }
+
+  @override
+  String get partnerPrivacyBadge => 'Privacy Protected · Aggregates Only';
+
+  @override
+  String get accSharingTitle => 'Shared Aggregate Data';
+
+  @override
+  String get accSharingSubtitle =>
+      'Manage anonymous aggregate data preferences for your partner.';
+
+  @override
+  String get accShareHealthTitle => 'Protection Health';
+
+  @override
+  String get accShareHealthSubtitle =>
+      'Active status, degradation, & permissions (no URLs).';
+
+  @override
+  String get accShareActivityTitle => 'Protection Activity';
+
+  @override
+  String get accShareActivitySubtitle =>
+      'Aggregate block & intervention counts.';
+
+  @override
+  String get accShareEngagementTitle => 'Recovery Engagement';
+
+  @override
+  String get accShareEngagementSubtitle =>
+      'Participation summary (not journal content).';
+
+  @override
+  String get accShareEducationTitle => 'Education Progress';
+
+  @override
+  String get accShareEducationSubtitle =>
+      'Daily psychoeducation module completion.';
+
+  @override
+  String get accSharingUpdated => 'Sharing preferences updated.';
+
+  @override
+  String get accUnsafeExitTitle => 'Unsafe-Situation Exit';
+
+  @override
+  String get accNormalExitTitle => 'Request to Leave Partnership';
+
+  @override
+  String get accUnsafeExitDesc =>
+      'Data sharing stops immediately and any normal request is cancelled.';
+
+  @override
+  String get accNormalExitDesc =>
+      'Your partner has 72 hours to review the request.';
+
+  @override
+  String get accReasonLabel => 'Reason (optional)';
+
+  @override
+  String get accReasonHint => 'Give a short explanation...';
+
+  @override
+  String get accSendRequest => 'Send Request';
+
+  @override
+  String get accExitRequestSent => 'Exit request sent.';
+
+  @override
+  String get accExitRequestCancelled => 'Exit request cancelled.';
+
+  @override
+  String get accApprovalCancelled => 'Approval request cancelled.';
+
+  @override
+  String get accExitPendingTitle => 'Exit request under review';
+
+  @override
+  String get accExitPendingBody =>
+      'You can cancel a normal request while it is still pending.';
+
+  @override
+  String get accExitChoose =>
+      'Choose the normal flow, or stop sharing immediately if the situation is unsafe.';
+
+  @override
+  String get accCodeRequired => 'Enter the group code first.';
+
+  @override
+  String get settingsRotateConfirmTitle => 'Rotate pairing token?';
+
+  @override
+  String get settingsRotateConfirmBody =>
+      'The existing browser-extension pairing becomes invalid immediately and must be paired again.';
+
+  @override
+  String get settingsRotateConfirmAction => 'Rotate token';
+
+  @override
+  String get settingsRotateSuccess => 'Pairing token rotated.';
+
+  @override
+  String get settingsPasswordChangedTitle => 'Password updated';
+
+  @override
+  String get settingsPasswordChangedBody =>
+      'Please sign in again with your new password.';
+
+  @override
+  String get patternWaitHint => 'Almost there — take a breath first.';
+
+  @override
+  String get statusPending => 'pending';
+
+  @override
+  String get statusReviewed => 'reviewed';
+
+  @override
+  String get statusApproved => 'approved';
+
+  @override
+  String get statusRejected => 'rejected';
+
+  @override
+  String get statusExpired => 'expired';
+
+  @override
+  String get missionsSectionTitle => 'Daily Missions';
+
+  @override
+  String get missionsSectionSubtitle =>
+      'EXP can be claimed after the system verifies the activity.';
+
+  @override
+  String get mission1 => 'Keep protection active today';
+
+  @override
+  String get mission2 => 'Record one mood and urge check-in';
+
+  @override
+  String get mission3 => 'Complete one learning section';
+
+  @override
+  String get mission4 => 'Keep partner support connected';
+
+  @override
+  String get mission5 => 'Complete one learning module';
+
+  @override
+  String get missionAction1 => 'Check protection';
+
+  @override
+  String get missionAction2 => 'Check in on the web';
+
+  @override
+  String get missionAction3 => 'Open learning on the web';
+
+  @override
+  String get missionAction4 => 'Manage partner';
+
+  @override
+  String get missionAction5 => 'Continue the module on the web';
+
+  @override
+  String missionClaim(int exp) {
+    return 'Claim $exp EXP';
+  }
+
+  @override
+  String get missionClaimedLabel => 'EXP claimed';
+
+  @override
+  String get missionLockedLabel => 'Awaiting verification';
+
+  @override
+  String get missionSkippedLabel => 'Skipped for today';
+
+  @override
+  String get missionBonusLabel => 'Bonus';
+
+  @override
+  String missionExpReward(int exp) {
+    return '+$exp EXP';
+  }
+
+  @override
+  String missionExpEarned(int exp) {
+    return '+$exp EXP. Thank you for showing up today.';
+  }
+
+  @override
+  String get missionLevelUp =>
+      'A new level is open. Keep going at your own pace.';
+
+  @override
+  String get missionsAllDone =>
+      'All of today\'s missions are done. Rest is part of recovery too.';
+
+  @override
+  String levelLabel(int level) {
+    return 'Level $level';
+  }
+
+  @override
+  String levelExpProgress(int progress, int target) {
+    return '$progress/$target EXP';
+  }
+
+  @override
+  String get levelTitle1 => 'First Step';
+
+  @override
+  String get levelTitle2 => 'Intention Keeper';
+
+  @override
+  String get levelTitle3 => 'Rhythm Builder';
+
+  @override
+  String get levelTitle4 => 'Calm Explorer';
+
+  @override
+  String get levelTitle5 => 'Focus Keeper';
+
+  @override
+  String get levelTitle6 => 'Habit Builder';
+
+  @override
+  String get levelTitle7 => 'Journey Companion';
+
+  @override
+  String get analyticsMilestoneTitle => 'Your protection is working';
+
+  @override
+  String analyticsMilestoneBody(int count, int days) {
+    return 'Protection helped you $count times in the last $days days. Every pause is room to choose again.';
+  }
+
+  @override
+  String get patternPhaseInhale => 'Breathe in…';
+
+  @override
+  String get patternPhaseExhale => 'Breathe out slowly…';
+
+  @override
+  String get patternPhaseStatic => 'Breathe in slowly, then let it out.';
+
+  @override
+  String get groundingStep1Title => 'See';
+
+  @override
+  String get groundingStep1Body => 'Name five things you can see around you.';
+
+  @override
+  String get groundingStep2Title => 'Feel';
+
+  @override
+  String get groundingStep2Body => 'Name four things you can touch or feel.';
+
+  @override
+  String get groundingStep3Title => 'Hear';
+
+  @override
+  String get groundingStep3Body => 'Name three sounds you can hear right now.';
+
+  @override
+  String get groundingStep4Title => 'Smell';
+
+  @override
+  String get groundingStep4Body => 'Name two scents you can smell.';
+
+  @override
+  String get groundingStep5Title => 'Protect';
+
+  @override
+  String get groundingStep5Body => 'Name one thing you want to protect today.';
+
+  @override
+  String groundingStepProgress(int current, int total) {
+    return 'Step $current of $total';
+  }
+
+  @override
+  String get groundingNext => 'Next';
+
+  @override
+  String get groundingDone => 'Done';
+
+  @override
+  String get groundingCompleteTitle => 'Exercise complete';
+
+  @override
+  String get groundingCompleteBody =>
+      'You brought yourself fully into this moment. Choose your next step calmly.';
+
+  @override
+  String get recoveryWebEyebrow => 'continue on the web';
+
+  @override
+  String get introPlatformAndroid => 'android';
+
+  @override
+  String get introPlatformWindows => 'windows';
 }

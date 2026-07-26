@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_dimens.dart';
 
 /// Reusable empty-state for lists (journal history, missions, members, …).
 /// Shows an icon, title, and optional hint, centered and muted.
@@ -21,24 +22,33 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.navy.withValues(alpha: 0.12),
-          style: BorderStyle.solid,
-        ),
+        color: AppColors.muted.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 32, color: AppColors.navy.withValues(alpha: 0.3)),
-          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.azure.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(AppRadius.sm),
+            ),
+            child: Icon(
+              icon,
+              size: AppIconSize.xl,
+              color: AppColors.navy.withValues(alpha: 0.55),
+            ),
+          ),
+          const SizedBox(height: 12),
           Text(
             title,
-            style: TextStyle(
-              fontSize: 14,
+            style: textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w700,
               color: AppColors.navy,
             ),
@@ -48,9 +58,8 @@ class EmptyState extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               hint!,
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.navy.withValues(alpha: 0.5),
+              style: textTheme.bodySmall?.copyWith(
+                color: AppColors.mutedForeground,
               ),
               textAlign: TextAlign.center,
             ),

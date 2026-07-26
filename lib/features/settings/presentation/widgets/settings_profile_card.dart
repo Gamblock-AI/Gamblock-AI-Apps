@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/auth/auth_state.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Identifies the authenticated user at the top of the Settings screen.
 class SettingsProfileCard extends StatelessWidget {
@@ -18,18 +19,11 @@ class SettingsProfileCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFF0F172A),
-            Color(0xFF1E293B),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: AppColors.navyGradient,
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.25),
+            color: AppColors.navyDark.withValues(alpha: 0.25),
             blurRadius: 18,
             offset: const Offset(0, 6),
           ),
@@ -45,7 +39,7 @@ class SettingsProfileCard extends StatelessWidget {
               height: 110,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF38BDF8).withValues(alpha: 0.07),
+                color: AppColors.sky.withValues(alpha: 0.07),
               ),
             ),
           ),
@@ -61,8 +55,8 @@ class SettingsProfileCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [
-                            Color(0xFF2563EB),
-                            Color(0xFF3B82F6),
+                            AppColors.navyLight,
+                            AppColors.skyDark,
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -74,7 +68,7 @@ class SettingsProfileCard extends StatelessWidget {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF2563EB).withValues(alpha: 0.35),
+                            color: AppColors.skyDark.withValues(alpha: 0.35),
                             blurRadius: 10,
                             offset: const Offset(0, 3),
                           ),
@@ -97,13 +91,13 @@ class SettingsProfileCard extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(2),
                           decoration: const BoxDecoration(
-                            color: Color(0xFF0F172A),
+                            color: AppColors.navyDark,
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.verified_rounded,
                             size: 16,
-                            color: Color(0xFF34D399),
+                            color: AppColors.sageLight,
                           ),
                         ),
                       ),
@@ -148,8 +142,8 @@ class SettingsProfileCard extends StatelessWidget {
                                 ? l10n.settingsEmailVerified
                                 : l10n.settingsEmailUnverified,
                             active: auth.emailVerified,
-                            activeColor: const Color(0xFF34D399),
-                            activeBg: const Color(0xFF10B981).withValues(alpha: 0.2),
+                            activeColor: AppColors.sageLight,
+                            activeBg: AppColors.sage.withValues(alpha: 0.2),
                           ),
                           _CapabilityChip(
                             icon: auth.googleLinked
@@ -159,8 +153,8 @@ class SettingsProfileCard extends StatelessWidget {
                                 ? l10n.settingsGoogleLinked
                                 : l10n.settingsGoogleUnlinked,
                             active: auth.googleLinked,
-                            activeColor: const Color(0xFF60A5FA),
-                            activeBg: const Color(0xFF3B82F6).withValues(alpha: 0.2),
+                            activeColor: AppColors.sky,
+                            activeBg: AppColors.sky.withValues(alpha: 0.2),
                           ),
                         ],
                       ),

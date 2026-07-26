@@ -20,6 +20,14 @@ class AppColors {
   static const sageLight = Color(0xFF5BB98E);
   static const amber = Color(0xFFE0A516);
 
+  // Deep ramp ends used by feature gradients/accents.
+  static const skyDark = Color(0xFF0284C7);
+  static const amberDark = Color(0xFFD97706);
+
+  // External brand color — Google account-linking contexts only.
+  static const googleRed = Color(0xFFEA4335);
+  static const googleRedDark = Color(0xFFD93025);
+
   // Surfaces (light)
   static const surface = Color(0xFFFFFFFF); // card
   static const background = Color(0xFFF4F9FE); // page base
@@ -44,6 +52,13 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [navy, Color(0xFF0D1D3D), navyDark],
+  );
+
+  /// Near-black calm backdrop reserved for the Pattern Interrupt pause.
+  static const calmDarkGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF0F172A), Color(0xFF1E1B4B), Color(0xFF09090B)],
   );
 
   /// Soft card shadow (mirrors web `shadow-card`).

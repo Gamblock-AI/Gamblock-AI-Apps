@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/glass_card.dart';
 import '../../../accountability/domain/entities/accountability_models.dart';
 
 /// Keeps partner approval and emergency access actions together in a compact layout.
@@ -42,19 +43,7 @@ class ProtectionAccountabilityCard extends StatelessWidget {
 
     final hasPartner = membership != null;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border.withValues(alpha: 0.8)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
+    return SurfaceCard(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,7 +57,7 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: (hasPartner ? AppColors.navy : AppColors.mutedForeground)
                       .withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(11),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   Icons.people_alt_outlined,
@@ -129,7 +118,7 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                           onPressed: isLoading
                               ? null
                               : () => onApplyApproval(approved),
-                          icon: const Icon(Icons.check_circle_outline, size: 14),
+                          icon: const Icon(Icons.check_circle_outline, size: 16),
                           label: FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
@@ -153,7 +142,7 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                               membership == null || pending != null || isLoading
                                   ? null
                                   : onRequestApproval,
-                          icon: const Icon(Icons.lock_clock_outlined, size: 14),
+                          icon: const Icon(Icons.lock_clock_outlined, size: 16),
                           label: FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
@@ -184,7 +173,7 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                       ),
                     ),
                     onPressed: onManagePartner,
-                    icon: const Icon(Icons.person_search_outlined, size: 14),
+                    icon: const Icon(Icons.person_search_outlined, size: 16),
                     label: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
@@ -214,7 +203,7 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                 height: 32,
                 decoration: BoxDecoration(
                   color: AppColors.crimson.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(9),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
                   Icons.key_outlined,
@@ -318,19 +307,19 @@ class ProtectionAccountabilityCard extends StatelessWidget {
 }
 
 String _formatEmergencyStatus(BuildContext context, String status) {
-  final isId = Localizations.localeOf(context).languageCode == 'id';
+  final l10n = AppLocalizations.of(context)!;
   switch (status.toLowerCase()) {
     case 'pending':
-      return isId ? 'menunggu' : 'pending';
+      return l10n.statusPending;
     case 'reviewed':
-      return isId ? 'dalam tinjauan' : 'reviewed';
+      return l10n.statusReviewed;
     case 'approved':
-      return isId ? 'disetujui' : 'approved';
+      return l10n.statusApproved;
     case 'rejected':
     case 'denied':
-      return isId ? 'ditolak' : 'rejected';
+      return l10n.statusRejected;
     case 'expired':
-      return isId ? 'kedaluwarsa' : 'expired';
+      return l10n.statusExpired;
     default:
       return status
           .split('_')

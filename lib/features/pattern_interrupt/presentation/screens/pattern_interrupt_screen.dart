@@ -2,9 +2,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
+
 import '../../../../core/feedback/feedback.dart';
+import '../../../../core/feedback/haptics.dart';
 
 import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../widgets/pattern_grounding_panel.dart';
 import '../widgets/pattern_interrupt_panel.dart';
 
@@ -16,13 +20,16 @@ class PatternInterruptScreen extends StatefulWidget {
 }
 
 class _PatternInterruptScreenState extends State<PatternInterruptScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   static const _durationSeconds = 7;
 
   late final AnimationController _breathingController;
+  late final AnimationController _ringController;
   Timer? _timer;
   int _remaining = _durationSeconds;
   bool _groundingOpen = false;
+  bool _showWaitHint = false;
+  bool _inhaling = true;
 
   @override
   void initState() {
@@ -33,10 +40,25 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
       lowerBound: 0,
       upperBound: 1,
     );
+    _breathingController.addStatusListener((status) {
+      if (!mounted) return;
+      if (status == AnimationStatus.forward) {
+        setState(() => _inhaling = true);
+      } else if (status == AnimationStatus.reverse) {
+        setState(() => _inhaling = false);
+      }
+    });
+    _ringController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: _durationSeconds),
+    );
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
       setState(() => _remaining = (_remaining - 1).clamp(0, _durationSeconds));
-      if (_remaining == 0) timer.cancel();
+      if (_remaining == 0) {
+        timer.cancel();
+        Haptics.success();
+      }
     });
   }
 
@@ -45,8 +67,14 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
     super.didChangeDependencies();
     if (MediaQuery.disableAnimationsOf(context)) {
       _breathingController.stop();
-    } else if (!_breathingController.isAnimating) {
-      _breathingController.repeat(reverse: true);
+      _ringController.stop();
+    } else {
+      if (!_breathingController.isAnimating) {
+        _breathingController.repeat(reverse: true);
+      }
+      if (_remaining > 0 && !_ringController.isAnimating) {
+        _ringController.forward();
+      }
     }
   }
 
@@ -54,8 +82,18 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
   void dispose() {
     _timer?.cancel();
     _breathingController.dispose();
+    _ringController.dispose();
     super.dispose();
   }
+
+  /// Normal path: the 7s controller sweeps the ring. Reduced motion: a
+  /// discrete once-per-second value with no decorative motion.
+  Animation<double> get _pauseProgress =>
+      MediaQuery.disableAnimationsOf(context)
+      ? AlwaysStoppedAnimation(
+          (_durationSeconds - _remaining) / _durationSeconds,
+        )
+      : _ringController;
 
   Future<void> _openWeb(String path) async {
     final opened = await launchUrl(
@@ -70,7 +108,7 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
     if (!opened && mounted) {
       AppFeedback.error(
         context,
-        'Halaman bantuan belum dapat dibuka. Coba lagi.',
+        AppLocalizations.of(context)!.helpPageOpenError,
       );
     }
   }
@@ -81,18 +119,13 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
     final disableAnimations = MediaQuery.disableAnimationsOf(context);
     return PopScope(
       canPop: ready,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && !_showWaitHint) setState(() => _showWaitHint = true);
+      },
       child: Scaffold(
         body: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF0F172A),
-                Color(0xFF1E1B4B),
-                Color(0xFF09090B),
-              ],
-            ),
+            gradient: AppColors.calmDarkGradient,
           ),
           child: SafeArea(
             child: Center(
@@ -100,24 +133,64 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 520),
-                  child: AnimatedSwitcher(
-                    duration: disableAnimations
-                        ? Duration.zero
-                        : const Duration(milliseconds: 220),
-                    child: _groundingOpen
-                        ? PatternGroundingPanel(
-                            onReturnToProtection: () => context.go('/dashboard'),
-                          )
-                        : PatternInterruptPanel(
-                            breathingAnimation: _breathingController,
-                            disableAnimations: disableAnimations,
-                            secondsRemaining: _remaining,
-                            onContinue: () => _openWeb('post-intervention'),
-                            onOpenGrounding: () =>
-                                setState(() => _groundingOpen = true),
-                            onOpenHelp: () => _openWeb('help'),
-                            onLater: () => context.go('/dashboard'),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AnimatedSize(
+                        duration: disableAnimations
+                            ? Duration.zero
+                            : const Duration(milliseconds: 220),
+                        curve: Curves.easeOutCubic,
+                        alignment: Alignment.topCenter,
+                        child: AnimatedSwitcher(
+                          duration: disableAnimations
+                              ? Duration.zero
+                              : const Duration(milliseconds: 220),
+                          child: _groundingOpen
+                              ? PatternGroundingPanel(
+                                  onReturnToProtection: () =>
+                                      context.go('/dashboard'),
+                                )
+                              : PatternInterruptPanel(
+                                  breathingAnimation: _breathingController,
+                                  pauseProgress: _pauseProgress,
+                                  inhaling: _inhaling,
+                                  disableAnimations: disableAnimations,
+                                  secondsRemaining: _remaining,
+                                  onContinue: () =>
+                                      _openWeb('post-intervention'),
+                                  onOpenGrounding: () =>
+                                      setState(() => _groundingOpen = true),
+                                  onOpenHelp: () => _openWeb('help'),
+                                  onLater: () => context.go('/dashboard'),
+                                ),
+                        ),
+                      ),
+                      // Fixed-height slot: the back-press hint fades in without
+                      // shifting the panel above it.
+                      SizedBox(
+                        height: 36,
+                        child: Center(
+                          child: AnimatedOpacity(
+                            opacity:
+                                _showWaitHint && !ready && !_groundingOpen
+                                    ? 1.0
+                                    : 0.0,
+                            duration: disableAnimations
+                                ? Duration.zero
+                                : const Duration(milliseconds: 250),
+                            child: Text(
+                              AppLocalizations.of(context)!.patternWaitHint,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.75),
+                                fontSize: 13,
+                              ),
+                            ),
                           ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

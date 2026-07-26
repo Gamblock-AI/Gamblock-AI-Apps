@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/glass_card.dart';
 import '../../domain/entities/accountability_models.dart';
 
 /// Renders the local user's server-backed approval-request history.
@@ -58,22 +60,10 @@ class ApprovalRequestHistory extends StatelessWidget {
           for (final request in requests)
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
-              child: Container(
+              child: SurfaceCard(
+                radius: AppRadius.md,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                      color: AppColors.border.withValues(alpha: 0.8)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.02),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
                 child: Row(
                   children: [
                     Container(
@@ -86,7 +76,7 @@ class ApprovalRequestHistory extends StatelessWidget {
                                     ? AppColors.crimson
                                     : AppColors.amber)
                             .withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(11),
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
                       ),
                       child: Icon(
                         request.status == 'approved'

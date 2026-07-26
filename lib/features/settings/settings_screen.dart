@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
+import '../../core/widgets/app_bar_title.dart';
 import '../../core/auth/auth_state.dart';
 import '../../core/config/app_config.dart';
 import '../../core/feedback/feedback.dart';
@@ -14,9 +15,11 @@ import '../../core/messaging/app_messages.dart';
 import '../../core/platform/platform_bridge.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_dimens.dart';
 import 'presentation/widgets/edit_profile_dialog.dart';
 import 'presentation/widgets/logout_confirmation_dialog.dart';
 import 'presentation/widgets/password_change_dialog.dart';
+import 'presentation/widgets/rotate_pairing_confirmation_dialog.dart';
 import 'presentation/widgets/settings_about_section.dart';
 import 'presentation/widgets/settings_account_section.dart';
 import 'presentation/widgets/settings_preferences_section.dart';
@@ -88,11 +91,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
     );
     if (!changed || !mounted) return;
-    AppFeedback.success(
-      context,
-      AppLocalizations.of(context)!.settingsPasswordUpdated,
+    final l10n = AppLocalizations.of(context)!;
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.settingsPasswordChangedTitle),
+        content: Text(l10n.settingsPasswordChangedBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n.continueAction),
+          ),
+        ],
+      ),
     );
-    context.go('/login');
+    if (mounted) context.go('/login');
   }
 
   Future<void> _linkGoogle() async {
@@ -106,7 +119,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     try {
       await ref.read(authProvider.notifier).linkGoogle(password);
       if (mounted) {
-        AppFeedback.success(context, 'Akun Google berhasil ditautkan.');
+        AppFeedback.success(
+          context,
+          AppLocalizations.of(context)!.settingsGoogleLinkedSuccess,
+        );
       }
     } catch (error) {
       if (mounted) {
@@ -131,8 +147,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _rotatePairingToken() async {
+    if (!await showRotatePairingConfirmationDialog(context)) return;
     final token = await PlatformBridge.rotatePairingToken();
-    if (mounted) setState(() => _pairingToken = token);
+    if (!mounted) return;
+    setState(() => _pairingToken = token);
+    AppFeedback.success(
+      context,
+      AppLocalizations.of(context)!.settingsRotateSuccess,
+    );
   }
 
   Future<void> _setHealthNotifications(bool enabled) async {
@@ -148,7 +170,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       mode: LaunchMode.externalApplication,
     );
     if (!opened && mounted) {
-      AppFeedback.error(context, 'Halaman belum dapat dibuka. Coba lagi.');
+      AppFeedback.error(
+        context,
+        AppLocalizations.of(context)!.webPageOpenError,
+      );
     }
   }
 
@@ -160,35 +185,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 16,
-        title: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: AppColors.navy.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(9),
-              ),
-              child: const Icon(
-                Icons.settings_rounded,
-                size: 18,
-                color: AppColors.navy,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              l10n.settingsTitle,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.navy,
-                    letterSpacing: -0.5,
-                  ),
-            ),
-          ],
-        ),
+        title: AppBarTitle(icon: Icons.settings_rounded, title: l10n.settingsTitle),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 36),
+        padding: AppSpacing.screenPadding,
         children: [
           if (auth.isAuthenticated) SettingsProfileCard(auth: auth),
           SettingsAccountSection(
@@ -226,7 +226,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SizedBox(height: 24),
             Card(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(22),
               ),
               color: AppColors.crimson.withValues(alpha: 0.05),
               child: ListTile(
@@ -307,14 +307,14 @@ class _LinkGoogleDialogState extends State<_LinkGoogleDialog> {
                   height: 44,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFFEA4335), Color(0xFFD93025)],
+                      colors: [AppColors.googleRed, AppColors.googleRedDark],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    borderRadius: BorderRadius.circular(13),
+                    borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFEA4335).withValues(alpha: 0.3),
+                        color: AppColors.googleRed.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       ),
@@ -322,7 +322,7 @@ class _LinkGoogleDialogState extends State<_LinkGoogleDialog> {
                   ),
                   child: const Icon(
                     Icons.add_link_rounded,
-                    size: 22,
+                    size: 20,
                     color: Colors.white,
                   ),
                 ),
@@ -349,12 +349,12 @@ class _LinkGoogleDialogState extends State<_LinkGoogleDialog> {
                 labelText: l10n.settingsCurrentPassword,
                 isDense: true,
                 filled: true,
-                fillColor: const Color(0xFFF8FAFC),
+                fillColor: AppColors.background,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                  borderSide: const BorderSide(color: AppColors.border),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -371,7 +371,7 @@ class _LinkGoogleDialogState extends State<_LinkGoogleDialog> {
                     height: 42,
                     child: FilledButton(
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFFF1F5F9),
+                        backgroundColor: AppColors.muted,
                         foregroundColor: AppColors.navy,
                         elevation: 0,
                         padding: EdgeInsets.zero,
@@ -394,7 +394,7 @@ class _LinkGoogleDialogState extends State<_LinkGoogleDialog> {
                     height: 42,
                     child: FilledButton(
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFFEA4335),
+                        backgroundColor: AppColors.googleRed,
                         elevation: 0,
                         padding: EdgeInsets.zero,
                         shape: RoundedRectangleBorder(

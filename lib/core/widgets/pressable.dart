@@ -29,6 +29,7 @@ class _PressableState extends State<Pressable>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scale;
+  bool _hovered = false;
 
   @override
   void initState() {
@@ -78,13 +79,26 @@ class _PressableState extends State<Pressable>
         cursor: widget.onTap == null
             ? MouseCursor.defer
             : SystemMouseCursors.click,
+        onEnter: widget.onTap == null
+            ? null
+            : (_) => setState(() => _hovered = true),
+        onExit: widget.onTap == null
+            ? null
+            : (_) => setState(() => _hovered = false),
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTapDown: _handleTapDown,
           onTapUp: _handleTapUp,
           onTapCancel: _handleTapCancel,
           onTap: widget.onTap == null ? null : _handleTap,
-          child: ScaleTransition(scale: _scale, child: widget.child),
+          child: AnimatedScale(
+            scale: _hovered ? 1.01 : 1.0,
+            duration: MediaQuery.disableAnimationsOf(context)
+                ? Duration.zero
+                : const Duration(milliseconds: 120),
+            curve: Curves.easeOut,
+            child: ScaleTransition(scale: _scale, child: widget.child),
+          ),
         ),
       ),
     );

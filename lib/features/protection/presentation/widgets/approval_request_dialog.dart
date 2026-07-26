@@ -54,15 +54,11 @@ class _ApprovalRequestDialogState extends State<ApprovalRequestDialog> {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(13),
+                      gradient: AppColors.navyGradient,
+                      borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF0F172A).withValues(alpha: 0.2),
+                          color: AppColors.navyDark.withValues(alpha: 0.2),
                           blurRadius: 8,
                           offset: const Offset(0, 3),
                         ),
@@ -70,8 +66,8 @@ class _ApprovalRequestDialogState extends State<ApprovalRequestDialog> {
                     ),
                     child: const Icon(
                       Icons.shield_outlined,
-                      size: 22,
-                      color: Color(0xFF38BDF8),
+                      size: 20,
+                      color: AppColors.sky,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -108,12 +104,12 @@ class _ApprovalRequestDialogState extends State<ApprovalRequestDialog> {
                   labelText: l10n.protectionActionLabel,
                   isDense: true,
                   filled: true,
-                  fillColor: const Color(0xFFF8FAFC),
+                  fillColor: AppColors.background,
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    borderSide: const BorderSide(color: AppColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -145,12 +141,12 @@ class _ApprovalRequestDialogState extends State<ApprovalRequestDialog> {
                     labelText: l10n.protectionDurationLabel,
                     isDense: true,
                     filled: true,
-                    fillColor: const Color(0xFFF8FAFC),
+                    fillColor: AppColors.background,
                     contentPadding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                      borderSide: const BorderSide(color: AppColors.border),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -184,12 +180,12 @@ class _ApprovalRequestDialogState extends State<ApprovalRequestDialog> {
                   helperText: l10n.protectionReasonHelp,
                   isDense: true,
                   filled: true,
-                  fillColor: const Color(0xFFF8FAFC),
+                  fillColor: AppColors.background,
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    borderSide: const BorderSide(color: AppColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -206,7 +202,7 @@ class _ApprovalRequestDialogState extends State<ApprovalRequestDialog> {
                       height: 42,
                       child: FilledButton(
                         style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFFF1F5F9),
+                          backgroundColor: AppColors.muted,
                           foregroundColor: AppColors.navy,
                           elevation: 0,
                           padding: EdgeInsets.zero,

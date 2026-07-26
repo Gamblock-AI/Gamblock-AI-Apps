@@ -50,7 +50,7 @@ Future<void> showSelfTestResultDialog(
     context: context,
     builder: (context) => Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
       ),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 380),
@@ -98,7 +98,7 @@ Future<void> showSelfTestResultDialog(
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: AppColors.navy.withValues(alpha: 0.04),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                       color: AppColors.border.withValues(alpha: 0.6)),
                 ),
@@ -107,7 +107,7 @@ Future<void> showSelfTestResultDialog(
                   children: [
                     const Icon(
                       Icons.tune_rounded,
-                      size: 13,
+                      size: 12,
                       color: AppColors.navy,
                     ),
                     const SizedBox(width: 6),

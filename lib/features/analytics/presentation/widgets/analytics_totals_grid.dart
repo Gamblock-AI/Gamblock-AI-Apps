@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
 import '../../domain/entities/protection_analytics.dart';
 
 /// Displays the four aggregate protection counters in a compact two-column grid.
@@ -13,11 +14,13 @@ class AnalyticsTotalsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return GridView.count(
-      crossAxisCount: 2,
-      crossAxisSpacing: 8,
-      mainAxisSpacing: 8,
-      childAspectRatio: 2.3,
+    return GridView(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        mainAxisExtent: 68,
+      ),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       children: [
@@ -69,15 +72,9 @@ class _CompactStatTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border.withValues(alpha: 0.7)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+        border: Border.all(color: AppColors.border),
+        boxShadow: AppColors.softShadow,
       ),
       child: Row(
         children: [
@@ -86,9 +83,9 @@ class _CompactStatTile extends StatelessWidget {
             height: 32,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(9),
+              borderRadius: BorderRadius.circular(AppRadius.xs),
             ),
-            child: Icon(icon, color: color, size: 16),
+            child: Icon(icon, color: color, size: AppIconSize.sm),
           ),
           const SizedBox(width: 8),
           Expanded(

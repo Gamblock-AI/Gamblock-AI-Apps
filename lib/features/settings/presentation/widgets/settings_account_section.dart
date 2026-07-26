@@ -3,6 +3,7 @@ import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_section_label.dart';
 
 /// Account actions that vary between authenticated and anonymous sessions.
 class SettingsAccountSection extends StatelessWidget {
@@ -29,20 +30,10 @@ class SettingsAccountSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8, top: 16),
-          child: Text(
-            l10n.settingsAccountSection.toUpperCase(),
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.mutedForeground,
-                  letterSpacing: 1.1,
-                ),
-          ),
-        ),
+        AppSectionLabel(title: l10n.settingsAccountSection),
         Card(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(22),
           ),
           child: Column(
             children: [
@@ -50,7 +41,7 @@ class SettingsAccountSection extends StatelessWidget {
                 _settingsTile(
                   context,
                   icon: Icons.person_outline_rounded,
-                  iconColor: const Color(0xFF3B82F6),
+                  iconColor: AppColors.navyLight,
                   title: l10n.settingsEditProfile,
                   onTap: onEditProfile,
                 ),
@@ -63,7 +54,7 @@ class SettingsAccountSection extends StatelessWidget {
                   _settingsTile(
                     context,
                     icon: Icons.add_link_rounded,
-                    iconColor: const Color(0xFFEA4335),
+                    iconColor: AppColors.googleRed,
                     title: l10n.settingsLinkGoogle,
                     subtitle: l10n.settingsLinkGoogleDesc,
                     onTap: onLinkGoogle,
@@ -77,7 +68,7 @@ class SettingsAccountSection extends StatelessWidget {
                 _settingsTile(
                   context,
                   icon: Icons.lock_outline_rounded,
-                  iconColor: const Color(0xFFA855F7),
+                  iconColor: AppColors.navy,
                   title: l10n.settingsChangePassword,
                   onTap: onChangePassword,
                 ),
@@ -89,7 +80,7 @@ class SettingsAccountSection extends StatelessWidget {
                 _settingsTile(
                   context,
                   icon: Icons.people_outline_rounded,
-                  iconColor: const Color(0xFF10B981),
+                  iconColor: AppColors.sage,
                   title: l10n.settingsAccountabilityPartner,
                   onTap: onManagePartner,
                 ),

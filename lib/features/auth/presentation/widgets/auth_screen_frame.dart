@@ -17,7 +17,8 @@ class AuthScreenFrame extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 420),
       child: child,
     );
-    final content = animate
+    final shouldAnimate = animate && !MediaQuery.disableAnimationsOf(context);
+    final content = shouldAnimate
         ? constrainedChild
               .animate()
               .fadeIn(duration: 400.ms)

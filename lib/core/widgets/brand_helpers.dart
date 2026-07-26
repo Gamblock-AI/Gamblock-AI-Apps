@@ -52,6 +52,6 @@ Widget _label(String label, IconData? icon) {
   if (icon == null) return text;
   return Row(
     mainAxisAlignment: MainAxisAlignment.center,
-    children: [Icon(icon, size: 18), const SizedBox(width: 8), text],
+    children: [Icon(icon, size: 20), const SizedBox(width: 8), text],
   );
 }

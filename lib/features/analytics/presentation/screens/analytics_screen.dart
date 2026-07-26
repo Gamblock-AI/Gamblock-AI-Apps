@@ -7,11 +7,15 @@ import '../../../../core/auth/auth_state.dart';
 import '../../../../core/device/aggregate_sync.dart';
 import '../../../../core/messaging/app_messages.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
+import '../../../../core/widgets/app_bar_title.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../data/providers.dart';
 import '../../domain/entities/protection_analytics.dart';
 import '../widgets/analytics_data_state_notice.dart';
 import '../widgets/analytics_period_selector.dart';
+import '../widgets/protection_milestone_card.dart';
+import '../widgets/analytics_skeleton.dart';
 import '../widgets/analytics_totals_grid.dart';
 import '../widgets/protection_trend_chart.dart';
 
@@ -74,37 +78,12 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 16,
-        title: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: AppColors.navy.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(9),
-              ),
-              child: const Icon(
-                Icons.auto_graph_rounded,
-                size: 18,
-                color: AppColors.navy,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              l10n.analyticsTitle,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.navy,
-                    letterSpacing: -0.5,
-                  ),
-            ),
-          ],
-        ),
+        title: AppBarTitle(icon: Icons.auto_graph_rounded, title: l10n.analyticsTitle),
       ),
       body: RefreshIndicator(
         onRefresh: _load,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+          padding: AppSpacing.screenPadding,
           children: [
             AnalyticsPeriodSelector(
               selectedDays: _days,
@@ -115,12 +94,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
             ),
             const SizedBox(height: 12),
             if (_loading && _analytics == null)
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(32),
-                  child: CircularProgressIndicator(),
-                ),
-              )
+              const AnalyticsSkeleton()
             else if (_error != null)
               EmptyState(
                 icon: Icons.cloud_off,
@@ -141,6 +115,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                     ),
               ),
               const SizedBox(height: 14),
+              ProtectionMilestoneCard(analytics: _analytics),
               ProtectionTrendChart(days: _analytics?.daily ?? const []),
               const SizedBox(height: 10),
               AnalyticsDataStateNotice(dataState: _analytics?.dataState),
@@ -201,7 +176,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 22, color: AppColors.navy),
+        Icon(icon, size: 20, color: AppColors.navy),
         const SizedBox(width: 12),
         Expanded(
           child: Column(

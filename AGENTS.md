@@ -1,6 +1,6 @@
 # Gamblock-AI Flutter Client Agent Rules
 
-Context version: `2026-07-20.5`
+Context version: `2026-07-27.1`
 
 This standalone repository contains the Android and Windows protection client.
 Read `docs/ai/README.md` before changing behavior; it distinguishes working
@@ -63,6 +63,13 @@ lib/features/<feature>/
 - `lib/core/auth/auth_state.dart`: authentication state and calls.
 - `lib/core/platform/`: native bridges and protection-related contracts.
 - `lib/core/messaging/app_messages.dart`: stable backend error-code mapping.
+- `lib/core/theme/`: `AppColors`, `AppTheme`, `AppText`, and the
+  `AppRadius`/`AppIconSize` scales in `app_dimens.dart`.
+- `lib/core/widgets/`: shared brand widgets (`SurfaceCard`, `Pressable`,
+  `SkeletonBox`, `EmptyState`, `AppSectionLabel`, and friends).
+- `lib/core/feedback/`: `AppFeedback` snackbars and the global `Haptics` flag.
+- `lib/core/device/`: device registry and aggregate sync helpers.
+- `lib/core/settings/`: persisted app preferences (locale, haptics).
 
 Do not hardcode URLs in features or call Dio from presentation code.
 

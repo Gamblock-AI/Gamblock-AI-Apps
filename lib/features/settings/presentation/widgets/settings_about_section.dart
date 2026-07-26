@@ -3,6 +3,7 @@ import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/platform/platform_bridge.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_section_label.dart';
 
 /// Shows local artifact provenance and static support links.
 class SettingsAboutSection extends StatelessWidget {
@@ -23,27 +24,17 @@ class SettingsAboutSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8, top: 16),
-          child: Text(
-            l10n.settingsAboutSection.toUpperCase(),
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.mutedForeground,
-                  letterSpacing: 1.1,
-                ),
-          ),
-        ),
+        AppSectionLabel(title: l10n.settingsAboutSection),
         Card(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(22),
           ),
           child: Column(
             children: [
               _settingsTile(
                 context,
                 icon: Icons.memory_rounded,
-                iconColor: const Color(0xFF64748B),
+                iconColor: AppColors.mutedForeground,
                 title: l10n.settingsArtifacts,
                 subtitle: '${snapshot.modelVersion} · ${snapshot.rulesetVersion}',
                 showChevron: false,
@@ -56,7 +47,7 @@ class SettingsAboutSection extends StatelessWidget {
               _settingsTile(
                 context,
                 icon: Icons.privacy_tip_outlined,
-                iconColor: const Color(0xFF10B981),
+                iconColor: AppColors.sage,
                 title: l10n.settingsPrivacy,
                 onTap: onOpenPrivacy,
               ),
@@ -68,7 +59,7 @@ class SettingsAboutSection extends StatelessWidget {
               _settingsTile(
                 context,
                 icon: Icons.help_outline_rounded,
-                iconColor: const Color(0xFF06B6D4),
+                iconColor: AppColors.skyDark,
                 title: l10n.settingsHelp,
                 onTap: onOpenHelp,
               ),
@@ -80,7 +71,7 @@ class SettingsAboutSection extends StatelessWidget {
               _settingsTile(
                 context,
                 icon: Icons.info_outline_rounded,
-                iconColor: const Color(0xFF8B5CF6),
+                iconColor: AppColors.navyLight,
                 title: l10n.settingsAboutApp,
                 subtitle: l10n.settingsAppVersion,
                 showChevron: false,

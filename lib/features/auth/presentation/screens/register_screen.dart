@@ -90,6 +90,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return AuthScreenFrame(
+      animate: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

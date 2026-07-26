@@ -30,7 +30,7 @@ class ProtectionActions extends StatelessWidget {
                 foregroundColor: AppColors.navy,
                 side: BorderSide(color: AppColors.border.withValues(alpha: 0.9)),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 backgroundColor: AppColors.surface,
               ),
@@ -58,7 +58,7 @@ class ProtectionActions extends StatelessWidget {
                 foregroundColor: AppColors.navy,
                 side: BorderSide(color: AppColors.border.withValues(alpha: 0.9)),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 backgroundColor: AppColors.surface,
               ),

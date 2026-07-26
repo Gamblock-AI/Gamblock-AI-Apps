@@ -59,14 +59,14 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
                   height: 44,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF0EA5E9), Color(0xFF0284C7)],
+                      colors: [AppColors.sky, AppColors.skyDark],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    borderRadius: BorderRadius.circular(13),
+                    borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF0EA5E9).withValues(alpha: 0.3),
+                        color: AppColors.sky.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       ),
@@ -74,7 +74,7 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
                   ),
                   child: const Icon(
                     Icons.edit_rounded,
-                    size: 22,
+                    size: 20,
                     color: Colors.white,
                   ),
                 ),
@@ -102,12 +102,12 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
                 labelText: l10n.authFullName,
                 isDense: true,
                 filled: true,
-                fillColor: const Color(0xFFF8FAFC),
+                fillColor: AppColors.background,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                  borderSide: const BorderSide(color: AppColors.border),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -124,7 +124,7 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
                     height: 42,
                     child: FilledButton(
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFFF1F5F9),
+                        backgroundColor: AppColors.muted,
                         foregroundColor: AppColors.navy,
                         elevation: 0,
                         padding: EdgeInsets.zero,

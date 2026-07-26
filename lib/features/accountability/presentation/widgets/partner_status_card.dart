@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/accountability_models.dart';
 
 /// Summarises whether the current account has an active accountability partner.
@@ -13,25 +14,17 @@ class PartnerStatusCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final hasPartner = membership != null;
-    final themeColor =
-        hasPartner ? const Color(0xFF34D399) : const Color(0xFFFBBF24);
+    final themeColor = hasPartner ? AppColors.sageLight : AppColors.amber;
 
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFF0F172A),
-            Color(0xFF1E293B),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: AppColors.navyGradient,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.25),
+            color: AppColors.navyDark.withValues(alpha: 0.25),
             blurRadius: 18,
             offset: const Offset(0, 6),
           ),
@@ -59,7 +52,7 @@ class PartnerStatusCard extends StatelessWidget {
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF38BDF8).withValues(alpha: 0.06),
+                color: AppColors.sky.withValues(alpha: 0.06),
               ),
             ),
           ),
@@ -96,23 +89,23 @@ class PartnerStatusCard extends StatelessWidget {
                         horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.06),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: Colors.white.withValues(alpha: 0.08),
                       ),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.shield_outlined,
-                          size: 13,
-                          color: Color(0xFF38BDF8),
+                          size: 12,
+                          color: AppColors.sky,
                         ),
-                        SizedBox(width: 6),
+                        const SizedBox(width: 6),
                         Text(
-                          'Privacy Protected · Aggregates Only',
-                          style: TextStyle(
+                          l10n.partnerPrivacyBadge,
+                          style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
                             color: Colors.white70,

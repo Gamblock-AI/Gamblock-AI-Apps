@@ -26,14 +26,14 @@ Future<bool> showLogoutConfirmationDialog(BuildContext context) async {
                       height: 44,
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
+                          colors: [AppColors.crimsonLight, AppColors.crimson],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(13),
+                        borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFFEF4444).withValues(alpha: 0.3),
+                            color: AppColors.crimsonLight.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
                           ),
@@ -41,7 +41,7 @@ Future<bool> showLogoutConfirmationDialog(BuildContext context) async {
                       ),
                       child: const Icon(
                         Icons.logout_rounded,
-                        size: 22,
+                        size: 20,
                         color: Colors.white,
                       ),
                     ),
@@ -75,7 +75,7 @@ Future<bool> showLogoutConfirmationDialog(BuildContext context) async {
                         height: 42,
                         child: FilledButton(
                           style: FilledButton.styleFrom(
-                            backgroundColor: const Color(0xFFF1F5F9),
+                            backgroundColor: AppColors.muted,
                             foregroundColor: AppColors.navy,
                             elevation: 0,
                             padding: EdgeInsets.zero,

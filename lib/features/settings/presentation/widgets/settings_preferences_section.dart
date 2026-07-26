@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_section_label.dart';
 
 /// Collects locale, haptic, and optional health-notification preferences.
 class SettingsPreferencesSection extends StatelessWidget {
@@ -30,20 +31,10 @@ class SettingsPreferencesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8, top: 16),
-          child: Text(
-            l10n.settingsPreferencesSection.toUpperCase(),
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.mutedForeground,
-                  letterSpacing: 1.1,
-                ),
-          ),
-        ),
+        AppSectionLabel(title: l10n.settingsPreferencesSection),
         Card(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(22),
           ),
           child: Column(
             children: [
@@ -52,13 +43,13 @@ class SettingsPreferencesSection extends StatelessWidget {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF6366F1).withValues(alpha: 0.12),
+                    color: AppColors.navyLight.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
                     Icons.language_rounded,
                     size: 20,
-                    color: Color(0xFF6366F1),
+                    color: AppColors.navyLight,
                   ),
                 ),
                 title: Text(
@@ -109,13 +100,13 @@ class SettingsPreferencesSection extends StatelessWidget {
                 secondary: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0EA5E9).withValues(alpha: 0.12),
+                    color: AppColors.skyDark.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
                     Icons.vibration_rounded,
                     size: 20,
-                    color: Color(0xFF0EA5E9),
+                    color: AppColors.skyDark,
                   ),
                 ),
                 title: Text(
@@ -140,13 +131,13 @@ class SettingsPreferencesSection extends StatelessWidget {
                   secondary: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
+                      color: AppColors.amber.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
                       Icons.notifications_active_rounded,
                       size: 20,
-                      color: Color(0xFFF59E0B),
+                      color: AppColors.amber,
                     ),
                   ),
                   title: Text(

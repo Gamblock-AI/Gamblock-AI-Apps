@@ -1,12 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
+import '../../../missions/data/providers.dart';
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/feedback/feedback.dart';
 import '../../../../core/messaging/app_messages.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../accountability/domain/entities/accountability_models.dart';
 import '../../domain/entities/protection_status.dart';
 import '../protection_coordinator.dart';
@@ -69,6 +71,11 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> with Widget
       return;
     }
     if (mounted) setState(() => _status = status);
+    // Missions load after the local status fetch so today's protection
+    // heartbeat precedes the mission-1 eligibility check server-side.
+    if (mounted) {
+      unawaited(ref.read(missionsProvider.notifier).load());
+    }
 
     final accountability = await ProtectionCoordinator(
       ref,
@@ -169,47 +176,12 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> with Widget
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final auth = ref.watch(authProvider);
+    // Slim header: the navy hero is the dashboard's only header; the refresh
+    // affordance lives inside it (mouse/Windows parity for pull-to-refresh).
     return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 16,
-        title: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: AppColors.navy.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(9),
-              ),
-              child: Icon(
-                Icons.shield_rounded,
-                size: 18,
-                color: AppColors.navy,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              l10n.dashboardTitle,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.navy,
-                    letterSpacing: -0.5,
-                  ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            tooltip: l10n.refresh,
-            onPressed: _loading ? null : _load,
-            icon: const Icon(Icons.refresh_rounded),
-          ),
-          const SizedBox(width: 4),
-        ],
-      ),
-      body: ProtectionScreenBody(
+      body: SafeArea(
+        child: ProtectionScreenBody(
         isLoading: _loading,
         isActionLoading: _actionLoading,
         status: _status,
@@ -228,6 +200,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> with Widget
         onEnterEmergencyKey: _enterEmergencyKey,
         onLogin: () => context.go('/login'),
         onOpenAccountSetup: () => context.go('/setup'),
+        ),
       ),
     );
   }

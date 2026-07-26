@@ -38,6 +38,10 @@ The app uses four predictable top-level destinations:
 - **Settings** — account/password, locale, haptics, health notifications,
   pairing, artifact versions, privacy/help, and logout.
 
+The brand typeface Plus Jakarta Sans (OFL) is bundled offline under
+`assets/fonts/` and registered in `pubspec.yaml`; the app never downloads
+fonts at runtime.
+
 The native Pattern Interrupt runs for seven seconds, respects reduced motion,
 works offline with a grounding option, and hands off to the website with only
 locale and `source=pattern_interrupt`. The longer recovery journey remains on
