@@ -84,7 +84,7 @@ class SettingsProfileCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (auth.emailVerified)
+                    if (auth.phoneVerified)
                       Positioned(
                         right: 0,
                         bottom: 0,
@@ -135,13 +135,13 @@ class SettingsProfileCard extends StatelessWidget {
                         runSpacing: 4,
                         children: [
                           _CapabilityChip(
-                            icon: auth.emailVerified
+                            icon: auth.phoneVerified
                                 ? Icons.check_circle_rounded
                                 : Icons.pending_rounded,
-                            label: auth.emailVerified
-                                ? l10n.settingsEmailVerified
-                                : l10n.settingsEmailUnverified,
-                            active: auth.emailVerified,
+                            label: auth.phoneVerified
+                                ? l10n.settingsWhatsappVerified
+                                : l10n.settingsWhatsappUnverified,
+                            active: auth.phoneVerified,
                             activeColor: AppColors.sageLight,
                             activeBg: AppColors.sage.withValues(alpha: 0.2),
                           ),

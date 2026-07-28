@@ -97,7 +97,7 @@ class ProtectionScreenBody extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          if (auth.isAuthenticated && !auth.emailVerified) ...[
+          if (auth.isAuthenticated && !auth.phoneVerified) ...[
             const _VerificationNotice(),
             const SizedBox(height: 16),
           ],
@@ -319,44 +319,116 @@ class _DashboardHero extends ConsumerWidget {
   }
 }
 
-class _VerificationNotice extends ConsumerWidget {
+class _VerificationNotice extends ConsumerStatefulWidget {
   const _VerificationNotice();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_VerificationNotice> createState() => _VerificationNoticeState();
+}
+
+class _VerificationNoticeState extends ConsumerState<_VerificationNotice> {
+  final _phoneController = TextEditingController();
+  final _codeController = TextEditingController();
+  String? _previewCode;
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _codeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Card(
       color: AppColors.azure,
-      child: ListTile(
-        minTileHeight: 72,
-        leading: const Icon(
-          Icons.mark_email_unread_outlined,
-          color: AppColors.navy,
-        ),
-        title: Text(l10n.verifyEmailTitle),
-        subtitle: Text(
-          l10n.verifyEmailBody,
-        ),
-        trailing: TextButton(
-          onPressed: () async {
-            try {
-              await ref.read(authProvider.notifier).resendEmailVerification();
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.verifyEmailSent)),
-                );
-              }
-            } catch (error) {
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(AppMessages.friendlyMessage(context, error)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.phone_rounded, color: AppColors.navy),
+                const SizedBox(width: 10),
+                Expanded(child: Text(l10n.verifyEmailTitle)),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(l10n.verifyEmailBody),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                hintText: '+6281234567890',
+                labelText: l10n.authWhatsapp,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _codeController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: l10n.codeVerificationLabel,
+                    ),
                   ),
-                );
-              }
-            }
-          },
-          child: Text(l10n.resendEmail),
+                ),
+                const SizedBox(width: 8),
+                FilledButton(
+                  onPressed: () async {
+                    try {
+                      _previewCode = await ref
+                          .read(authProvider.notifier)
+                          .startPhoneVerification(_phoneController.text);
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(l10n.verifyEmailSent)),
+                        );
+                        setState(() {});
+                      }
+                    } catch (error) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              AppMessages.friendlyMessage(context, error),
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  child: Text(l10n.resendEmail),
+                ),
+              ],
+            ),
+            if (_previewCode != null) Text('Demo code: $_previewCode'),
+            const SizedBox(height: 8),
+            OutlinedButton(
+              onPressed: () async {
+                try {
+                  await ref
+                      .read(authProvider.notifier)
+                      .confirmPhoneVerification(_codeController.text);
+                  if (mounted) setState(() {});
+                } catch (error) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(AppMessages.friendlyMessage(context, error)),
+                      ),
+                    );
+                  }
+                }
+              },
+              child: Text(l10n.verifyCode),
+            ),
+          ],
         ),
       ),
     );

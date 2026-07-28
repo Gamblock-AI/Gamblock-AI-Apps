@@ -1,6 +1,6 @@
 # Flutter Client AI Context
 
-Context version: `2026-07-27.2`
+Context version: `2026-07-29.1`
 
 ## Product capsule
 

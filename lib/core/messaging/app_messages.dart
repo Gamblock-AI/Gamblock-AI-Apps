@@ -49,7 +49,7 @@ class AppMessages {
       case 'password_reset_failed':
         return loc.msgErrPasswordResetFailed;
       case 'initial_password_change_invalid':
-      case 'email_verification_required':
+      case 'phone_required':
       case 'admin_accounts_fetch_failed':
       case 'admin_account_create_failed':
       case 'admin_account_update_failed':
@@ -64,6 +64,7 @@ class AppMessages {
       case 'email_verification_failed':
       case 'email_verification_delivery_failed':
       case 'phone_verification_failed':
+      case 'phone_verification_required':
       case 'recent_auth_required':
         return loc.msgErrInvalidRequest;
       case 'device_create_failed':

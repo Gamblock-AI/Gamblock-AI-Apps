@@ -21,7 +21,8 @@ class AuthState {
     this.role,
     this.deviceId,
     this.isLoading = true,
-    this.emailVerified = false,
+    this.phone,
+    this.phoneVerified = false,
     this.passwordEnabled = false,
     this.googleLinked = false,
   });
@@ -33,7 +34,8 @@ class AuthState {
   final String? role;
   final String? deviceId;
   final bool isLoading;
-  final bool emailVerified;
+  final String? phone;
+  final bool phoneVerified;
   final bool passwordEnabled;
   final bool googleLinked;
 
@@ -45,7 +47,8 @@ class AuthState {
     String? role,
     String? deviceId,
     bool? isLoading,
-    bool? emailVerified,
+    String? phone,
+    bool? phoneVerified,
     bool? passwordEnabled,
     bool? googleLinked,
   }) {
@@ -57,7 +60,8 @@ class AuthState {
       role: role ?? this.role,
       deviceId: deviceId ?? this.deviceId,
       isLoading: isLoading ?? this.isLoading,
-      emailVerified: emailVerified ?? this.emailVerified,
+      phone: phone ?? this.phone,
+      phoneVerified: phoneVerified ?? this.phoneVerified,
       passwordEnabled: passwordEnabled ?? this.passwordEnabled,
       googleLinked: googleLinked ?? this.googleLinked,
     );
@@ -101,7 +105,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
         displayName: user['display_name']?.toString(),
         role: user['role']?.toString(),
         deviceId: deviceId,
-        emailVerified: user['email_verified_at'] != null,
+        phone: user['phone_e164']?.toString(),
+        phoneVerified: user['phone_verified_at'] != null,
         passwordEnabled: user['_password_enabled'] == true,
         googleLinked: user['_google_linked'] == true,
       );
@@ -142,6 +147,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     String email,
     String password,
     String name,
+    String phone,
   ) async {
     final response = await ApiClient.dio.post(
       '/v1/auth/register',
@@ -149,6 +155,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         'email': email,
         'password': password,
         'name': name,
+        'phone': phone,
         'role': 'user',
       },
     );
@@ -229,7 +236,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       displayName: user['display_name']?.toString(),
       role: user['role']?.toString(),
       deviceId: deviceId,
-      emailVerified: user['email_verified_at'] != null,
+      phone: user['phone_e164']?.toString(),
+      phoneVerified: user['phone_verified_at'] != null,
       passwordEnabled: user['_password_enabled'] == true,
       googleLinked: user['_google_linked'] == true,
     );
@@ -250,14 +258,28 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(
       email: user['email']?.toString(),
       displayName: user['display_name']?.toString(),
-      emailVerified: user['email_verified_at'] != null,
+      phone: user['phone_e164']?.toString(),
+      phoneVerified: user['phone_verified_at'] != null,
       passwordEnabled: user['_password_enabled'] == true,
       googleLinked: user['_google_linked'] == true,
     );
   }
 
-  Future<void> resendEmailVerification() async {
-    await ApiClient.dio.post('/v1/auth/email-verification/resend');
+  Future<String?> startPhoneVerification([String? phone]) async {
+    final response = await ApiClient.dio.post(
+      '/v1/auth/phone-verification/start',
+      data: phone == null || phone.trim().isEmpty ? {} : {'phone': phone.trim()},
+    );
+    final data = ApiResponse.map(response);
+    return data?['preview_code']?.toString();
+  }
+
+  Future<void> confirmPhoneVerification(String code) async {
+    await ApiClient.dio.post(
+      '/v1/auth/phone-verification/confirm',
+      data: {'code': code.trim()},
+    );
+    await refreshProfile();
   }
 
   Future<void> linkGoogle(String currentPassword) async {

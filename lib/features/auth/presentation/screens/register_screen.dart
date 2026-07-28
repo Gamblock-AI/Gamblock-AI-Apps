@@ -24,6 +24,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   bool _submitted = false;
   bool _loading = false;
@@ -33,6 +34,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   void dispose() {
     _nameCtrl.dispose();
     _emailCtrl.dispose();
+    _phoneCtrl.dispose();
     _passCtrl.dispose();
     super.dispose();
   }
@@ -54,6 +56,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             _emailCtrl.text.trim(),
             _passCtrl.text,
             _nameCtrl.text.trim(),
+            _phoneCtrl.text.trim(),
           );
       if (user != null && mounted) {
         context.go('/dashboard');
@@ -120,6 +123,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   textInputAction: TextInputAction.next,
                   validator: (value) => (value?.trim().length ?? 0) < 3
                       ? l10n.authNameMinimum
+                      : null,
+                ),
+                const SizedBox(height: 14),
+                AuthInputField(
+                  controller: _phoneCtrl,
+                  label: l10n.authWhatsapp,
+                  icon: Icons.phone_rounded,
+                  keyboardType: TextInputType.phone,
+                  autofillHints: const [AutofillHints.telephoneNumber],
+                  textInputAction: TextInputAction.next,
+                  validator: (value) => (value?.trim().length ?? 0) < 8
+                      ? l10n.authWhatsappInvalid
                       : null,
                 ),
                 const SizedBox(height: 14),
