@@ -58,6 +58,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsEmailUnverified => 'Email belum terverifikasi';
 
   @override
+  String get settingsWhatsappVerified => 'WhatsApp terverifikasi';
+
+  @override
+  String get settingsWhatsappUnverified => 'WhatsApp belum terverifikasi';
+
+  @override
   String get settingsGoogleLinked => 'Google tertaut';
 
   @override
@@ -373,6 +379,12 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get authEmail => 'Email';
+
+  @override
+  String get authWhatsapp => 'Nomor WhatsApp';
+
+  @override
+  String get authWhatsappInvalid => 'Masukkan nomor WhatsApp yang valid.';
 
   @override
   String get authLoginDesc => 'Masuk untuk melanjutkan perlindungan Anda.';
@@ -1282,10 +1294,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get partnerLeaveUnsafe => 'Situasi tidak aman';
 
   @override
-  String get verifyEmailTitle => 'Verifikasi email Anda';
+  String get verifyEmailTitle => 'Verifikasi WhatsApp Anda';
 
   @override
-  String get verifyEmailSent => 'Email verifikasi telah dikirim.';
+  String get verifyEmailSent => 'Kode verifikasi WhatsApp telah dikirim.';
 
   @override
   String get resendEmail => 'Kirim ulang';
@@ -1388,7 +1400,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get verifyEmailBody =>
-      'Diperlukan untuk fitur pendamping dan pemulihan akun.';
+      'Diperlukan untuk fitur pendamping dan pemulihan akun. Masukkan kode yang dikirim ke WhatsApp.';
 
   @override
   String get statusChipOk => 'OK';

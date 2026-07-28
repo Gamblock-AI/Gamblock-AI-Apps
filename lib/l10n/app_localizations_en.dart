@@ -58,6 +58,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsEmailUnverified => 'Email not verified';
 
   @override
+  String get settingsWhatsappVerified => 'WhatsApp verified';
+
+  @override
+  String get settingsWhatsappUnverified => 'WhatsApp not verified';
+
+  @override
   String get settingsGoogleLinked => 'Google linked';
 
   @override
@@ -373,6 +379,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authEmail => 'Email';
+
+  @override
+  String get authWhatsapp => 'WhatsApp number';
+
+  @override
+  String get authWhatsappInvalid => 'Enter a valid WhatsApp number.';
 
   @override
   String get authLoginDesc => 'Sign in to manage your protection account.';
@@ -1290,10 +1302,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get partnerLeaveUnsafe => 'Unsafe situation leave';
 
   @override
-  String get verifyEmailTitle => 'Verify your email';
+  String get verifyEmailTitle => 'Verify your WhatsApp';
 
   @override
-  String get verifyEmailSent => 'Verification email sent.';
+  String get verifyEmailSent => 'WhatsApp verification code sent.';
 
   @override
   String get resendEmail => 'Resend';
@@ -1397,7 +1409,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get verifyEmailBody =>
-      'Required for partner features and account recovery.';
+      'Required for partner features and account recovery. Enter the code sent to WhatsApp.';
 
   @override
   String get statusChipOk => 'OK';

@@ -194,6 +194,18 @@ abstract class AppLocalizations {
   /// **'Email belum terverifikasi'**
   String get settingsEmailUnverified;
 
+  /// No description provided for @settingsWhatsappVerified.
+  ///
+  /// In id, this message translates to:
+  /// **'WhatsApp terverifikasi'**
+  String get settingsWhatsappVerified;
+
+  /// No description provided for @settingsWhatsappUnverified.
+  ///
+  /// In id, this message translates to:
+  /// **'WhatsApp belum terverifikasi'**
+  String get settingsWhatsappUnverified;
+
   /// No description provided for @settingsGoogleLinked.
   ///
   /// In id, this message translates to:
@@ -793,6 +805,18 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Email'**
   String get authEmail;
+
+  /// No description provided for @authWhatsapp.
+  ///
+  /// In id, this message translates to:
+  /// **'Nomor WhatsApp'**
+  String get authWhatsapp;
+
+  /// No description provided for @authWhatsappInvalid.
+  ///
+  /// In id, this message translates to:
+  /// **'Masukkan nomor WhatsApp yang valid.'**
+  String get authWhatsappInvalid;
 
   /// No description provided for @authLoginDesc.
   ///
@@ -2441,13 +2465,13 @@ abstract class AppLocalizations {
   /// No description provided for @verifyEmailTitle.
   ///
   /// In id, this message translates to:
-  /// **'Verifikasi email Anda'**
+  /// **'Verifikasi WhatsApp Anda'**
   String get verifyEmailTitle;
 
   /// No description provided for @verifyEmailSent.
   ///
   /// In id, this message translates to:
-  /// **'Email verifikasi telah dikirim.'**
+  /// **'Kode verifikasi WhatsApp telah dikirim.'**
   String get verifyEmailSent;
 
   /// No description provided for @resendEmail.
@@ -2639,7 +2663,7 @@ abstract class AppLocalizations {
   /// No description provided for @verifyEmailBody.
   ///
   /// In id, this message translates to:
-  /// **'Diperlukan untuk fitur pendamping dan pemulihan akun.'**
+  /// **'Diperlukan untuk fitur pendamping dan pemulihan akun. Masukkan kode yang dikirim ke WhatsApp.'**
   String get verifyEmailBody;
 
   /// No description provided for @statusChipOk.
