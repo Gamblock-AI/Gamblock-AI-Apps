@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app/app.dart';
 import 'core/network/api_client.dart';
+import 'core/notifications/daily_reminder_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,6 +14,9 @@ void main() async {
 
   // Initialize the Dio client once config is available (base URL from .env).
   await ApiClient.init();
+
+  // Optional daily-reminder plumbing (Android only; no-op elsewhere).
+  await _safe(DailyReminderService.init);
 
   runApp(const ProviderScope(child: GamblockApp()));
 }

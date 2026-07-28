@@ -23,9 +23,17 @@ const _steps = [
 /// and a calm completion state. The return-to-protection exit stays available
 /// on every step — the exercise never traps.
 class PatternGroundingPanel extends StatefulWidget {
-  const PatternGroundingPanel({super.key, required this.onReturnToProtection});
+  const PatternGroundingPanel({
+    super.key,
+    required this.onReturnToProtection,
+    this.onCompleted,
+  });
 
   final VoidCallback onReturnToProtection;
+
+  /// Invoked exactly once when the final step is completed, with the time
+  /// spent in the exercise. The panel stays Riverpod-free.
+  final void Function(Duration elapsed)? onCompleted;
 
   @override
   State<PatternGroundingPanel> createState() => _PatternGroundingPanelState();
@@ -33,6 +41,7 @@ class PatternGroundingPanel extends StatefulWidget {
 
 class _PatternGroundingPanelState extends State<PatternGroundingPanel> {
   int _stepIndex = 0;
+  final DateTime _startedAt = DateTime.now();
 
   bool get _completed => _stepIndex >= _steps.length;
 
@@ -41,6 +50,7 @@ class _PatternGroundingPanelState extends State<PatternGroundingPanel> {
     setState(() => _stepIndex += 1);
     if (_stepIndex >= _steps.length) {
       Haptics.success();
+      widget.onCompleted?.call(DateTime.now().difference(_startedAt));
     } else {
       Haptics.selection();
     }

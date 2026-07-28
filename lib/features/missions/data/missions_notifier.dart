@@ -31,7 +31,8 @@ class MissionsState {
       status: status ?? this.status,
       mission: mission ?? this.mission,
       error: clearError ? null : (error ?? this.error),
-      claimingNumber: clearClaiming ? null : (claimingNumber ?? claimingNumber),
+      claimingNumber:
+          clearClaiming ? null : (claimingNumber ?? this.claimingNumber),
     );
   }
 }

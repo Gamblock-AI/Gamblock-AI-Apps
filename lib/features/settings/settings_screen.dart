@@ -164,6 +164,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     await PlatformBridge.setHealthNotifications(enabled);
   }
 
+  Future<void> _setCheckInReminder(bool enabled) async {
+    final accepted = await ref
+        .read(appSettingsProvider.notifier)
+        .setCheckInReminder(enabled);
+    if (!accepted && mounted) {
+      final l10n = AppLocalizations.of(context)!;
+      AppFeedback.error(context, l10n.settingsReminderPermissionDenied);
+    }
+  }
+
+  Future<void> _pickCheckInReminderTime() async {
+    final current = ref.read(appSettingsProvider).checkInReminderTime;
+    final picked = await showTimePicker(context: context, initialTime: current);
+    if (picked != null) {
+      await ref
+          .read(appSettingsProvider.notifier)
+          .setCheckInReminderTime(picked);
+    }
+  }
+
   Future<void> _openWebPath(String path) async {
     final opened = await launchUrl(
       AppConfig.webUri('${Localizations.localeOf(context).languageCode}/$path'),
@@ -209,6 +229,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onHapticsChanged: (enabled) =>
                 ref.read(appSettingsProvider.notifier).setHaptics(enabled),
             onHealthNotificationsChanged: _setHealthNotifications,
+            showCheckInReminder: Platform.isAndroid,
+            checkInReminderEnabled: settings.checkInReminderEnabled,
+            checkInReminderTime: settings.checkInReminderTime,
+            onCheckInReminderChanged: _setCheckInReminder,
+            onCheckInReminderTimeTap: _pickCheckInReminderTime,
           ),
           if (Platform.isWindows) ...[
             WindowsSettingsSection(

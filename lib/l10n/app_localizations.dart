@@ -3002,6 +3002,12 @@ abstract class AppLocalizations {
   /// **'Selesaikan satu modul pembelajaran'**
   String get mission5;
 
+  /// No description provided for @mission6.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesaikan satu latihan pemulihan'**
+  String get mission6;
+
   /// No description provided for @missionAction1.
   ///
   /// In id, this message translates to:
@@ -3031,6 +3037,390 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Lanjutkan modul di web'**
   String get missionAction5;
+
+  /// No description provided for @missionAction6.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka ruang pulih di web'**
+  String get missionAction6;
+
+  /// No description provided for @levelTotalExp.
+  ///
+  /// In id, this message translates to:
+  /// **'Total {exp} EXP'**
+  String levelTotalExp(int exp);
+
+  /// No description provided for @dashboardAppreciationTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Perlindunganmu menemanimu'**
+  String get dashboardAppreciationTitle;
+
+  /// No description provided for @dashboardAppreciationBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Perlindungan menemanimu {count} kali dalam 7 hari terakhir. Setiap jeda adalah ruang untuk memilih ulang.'**
+  String dashboardAppreciationBody(int count);
+
+  /// No description provided for @dashboardGamiAllDone.
+  ///
+  /// In id, this message translates to:
+  /// **'Semua misi hari ini selesai. Nikmati sisa harimu dengan tenang.'**
+  String get dashboardGamiAllDone;
+
+  /// No description provided for @dashboardGamiPauseTaken.
+  ///
+  /// In id, this message translates to:
+  /// **'Jeda yang kamu ambil adalah langkah nyata.'**
+  String get dashboardGamiPauseTaken;
+
+  /// No description provided for @dashboardGamiFirstOpen.
+  ///
+  /// In id, this message translates to:
+  /// **'Selamat datang kembali. Mulai pelan-pelan saja.'**
+  String get dashboardGamiFirstOpen;
+
+  /// No description provided for @pauseAckTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Momen jeda'**
+  String get pauseAckTitle;
+
+  /// No description provided for @pauseAckToday.
+  ///
+  /// In id, this message translates to:
+  /// **'Hari ini kamu mengambil jeda — itu langkah nyata.'**
+  String get pauseAckToday;
+
+  /// No description provided for @pauseAckYesterday.
+  ///
+  /// In id, this message translates to:
+  /// **'Kemarin kamu mengambil jeda — itu langkah nyata.'**
+  String get pauseAckYesterday;
+
+  /// No description provided for @pauseAckDismiss.
+  ///
+  /// In id, this message translates to:
+  /// **'Oke'**
+  String get pauseAckDismiss;
+
+  /// No description provided for @breathingEntryTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Latihan napas'**
+  String get breathingEntryTitle;
+
+  /// No description provided for @breathingEntrySubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Satu menit untuk menenangkan tubuh'**
+  String get breathingEntrySubtitle;
+
+  /// No description provided for @breathingPatternBox.
+  ///
+  /// In id, this message translates to:
+  /// **'Kotak 4-4-4-4'**
+  String get breathingPatternBox;
+
+  /// No description provided for @breathingPattern478.
+  ///
+  /// In id, this message translates to:
+  /// **'4-7-8'**
+  String get breathingPattern478;
+
+  /// No description provided for @breathingStart.
+  ///
+  /// In id, this message translates to:
+  /// **'Mulai'**
+  String get breathingStart;
+
+  /// No description provided for @breathingPhaseInhale.
+  ///
+  /// In id, this message translates to:
+  /// **'Tarik napas'**
+  String get breathingPhaseInhale;
+
+  /// No description provided for @breathingPhaseHold.
+  ///
+  /// In id, this message translates to:
+  /// **'Tahan'**
+  String get breathingPhaseHold;
+
+  /// No description provided for @breathingPhaseExhale.
+  ///
+  /// In id, this message translates to:
+  /// **'Hembuskan'**
+  String get breathingPhaseExhale;
+
+  /// No description provided for @breathingCyclesProgress.
+  ///
+  /// In id, this message translates to:
+  /// **'Putaran {done} dari {total}'**
+  String breathingCyclesProgress(int done, int total);
+
+  /// No description provided for @breathingDoneTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Tubuhmu lebih tenang'**
+  String get breathingDoneTitle;
+
+  /// No description provided for @breathingDoneBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Napas pelan memberi ruang untuk memilih ulang.'**
+  String get breathingDoneBody;
+
+  /// No description provided for @settingsReminderTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengingat check-in harian'**
+  String get settingsReminderTitle;
+
+  /// No description provided for @settingsReminderDesc.
+  ///
+  /// In id, this message translates to:
+  /// **'Sekali sehari, di waktu pilihanmu. Tanpa isi sensitif di layar kunci.'**
+  String get settingsReminderDesc;
+
+  /// No description provided for @settingsReminderTime.
+  ///
+  /// In id, this message translates to:
+  /// **'Waktu pengingat'**
+  String get settingsReminderTime;
+
+  /// No description provided for @settingsReminderPermissionDenied.
+  ///
+  /// In id, this message translates to:
+  /// **'Izin notifikasi belum diberikan. Kamu bisa mengaktifkannya lewat pengaturan sistem.'**
+  String get settingsReminderPermissionDenied;
+
+  /// No description provided for @reminderChannelName.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengingat harian'**
+  String get reminderChannelName;
+
+  /// No description provided for @reminderChannelDesc.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengingat check-in sekali sehari'**
+  String get reminderChannelDesc;
+
+  /// No description provided for @reminderNotificationTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Waktu untuk dirimu'**
+  String get reminderNotificationTitle;
+
+  /// No description provided for @reminderNotificationBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Luangkan satu menit untuk check-in hari ini. Kapan pun kamu siap.'**
+  String get reminderNotificationBody;
+
+  /// No description provided for @journeyBadgesEyebrow.
+  ///
+  /// In id, this message translates to:
+  /// **'Lencana perjalanan'**
+  String get journeyBadgesEyebrow;
+
+  /// No description provided for @journeyBadgesTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Tanda perjalananmu'**
+  String get journeyBadgesTitle;
+
+  /// No description provided for @journeyBadgesBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Setiap lencana mencatat partisipasi yang sudah kamu lakukan. Tidak ada yang bisa hilang atau hangus.'**
+  String get journeyBadgesBody;
+
+  /// No description provided for @journeyBadgesUnavailable.
+  ///
+  /// In id, this message translates to:
+  /// **'Lencana belum dapat dimuat saat ini.'**
+  String get journeyBadgesUnavailable;
+
+  /// No description provided for @journeyRhythmHint.
+  ///
+  /// In id, this message translates to:
+  /// **'Ritme kehadiran, bukan rekor yang harus dijaga.'**
+  String get journeyRhythmHint;
+
+  /// No description provided for @journeyBadgesUpNext.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} lencana berikutnya'**
+  String journeyBadgesUpNext(int count);
+
+  /// No description provided for @journeyBadgesCount.
+  ///
+  /// In id, this message translates to:
+  /// **'{earned} dari {total} lencana terbuka'**
+  String journeyBadgesCount(int earned, int total);
+
+  /// No description provided for @journeyRhythmLine.
+  ///
+  /// In id, this message translates to:
+  /// **'Hadir {count} dari 7 hari terakhir'**
+  String journeyRhythmLine(int count);
+
+  /// No description provided for @journeyBadgeFirstCheckInName.
+  ///
+  /// In id, this message translates to:
+  /// **'Check-in pertama'**
+  String get journeyBadgeFirstCheckInName;
+
+  /// No description provided for @journeyBadgeFirstCheckInCriteria.
+  ///
+  /// In id, this message translates to:
+  /// **'Simpan satu check-in harian.'**
+  String get journeyBadgeFirstCheckInCriteria;
+
+  /// No description provided for @journeyBadgeFiveActiveDaysName.
+  ///
+  /// In id, this message translates to:
+  /// **'Lima hari hadir'**
+  String get journeyBadgeFiveActiveDaysName;
+
+  /// No description provided for @journeyBadgeFiveActiveDaysCriteria.
+  ///
+  /// In id, this message translates to:
+  /// **'Hadir dengan aktivitas apa pun pada 5 hari dalam 90 hari terakhir.'**
+  String get journeyBadgeFiveActiveDaysCriteria;
+
+  /// No description provided for @journeyBadgeFifteenActiveDaysName.
+  ///
+  /// In id, this message translates to:
+  /// **'Lima belas hari hadir'**
+  String get journeyBadgeFifteenActiveDaysName;
+
+  /// No description provided for @journeyBadgeFifteenActiveDaysCriteria.
+  ///
+  /// In id, this message translates to:
+  /// **'Hadir pada 15 hari dalam 90 hari terakhir.'**
+  String get journeyBadgeFifteenActiveDaysCriteria;
+
+  /// No description provided for @journeyBadgeFirstPracticeName.
+  ///
+  /// In id, this message translates to:
+  /// **'Latihan pertama'**
+  String get journeyBadgeFirstPracticeName;
+
+  /// No description provided for @journeyBadgeFirstPracticeCriteria.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesaikan satu latihan di ruang pulih.'**
+  String get journeyBadgeFirstPracticeCriteria;
+
+  /// No description provided for @journeyBadgePracticeExplorerName.
+  ///
+  /// In id, this message translates to:
+  /// **'Penjelajah latihan'**
+  String get journeyBadgePracticeExplorerName;
+
+  /// No description provided for @journeyBadgePracticeExplorerCriteria.
+  ///
+  /// In id, this message translates to:
+  /// **'Coba ketiga jenis latihan: ombak dorongan, grounding, dan sprint fokus.'**
+  String get journeyBadgePracticeExplorerCriteria;
+
+  /// No description provided for @journeyBadgeFirstJournalName.
+  ///
+  /// In id, this message translates to:
+  /// **'Jurnal pertama'**
+  String get journeyBadgeFirstJournalName;
+
+  /// No description provided for @journeyBadgeFirstJournalCriteria.
+  ///
+  /// In id, this message translates to:
+  /// **'Tulis satu refleksi jurnal.'**
+  String get journeyBadgeFirstJournalCriteria;
+
+  /// No description provided for @journeyBadgeFirstMissionName.
+  ///
+  /// In id, this message translates to:
+  /// **'Misi pertama'**
+  String get journeyBadgeFirstMissionName;
+
+  /// No description provided for @journeyBadgeFirstMissionCriteria.
+  ///
+  /// In id, this message translates to:
+  /// **'Klaim satu misi harian.'**
+  String get journeyBadgeFirstMissionCriteria;
+
+  /// No description provided for @journeyBadgeMissionTenDaysName.
+  ///
+  /// In id, this message translates to:
+  /// **'Sepuluh hari bermisi'**
+  String get journeyBadgeMissionTenDaysName;
+
+  /// No description provided for @journeyBadgeMissionTenDaysCriteria.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesaikan misi pada 10 hari berbeda dalam 90 hari terakhir.'**
+  String get journeyBadgeMissionTenDaysCriteria;
+
+  /// No description provided for @journeyBadgeFirstReviewName.
+  ///
+  /// In id, this message translates to:
+  /// **'Perencana mingguan'**
+  String get journeyBadgeFirstReviewName;
+
+  /// No description provided for @journeyBadgeFirstReviewCriteria.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesaikan satu tinjauan mingguan.'**
+  String get journeyBadgeFirstReviewCriteria;
+
+  /// No description provided for @journeyBadgeFirstEducationName.
+  ///
+  /// In id, this message translates to:
+  /// **'Pembaca modul'**
+  String get journeyBadgeFirstEducationName;
+
+  /// No description provided for @journeyBadgeFirstEducationCriteria.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka dan pelajari satu modul edukasi.'**
+  String get journeyBadgeFirstEducationCriteria;
+
+  /// No description provided for @journeyBadgeModuleCompleteName.
+  ///
+  /// In id, this message translates to:
+  /// **'Modul tuntas'**
+  String get journeyBadgeModuleCompleteName;
+
+  /// No description provided for @journeyBadgeModuleCompleteCriteria.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesaikan satu modul edukasi sampai akhir.'**
+  String get journeyBadgeModuleCompleteCriteria;
+
+  /// No description provided for @journeyBadgeLevelFiveName.
+  ///
+  /// In id, this message translates to:
+  /// **'Mencapai Level 5'**
+  String get journeyBadgeLevelFiveName;
+
+  /// No description provided for @journeyBadgeLevelFiveCriteria.
+  ///
+  /// In id, this message translates to:
+  /// **'Kumpulkan EXP dari misi harian hingga Level 5.'**
+  String get journeyBadgeLevelFiveCriteria;
+
+  /// No description provided for @journeyBadgeLevelTenName.
+  ///
+  /// In id, this message translates to:
+  /// **'Mencapai Level 10'**
+  String get journeyBadgeLevelTenName;
+
+  /// No description provided for @journeyBadgeLevelTenCriteria.
+  ///
+  /// In id, this message translates to:
+  /// **'Lanjutkan perjalanan misi harianmu hingga Level 10.'**
+  String get journeyBadgeLevelTenCriteria;
 
   /// No description provided for @missionClaim.
   ///

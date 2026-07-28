@@ -7,13 +7,20 @@ import '../../../../core/auth/auth_state.dart';
 import '../../../../core/messaging/app_messages.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../accountability/domain/entities/accountability_models.dart';
+import '../../data/daily_presence_store.dart';
 import '../../domain/entities/protection_status.dart';
+import '../../../pattern_interrupt/data/providers.dart';
 import 'protection_accountability_section.dart';
+import '../../../missions/data/providers.dart';
 import '../../../missions/presentation/widgets/daily_missions_section.dart';
 import '../../../missions/presentation/widgets/mission_level_chip.dart';
+import 'breathing_entry_tile.dart';
+import 'dashboard_gami.dart';
+import 'pause_acknowledgment_card.dart';
 import 'protection_actions.dart';
 import 'protection_screen_skeleton.dart';
 import 'protection_status_card.dart';
+import 'protection_weekly_appreciation.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimens.dart';
 
@@ -99,6 +106,7 @@ class ProtectionScreenBody extends StatelessWidget {
           else ...[
             _entrance(context, 1, ProtectionStatusCard(status: status)),
             const SizedBox(height: 16),
+            const ProtectionWeeklyAppreciation(),
             _entrance(
               context,
               2,
@@ -119,7 +127,10 @@ class ProtectionScreenBody extends StatelessWidget {
               ),
             ],
             const SizedBox(height: 24),
+            const PauseAcknowledgmentCard(),
             _entrance(context, 3, const DailyMissionsSection()),
+            const SizedBox(height: 16),
+            _entrance(context, 4, const BreathingEntryTile()),
             const SizedBox(height: 24),
             ProtectionAccountabilitySection(
               auth: auth,
@@ -142,7 +153,7 @@ class ProtectionScreenBody extends StatelessWidget {
   }
 }
 
-class _DashboardHero extends StatelessWidget {
+class _DashboardHero extends ConsumerWidget {
   const _DashboardHero({
     required this.auth,
     required this.status,
@@ -158,7 +169,16 @@ class _DashboardHero extends StatelessWidget {
   final bool refreshing;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final missions = ref.watch(missionsProvider);
+    final firstOpenToday =
+        ref.watch(firstOpenTodayProvider).valueOrNull ?? false;
+    final recentPause = ref.watch(recentPauseProvider).valueOrNull;
+    final gami = resolveDashboardGami(
+      missionsAllDone: missions.mission?.allResolved ?? false,
+      pauseTaken: recentPause != null,
+      firstOpenToday: firstOpenToday,
+    );
     return Container(
       clipBehavior: Clip.antiAlias,
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
@@ -181,20 +201,26 @@ class _DashboardHero extends StatelessWidget {
             child: Opacity(
               opacity: 0.9,
               child: Image.asset(
-                'assets/images/gami.webp',
+                gami.asset,
                 height: 88,
                 cacheWidth: 264,
                 excludeFromSemantics: true,
+                errorBuilder: (context, error, stackTrace) => Image.asset(
+                  'assets/images/gami.webp',
+                  height: 88,
+                  cacheWidth: 264,
+                  excludeFromSemantics: true,
+                ),
               ),
             ),
           ),
-          _heroContent(context),
+          _heroContent(context, gami),
         ],
       ),
     );
   }
 
-  Widget _heroContent(BuildContext context) {
+  Widget _heroContent(BuildContext context, DashboardGamiPresentation gami) {
     final l10n = AppLocalizations.of(context)!;
     final name = auth.displayName?.trim().split(' ').first;
     final active = status?.isActive == true;
@@ -253,6 +279,18 @@ class _DashboardHero extends StatelessWidget {
               height: 1.45,
             ),
           ),
+          if (gami.lineBuilder != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              gami.lineBuilder!(l10n),
+              style: const TextStyle(
+                color: AppColors.skyLight,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                height: 1.4,
+              ),
+            ),
+          ],
           const SizedBox(height: 14),
           const MissionLevelChip(),
           const SizedBox(height: 14),

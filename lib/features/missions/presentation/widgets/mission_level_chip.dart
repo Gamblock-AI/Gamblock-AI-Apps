@@ -52,7 +52,7 @@ class MissionLevelChip extends ConsumerWidget {
               const Icon(
                 Icons.emoji_events_rounded,
                 size: AppIconSize.sm,
-                color: AppColors.amber,
+                color: AppColors.sky,
               ),
               const SizedBox(width: 6),
               Flexible(
@@ -70,10 +70,8 @@ class MissionLevelChip extends ConsumerWidget {
               ),
               const SizedBox(width: 10),
               Text(
-                l10n.levelExpProgress(
-                  experience.levelProgress,
-                  experience.levelTarget,
-                ),
+                '${l10n.levelExpProgress(experience.levelProgress, experience.levelTarget)}'
+                ' · ${l10n.levelTotalExp(experience.totalExp)}',
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.75),
                   fontSize: 11,

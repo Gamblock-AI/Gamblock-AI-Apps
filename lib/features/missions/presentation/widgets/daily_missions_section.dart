@@ -46,6 +46,8 @@ class DailyMissionsSection extends ConsumerWidget {
         context.go('/accountability');
       case 2:
         _openWebPath(context, 'dashboard');
+      case 6:
+        _openWebPath(context, 'recovery');
       default:
         _openWebPath(context, 'education');
     }

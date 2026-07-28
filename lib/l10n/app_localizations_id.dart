@@ -1588,6 +1588,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get mission5 => 'Selesaikan satu modul pembelajaran';
 
   @override
+  String get mission6 => 'Selesaikan satu latihan pemulihan';
+
+  @override
   String get missionAction1 => 'Periksa proteksi';
 
   @override
@@ -1601,6 +1604,231 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get missionAction5 => 'Lanjutkan modul di web';
+
+  @override
+  String get missionAction6 => 'Buka ruang pulih di web';
+
+  @override
+  String levelTotalExp(int exp) {
+    return 'Total $exp EXP';
+  }
+
+  @override
+  String get dashboardAppreciationTitle => 'Perlindunganmu menemanimu';
+
+  @override
+  String dashboardAppreciationBody(int count) {
+    return 'Perlindungan menemanimu $count kali dalam 7 hari terakhir. Setiap jeda adalah ruang untuk memilih ulang.';
+  }
+
+  @override
+  String get dashboardGamiAllDone =>
+      'Semua misi hari ini selesai. Nikmati sisa harimu dengan tenang.';
+
+  @override
+  String get dashboardGamiPauseTaken =>
+      'Jeda yang kamu ambil adalah langkah nyata.';
+
+  @override
+  String get dashboardGamiFirstOpen =>
+      'Selamat datang kembali. Mulai pelan-pelan saja.';
+
+  @override
+  String get pauseAckTitle => 'Momen jeda';
+
+  @override
+  String get pauseAckToday =>
+      'Hari ini kamu mengambil jeda — itu langkah nyata.';
+
+  @override
+  String get pauseAckYesterday =>
+      'Kemarin kamu mengambil jeda — itu langkah nyata.';
+
+  @override
+  String get pauseAckDismiss => 'Oke';
+
+  @override
+  String get breathingEntryTitle => 'Latihan napas';
+
+  @override
+  String get breathingEntrySubtitle => 'Satu menit untuk menenangkan tubuh';
+
+  @override
+  String get breathingPatternBox => 'Kotak 4-4-4-4';
+
+  @override
+  String get breathingPattern478 => '4-7-8';
+
+  @override
+  String get breathingStart => 'Mulai';
+
+  @override
+  String get breathingPhaseInhale => 'Tarik napas';
+
+  @override
+  String get breathingPhaseHold => 'Tahan';
+
+  @override
+  String get breathingPhaseExhale => 'Hembuskan';
+
+  @override
+  String breathingCyclesProgress(int done, int total) {
+    return 'Putaran $done dari $total';
+  }
+
+  @override
+  String get breathingDoneTitle => 'Tubuhmu lebih tenang';
+
+  @override
+  String get breathingDoneBody =>
+      'Napas pelan memberi ruang untuk memilih ulang.';
+
+  @override
+  String get settingsReminderTitle => 'Pengingat check-in harian';
+
+  @override
+  String get settingsReminderDesc =>
+      'Sekali sehari, di waktu pilihanmu. Tanpa isi sensitif di layar kunci.';
+
+  @override
+  String get settingsReminderTime => 'Waktu pengingat';
+
+  @override
+  String get settingsReminderPermissionDenied =>
+      'Izin notifikasi belum diberikan. Kamu bisa mengaktifkannya lewat pengaturan sistem.';
+
+  @override
+  String get reminderChannelName => 'Pengingat harian';
+
+  @override
+  String get reminderChannelDesc => 'Pengingat check-in sekali sehari';
+
+  @override
+  String get reminderNotificationTitle => 'Waktu untuk dirimu';
+
+  @override
+  String get reminderNotificationBody =>
+      'Luangkan satu menit untuk check-in hari ini. Kapan pun kamu siap.';
+
+  @override
+  String get journeyBadgesEyebrow => 'Lencana perjalanan';
+
+  @override
+  String get journeyBadgesTitle => 'Tanda perjalananmu';
+
+  @override
+  String get journeyBadgesBody =>
+      'Setiap lencana mencatat partisipasi yang sudah kamu lakukan. Tidak ada yang bisa hilang atau hangus.';
+
+  @override
+  String get journeyBadgesUnavailable => 'Lencana belum dapat dimuat saat ini.';
+
+  @override
+  String get journeyRhythmHint =>
+      'Ritme kehadiran, bukan rekor yang harus dijaga.';
+
+  @override
+  String journeyBadgesUpNext(int count) {
+    return '$count lencana berikutnya';
+  }
+
+  @override
+  String journeyBadgesCount(int earned, int total) {
+    return '$earned dari $total lencana terbuka';
+  }
+
+  @override
+  String journeyRhythmLine(int count) {
+    return 'Hadir $count dari 7 hari terakhir';
+  }
+
+  @override
+  String get journeyBadgeFirstCheckInName => 'Check-in pertama';
+
+  @override
+  String get journeyBadgeFirstCheckInCriteria => 'Simpan satu check-in harian.';
+
+  @override
+  String get journeyBadgeFiveActiveDaysName => 'Lima hari hadir';
+
+  @override
+  String get journeyBadgeFiveActiveDaysCriteria =>
+      'Hadir dengan aktivitas apa pun pada 5 hari dalam 90 hari terakhir.';
+
+  @override
+  String get journeyBadgeFifteenActiveDaysName => 'Lima belas hari hadir';
+
+  @override
+  String get journeyBadgeFifteenActiveDaysCriteria =>
+      'Hadir pada 15 hari dalam 90 hari terakhir.';
+
+  @override
+  String get journeyBadgeFirstPracticeName => 'Latihan pertama';
+
+  @override
+  String get journeyBadgeFirstPracticeCriteria =>
+      'Selesaikan satu latihan di ruang pulih.';
+
+  @override
+  String get journeyBadgePracticeExplorerName => 'Penjelajah latihan';
+
+  @override
+  String get journeyBadgePracticeExplorerCriteria =>
+      'Coba ketiga jenis latihan: ombak dorongan, grounding, dan sprint fokus.';
+
+  @override
+  String get journeyBadgeFirstJournalName => 'Jurnal pertama';
+
+  @override
+  String get journeyBadgeFirstJournalCriteria => 'Tulis satu refleksi jurnal.';
+
+  @override
+  String get journeyBadgeFirstMissionName => 'Misi pertama';
+
+  @override
+  String get journeyBadgeFirstMissionCriteria => 'Klaim satu misi harian.';
+
+  @override
+  String get journeyBadgeMissionTenDaysName => 'Sepuluh hari bermisi';
+
+  @override
+  String get journeyBadgeMissionTenDaysCriteria =>
+      'Selesaikan misi pada 10 hari berbeda dalam 90 hari terakhir.';
+
+  @override
+  String get journeyBadgeFirstReviewName => 'Perencana mingguan';
+
+  @override
+  String get journeyBadgeFirstReviewCriteria =>
+      'Selesaikan satu tinjauan mingguan.';
+
+  @override
+  String get journeyBadgeFirstEducationName => 'Pembaca modul';
+
+  @override
+  String get journeyBadgeFirstEducationCriteria =>
+      'Buka dan pelajari satu modul edukasi.';
+
+  @override
+  String get journeyBadgeModuleCompleteName => 'Modul tuntas';
+
+  @override
+  String get journeyBadgeModuleCompleteCriteria =>
+      'Selesaikan satu modul edukasi sampai akhir.';
+
+  @override
+  String get journeyBadgeLevelFiveName => 'Mencapai Level 5';
+
+  @override
+  String get journeyBadgeLevelFiveCriteria =>
+      'Kumpulkan EXP dari misi harian hingga Level 5.';
+
+  @override
+  String get journeyBadgeLevelTenName => 'Mencapai Level 10';
+
+  @override
+  String get journeyBadgeLevelTenCriteria =>
+      'Lanjutkan perjalanan misi harianmu hingga Level 10.';
 
   @override
   String missionClaim(int exp) {

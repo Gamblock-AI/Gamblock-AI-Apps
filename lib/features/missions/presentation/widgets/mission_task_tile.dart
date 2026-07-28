@@ -33,6 +33,8 @@ class MissionTaskTile extends StatelessWidget {
         return l10n.mission3;
       case 4:
         return l10n.mission4;
+      case 6:
+        return l10n.mission6;
       default:
         return l10n.mission5;
     }
@@ -48,6 +50,8 @@ class MissionTaskTile extends StatelessWidget {
         return l10n.missionAction3;
       case 4:
         return l10n.missionAction4;
+      case 6:
+        return l10n.missionAction6;
       default:
         return l10n.missionAction5;
     }

@@ -1597,6 +1597,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mission5 => 'Complete one learning module';
 
   @override
+  String get mission6 => 'Complete one recovery practice';
+
+  @override
   String get missionAction1 => 'Check protection';
 
   @override
@@ -1610,6 +1613,227 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get missionAction5 => 'Continue the module on the web';
+
+  @override
+  String get missionAction6 => 'Open the recovery room on the web';
+
+  @override
+  String levelTotalExp(int exp) {
+    return '$exp EXP total';
+  }
+
+  @override
+  String get dashboardAppreciationTitle => 'Your protection stayed with you';
+
+  @override
+  String dashboardAppreciationBody(int count) {
+    return 'Protection was there for you $count times in the last 7 days. Every pause is room to choose again.';
+  }
+
+  @override
+  String get dashboardGamiAllDone =>
+      'All of today\'s missions are done. Enjoy the rest of your day.';
+
+  @override
+  String get dashboardGamiPauseTaken => 'The pause you took was a real step.';
+
+  @override
+  String get dashboardGamiFirstOpen => 'Welcome back. Ease in gently.';
+
+  @override
+  String get pauseAckTitle => 'A pause moment';
+
+  @override
+  String get pauseAckToday => 'Today you took a pause — that is a real step.';
+
+  @override
+  String get pauseAckYesterday =>
+      'Yesterday you took a pause — that is a real step.';
+
+  @override
+  String get pauseAckDismiss => 'Okay';
+
+  @override
+  String get breathingEntryTitle => 'Breathing exercise';
+
+  @override
+  String get breathingEntrySubtitle => 'One minute to settle your body';
+
+  @override
+  String get breathingPatternBox => 'Box 4-4-4-4';
+
+  @override
+  String get breathingPattern478 => '4-7-8';
+
+  @override
+  String get breathingStart => 'Start';
+
+  @override
+  String get breathingPhaseInhale => 'Breathe in';
+
+  @override
+  String get breathingPhaseHold => 'Hold';
+
+  @override
+  String get breathingPhaseExhale => 'Breathe out';
+
+  @override
+  String breathingCyclesProgress(int done, int total) {
+    return 'Round $done of $total';
+  }
+
+  @override
+  String get breathingDoneTitle => 'Your body is calmer';
+
+  @override
+  String get breathingDoneBody => 'Slow breathing makes room to choose again.';
+
+  @override
+  String get settingsReminderTitle => 'Daily check-in reminder';
+
+  @override
+  String get settingsReminderDesc =>
+      'Once a day, at a time you choose. Nothing sensitive on the lock screen.';
+
+  @override
+  String get settingsReminderTime => 'Reminder time';
+
+  @override
+  String get settingsReminderPermissionDenied =>
+      'Notification permission was not granted. You can enable it in system settings.';
+
+  @override
+  String get reminderChannelName => 'Daily reminder';
+
+  @override
+  String get reminderChannelDesc => 'Once-a-day check-in reminder';
+
+  @override
+  String get reminderNotificationTitle => 'A moment for yourself';
+
+  @override
+  String get reminderNotificationBody =>
+      'Take one minute for today\'s check-in. Whenever you are ready.';
+
+  @override
+  String get journeyBadgesEyebrow => 'Journey badges';
+
+  @override
+  String get journeyBadgesTitle => 'Marks of your journey';
+
+  @override
+  String get journeyBadgesBody =>
+      'Each badge records participation that already happened. Nothing can be lost or taken away.';
+
+  @override
+  String get journeyBadgesUnavailable => 'Badges cannot be loaded right now.';
+
+  @override
+  String get journeyRhythmHint =>
+      'A rhythm of presence, not a record to protect.';
+
+  @override
+  String journeyBadgesUpNext(int count) {
+    return '$count badges up next';
+  }
+
+  @override
+  String journeyBadgesCount(int earned, int total) {
+    return '$earned of $total badges unlocked';
+  }
+
+  @override
+  String journeyRhythmLine(int count) {
+    return 'Present $count of the last 7 days';
+  }
+
+  @override
+  String get journeyBadgeFirstCheckInName => 'First check-in';
+
+  @override
+  String get journeyBadgeFirstCheckInCriteria => 'Save one daily check-in.';
+
+  @override
+  String get journeyBadgeFiveActiveDaysName => 'Five days present';
+
+  @override
+  String get journeyBadgeFiveActiveDaysCriteria =>
+      'Be present with any activity on 5 days within the last 90 days.';
+
+  @override
+  String get journeyBadgeFifteenActiveDaysName => 'Fifteen days present';
+
+  @override
+  String get journeyBadgeFifteenActiveDaysCriteria =>
+      'Be present on 15 days within the last 90 days.';
+
+  @override
+  String get journeyBadgeFirstPracticeName => 'First practice';
+
+  @override
+  String get journeyBadgeFirstPracticeCriteria =>
+      'Complete one practice in the recovery room.';
+
+  @override
+  String get journeyBadgePracticeExplorerName => 'Practice explorer';
+
+  @override
+  String get journeyBadgePracticeExplorerCriteria =>
+      'Try all three practice kinds: urge surfing, grounding, and focus sprint.';
+
+  @override
+  String get journeyBadgeFirstJournalName => 'First journal';
+
+  @override
+  String get journeyBadgeFirstJournalCriteria =>
+      'Write one journal reflection.';
+
+  @override
+  String get journeyBadgeFirstMissionName => 'First mission';
+
+  @override
+  String get journeyBadgeFirstMissionCriteria => 'Claim one daily mission.';
+
+  @override
+  String get journeyBadgeMissionTenDaysName => 'Ten mission days';
+
+  @override
+  String get journeyBadgeMissionTenDaysCriteria =>
+      'Complete missions on 10 different days within the last 90 days.';
+
+  @override
+  String get journeyBadgeFirstReviewName => 'Weekly planner';
+
+  @override
+  String get journeyBadgeFirstReviewCriteria => 'Complete one weekly review.';
+
+  @override
+  String get journeyBadgeFirstEducationName => 'Module reader';
+
+  @override
+  String get journeyBadgeFirstEducationCriteria =>
+      'Open and study one education module.';
+
+  @override
+  String get journeyBadgeModuleCompleteName => 'Module finished';
+
+  @override
+  String get journeyBadgeModuleCompleteCriteria =>
+      'Finish one education module to the end.';
+
+  @override
+  String get journeyBadgeLevelFiveName => 'Reached Level 5';
+
+  @override
+  String get journeyBadgeLevelFiveCriteria =>
+      'Gather EXP from daily missions up to Level 5.';
+
+  @override
+  String get journeyBadgeLevelTenName => 'Reached Level 10';
+
+  @override
+  String get journeyBadgeLevelTenCriteria =>
+      'Continue your daily-mission journey up to Level 10.';
 
   @override
   String missionClaim(int exp) {
