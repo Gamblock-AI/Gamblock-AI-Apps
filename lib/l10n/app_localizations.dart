@@ -818,6 +818,18 @@ abstract class AppLocalizations {
   /// **'Masukkan nomor WhatsApp yang valid.'**
   String get authWhatsappInvalid;
 
+  /// No description provided for @codeVerificationLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Kode verifikasi WhatsApp'**
+  String get codeVerificationLabel;
+
+  /// No description provided for @verifyCode.
+  ///
+  /// In id, this message translates to:
+  /// **'Verifikasi kode'**
+  String get verifyCode;
+
   /// No description provided for @authLoginDesc.
   ///
   /// In id, this message translates to:

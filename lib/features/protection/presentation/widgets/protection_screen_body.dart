@@ -385,14 +385,14 @@ class _VerificationNoticeState extends ConsumerState<_VerificationNotice> {
                       _previewCode = await ref
                           .read(authProvider.notifier)
                           .startPhoneVerification(_phoneController.text);
-                      if (mounted) {
+                      if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(l10n.verifyEmailSent)),
                         );
                         setState(() {});
                       }
                     } catch (error) {
-                      if (mounted) {
+                      if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
@@ -415,9 +415,9 @@ class _VerificationNoticeState extends ConsumerState<_VerificationNotice> {
                   await ref
                       .read(authProvider.notifier)
                       .confirmPhoneVerification(_codeController.text);
-                  if (mounted) setState(() {});
+                  if (context.mounted) setState(() {});
                 } catch (error) {
-                  if (mounted) {
+                  if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(AppMessages.friendlyMessage(context, error)),

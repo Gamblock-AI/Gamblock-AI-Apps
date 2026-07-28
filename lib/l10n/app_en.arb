@@ -120,6 +120,8 @@
   "authEmail": "Email",
   "authWhatsapp": "WhatsApp number",
   "authWhatsappInvalid": "Enter a valid WhatsApp number.",
+  "codeVerificationLabel": "WhatsApp verification code",
+  "verifyCode": "Verify code",
   "authLoginDesc": "Sign in to manage your protection account.",
   "authCreateAccountTitle": "Create a new account.",
   "authRegisterAs": "Saya mendaftar sebagai",

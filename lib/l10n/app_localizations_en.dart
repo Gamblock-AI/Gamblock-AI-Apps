@@ -387,6 +387,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authWhatsappInvalid => 'Enter a valid WhatsApp number.';
 
   @override
+  String get codeVerificationLabel => 'WhatsApp verification code';
+
+  @override
+  String get verifyCode => 'Verify code';
+
+  @override
   String get authLoginDesc => 'Sign in to manage your protection account.';
 
   @override

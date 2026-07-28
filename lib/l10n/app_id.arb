@@ -120,6 +120,8 @@
   "authEmail": "Email",
   "authWhatsapp": "Nomor WhatsApp",
   "authWhatsappInvalid": "Masukkan nomor WhatsApp yang valid.",
+  "codeVerificationLabel": "Kode verifikasi WhatsApp",
+  "verifyCode": "Verifikasi kode",
   "authLoginDesc": "Masuk untuk melanjutkan perlindungan Anda.",
   "authCreateAccountTitle": "Buat akun baru.",
   "authRegisterAs": "Saya mendaftar sebagai",
