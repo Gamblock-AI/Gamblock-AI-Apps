@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
@@ -10,20 +9,19 @@ import '../../../../core/feedback/haptics.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../data/providers.dart';
 import '../widgets/pattern_grounding_panel.dart';
 import '../widgets/pattern_interrupt_panel.dart';
 
-class PatternInterruptScreen extends ConsumerStatefulWidget {
+class PatternInterruptScreen extends StatefulWidget {
   const PatternInterruptScreen({super.key});
 
   @override
-  ConsumerState<PatternInterruptScreen> createState() =>
+  State<PatternInterruptScreen> createState() =>
       _PatternInterruptScreenState();
 }
 
 class _PatternInterruptScreenState
-    extends ConsumerState<PatternInterruptScreen>
+    extends State<PatternInterruptScreen>
     with TickerProviderStateMixin {
   static const _durationSeconds = 7;
 
@@ -154,9 +152,6 @@ class _PatternInterruptScreenState
                               ? PatternGroundingPanel(
                                   onReturnToProtection: () =>
                                       context.go('/dashboard'),
-                                  onCompleted: (elapsed) => ref
-                                      .read(pauseMomentsRepositoryProvider)
-                                      .record('grounding', elapsed),
                                 )
                               : PatternInterruptPanel(
                                   breathingAnimation: _breathingController,

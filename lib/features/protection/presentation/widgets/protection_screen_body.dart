@@ -9,14 +9,8 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../../accountability/domain/entities/accountability_models.dart';
 import '../../data/daily_presence_store.dart';
 import '../../domain/entities/protection_status.dart';
-import '../../../pattern_interrupt/data/providers.dart';
 import 'protection_accountability_section.dart';
-import '../../../missions/data/providers.dart';
-import '../../../missions/presentation/widgets/daily_missions_section.dart';
-import '../../../missions/presentation/widgets/mission_level_chip.dart';
-import 'breathing_entry_tile.dart';
 import 'dashboard_gami.dart';
-import 'pause_acknowledgment_card.dart';
 import 'protection_actions.dart';
 import 'protection_screen_skeleton.dart';
 import 'protection_status_card.dart';
@@ -127,11 +121,6 @@ class ProtectionScreenBody extends StatelessWidget {
               ),
             ],
             const SizedBox(height: 24),
-            const PauseAcknowledgmentCard(),
-            _entrance(context, 3, const DailyMissionsSection()),
-            const SizedBox(height: 16),
-            _entrance(context, 4, const BreathingEntryTile()),
-            const SizedBox(height: 24),
             ProtectionAccountabilitySection(
               auth: auth,
               accountability: accountability,
@@ -170,13 +159,9 @@ class _DashboardHero extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final missions = ref.watch(missionsProvider);
     final firstOpenToday =
         ref.watch(firstOpenTodayProvider).valueOrNull ?? false;
-    final recentPause = ref.watch(recentPauseProvider).valueOrNull;
     final gami = resolveDashboardGami(
-      missionsAllDone: missions.mission?.allResolved ?? false,
-      pauseTaken: recentPause != null,
       firstOpenToday: firstOpenToday,
     );
     return Container(
@@ -291,8 +276,6 @@ class _DashboardHero extends ConsumerWidget {
               ),
             ),
           ],
-          const SizedBox(height: 14),
-          const MissionLevelChip(),
           const SizedBox(height: 14),
           SizedBox(
             height: 38,

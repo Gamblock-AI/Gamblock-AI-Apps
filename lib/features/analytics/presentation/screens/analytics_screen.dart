@@ -14,7 +14,6 @@ import '../../data/providers.dart';
 import '../../domain/entities/protection_analytics.dart';
 import '../widgets/analytics_data_state_notice.dart';
 import '../widgets/analytics_period_selector.dart';
-import '../../../journey/presentation/widgets/journey_badges_section.dart';
 import '../widgets/protection_milestone_card.dart';
 import '../widgets/analytics_skeleton.dart';
 import '../widgets/analytics_totals_grid.dart';
@@ -117,7 +116,6 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
               ),
               const SizedBox(height: 14),
               ProtectionMilestoneCard(analytics: _analytics),
-              const JourneyBadgesSection(),
               ProtectionTrendChart(days: _analytics?.daily ?? const []),
               const SizedBox(height: 10),
               AnalyticsDataStateNotice(dataState: _analytics?.dataState),

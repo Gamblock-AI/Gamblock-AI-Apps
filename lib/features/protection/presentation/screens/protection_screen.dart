@@ -1,11 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
-import '../../../missions/data/providers.dart';
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/feedback/feedback.dart';
 import '../../../../core/messaging/app_messages.dart';
@@ -71,12 +68,6 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> with Widget
       return;
     }
     if (mounted) setState(() => _status = status);
-    // Missions load after the local status fetch so today's protection
-    // heartbeat precedes the mission-1 eligibility check server-side.
-    if (mounted) {
-      unawaited(ref.read(missionsProvider.notifier).load());
-    }
-
     final accountability = await ProtectionCoordinator(
       ref,
     ).loadAccountability(ref.read(authProvider));

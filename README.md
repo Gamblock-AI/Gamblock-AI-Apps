@@ -3,8 +3,9 @@
 Android and Windows client for local gambling-content protection, Pattern
 Interrupt, social accountability, and privacy-safe protection analytics.
 
-The current result is a **code-complete prototype**. It includes the product
-flows and native runtime wiring. A supplied trained model is integrated, but
+The current result is a **code-complete prototype**. It includes the local
+protection flows and native runtime wiring. Detailed rehabilitation remains on
+the website so this client stays small and focused. A supplied trained model is integrated, but
 its reported metrics are not yet reproducible evaluation evidence or a
 release-readiness claim. Android real-device validation, Windows signed-VM
 validation, accessibility review, performance profiling, and model evaluation
@@ -45,7 +46,9 @@ fonts at runtime.
 The native Pattern Interrupt runs for seven seconds, respects reduced motion,
 works offline with a grounding option, and hands off to the website with only
 locale and `source=pattern_interrupt`. The longer recovery journey remains on
-the website and is not duplicated in Flutter.
+the website and is not duplicated in Flutter. Android's optional daily
+check-in reminder is local-only; Windows treats notification scheduling as a
+no-op.
 
 ## Hybrid-v2 local model
 

@@ -559,28 +559,6 @@
   "statusApproved": "disetujui",
   "statusRejected": "ditolak",
   "statusExpired": "kedaluwarsa",
-  "missionsSectionTitle": "Misi Harian",
-  "missionsSectionSubtitle": "EXP dapat diklaim setelah aktivitas terverifikasi oleh sistem.",
-  "mission1": "Jaga perlindungan aktif hari ini",
-  "mission2": "Catat satu check-in suasana hati dan dorongan",
-  "mission3": "Selesaikan satu bagian pembelajaran",
-  "mission4": "Jaga dukungan pendamping tetap terhubung",
-  "mission5": "Selesaikan satu modul pembelajaran",
-  "mission6": "Selesaikan satu latihan pemulihan",
-  "missionAction1": "Periksa proteksi",
-  "missionAction2": "Isi check-in di web",
-  "missionAction3": "Buka pembelajaran di web",
-  "missionAction4": "Kelola pendamping",
-  "missionAction5": "Lanjutkan modul di web",
-  "missionAction6": "Buka ruang pulih di web",
-  "levelTotalExp": "Total {exp} EXP",
-  "@levelTotalExp": {
-    "placeholders": {
-      "exp": {
-        "type": "int"
-      }
-    }
-  },
   "dashboardAppreciationTitle": "Perlindunganmu menemanimu",
   "dashboardAppreciationBody": "Perlindungan menemanimu {count} kali dalam 7 hari terakhir. Setiap jeda adalah ruang untuk memilih ulang.",
   "@dashboardAppreciationBody": {
@@ -590,25 +568,7 @@
       }
     }
   },
-  "dashboardGamiAllDone": "Semua misi hari ini selesai. Nikmati sisa harimu dengan tenang.",
-  "dashboardGamiPauseTaken": "Jeda yang kamu ambil adalah langkah nyata.",
   "dashboardGamiFirstOpen": "Selamat datang kembali. Mulai pelan-pelan saja.",
-  "pauseAckTitle": "Momen jeda",
-  "pauseAckToday": "Hari ini kamu mengambil jeda — itu langkah nyata.",
-  "pauseAckYesterday": "Kemarin kamu mengambil jeda — itu langkah nyata.",
-  "pauseAckDismiss": "Oke",
-  "breathingEntryTitle": "Latihan napas",
-  "breathingEntrySubtitle": "Satu menit untuk menenangkan tubuh",
-  "breathingPatternBox": "Kotak 4-4-4-4",
-  "breathingPattern478": "4-7-8",
-  "breathingStart": "Mulai",
-  "breathingPhaseInhale": "Tarik napas",
-  "breathingPhaseHold": "Tahan",
-  "breathingPhaseExhale": "Hembuskan",
-  "breathingCyclesProgress": "Putaran {done} dari {total}",
-  "@breathingCyclesProgress": {"placeholders": {"done": {"type": "int"}, "total": {"type": "int"}}},
-  "breathingDoneTitle": "Tubuhmu lebih tenang",
-  "breathingDoneBody": "Napas pelan memberi ruang untuk memilih ulang.",
   "settingsReminderTitle": "Pengingat check-in harian",
   "settingsReminderDesc": "Sekali sehari, di waktu pilihanmu. Tanpa isi sensitif di layar kunci.",
   "settingsReminderTime": "Waktu pengingat",
@@ -617,99 +577,6 @@
   "reminderChannelDesc": "Pengingat check-in sekali sehari",
   "reminderNotificationTitle": "Waktu untuk dirimu",
   "reminderNotificationBody": "Luangkan satu menit untuk check-in hari ini. Kapan pun kamu siap.",
-  "journeyBadgesEyebrow": "Lencana perjalanan",
-  "journeyBadgesTitle": "Tanda perjalananmu",
-  "journeyBadgesBody": "Setiap lencana mencatat partisipasi yang sudah kamu lakukan. Tidak ada yang bisa hilang atau hangus.",
-  "journeyBadgesUnavailable": "Lencana belum dapat dimuat saat ini.",
-  "journeyRhythmHint": "Ritme kehadiran, bukan rekor yang harus dijaga.",
-  "journeyBadgesUpNext": "{count} lencana berikutnya",
-  "@journeyBadgesUpNext": {"placeholders": {"count": {"type": "int"}}},
-  "journeyBadgesCount": "{earned} dari {total} lencana terbuka",
-  "@journeyBadgesCount": {"placeholders": {"earned": {"type": "int"}, "total": {"type": "int"}}},
-  "journeyRhythmLine": "Hadir {count} dari 7 hari terakhir",
-  "@journeyRhythmLine": {"placeholders": {"count": {"type": "int"}}},
-  "journeyBadgeFirstCheckInName": "Check-in pertama",
-  "journeyBadgeFirstCheckInCriteria": "Simpan satu check-in harian.",
-  "journeyBadgeFiveActiveDaysName": "Lima hari hadir",
-  "journeyBadgeFiveActiveDaysCriteria": "Hadir dengan aktivitas apa pun pada 5 hari dalam 90 hari terakhir.",
-  "journeyBadgeFifteenActiveDaysName": "Lima belas hari hadir",
-  "journeyBadgeFifteenActiveDaysCriteria": "Hadir pada 15 hari dalam 90 hari terakhir.",
-  "journeyBadgeFirstPracticeName": "Latihan pertama",
-  "journeyBadgeFirstPracticeCriteria": "Selesaikan satu latihan di ruang pulih.",
-  "journeyBadgePracticeExplorerName": "Penjelajah latihan",
-  "journeyBadgePracticeExplorerCriteria": "Coba ketiga jenis latihan: ombak dorongan, grounding, dan sprint fokus.",
-  "journeyBadgeFirstJournalName": "Jurnal pertama",
-  "journeyBadgeFirstJournalCriteria": "Tulis satu refleksi jurnal.",
-  "journeyBadgeFirstMissionName": "Misi pertama",
-  "journeyBadgeFirstMissionCriteria": "Klaim satu misi harian.",
-  "journeyBadgeMissionTenDaysName": "Sepuluh hari bermisi",
-  "journeyBadgeMissionTenDaysCriteria": "Selesaikan misi pada 10 hari berbeda dalam 90 hari terakhir.",
-  "journeyBadgeFirstReviewName": "Perencana mingguan",
-  "journeyBadgeFirstReviewCriteria": "Selesaikan satu tinjauan mingguan.",
-  "journeyBadgeFirstEducationName": "Pembaca modul",
-  "journeyBadgeFirstEducationCriteria": "Buka dan pelajari satu modul edukasi.",
-  "journeyBadgeModuleCompleteName": "Modul tuntas",
-  "journeyBadgeModuleCompleteCriteria": "Selesaikan satu modul edukasi sampai akhir.",
-  "journeyBadgeLevelFiveName": "Mencapai Level 5",
-  "journeyBadgeLevelFiveCriteria": "Kumpulkan EXP dari misi harian hingga Level 5.",
-  "journeyBadgeLevelTenName": "Mencapai Level 10",
-  "journeyBadgeLevelTenCriteria": "Lanjutkan perjalanan misi harianmu hingga Level 10.",
-  "missionClaim": "Klaim {exp} EXP",
-  "@missionClaim": {
-    "placeholders": {
-      "exp": {
-        "type": "int"
-      }
-    }
-  },
-  "missionClaimedLabel": "EXP diklaim",
-  "missionLockedLabel": "Menunggu verifikasi",
-  "missionSkippedLabel": "Dilewati hari ini",
-  "missionBonusLabel": "Bonus",
-  "missionExpReward": "+{exp} EXP",
-  "@missionExpReward": {
-    "placeholders": {
-      "exp": {
-        "type": "int"
-      }
-    }
-  },
-  "missionExpEarned": "+{exp} EXP. Terima kasih sudah hadir hari ini.",
-  "@missionExpEarned": {
-    "placeholders": {
-      "exp": {
-        "type": "int"
-      }
-    }
-  },
-  "missionLevelUp": "Level baru terbuka. Teruskan dengan ritmemu sendiri.",
-  "missionsAllDone": "Semua misi hari ini selesai. Istirahat juga bagian dari pemulihan.",
-  "levelLabel": "Level {level}",
-  "@levelLabel": {
-    "placeholders": {
-      "level": {
-        "type": "int"
-      }
-    }
-  },
-  "levelExpProgress": "{progress}/{target} EXP",
-  "@levelExpProgress": {
-    "placeholders": {
-      "progress": {
-        "type": "int"
-      },
-      "target": {
-        "type": "int"
-      }
-    }
-  },
-  "levelTitle1": "Langkah Pertama",
-  "levelTitle2": "Penjaga Niat",
-  "levelTitle3": "Penata Ritme",
-  "levelTitle4": "Penjelajah Tenang",
-  "levelTitle5": "Penjaga Fokus",
-  "levelTitle6": "Pembangun Kebiasaan",
-  "levelTitle7": "Sahabat Perjalanan",
   "analyticsMilestoneTitle": "Perlindunganmu bekerja",
   "analyticsMilestoneBody": "Perlindungan membantumu {count} kali dalam {days} hari terakhir. Setiap jeda adalah ruang untuk memilih ulang.",
   "@analyticsMilestoneBody": {

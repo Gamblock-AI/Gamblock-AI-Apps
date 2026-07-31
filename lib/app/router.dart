@@ -10,7 +10,6 @@ import '../features/auth/presentation/screens/register_screen.dart';
 import '../features/intro/presentation/screens/intro_screen.dart';
 import '../features/intro/data/onboarding_state.dart';
 import '../features/auth/presentation/screens/forgot_password_screen.dart';
-import '../features/pattern_interrupt/presentation/screens/breathing_exercise_screen.dart';
 import '../features/pattern_interrupt/presentation/screens/pattern_interrupt_screen.dart';
 import '../features/protection/presentation/screens/protection_screen.dart';
 import '../features/recovery/presentation/screens/recovery_handoff_screen.dart';
@@ -152,11 +151,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/recovery',
         pageBuilder: (_, state) =>
             _page(key: state.pageKey, child: const RecoveryHandoffScreen()),
-      ),
-      GoRoute(
-        path: '/breathing',
-        pageBuilder: (_, state) =>
-            _page(key: state.pageKey, child: const BreathingExerciseScreen()),
       ),
       ShellRoute(
         builder: (_, __, child) => AppShell(child: child),

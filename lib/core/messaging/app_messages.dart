@@ -156,7 +156,9 @@ class AppMessages {
       case 'invalid_mission':
         return loc.msgErrInvalidMission;
       case 'mission_update_failed':
-      case 'mission_adjust_failed':
+      case 'custom_mission_limit':
+      case 'custom_mission_invalid':
+      case 'custom_mission_not_editable':
         return loc.msgErrUpdateMission;
       case 'fetch_reflections_failed':
         return loc.msgErrLoadJournal;
