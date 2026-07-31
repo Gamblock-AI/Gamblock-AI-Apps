@@ -90,42 +90,13 @@ class PatternInterruptPanel extends StatelessWidget {
         Semantics(
           liveRegion: true,
           label: l10n.patternSecondsRemaining(secondsRemaining),
-          child: AnimatedSize(
-            duration: disableAnimations
-                ? Duration.zero
-                : const Duration(milliseconds: 220),
-            curve: Curves.easeOutCubic,
-            child: Container(
-              constraints: const BoxConstraints(minWidth: 180),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  width: 1,
+          child: disableAnimations
+              ? _statusLabel(context, l10n, ready, secondsRemaining)
+              : AnimatedSize(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
+                  child: _statusLabel(context, l10n, ready, secondsRemaining),
                 ),
-              ),
-              child: AnimatedSwitcher(
-                duration: disableAnimations
-                    ? Duration.zero
-                    : const Duration(milliseconds: 220),
-                child: Text(
-                  ready
-                      ? l10n.patternReady
-                      : l10n.patternSecondsRemaining(secondsRemaining),
-                  key: ValueKey(ready),
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.skyLight,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                ),
-              ),
-            ),
-          ),
         ),
         const SizedBox(height: 28),
         PatternInterruptActions(
@@ -139,4 +110,32 @@ class PatternInterruptPanel extends StatelessWidget {
       ],
     );
   }
+
+  Widget _statusLabel(
+    BuildContext context,
+    AppLocalizations l10n,
+    bool ready,
+    int secondsRemaining,
+  ) => Container(
+    constraints: const BoxConstraints(minWidth: 180),
+    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+    decoration: BoxDecoration(
+      color: Colors.white.withValues(alpha: 0.1),
+      borderRadius: BorderRadius.circular(30),
+      border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1),
+    ),
+    child: Text(
+      ready
+          ? l10n.patternReady
+          : l10n.patternSecondsRemaining(secondsRemaining),
+      key: ValueKey(ready),
+      textAlign: TextAlign.center,
+      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+        color: AppColors.skyLight,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.5,
+        fontFeatures: const [FontFeature.tabularFigures()],
+      ),
+    ),
+  );
 }

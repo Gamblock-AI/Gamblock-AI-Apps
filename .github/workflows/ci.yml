@@ -5,13 +5,14 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: flutter-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  test:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,14 +25,18 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test --coverage
+        if: ${{ vars.ENABLE_CI_TESTS == 'true' }}
       - uses: actions/upload-artifact@v4
+        if: ${{ vars.ENABLE_CI_TESTS == 'true' }}
         with:
           name: flutter-coverage
           path: coverage/lcov.info
 
   development_android:
-    needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: verify
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -69,8 +74,10 @@ jobs:
           path: gamblock-ai-android-development.apk
 
   development_windows:
-    needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: verify
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -111,8 +118,10 @@ jobs:
           path: gamblock-ai-windows-development.zip
 
   production_debug_android:
-    needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: verify
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -150,8 +159,10 @@ jobs:
           path: gamblock-ai-android-production-debug.apk
 
   production_debug_windows:
-    needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: verify
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -192,7 +203,7 @@ jobs:
           path: gamblock-ai-windows-production-debug.zip
 
   signed_production_android:
-    needs: test
+    needs: verify
     if: >-
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main' &&
@@ -251,7 +262,7 @@ jobs:
           path: gamblock-ai-android-production.apk
 
   signed_production_windows:
-    needs: test
+    needs: verify
     if: >-
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main' &&
@@ -320,7 +331,7 @@ jobs:
 
   release_latest:
     needs:
-      - test
+      - verify
       - development_android
       - development_windows
       - production_debug_android
@@ -331,7 +342,7 @@ jobs:
       always() &&
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main' &&
-      needs.test.result == 'success' &&
+      needs.verify.result == 'success' &&
       needs.development_android.result == 'success' &&
       needs.development_windows.result == 'success' &&
       needs.production_debug_android.result == 'success' &&

@@ -16,12 +16,10 @@ class PatternInterruptScreen extends StatefulWidget {
   const PatternInterruptScreen({super.key});
 
   @override
-  State<PatternInterruptScreen> createState() =>
-      _PatternInterruptScreenState();
+  State<PatternInterruptScreen> createState() => _PatternInterruptScreenState();
 }
 
-class _PatternInterruptScreenState
-    extends State<PatternInterruptScreen>
+class _PatternInterruptScreenState extends State<PatternInterruptScreen>
     with TickerProviderStateMixin {
   static const _durationSeconds = 7;
 
@@ -126,58 +124,36 @@ class _PatternInterruptScreenState
       },
       child: Scaffold(
         body: Container(
-          decoration: const BoxDecoration(
-            gradient: AppColors.calmDarkGradient,
-          ),
+          decoration: const BoxDecoration(gradient: AppColors.calmDarkGradient),
           child: SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 28,
+                ),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 520),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      AnimatedSize(
-                        duration: disableAnimations
-                            ? Duration.zero
-                            : const Duration(milliseconds: 220),
-                        curve: Curves.easeOutCubic,
-                        alignment: Alignment.topCenter,
-                        child: AnimatedSwitcher(
-                          duration: disableAnimations
-                              ? Duration.zero
-                              : const Duration(milliseconds: 220),
-                          child: _groundingOpen
-                              ? PatternGroundingPanel(
-                                  onReturnToProtection: () =>
-                                      context.go('/dashboard'),
-                                )
-                              : PatternInterruptPanel(
-                                  breathingAnimation: _breathingController,
-                                  pauseProgress: _pauseProgress,
-                                  inhaling: _inhaling,
-                                  disableAnimations: disableAnimations,
-                                  secondsRemaining: _remaining,
-                                  onContinue: () =>
-                                      _openWeb('post-intervention'),
-                                  onOpenGrounding: () =>
-                                      setState(() => _groundingOpen = true),
-                                  onOpenHelp: () => _openWeb('help'),
-                                  onLater: () => context.go('/dashboard'),
-                                ),
-                        ),
-                      ),
+                      disableAnimations
+                          ? _interruptContent(disableAnimations)
+                          : AnimatedSize(
+                              duration: const Duration(milliseconds: 220),
+                              curve: Curves.easeOutCubic,
+                              alignment: Alignment.topCenter,
+                              child: _interruptContent(disableAnimations),
+                            ),
                       // Fixed-height slot: the back-press hint fades in without
                       // shifting the panel above it.
                       SizedBox(
                         height: 36,
                         child: Center(
                           child: AnimatedOpacity(
-                            opacity:
-                                _showWaitHint && !ready && !_groundingOpen
-                                    ? 1.0
-                                    : 0.0,
+                            opacity: _showWaitHint && !ready && !_groundingOpen
+                                ? 1.0
+                                : 0.0,
                             duration: disableAnimations
                                 ? Duration.zero
                                 : const Duration(milliseconds: 250),
@@ -202,4 +178,25 @@ class _PatternInterruptScreenState
       ),
     );
   }
+
+  Widget _interruptContent(bool disableAnimations) => AnimatedSwitcher(
+    duration: disableAnimations
+        ? Duration.zero
+        : const Duration(milliseconds: 220),
+    child: _groundingOpen
+        ? PatternGroundingPanel(
+            onReturnToProtection: () => context.go('/dashboard'),
+          )
+        : PatternInterruptPanel(
+            breathingAnimation: _breathingController,
+            pauseProgress: _pauseProgress,
+            inhaling: _inhaling,
+            disableAnimations: disableAnimations,
+            secondsRemaining: _remaining,
+            onContinue: () => _openWeb('post-intervention'),
+            onOpenGrounding: () => setState(() => _groundingOpen = true),
+            onOpenHelp: () => _openWeb('help'),
+            onLater: () => context.go('/dashboard'),
+          ),
+  );
 }
