@@ -347,8 +347,8 @@ jobs:
       needs.development_windows.result == 'success' &&
       needs.production_debug_android.result == 'success' &&
       needs.production_debug_windows.result == 'success' &&
-      (needs.signed_production_android.result == 'success' || needs.signed_production_android.result == 'skipped') &&
-      (needs.signed_production_windows.result == 'success' || needs.signed_production_windows.result == 'skipped')
+      needs.signed_production_android.result == 'success' &&
+      needs.signed_production_windows.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write
