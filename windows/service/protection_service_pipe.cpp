@@ -129,7 +129,12 @@ void ProtectionService::HandlePipeClient(HANDLE pipe) {
 void ProtectionService::HandlePipeCommand(const std::string& command) {
   const std::string type = JsonString(command, "type").value_or("");
   const std::string request_id = RequestId(command);
-  if (type == "snapshot") {
+  if (type == "intervention_committed") {
+    CompletePhase4Latency(
+        JsonString(command, "evidence_id").value_or(""));
+    SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
+                   EscapeJson(request_id) + "\",\"ok\":true}");
+  } else if (type == "snapshot") {
     SendAgentEvent(SnapshotJson(request_id));
   } else if (type == "self_test") {
     ClassificationDecision positive;

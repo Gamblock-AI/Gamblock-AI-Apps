@@ -5,6 +5,7 @@ import android.accessibilityservice.AccessibilityServiceInfo
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import java.util.ArrayDeque
@@ -37,6 +38,7 @@ class GamblockAccessibilityService : AccessibilityService() {
     private lateinit var stateStore: ProtectionStateStore
     private lateinit var overlay: PatternInterruptOverlay
     private lateinit var artifactUpdater: ArtifactUpdater
+    private lateinit var phase4Evidence: Phase4EvidenceRecorder
     private var lastSignature = 0
     private var lastDecisionAt = 0L
     private var pendingScan: Runnable? = null
@@ -57,6 +59,7 @@ class GamblockAccessibilityService : AccessibilityService() {
         stateStore = ProtectionStateStore(applicationContext)
         overlay = PatternInterruptOverlay(this, NativeConfig.webBaseUrl(this))
         artifactUpdater = ArtifactUpdater(applicationContext, classifier, aggregateStore)
+        phase4Evidence = Phase4EvidenceRecorder(applicationContext)
         if (classifier.load()) {
             stateStore.setStatus("active")
         } else {
@@ -86,14 +89,18 @@ class GamblockAccessibilityService : AccessibilityService() {
         }
         pendingScan?.let(mainHandler::removeCallbacks)
         val runnable = Runnable {
+            val scanStartedNanos = SystemClock.elapsedRealtimeNanos()
             val input = extractSignals(event, rootInActiveWindow)
             if (input == null) {
                 stateStore.setStatus("degraded", "signal_unavailable")
                 NativeEventBus.emit(snapshotEvent())
                 return@Runnable
             }
+            val inputReadyNanos = SystemClock.elapsedRealtimeNanos()
             worker.execute {
+                val classificationStartedNanos = SystemClock.elapsedRealtimeNanos()
                 val result = classifier.classify(input)
+                val classificationFinishedNanos = SystemClock.elapsedRealtimeNanos()
                 val signature = listOf(input.url, input.title, input.headings, input.anchorTexts).hashCode()
                 val now = System.currentTimeMillis()
                 if (signature == lastSignature && now - lastDecisionAt < 2500) {
@@ -108,7 +115,19 @@ class GamblockAccessibilityService : AccessibilityService() {
                     aggregateStore.increment("intervention_shown")
                     mainHandler.post {
                         performGlobalAction(GLOBAL_ACTION_BACK)
-                        overlay.showIntervention()
+                        overlay.showIntervention {
+                            phase4Evidence.recordLatency(
+                                Phase4LatencySample(
+                                    scanStartedNanos = scanStartedNanos,
+                                    inputReadyNanos = inputReadyNanos,
+                                    classificationStartedNanos = classificationStartedNanos,
+                                    classificationFinishedNanos = classificationFinishedNanos,
+                                    visibleNanos = SystemClock.elapsedRealtimeNanos(),
+                                    modelVersion = result.modelVersion,
+                                    rulesetVersion = result.rulesetVersion,
+                                ),
+                            )
+                        }
                         NativeEventBus.emit(
                             mapOf(
                                 "type" to "intervention_shown",

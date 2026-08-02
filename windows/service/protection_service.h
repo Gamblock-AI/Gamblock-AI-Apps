@@ -5,6 +5,7 @@
 #include <windows.h>
 
 #include <atomic>
+#include <chrono>
 #include <map>
 #include <mutex>
 #include <set>
@@ -55,6 +56,27 @@ class ProtectionService {
   std::string AggregatesJson(const std::string& request_id,
                              bool completed_only);
   void AcknowledgeAggregates(const std::string& command);
+  std::string BeginPhase4Latency(
+      std::chrono::steady_clock::time_point input_ready,
+      double pre_input_duration_ms,
+      double extraction_duration_ms,
+      double queue_duration_ms,
+      double classification_duration_ms,
+      const ClassificationDecision& decision);
+  void CompletePhase4Latency(const std::string& evidence_id);
+
+  struct PendingPhase4Latency {
+    std::chrono::steady_clock::time_point input_ready;
+    double pre_input_duration_ms = 0;
+    double extraction_duration_ms = 0;
+    double queue_duration_ms = 0;
+    double classification_duration_ms = 0;
+    std::string run_id;
+    std::string device_alias;
+    std::string scenario;
+    std::string model_version;
+    std::string ruleset_version;
+  };
 
   SERVICE_STATUS_HANDLE status_handle_ = nullptr;
   SERVICE_STATUS status_{};
@@ -71,6 +93,9 @@ class ProtectionService {
   std::set<SOCKET> authenticated_clients_;
   mutable std::mutex aggregate_mutex_;
   std::map<std::string, int> aggregates_;
+  std::mutex phase4_evidence_mutex_;
+  std::map<std::string, PendingPhase4Latency> pending_phase4_latency_;
+  std::atomic<unsigned long> phase4_evidence_sequence_{1};
   HybridClassifier classifier_;
   std::string artifact_error_;
   std::string device_id_;

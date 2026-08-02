@@ -13,6 +13,7 @@ import android.os.Looper
 import android.provider.Settings
 import android.view.Gravity
 import android.view.View
+import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
@@ -29,7 +30,7 @@ class PatternInterruptOverlay(
     private var root: View? = null
     private var animator: ValueAnimator? = null
 
-    fun showIntervention() {
+    fun showIntervention(onCommitted: (() -> Unit)? = null) {
         if (root != null) return
         val locale = if (Locale.getDefault().language == "en") "en" else "id"
         val isEnglish = locale == "en"
@@ -100,6 +101,24 @@ class PatternInterruptOverlay(
                     },
                 )
             }
+        onCommitted?.let { callback ->
+            container.viewTreeObserver.addOnDrawListener(
+                object : ViewTreeObserver.OnDrawListener {
+                    private var delivered = false
+
+                    override fun onDraw() {
+                        if (delivered) return
+                        delivered = true
+                        container.post {
+                            if (container.viewTreeObserver.isAlive) {
+                                container.viewTreeObserver.removeOnDrawListener(this)
+                            }
+                            callback()
+                        }
+                    }
+                },
+            )
+        }
         attach(container)
         if (!reducedMotion()) {
             animator = ValueAnimator.ofFloat(0.88f, 1.0f).apply {

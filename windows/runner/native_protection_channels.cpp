@@ -94,6 +94,14 @@ void NativeProtectionBridge::ConfigureMethodChannel(
               JsonString(response, "pairing_token")));
         } else if (call.method_name() == "setHealthNotifications") {
           result->Success(flutter::EncodableValue(true));
+        } else if (call.method_name() == "recordInterventionCommitted") {
+          const auto* value = FindArgument(arguments, "evidence_id");
+          const auto* evidence_id =
+              value ? std::get_if<std::string>(value) : nullptr;
+          const std::string fields = ",\"evidence_id\":\"" +
+              EscapeJson(evidence_id == nullptr ? "" : *evidence_id) + "\"";
+          result->Success(flutter::EncodableValue(JsonBool(
+              CallService("intervention_committed", fields), "ok")));
         } else {
           result->NotImplemented();
         }

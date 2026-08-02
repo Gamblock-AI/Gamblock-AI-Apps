@@ -87,6 +87,7 @@ class MainActivity : FlutterActivity() {
                     stateStore.setDeviceId(call.argument<String>("device_id").orEmpty())
                     result.success(null)
                 }
+                "recordInterventionCommitted" -> result.success(true)
                 "drainDailyAggregates" -> result.success(aggregates.completedDays())
                 "getCurrentDailyAggregates" -> result.success(aggregates.currentDay())
                 "ackDailyAggregates" -> {

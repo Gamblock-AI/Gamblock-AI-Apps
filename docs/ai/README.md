@@ -1,6 +1,6 @@
 # Flutter Client AI Context
 
-Context version: `2026-07-31.15`
+Context version: `2026-08-02.23`
 
 ## Product capsule
 
@@ -26,9 +26,10 @@ the device; the backend receives aggregate events only.
 | Website recovery handoff | Implemented code-complete prototype | The client opens the privacy-safe web handoff with locale plus fixed source category only. Detailed intention, check-in, mission, education, skill, journal, and weekly-review surfaces remain website-owned. |
 | Protection dashboard + Gami | Implemented supporting UI | Dashboard hero, setup/self-test, aggregate appreciation, and first-open mascot state remain. Native missions, EXP/level, journey badges, standalone breathing, pause acknowledgement, and recovery-practice bookkeeping were removed so the client stays a thin protection surface. |
 | Hybrid-v2 local classifier | Implemented trained-artifact prototype; not evaluated | supplied ONNX graph is reproducibly exported without unpickling into 5,664 unigram + 4,336 bigram weights, 14 scaled URL features, LR bias/weights, `0.75/0.25` fusion, and threshold `0.4`; Android and Windows native authorities load the same hashed artifact/rules/fixtures. Supplied metrics remain unverified because dataset card, split/training source, FPR slices, and preprocessing-parity evidence are absent |
-| Pattern Interrupt and recovery handoff | Implemented code path | Seven-second native/Flutter paths, reduced motion, offline grounding/help, and browsing-data-free web handoff are wired; device evidence remains required. The Flutter screen retains the breath-phase cue, countdown/progress treatment, haptics, and interactive 5-4-3-2-1 grounding stepper. The Android native overlay (`PatternInterruptOverlay.kt`) is a separate surface and was intentionally not changed. |
-| Android protection runtime | Implemented code-complete prototype | active manifest service, Chrome/Edge extraction, local decision, Back/overlay, settings friction, Keystore grant, aggregate sync, and artifact checks; analyzer passes, Android compile/device proof remains |
-| Windows service + user-session agent | Implemented code-complete prototype | separate CMake service target, authenticated loopback WebSocket, DPAPI state, logon-SID pipe, Flutter bridge, SendInput action, SCM recovery, scripts, portable classifier fixture, and a non-signing Windows debug compile CI job are wired; a successful runner result and VM proof remain external evidence gates |
+| Pattern Interrupt and recovery handoff | Implemented code path | Seven-second native/Flutter paths, reduced motion, offline grounding/help, and browsing-data-free web handoff are wired; device evidence remains required. Flutter reports its first completed route frame to the Windows service only for an active opaque Phase 4 evidence sample; the Android overlay records after its first draw. |
+| Android protection runtime | Implemented code-complete prototype; Phase 4 instrumented | active manifest service, Chrome/Edge extraction, local decision, Back/overlay, settings friction, Keystore grant, aggregate sync, and artifact checks are wired. Opt-in bounded latency capture plus an acknowledged disposable-device recovery harness exist; Android compile/device runs and reviewed scenario evidence remain external gates. |
+| Windows service + user-session agent | Implemented code-complete prototype; Phase 4 instrumented | separate CMake service target, authenticated loopback WebSocket, DPAPI state, logon-SID pipe, Flutter bridge, SendInput action, SCM recovery, portable classifier fixture, opt-in bounded input-to-visible capture, and a disposable-VM process-kill harness are wired. A successful runner build and reviewed VM/device matrix remain external evidence gates. |
+| Phase 4 evaluation | Instrumented; not evaluated | The umbrella `evaluation/phase4/` workbench evaluates Hybrid/model/rule metrics, FPR slices, native latency, retention, and evidence completeness. No approved dataset, real-device matrix, executed resilience matrix, UTY cohort, ethics approval, or reviewer sign-off is present. |
 | Release scaffolding | Implemented operational workflow | every successful `main` commit force-updates the mutable `latest` tag/release with development debug assets and explicitly named `production-debug` assets using the production API/site URLs; signed production jobs remain behind `ENABLE_PRODUCTION_RELEASE=true` with Android keystore and Windows Authenticode inputs; debug/unsigned artifacts are never presented as signed |
 
 Target architecture in comments or proposal documents does not change these
@@ -36,7 +37,7 @@ states. Update the table only with code, wiring, and verification evidence.
 
 Windows service implementation is organized by responsibility in
 `windows/service/`: runtime lifecycle, WebSocket transport/handler, named-pipe
-handler, artifact updater, local state, user-agent launcher, and small support
+handler, artifact updater, local evidence recorder, local state, user-agent launcher, and small support
 modules. The Flutter runner mirrors that split in `native_protection_*.{cpp,h}`
 for codec, channels, pipe transport, events, and settings monitoring. The
 split does not change the loopback or Flutter pipe contracts. Pipe operations

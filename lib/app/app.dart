@@ -31,6 +31,12 @@ class _GamblockAppState extends ConsumerState<GamblockApp>
       if (event.type == 'intervention_shown') {
         if (event.payload['native_overlay'] != true) {
           router.go('/pattern-interrupt');
+          final evidenceId = event.payload['evidence_id']?.toString() ?? '';
+          if (evidenceId.isNotEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              unawaited(PlatformBridge.recordInterventionCommitted(evidenceId));
+            });
+          }
         }
       } else if (event.type == 'approval_required') {
         router.go('/dashboard');

@@ -1,6 +1,7 @@
 #include "service_support.h"
 
 #include <algorithm>
+#include <cmath>
 #include <iomanip>
 #include <regex>
 #include <sstream>
@@ -42,6 +43,21 @@ std::optional<std::string> JsonString(const std::string& json,
     }
   }
   return decoded;
+}
+
+std::optional<double> JsonNumber(const std::string& json,
+                                 const std::string& key) {
+  const std::regex pattern(
+      "\"" + key +
+      "\"\\s*:\\s*([+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?)");
+  std::smatch match;
+  if (!std::regex_search(json, match, pattern)) return std::nullopt;
+  try {
+    const double value = std::stod(match[1].str());
+    return std::isfinite(value) ? std::optional<double>(value) : std::nullopt;
+  } catch (...) {
+    return std::nullopt;
+  }
 }
 
 std::vector<std::string> JsonStringArray(const std::string& json,

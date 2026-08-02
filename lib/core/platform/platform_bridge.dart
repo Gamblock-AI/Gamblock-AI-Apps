@@ -60,6 +60,13 @@ class PlatformBridge {
   static Future<bool> setHealthNotifications(bool enabled) =>
       _boolMethodWithArguments('setHealthNotifications', {'enabled': enabled});
 
+  static Future<bool> recordInterventionCommitted(String evidenceId) {
+    if (evidenceId.isEmpty) return Future.value(false);
+    return _boolMethodWithArguments('recordInterventionCommitted', {
+      'evidence_id': evidenceId,
+    });
+  }
+
   static Future<void> setDeviceId(String deviceId) async {
     try {
       await _channel.invokeMethod<void>('setDeviceId', {'device_id': deviceId});

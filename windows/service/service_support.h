@@ -36,6 +36,8 @@ std::wstring Widen(const std::string& value);
 std::string EscapeJson(const std::string& value);
 std::optional<std::string> JsonString(const std::string& json,
                                       const std::string& key);
+std::optional<double> JsonNumber(const std::string& json,
+                                 const std::string& key);
 std::vector<std::string> JsonStringArray(const std::string& json,
                                          const std::string& key,
                                          size_t maximum_items,

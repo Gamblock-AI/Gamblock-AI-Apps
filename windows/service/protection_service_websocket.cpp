@@ -174,27 +174,57 @@ void ProtectionService::HandleWebSocketClient(SOCKET client) {
       scans_in_window = 0;
     }
     if (++scans_in_window > 30) continue;
+    const double extraction_duration_ms = std::clamp(
+        JsonNumber(payload, "extractionDurationMs").value_or(0.0),
+        0.0, 10000.0);
     ClassificationInput input;
     input.url = JsonString(payload, "url").value_or("");
     input.title = JsonString(payload, "title").value_or("");
     input.headings = JsonStringArray(payload, "headings", 32, 256);
     input.anchor_texts = JsonStringArray(payload, "anchorTexts", 64, 256);
+    const auto input_ready = std::chrono::steady_clock::now();
+    const double input_ready_epoch_ms =
+        std::chrono::duration<double, std::milli>(
+            std::chrono::system_clock::now().time_since_epoch()).count();
+    const double scan_started_epoch_ms =
+        JsonNumber(payload, "scanStartedAtMs").value_or(input_ready_epoch_ms);
+    const double measured_pre_input_ms =
+        input_ready_epoch_ms - scan_started_epoch_ms;
+    const double pre_input_duration_ms =
+        measured_pre_input_ms >= 0.0 && measured_pre_input_ms <= 10000.0
+            ? measured_pre_input_ms
+            : extraction_duration_ms;
+    const auto classification_started = std::chrono::steady_clock::now();
     ClassificationDecision decision;
     {
       std::lock_guard lock(state_mutex_);
       decision = classifier_.Classify(input);
     }
+    const auto classification_finished = std::chrono::steady_clock::now();
     if (decision.block) {
       IncrementAggregate("block_count_sync");
       IncrementAggregate("intervention_shown");
       EnsureUserAgentRunning();
+      const std::string evidence_id = BeginPhase4Latency(
+          input_ready,
+          pre_input_duration_ms,
+          extraction_duration_ms,
+          std::chrono::duration<double, std::milli>(
+              classification_started - input_ready).count(),
+          std::chrono::duration<double, std::milli>(
+              classification_finished - classification_started).count(),
+          decision);
       std::ostringstream event;
       event << "{\"type\":\"intervention_shown\",\"reason_code\":\""
             << EscapeJson(decision.reason_code)
             << "\",\"model_version\":\""
             << EscapeJson(decision.model_version)
             << "\",\"ruleset_version\":\""
-            << EscapeJson(decision.ruleset_version) << "\"}";
+            << EscapeJson(decision.ruleset_version) << "\"";
+      if (!evidence_id.empty()) {
+        event << ",\"evidence_id\":\"" << EscapeJson(evidence_id) << "\"";
+      }
+      event << '}';
       SendAgentEvent(event.str());
     }
   }

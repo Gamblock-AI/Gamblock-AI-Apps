@@ -160,6 +160,18 @@ class AppMessages {
       case 'custom_mission_invalid':
       case 'custom_mission_not_editable':
         return loc.msgErrUpdateMission;
+      case 'learning_hub_fetch_failed':
+      case 'learning_hub_progress_failed':
+      case 'learning_hub_state_invalid':
+      case 'learning_hub_checkpoint_invalid':
+      case 'learning_hub_item_not_found':
+      case 'learning_hub_mutation_failed':
+      case 'learning_hub_admin_failed':
+      case 'learning_hub_admin_not_found':
+      case 'learning_hub_admin_validation_failed':
+      case 'learning_hub_admin_conflict':
+      case 'learning_hub_taxonomy_conflict':
+        return loc.msgErrGeneric;
       case 'fetch_reflections_failed':
         return loc.msgErrLoadJournal;
       case 'reflection_create_failed':

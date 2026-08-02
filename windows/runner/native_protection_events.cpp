@@ -50,7 +50,8 @@ void NativeProtectionBridge::DispatchEvent(const std::string& message) {
   };
   for (const auto& key : {"reason_code", "model_version", "ruleset_version",
                           "status", "platform", "sensor_status",
-                          "permission_status", "degraded_reason_code"}) {
+                          "permission_status", "degraded_reason_code",
+                          "evidence_id"}) {
     const std::string value = JsonString(message, key);
     if (!value.empty()) {
       payload[flutter::EncodableValue(key)] = flutter::EncodableValue(value);

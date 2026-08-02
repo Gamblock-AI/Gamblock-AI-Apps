@@ -6,14 +6,41 @@
 #include "service_support.h"
 
 namespace gamblock {
+namespace {
+
+constexpr DWORD kPipeWriteTimeoutMs = 5000;
+
+bool WritePipeMessage(HANDLE pipe, const std::string& payload) {
+  HANDLE event = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+  if (event == nullptr) return false;
+  OVERLAPPED operation{};
+  operation.hEvent = event;
+  DWORD written = 0;
+  const BOOL completed = WriteFile(
+      pipe, payload.data(), static_cast<DWORD>(payload.size()), &written,
+      &operation);
+  const DWORD error = completed ? ERROR_SUCCESS : GetLastError();
+  bool success = completed != FALSE;
+  if (!success && error == ERROR_IO_PENDING) {
+    if (WaitForSingleObject(event, kPipeWriteTimeoutMs) == WAIT_OBJECT_0) {
+      success = GetOverlappedResult(
+                    pipe, &operation, &written, FALSE) != FALSE;
+    } else {
+      CancelIoEx(pipe, &operation);
+      GetOverlappedResult(pipe, &operation, &written, TRUE);
+    }
+  }
+  CloseHandle(event);
+  return success && written == payload.size();
+}
+
+}  // namespace
 
 void ProtectionService::SendAgentEvent(const std::string& json) {
   std::lock_guard lock(pipe_mutex_);
   if (pipe_client_ == INVALID_HANDLE_VALUE) return;
   const std::string framed = json + "\n";
-  DWORD written = 0;
-  if (!WriteFile(pipe_client_, framed.data(), static_cast<DWORD>(framed.size()),
-                 &written, nullptr)) {
+  if (!WritePipeMessage(pipe_client_, framed)) {
     pipe_client_ = INVALID_HANDLE_VALUE;
   }
 }

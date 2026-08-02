@@ -1,5 +1,5 @@
 schema_version: 1
-context_version: 2026-07-31.15
+context_version: 2026-08-02.23
 component: flutter
 contracts:
   proposal_authority: 1
@@ -7,7 +7,8 @@ contracts:
   local_ai_lint_policy: 1
   privacy_boundary: 1
   hybrid_artifact: 2
-  websocket_loopback: 1
+  websocket_loopback: 2
+  phase4_evidence: 1
   api_error_catalog: 1
   account_recovery: 1
   accountability_state: 2
@@ -33,6 +34,8 @@ proposal_requirements:
   - PKM-ACC-002
   - PKM-ACC-003
   - PKM-ACC-004
+  - PKM-EVAL-003
+  - PKM-EVAL-005
 default_lint: ./scripts/verify.sh
 explicit_request_checks:
   - flutter test

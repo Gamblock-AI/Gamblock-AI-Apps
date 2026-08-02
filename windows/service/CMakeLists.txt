@@ -6,6 +6,7 @@ add_executable(gamblock_ai_service
   "pipe_security.cpp"
   "protection_service_agent.cpp"
   "protection_service_artifacts.cpp"
+  "protection_service_evidence.cpp"
   "protection_service_pipe.cpp"
   "protection_service_runtime.cpp"
   "protection_service_state.cpp"

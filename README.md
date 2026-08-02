@@ -122,12 +122,59 @@ signing still require validation on a Windows VM/device.
 
 The Windows service is split by responsibility under `windows/service/`:
 runtime/SCM lifecycle, WebSocket handling, named-pipe commands, local state,
-artifact updates, user-agent launch, and small platform support modules. The
+artifact updates, opt-in evidence capture, user-agent launch, and small
+platform support modules. The
 Flutter runner similarly uses `native_protection_*.{cpp,h}` modules for codec,
 channels, pipe transport, events, and settings monitoring. This keeps IPC,
 credential storage, and update logic independently reviewable. Pipe operations
 are cancellable during shutdown, and the Windows service joins its socket
 workers before Winsock teardown.
+
+## Phase 4 evidence capture
+
+Latency evidence is disabled by default and remains device-local. When an
+approved evaluator enables it, Android and Windows write bounded JSON Lines
+containing opaque run/device/scenario labels, artifact versions, and durations
+only. They never record URL, domain, DOM, title, decision score, account ID, or
+browsing timestamp. `input_to_visible_ms` measures complete supported local
+input through the first committed Pattern Interrupt frame.
+
+Android evidence mode and export:
+
+```sh
+./scripts/phase4-android-evidence.sh enable --device SERIAL \
+  --run-id RUN_ID --device-alias DEVICE_ALIAS --scenario SCENARIO
+./scripts/phase4-android-evidence.sh export --device SERIAL \
+  --output android-latency.jsonl
+./scripts/phase4-android-evidence.sh disable --device SERIAL
+```
+
+Windows evidence mode/export and the ordinary process-kill recovery scenario
+run from an elevated PowerShell on an approved disposable VM:
+
+```powershell
+.\windows\scripts\phase4-evidence.ps1 Enable `
+  -RunId RUN_ID -DeviceAlias DEVICE_ALIAS -Scenario SCENARIO
+.\windows\scripts\phase4-evidence.ps1 Export -Output windows-latency.jsonl
+.\windows\scripts\phase4-evidence.ps1 Disable
+.\windows\scripts\run-phase4-hardening.ps1 `
+  -RunId RUN_ID -DeviceAlias DEVICE_ALIAS `
+  -Output windows-resilience.json -AcknowledgeDisposableVm
+```
+
+Android resilience capture likewise requires an explicitly acknowledged
+disposable device:
+
+```sh
+./scripts/run-phase4-android-hardening.sh --device SERIAL \
+  --run-id RUN_ID --device-alias DEVICE_ALIAS \
+  --output android-resilience.json --acknowledge-disposable-device
+```
+
+These harnesses emit the standardized `phase4_resilience_run` shape for one
+ordinary process-kill cell. Remaining approved matrix scenarios must be
+captured with the workbench template and reviewed; an unexecuted scenario is
+never a passed evaluation.
 
 ## Backend contracts
 
