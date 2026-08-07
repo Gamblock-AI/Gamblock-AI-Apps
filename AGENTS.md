@@ -1,6 +1,5 @@
 # Gamblock-AI Flutter Client Agent Rules
 
-Context version: `2026-08-02.24`
 
 This standalone repository contains the Android and Windows protection client.
 Read `docs/ai/README.md` before changing behavior; it distinguishes working
@@ -91,13 +90,10 @@ Do not hardcode URLs in features or call Dio from presentation code.
 - Any WebSocket shape change must be coordinated with the browser extension
   implementation/tests/README without moving blocking authority into it.
 
-The proposal requires URL rules + DOM title/headings/anchors + Bag-of-Words +
-Logistic Regression, real-time local blocking, a 5–10 second Pattern Interrupt,
-a privacy-safe web recovery handoff, and partner-controlled removal. Existing
-UI/contracts do not by themselves satisfy the platform, AI, blocking,
-interruption, or accountability proposal requirements
-until wired and evidenced on the active Android/Windows runtimes. The current
-handoff label is code-complete prototype, not evaluated/release-ready.
+Existing UI/contracts do not by themselves satisfy the platform, AI, blocking,
+interruption, or accountability requirements until wired and evidenced on the
+active Android/Windows runtimes. The current handoff label is code-complete
+prototype, not evaluated/release-ready.
 
 ## Messaging and interaction
 

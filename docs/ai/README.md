@@ -1,6 +1,7 @@
 # Flutter Client AI Context
 
-Context version: `2026-08-02.24`
+
+Jika ada pertentangan dengan `pkm_proposal.md`, proposal PKM adalah sumber mutlak.
 
 ## Product capsule
 
@@ -26,10 +27,10 @@ the device; the backend receives aggregate events only.
 | Website recovery handoff | Implemented code-complete prototype | The client opens the privacy-safe web handoff with locale plus fixed source category only. Detailed intention, check-in, mission, education, skill, journal, and weekly-review surfaces remain website-owned. |
 | Protection dashboard + Gami | Implemented supporting UI | Dashboard hero, setup/self-test, aggregate appreciation, and first-open mascot state remain. Native missions, EXP/level, journey badges, standalone breathing, pause acknowledgement, and recovery-practice bookkeeping were removed so the client stays a thin protection surface. |
 | Hybrid-v2 local classifier | Implemented trained-artifact prototype; not evaluated | supplied ONNX graph is reproducibly exported without unpickling into 5,664 unigram + 4,336 bigram weights, 14 scaled URL features, LR bias/weights, `0.75/0.25` fusion, and threshold `0.4`; Android and Windows native authorities load the same hashed artifact/rules/fixtures. Supplied metrics remain unverified because dataset card, split/training source, FPR slices, and preprocessing-parity evidence are absent |
-| Pattern Interrupt and recovery handoff | Implemented code path | Seven-second native/Flutter paths, reduced motion, offline grounding/help, and browsing-data-free web handoff are wired; device evidence remains required. Flutter reports its first completed route frame to the Windows service only for an active opaque Phase 4 evidence sample; the Android overlay records after its first draw. |
-| Android protection runtime | Implemented code-complete prototype; Phase 4 instrumented | active manifest service, Chrome/Edge extraction, local decision, Back/overlay, settings friction, Keystore grant, aggregate sync, and artifact checks are wired. Opt-in bounded latency capture plus an acknowledged disposable-device recovery harness exist; Android compile/device runs and reviewed scenario evidence remain external gates. |
-| Windows service + user-session agent | Implemented code-complete prototype; Phase 4 instrumented | separate CMake service target, authenticated loopback WebSocket, DPAPI state, logon-SID pipe, Flutter bridge, SendInput action, SCM recovery, portable classifier fixture, opt-in bounded input-to-visible capture, and a disposable-VM process-kill harness are wired. A successful runner build and reviewed VM/device matrix remain external evidence gates. |
-| Phase 4 evaluation | Instrumented; not evaluated | The umbrella `evaluation/phase4/` workbench evaluates Hybrid/model/rule metrics, FPR slices, native latency, retention, and evidence completeness. No approved dataset, real-device matrix, executed resilience matrix, UTY cohort, ethics approval, or reviewer sign-off is present. |
+| Pattern Interrupt and recovery handoff | Implemented code path | Seven-second native/Flutter paths, reduced motion, offline grounding/help, and browsing-data-free web handoff are wired; device evidence remains required. |
+| Android protection runtime | Implemented code-complete prototype | active manifest service, Chrome/Edge extraction, local decision, Back/overlay, settings friction, Keystore grant, aggregate sync, and artifact checks are wired. Android compile/device runs and reviewed scenario evidence remain external gates. |
+| Windows service + user-session agent | Implemented code-complete prototype | separate CMake service target, authenticated loopback WebSocket, DPAPI state, logon-SID pipe, Flutter bridge, SendInput action, SCM recovery, and portable classifier fixture are wired. A successful runner build and reviewed VM/device matrix remain external evidence gates. |
+| Evaluation | Instrumented; not evaluated | Hybrid/model/rule metrics, FPR slices, native latency, retention, and evidence completeness. No approved dataset, real-device matrix, or reviewer sign-off is present. |
 | Release scaffolding | Implemented operational workflow | every successful `main` commit force-updates the mutable `latest` tag/release with development debug assets and explicitly named `production-debug` assets using the production API/site URLs; signed production jobs remain behind `ENABLE_PRODUCTION_RELEASE=true` with Android keystore and Windows Authenticode inputs; debug/unsigned artifacts are never presented as signed |
 
 Target architecture in comments or proposal documents does not change these
@@ -44,14 +45,9 @@ split does not change the loopback or Flutter pipe contracts. Pipe operations
 are cancellable during shutdown, and the service joins WebSocket workers before
 tearing down Winsock.
 
-Proposal traceability: this client owns `PKM-PLAT-001`, `PKM-PLAT-002`,
-`PKM-PLAT-003`, `PKM-AI-001`, `PKM-AI-002`, `PKM-AI-003`, `PKM-AI-004`,
-`PKM-AI-005`, `PKM-AI-006`, `PKM-AI-007`, `PKM-BLOCK-001`, `PKM-BLOCK-002`,
-`PKM-INT-001`, `PKM-INT-002`, `PKM-INT-003`, `PKM-INT-004`, `PKM-ACC-002`,
-`PKM-ACC-003`, and `PKM-ACC-004` runtime outcomes. The required pipeline
-includes URL rules, DOM title/headings/anchors, BoW, Logistic Regression, local
-decision/block, a 5–10 second Pattern Interrupt, and a browsing-data-free
-recovery handoff.
+The required pipeline includes URL rules, DOM title/headings/anchors, BoW,
+Logistic Regression, local decision/block, a 5–10 second Pattern Interrupt,
+and a browsing-data-free recovery handoff.
 
 ## Default AI validation
 

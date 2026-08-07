@@ -1,8 +1,6 @@
 ---
-description: Canonical Gamblock-AI Flutter architecture and safety rules
+description: Gamblock-AI Flutter architecture and safety rules
 alwaysApply: true
 ---
 
-Follow @AGENTS.md and @docs/ai/README.md. Keep browsing data and inference
-on-device, keep presentation independent of Dio, and distinguish working code
-from model/native stubs.
+@AGENTS.md
