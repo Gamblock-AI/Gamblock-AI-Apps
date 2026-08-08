@@ -271,6 +271,17 @@ class AppMessages {
         return loc.msgErrEmergencyKeyRequired;
       case 'invalid_key':
         return loc.msgErrInvalidEmergencyKey;
+
+      // translation (DeepSeek)
+      case 'translation_failed':
+        return loc.msgErrTranslationFailed;
+      case 'translation_invalid_input':
+        return loc.msgErrTranslationInvalidInput;
+      case 'translation_unavailable':
+        return loc.msgErrTranslationUnavailable;
+      case 'translation_rate_limited':
+        return loc.msgErrTranslationRateLimited;
+
       default:
         return loc.msgErrGeneric;
     }

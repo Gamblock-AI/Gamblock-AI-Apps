@@ -1040,6 +1040,30 @@ abstract class AppLocalizations {
   /// **'Kunci darurat tidak valid.'**
   String get msgErrInvalidEmergencyKey;
 
+  /// No description provided for @msgErrTranslationFailed.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal menerjemahkan konten. Silakan coba lagi.'**
+  String get msgErrTranslationFailed;
+
+  /// No description provided for @msgErrTranslationInvalidInput.
+  ///
+  /// In id, this message translates to:
+  /// **'Input translasi tidak valid.'**
+  String get msgErrTranslationInvalidInput;
+
+  /// No description provided for @msgErrTranslationUnavailable.
+  ///
+  /// In id, this message translates to:
+  /// **'Layanan AI penerjemahan sedang tidak tersedia.'**
+  String get msgErrTranslationUnavailable;
+
+  /// No description provided for @msgErrTranslationRateLimited.
+  ///
+  /// In id, this message translates to:
+  /// **'Penerjemahan AI sedang sibuk, coba lagi dalam beberapa saat.'**
+  String get msgErrTranslationRateLimited;
+
   /// No description provided for @msgErrCreateGroup.
   ///
   /// In id, this message translates to:

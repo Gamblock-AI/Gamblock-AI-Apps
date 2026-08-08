@@ -506,6 +506,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get msgErrInvalidEmergencyKey => 'The emergency key is invalid.';
 
   @override
+  String get msgErrTranslationFailed =>
+      'Could not translate the content. Please try again.';
+
+  @override
+  String get msgErrTranslationInvalidInput => 'Invalid translation input.';
+
+  @override
+  String get msgErrTranslationUnavailable =>
+      'The AI translation service is unavailable.';
+
+  @override
+  String get msgErrTranslationRateLimited =>
+      'The translation service is busy. Please try again shortly.';
+
+  @override
   String get msgErrCreateGroup => 'The group could not be created.';
 
   @override

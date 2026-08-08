@@ -507,6 +507,20 @@ class AppLocalizationsId extends AppLocalizations {
   String get msgErrInvalidEmergencyKey => 'Kunci darurat tidak valid.';
 
   @override
+  String get msgErrTranslationFailed => 'Gagal menerjemahkan konten. Silakan coba lagi.';
+
+  @override
+  String get msgErrTranslationInvalidInput => 'Input translasi tidak valid.';
+
+  @override
+  String get msgErrTranslationUnavailable =>
+      'Layanan AI penerjemahan sedang tidak tersedia.';
+
+  @override
+  String get msgErrTranslationRateLimited =>
+      'Penerjemahan AI sedang sibuk, coba lagi dalam beberapa saat.';
+
+  @override
   String get msgErrCreateGroup => 'Gagal membuat grup.';
 
   @override
