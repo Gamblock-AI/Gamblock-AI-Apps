@@ -49,19 +49,13 @@ jobs:
         env:
           API_BASE_URL: ${{ vars.DEV_API_BASE_URL }}
           WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}
-          GOOGLE_WEB_CLIENT_ID: ${{ vars.GOOGLE_WEB_CLIENT_ID }}
-          GOOGLE_WINDOWS_CLIENT_ID: ${{ vars.GOOGLE_WINDOWS_CLIENT_ID }}
         run: |
           test -n "$API_BASE_URL"
           test -n "$WEB_BASE_URL"
-          test -n "$GOOGLE_WEB_CLIENT_ID"
-          test -n "$GOOGLE_WINDOWS_CLIENT_ID"
           printf '%s\n' \
             'APP_ENV=development' \
             "API_BASE_URL=$API_BASE_URL" \
-            "WEB_BASE_URL=$WEB_BASE_URL" \
-            "GOOGLE_WEB_CLIENT_ID=$GOOGLE_WEB_CLIENT_ID" \
-            "GOOGLE_WINDOWS_CLIENT_ID=$GOOGLE_WINDOWS_CLIENT_ID" > .env
+            "WEB_BASE_URL=$WEB_BASE_URL" > .env
 
       - run: flutter pub get
       - name: Build development Android APK
@@ -91,19 +85,13 @@ jobs:
         env:
           API_BASE_URL: ${{ vars.DEV_API_BASE_URL }}
           WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}
-          GOOGLE_WEB_CLIENT_ID: ${{ vars.GOOGLE_WEB_CLIENT_ID }}
-          GOOGLE_WINDOWS_CLIENT_ID: ${{ vars.GOOGLE_WINDOWS_CLIENT_ID }}
         run: |
           if ([string]::IsNullOrWhiteSpace($env:API_BASE_URL)) { throw "DEV_API_BASE_URL is required" }
           if ([string]::IsNullOrWhiteSpace($env:WEB_BASE_URL)) { throw "WEB_BASE_URL is required" }
-          if ([string]::IsNullOrWhiteSpace($env:GOOGLE_WEB_CLIENT_ID)) { throw "GOOGLE_WEB_CLIENT_ID is required" }
-          if ([string]::IsNullOrWhiteSpace($env:GOOGLE_WINDOWS_CLIENT_ID)) { throw "GOOGLE_WINDOWS_CLIENT_ID is required" }
           @"
           APP_ENV=development
           API_BASE_URL=$env:API_BASE_URL
           WEB_BASE_URL=$env:WEB_BASE_URL
-          GOOGLE_WEB_CLIENT_ID=$env:GOOGLE_WEB_CLIENT_ID
-          GOOGLE_WINDOWS_CLIENT_ID=$env:GOOGLE_WINDOWS_CLIENT_ID
           "@ | Set-Content -Encoding utf8NoBOM .env
 
       - run: flutter pub get
@@ -134,19 +122,13 @@ jobs:
         env:
           API_BASE_URL: ${{ vars.PROD_API_BASE_URL }}
           WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}
-          GOOGLE_WEB_CLIENT_ID: ${{ vars.GOOGLE_WEB_CLIENT_ID }}
-          GOOGLE_WINDOWS_CLIENT_ID: ${{ vars.GOOGLE_WINDOWS_CLIENT_ID }}
         run: |
           test -n "$API_BASE_URL"
           test -n "$WEB_BASE_URL"
-          test -n "$GOOGLE_WEB_CLIENT_ID"
-          test -n "$GOOGLE_WINDOWS_CLIENT_ID"
           printf '%s\n' \
             'APP_ENV=production' \
             "API_BASE_URL=$API_BASE_URL" \
-            "WEB_BASE_URL=$WEB_BASE_URL" \
-            "GOOGLE_WEB_CLIENT_ID=$GOOGLE_WEB_CLIENT_ID" \
-            "GOOGLE_WINDOWS_CLIENT_ID=$GOOGLE_WINDOWS_CLIENT_ID" > .env
+            "WEB_BASE_URL=$WEB_BASE_URL" > .env
 
       - run: flutter pub get
       - name: Build debug-signed Android APK with production configuration
@@ -176,19 +158,13 @@ jobs:
         env:
           API_BASE_URL: ${{ vars.PROD_API_BASE_URL }}
           WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}
-          GOOGLE_WEB_CLIENT_ID: ${{ vars.GOOGLE_WEB_CLIENT_ID }}
-          GOOGLE_WINDOWS_CLIENT_ID: ${{ vars.GOOGLE_WINDOWS_CLIENT_ID }}
         run: |
           if ([string]::IsNullOrWhiteSpace($env:API_BASE_URL)) { throw "PROD_API_BASE_URL is required" }
           if ([string]::IsNullOrWhiteSpace($env:WEB_BASE_URL)) { throw "WEB_BASE_URL is required" }
-          if ([string]::IsNullOrWhiteSpace($env:GOOGLE_WEB_CLIENT_ID)) { throw "GOOGLE_WEB_CLIENT_ID is required" }
-          if ([string]::IsNullOrWhiteSpace($env:GOOGLE_WINDOWS_CLIENT_ID)) { throw "GOOGLE_WINDOWS_CLIENT_ID is required" }
           @"
           APP_ENV=production
           API_BASE_URL=$env:API_BASE_URL
           WEB_BASE_URL=$env:WEB_BASE_URL
-          GOOGLE_WEB_CLIENT_ID=$env:GOOGLE_WEB_CLIENT_ID
-          GOOGLE_WINDOWS_CLIENT_ID=$env:GOOGLE_WINDOWS_CLIENT_ID
           "@ | Set-Content -Encoding utf8NoBOM .env
 
       - run: flutter pub get
@@ -220,19 +196,13 @@ jobs:
         env:
           API_BASE_URL: ${{ vars.PROD_API_BASE_URL }}
           WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}
-          GOOGLE_WEB_CLIENT_ID: ${{ vars.GOOGLE_WEB_CLIENT_ID }}
-          GOOGLE_WINDOWS_CLIENT_ID: ${{ vars.GOOGLE_WINDOWS_CLIENT_ID }}
         run: |
           test -n "$API_BASE_URL"
           test -n "$WEB_BASE_URL"
-          test -n "$GOOGLE_WEB_CLIENT_ID"
-          test -n "$GOOGLE_WINDOWS_CLIENT_ID"
           printf '%s\n' \
             'APP_ENV=production' \
             "API_BASE_URL=$API_BASE_URL" \
-            "WEB_BASE_URL=$WEB_BASE_URL" \
-            "GOOGLE_WEB_CLIENT_ID=$GOOGLE_WEB_CLIENT_ID" \
-            "GOOGLE_WINDOWS_CLIENT_ID=$GOOGLE_WINDOWS_CLIENT_ID" > .env
+            "WEB_BASE_URL=$WEB_BASE_URL" > .env
 
       - name: Validate and restore Android signing key
         env:
@@ -280,19 +250,13 @@ jobs:
         env:
           API_BASE_URL: ${{ vars.PROD_API_BASE_URL }}
           WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}
-          GOOGLE_WEB_CLIENT_ID: ${{ vars.GOOGLE_WEB_CLIENT_ID }}
-          GOOGLE_WINDOWS_CLIENT_ID: ${{ vars.GOOGLE_WINDOWS_CLIENT_ID }}
         run: |
           if ([string]::IsNullOrWhiteSpace($env:API_BASE_URL)) { throw "PROD_API_BASE_URL is required" }
           if ([string]::IsNullOrWhiteSpace($env:WEB_BASE_URL)) { throw "WEB_BASE_URL is required" }
-          if ([string]::IsNullOrWhiteSpace($env:GOOGLE_WEB_CLIENT_ID)) { throw "GOOGLE_WEB_CLIENT_ID is required" }
-          if ([string]::IsNullOrWhiteSpace($env:GOOGLE_WINDOWS_CLIENT_ID)) { throw "GOOGLE_WINDOWS_CLIENT_ID is required" }
           @"
           APP_ENV=production
           API_BASE_URL=$env:API_BASE_URL
           WEB_BASE_URL=$env:WEB_BASE_URL
-          GOOGLE_WEB_CLIENT_ID=$env:GOOGLE_WEB_CLIENT_ID
-          GOOGLE_WINDOWS_CLIENT_ID=$env:GOOGLE_WINDOWS_CLIENT_ID
           "@ | Set-Content -Encoding utf8NoBOM .env
 
       - name: Restore Windows signing certificate

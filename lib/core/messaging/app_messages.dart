@@ -36,14 +36,6 @@ class AppMessages {
         return loc.msgErrRegisterFailed;
       case 'dev_login_failed':
         return loc.msgErrDevLogin;
-      case 'google_token_required':
-        return loc.msgErrGoogleTokenRequired;
-      case 'google_verification_failed':
-        return loc.msgErrGoogleVerification;
-      case 'google_link_required':
-        return loc.msgErrGoogleLinkRequired;
-      case 'google_link_failed':
-        return loc.msgErrGoogleLinkFailed;
       case 'password_reset_invalid':
         return loc.msgErrPasswordResetInvalid;
       case 'password_reset_failed':
@@ -86,6 +78,13 @@ class AppMessages {
       case 'analytics_period_invalid':
       case 'protection_analytics_failed':
         return loc.msgErrGeneric;
+      case 'reminder_preference_load_failed':
+      case 'reminder_preference_update_failed':
+      case 'push_subscription_update_failed':
+        return loc.msgErrGeneric;
+      case 'reminder_preference_invalid':
+      case 'push_subscription_invalid':
+        return loc.msgErrInvalidRequest;
       case 'password_validation_failed':
         return loc.msgErrPasswordValidation;
       case 'current_password_invalid':

@@ -24,10 +24,6 @@ class AppColors {
   static const skyDark = Color(0xFF0284C7);
   static const amberDark = Color(0xFFD97706);
 
-  // External brand color — Google account-linking contexts only.
-  static const googleRed = Color(0xFFEA4335);
-  static const googleRedDark = Color(0xFFD93025);
-
   // Surfaces (light)
   static const surface = Color(0xFFFFFFFF); // card
   static const background = Color(0xFFF4F9FE); // page base

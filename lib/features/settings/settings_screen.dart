@@ -108,29 +108,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (mounted) context.go('/login');
   }
 
-  Future<void> _linkGoogle() async {
-    final password = await showDialog<String>(
-      context: context,
-      builder: (dialogContext) => const _LinkGoogleDialog(),
-    );
-    if (password == null || password.isEmpty || !mounted) {
-      return;
-    }
-    try {
-      await ref.read(authProvider.notifier).linkGoogle(password);
-      if (mounted) {
-        AppFeedback.success(
-          context,
-          AppLocalizations.of(context)!.settingsGoogleLinkedSuccess,
-        );
-      }
-    } catch (error) {
-      if (mounted) {
-        AppFeedback.error(context, AppMessages.friendlyMessage(context, error));
-      }
-    }
-  }
-
   Future<void> _logout() async {
     if (!await showLogoutConfirmationDialog(context)) return;
     await ref.read(authProvider.notifier).logout();
@@ -217,7 +194,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onChangePassword: _changePassword,
             onManagePartner: () => context.go('/accountability'),
             onLogin: () => context.go('/login'),
-            onLinkGoogle: _linkGoogle,
           ),
           SettingsPreferencesSection(
             locale: settings.locale,
@@ -229,7 +205,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onHapticsChanged: (enabled) =>
                 ref.read(appSettingsProvider.notifier).setHaptics(enabled),
             onHealthNotificationsChanged: _setHealthNotifications,
-            showCheckInReminder: Platform.isAndroid,
+            showCheckInReminder: Platform.isAndroid || Platform.isWindows,
             checkInReminderEnabled: settings.checkInReminderEnabled,
             checkInReminderTime: settings.checkInReminderTime,
             onCheckInReminderChanged: _setCheckInReminder,
@@ -289,157 +265,3 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 }
 
-class _LinkGoogleDialog extends StatefulWidget {
-  const _LinkGoogleDialog();
-
-  @override
-  State<_LinkGoogleDialog> createState() => _LinkGoogleDialogState();
-}
-
-class _LinkGoogleDialogState extends State<_LinkGoogleDialog> {
-  late final TextEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-      ),
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 380),
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.googleRed, AppColors.googleRedDark],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.googleRed.withValues(alpha: 0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.add_link_rounded,
-                    size: 20,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    l10n.linkGoogleTitle,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.navy,
-                          letterSpacing: -0.3,
-                        ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _controller,
-              obscureText: true,
-              autofocus: true,
-              autofillHints: const [AutofillHints.password],
-              decoration: InputDecoration(
-                labelText: l10n.settingsCurrentPassword,
-                isDense: true,
-                filled: true,
-                fillColor: AppColors.background,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.border),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide:
-                      const BorderSide(color: AppColors.navy, width: 1.5),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    height: 42,
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.muted,
-                        foregroundColor: AppColors.navy,
-                        elevation: 0,
-                        padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(
-                        l10n.cancel,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 13),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: SizedBox(
-                    height: 42,
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.googleRed,
-                        elevation: 0,
-                        padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: () => Navigator.pop(context, _controller.text),
-                      child: Text(
-                        l10n.continueAction,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 13),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

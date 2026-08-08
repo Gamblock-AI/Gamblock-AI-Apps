@@ -20,11 +20,9 @@ flutter run
 ```
 
 Flutter `3.41.9` is pinned through `.fvmrc` and CI. Configure
-`API_BASE_URL`, `WEB_BASE_URL`, `GOOGLE_WEB_CLIENT_ID`, and
-`GOOGLE_WINDOWS_CLIENT_ID` in `.env`; the file contains public client
-configuration only and is never committed. Android also requires the OAuth
-client signing/SHA registration in Google Cloud. Never place an OAuth client
-secret in the app.
+`API_BASE_URL` and `WEB_BASE_URL` in `.env`; the file contains public client
+configuration only and is never committed. Never place a client secret in the
+app.
 
 ## Product surfaces
 
@@ -46,9 +44,12 @@ fonts at runtime.
 The native Pattern Interrupt runs for seven seconds, respects reduced motion,
 works offline with a grounding option, and hands off to the website with only
 locale and `source=pattern_interrupt`. The longer recovery journey remains on
-the website and is not duplicated in Flutter. Android's optional daily
-check-in reminder is local-only; Windows treats notification scheduling as a
-no-op.
+the website and is not duplicated in Flutter. The opt-in daily check-in
+reminder works on Android (repeating daily schedule) and Windows (one-shot
+toast re-scheduled at the next app launch, since the Windows plugin has no
+repeating API); its preference syncs through the backend so the same time
+applies on the web and across devices. Tapping the notification opens the
+dashboard.
 
 ## Hybrid-v2 local model
 
@@ -193,10 +194,7 @@ Raw browsing inputs never enter these APIs.
 
 Authentication starts with a persisted three-step onboarding, then
 login/register, then `/dashboard`. Password recovery uses a non-enumerating
-email request and a single-use 12-character code. Android Google sign-in uses
-the official provider plugin; Windows opens the installed-app OAuth flow in the
-system browser and validates loopback state, nonce, and PKCE before sending
-only the ID token to the backend. Provider access/refresh tokens are discarded.
+email request and a single-use 12-character code.
 The client remains `user`-only. If an admin-provisioned student signs in with a
 temporary password, the login screen completes the required first-password
 change before accepting the normal access/refresh session.

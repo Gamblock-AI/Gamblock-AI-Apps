@@ -7,7 +7,8 @@ import '../device/device_registry.dart';
 import '../network/api_client.dart';
 import '../network/api_response.dart';
 import '../platform/platform_bridge.dart';
-import '../../features/auth/data/google_auth_service.dart';
+import '../settings/app_settings.dart';
+import '../notifications/reminder_preference_api.dart';
 
 const _storage = FlutterSecureStorage();
 const _userKey = 'gamblock_user';
@@ -24,7 +25,6 @@ class AuthState {
     this.phone,
     this.phoneVerified = false,
     this.passwordEnabled = false,
-    this.googleLinked = false,
   });
 
   final bool isAuthenticated;
@@ -37,7 +37,6 @@ class AuthState {
   final String? phone;
   final bool phoneVerified;
   final bool passwordEnabled;
-  final bool googleLinked;
 
   AuthState copyWith({
     bool? isAuthenticated,
@@ -50,7 +49,6 @@ class AuthState {
     String? phone,
     bool? phoneVerified,
     bool? passwordEnabled,
-    bool? googleLinked,
   }) {
     return AuthState(
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
@@ -63,18 +61,17 @@ class AuthState {
       phone: phone ?? this.phone,
       phoneVerified: phoneVerified ?? this.phoneVerified,
       passwordEnabled: passwordEnabled ?? this.passwordEnabled,
-      googleLinked: googleLinked ?? this.googleLinked,
     );
   }
 }
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier(this._googleAuth) : super(const AuthState()) {
+  AuthNotifier(this._ref) : super(const AuthState()) {
     ApiClient.onSessionExpired = _expireLocalSession;
     _init();
   }
 
-  final GoogleAuthService _googleAuth;
+  final Ref _ref;
 
   Future<void> _init() async {
     try {
@@ -108,7 +105,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
         phone: user['phone_e164']?.toString(),
         phoneVerified: user['phone_verified_at'] != null,
         passwordEnabled: user['_password_enabled'] == true,
-        googleLinked: user['_google_linked'] == true,
       );
       if (deviceId != null) {
         try {
@@ -117,8 +113,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
           // An offline backend must not invalidate a locally restored session.
         }
       }
+      await _syncReminderFromBackend();
     } catch (_) {
       await _clearLocalSession();
+    }
+  }
+
+  /// Applies the backend reminder preference after a session is established so
+  /// a change made on the web or another device is reflected here.
+  Future<void> _syncReminderFromBackend() async {
+    try {
+      final preference = await ReminderPreferenceApi.fetch();
+      if (preference == null) return;
+      await _ref
+          .read(appSettingsProvider.notifier)
+          .applyBackendPreference(preference);
+    } catch (_) {
+      // Syncing is best-effort; the locally stored reminder stays in effect.
     }
   }
 
@@ -158,15 +169,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
         'phone': phone,
         'role': 'user',
       },
-    );
-    return _completeSession(ApiResponse.map(response));
-  }
-
-  Future<Map<String, dynamic>?> loginWithGoogle() async {
-    final google = await _googleAuth.authenticate();
-    final response = await ApiClient.dio.post(
-      '/v1/auth/google',
-      data: {'id_token': google.idToken, 'nonce': google.nonce, 'role': 'user'},
     );
     return _completeSession(ApiResponse.map(response));
   }
@@ -211,7 +213,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
       throw StateError('Aplikasi ini hanya tersedia untuk akun mahasiswa');
     }
     user['_password_enabled'] = data['password_enabled'] == true;
-    user['_google_linked'] = data['google_linked'] == true;
     await ApiClient.saveTokens(accessToken, refreshToken);
     await _storage.write(key: _userKey, value: jsonEncode(user));
     final userId = user['id']?.toString() ?? '';
@@ -239,8 +240,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       phone: user['phone_e164']?.toString(),
       phoneVerified: user['phone_verified_at'] != null,
       passwordEnabled: user['_password_enabled'] == true,
-      googleLinked: user['_google_linked'] == true,
     );
+    await _syncReminderFromBackend();
     return user;
   }
 
@@ -253,7 +254,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
       throw StateError('Aplikasi ini hanya tersedia untuk akun mahasiswa');
     }
     user['_password_enabled'] = user['password_enabled'] == true;
-    user['_google_linked'] = user['google_linked'] == true;
     await _storage.write(key: _userKey, value: jsonEncode(user));
     state = state.copyWith(
       email: user['email']?.toString(),
@@ -261,7 +261,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
       phone: user['phone_e164']?.toString(),
       phoneVerified: user['phone_verified_at'] != null,
       passwordEnabled: user['_password_enabled'] == true,
-      googleLinked: user['_google_linked'] == true,
     );
   }
 
@@ -282,19 +281,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await refreshProfile();
   }
 
-  Future<void> linkGoogle(String currentPassword) async {
-    final google = await _googleAuth.authenticate();
-    await ApiClient.dio.post(
-      '/v1/me/google/link',
-      data: {
-        'current_password': currentPassword,
-        'id_token': google.idToken,
-        'nonce': google.nonce,
-      },
-    );
-    state = state.copyWith(googleLinked: true);
-  }
-
   Future<void> updateDisplayName(String displayName) async {
     final response = await ApiClient.dio.patch(
       '/v1/me',
@@ -303,7 +289,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     final user = ApiResponse.map(response);
     if (user == null) throw StateError('Profile response is empty');
     user['_password_enabled'] = state.passwordEnabled;
-    user['_google_linked'] = state.googleLinked;
     await _storage.write(key: _userKey, value: jsonEncode(user));
     state = state.copyWith(displayName: user['display_name']?.toString());
   }
@@ -354,5 +339,5 @@ class AuthNotifier extends StateNotifier<AuthState> {
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier(GoogleAuthService());
+  return AuthNotifier(ref);
 });

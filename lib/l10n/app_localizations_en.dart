@@ -64,19 +64,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsWhatsappUnverified => 'WhatsApp not verified';
 
   @override
-  String get settingsGoogleLinked => 'Google linked';
-
-  @override
-  String get settingsGoogleUnlinked => 'Google unlinked';
-
-  @override
-  String get settingsLinkGoogle => 'Link Google account';
-
-  @override
-  String get settingsLinkGoogleDesc =>
-      'Use the same Google email as this account.';
-
-  @override
   String get cancel => 'Cancel';
 
   @override
@@ -356,12 +343,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authForgotPassword => 'Forgot password?';
 
   @override
-  String get authContinueWithGoogle => 'Continue with Google';
-
-  @override
-  String get authRegisterWithGoogle => 'Register with Google';
-
-  @override
   String get authPassword => 'Password';
 
   @override
@@ -442,18 +423,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get msgErrGroupCodeRequired => 'A group code is required.';
-
-  @override
-  String get msgErrGoogleVerification =>
-      'Google verification failed. Try again.';
-
-  @override
-  String get msgErrGoogleLinkRequired =>
-      'This account already exists. Sign in with your password, then link Google from Settings.';
-
-  @override
-  String get msgErrGoogleLinkFailed =>
-      'Google could not be linked. Use the same Google email as this account.';
 
   @override
   String get msgErrPasswordResetInvalid =>
@@ -609,9 +578,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get msgErrDevLogin => 'Failed to sign in as the demo user.';
-
-  @override
-  String get msgErrGoogleTokenRequired => 'A Google token is required.';
 
   @override
   String get msgErrCreateDevice => 'Failed to register the device.';
@@ -1335,9 +1301,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get checkSetupAction => 'Check setup';
 
   @override
-  String get linkGoogleTitle => 'Link Google account';
-
-  @override
   String get continueAction => 'Continue';
 
   @override
@@ -1424,9 +1387,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get recoveryPageOpenError =>
       'The recovery page could not be opened yet. Try again.';
-
-  @override
-  String get settingsGoogleLinkedSuccess => 'Google account linked.';
 
   @override
   String get verifyEmailBody =>
@@ -1644,6 +1604,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get reminderNotificationBody =>
       'Take one minute for today\'s check-in. Whenever you are ready.';
+
+  @override
+  String get reminderBodyStreak =>
+      'Don\'t break your rhythm — complete today\'s check-in.';
+
+  @override
+  String get reminderBodyStep =>
+      'One small step is still progress. A quick check-in goes a long way.';
+
+  @override
+  String get reminderBodyConsistent =>
+      'Stay calm, stay consistent. Your daily check-in awaits.';
 
   @override
   String get analyticsMilestoneTitle => 'Your protection is working';

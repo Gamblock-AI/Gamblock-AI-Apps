@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/feedback/haptics.dart';
 import '../../../../core/messaging/app_messages.dart';
 import '../../../../core/auth/auth_state.dart';
-import '../../../../core/widgets/google_logo_icon.dart';
 import '../widgets/auth_brand_lockup.dart';
 import '../widgets/auth_form_error.dart';
 import '../widgets/auth_input_field.dart';
@@ -64,25 +63,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _error = AppMessages.friendlyMessage(context, e));
-      }
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _googleRegister() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    try {
-      final user = await ref.read(authProvider.notifier).loginWithGoogle();
-      if (user != null && mounted) {
-        context.go('/dashboard');
-      }
-    } catch (error) {
-      if (mounted) {
-        setState(() => _error = AppMessages.friendlyMessage(context, error));
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -172,12 +152,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             label: l10n.authRegister,
             isLoading: _loading,
             onPressed: _submit,
-          ),
-          const SizedBox(height: 12),
-          OutlinedButton.icon(
-            onPressed: _loading ? null : _googleRegister,
-            icon: const GoogleLogoIcon(size: 20),
-            label: Text(l10n.authRegisterWithGoogle),
           ),
           const SizedBox(height: 16),
           AuthSwitchPrompt(

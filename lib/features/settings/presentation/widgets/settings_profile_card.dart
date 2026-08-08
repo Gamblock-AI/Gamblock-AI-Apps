@@ -145,17 +145,6 @@ class SettingsProfileCard extends StatelessWidget {
                             activeColor: AppColors.sageLight,
                             activeBg: AppColors.sage.withValues(alpha: 0.2),
                           ),
-                          _CapabilityChip(
-                            icon: auth.googleLinked
-                                ? Icons.link_rounded
-                                : Icons.link_off_rounded,
-                            label: auth.googleLinked
-                                ? l10n.settingsGoogleLinked
-                                : l10n.settingsGoogleUnlinked,
-                            active: auth.googleLinked,
-                            activeColor: AppColors.sky,
-                            activeBg: AppColors.sky.withValues(alpha: 0.2),
-                          ),
                         ],
                       ),
                     ],

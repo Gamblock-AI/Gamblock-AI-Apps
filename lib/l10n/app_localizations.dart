@@ -206,30 +206,6 @@ abstract class AppLocalizations {
   /// **'WhatsApp belum terverifikasi'**
   String get settingsWhatsappUnverified;
 
-  /// No description provided for @settingsGoogleLinked.
-  ///
-  /// In id, this message translates to:
-  /// **'Google tertaut'**
-  String get settingsGoogleLinked;
-
-  /// No description provided for @settingsGoogleUnlinked.
-  ///
-  /// In id, this message translates to:
-  /// **'Google belum tertaut'**
-  String get settingsGoogleUnlinked;
-
-  /// No description provided for @settingsLinkGoogle.
-  ///
-  /// In id, this message translates to:
-  /// **'Tautkan akun Google'**
-  String get settingsLinkGoogle;
-
-  /// No description provided for @settingsLinkGoogleDesc.
-  ///
-  /// In id, this message translates to:
-  /// **'Gunakan email Google yang sama dengan akun ini.'**
-  String get settingsLinkGoogleDesc;
-
   /// No description provided for @cancel.
   ///
   /// In id, this message translates to:
@@ -758,18 +734,6 @@ abstract class AppLocalizations {
   /// **'Lupa kata sandi?'**
   String get authForgotPassword;
 
-  /// No description provided for @authContinueWithGoogle.
-  ///
-  /// In id, this message translates to:
-  /// **'Lanjutkan dengan Google'**
-  String get authContinueWithGoogle;
-
-  /// No description provided for @authRegisterWithGoogle.
-  ///
-  /// In id, this message translates to:
-  /// **'Daftar dengan Google'**
-  String get authRegisterWithGoogle;
-
   /// No description provided for @authPassword.
   ///
   /// In id, this message translates to:
@@ -925,24 +889,6 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Kode grup wajib diisi.'**
   String get msgErrGroupCodeRequired;
-
-  /// No description provided for @msgErrGoogleVerification.
-  ///
-  /// In id, this message translates to:
-  /// **'Verifikasi Google gagal. Silakan coba lagi.'**
-  String get msgErrGoogleVerification;
-
-  /// No description provided for @msgErrGoogleLinkRequired.
-  ///
-  /// In id, this message translates to:
-  /// **'Akun ini sudah terdaftar. Masuk dengan kata sandi lalu tautkan Google dari Pengaturan.'**
-  String get msgErrGoogleLinkRequired;
-
-  /// No description provided for @msgErrGoogleLinkFailed.
-  ///
-  /// In id, this message translates to:
-  /// **'Akun Google belum dapat ditautkan. Pastikan email Google sama dengan email akun.'**
-  String get msgErrGoogleLinkFailed;
 
   /// No description provided for @msgErrPasswordResetInvalid.
   ///
@@ -1231,12 +1177,6 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Gagal masuk sebagai pengguna demo.'**
   String get msgErrDevLogin;
-
-  /// No description provided for @msgErrGoogleTokenRequired.
-  ///
-  /// In id, this message translates to:
-  /// **'Token Google wajib diisi.'**
-  String get msgErrGoogleTokenRequired;
 
   /// No description provided for @msgErrCreateDevice.
   ///
@@ -2522,12 +2462,6 @@ abstract class AppLocalizations {
   /// **'Periksa setup'**
   String get checkSetupAction;
 
-  /// No description provided for @linkGoogleTitle.
-  ///
-  /// In id, this message translates to:
-  /// **'Tautkan akun Google'**
-  String get linkGoogleTitle;
-
   /// No description provided for @continueAction.
   ///
   /// In id, this message translates to:
@@ -2689,12 +2623,6 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Halaman pemulihan belum dapat dibuka. Coba lagi.'**
   String get recoveryPageOpenError;
-
-  /// No description provided for @settingsGoogleLinkedSuccess.
-  ///
-  /// In id, this message translates to:
-  /// **'Akun Google berhasil ditautkan.'**
-  String get settingsGoogleLinkedSuccess;
 
   /// No description provided for @verifyEmailBody.
   ///
@@ -3085,6 +3013,24 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Luangkan satu menit untuk check-in hari ini. Kapan pun kamu siap.'**
   String get reminderNotificationBody;
+
+  /// No description provided for @reminderBodyStreak.
+  ///
+  /// In id, this message translates to:
+  /// **'Jangan putus ritme-mu — isi check-in harianmu.'**
+  String get reminderBodyStreak;
+
+  /// No description provided for @reminderBodyStep.
+  ///
+  /// In id, this message translates to:
+  /// **'Satu langkah kecil tetap kemajuan. Check-in sebentar saja.'**
+  String get reminderBodyStep;
+
+  /// No description provided for @reminderBodyConsistent.
+  ///
+  /// In id, this message translates to:
+  /// **'Tetap tenang, tetap konsisten. Check-in harian menunggumu.'**
+  String get reminderBodyConsistent;
 
   /// No description provided for @analyticsMilestoneTitle.
   ///

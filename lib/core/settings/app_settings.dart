@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../feedback/haptics.dart';
 import '../notifications/daily_reminder_service.dart';
+import '../notifications/reminder_preference_api.dart';
 
 class AppSettings {
   const AppSettings({
@@ -138,11 +139,13 @@ class AppSettingsNotifier extends StateNotifier<AppSettings> {
         state.checkInReminderTime,
         state.locale,
       );
+      await _saveToBackend();
       return true;
     }
     await _storage.write(key: _reminderEnabledKey, value: 'false');
     state = state.copyWith(checkInReminderEnabled: false);
     await DailyReminderService.cancel();
+    await _saveToBackend();
     return true;
   }
 
@@ -154,6 +157,43 @@ class AppSettingsNotifier extends StateNotifier<AppSettings> {
     state = state.copyWith(checkInReminderTime: time);
     if (state.checkInReminderEnabled) {
       await DailyReminderService.scheduleDaily(time, state.locale);
+    }
+    await _saveToBackend();
+  }
+
+  /// Applies a preference read from the backend (source of truth) without
+  /// writing it back, so a change made on the web is reflected on this device.
+  Future<void> applyBackendPreference(ReminderPreference preference) async {
+    final hour = int.tryParse(preference.localTime.split(':').first) ?? 19;
+    final minute = int.tryParse(preference.localTime.split(':').last) ?? 0;
+    final time = TimeOfDay(hour: hour.clamp(0, 23), minute: minute.clamp(0, 59));
+    await _storage.write(key: _reminderEnabledKey, value: '${preference.enabled}');
+    await _storage.write(
+      key: _reminderTimeKey,
+      value: '${time.hour}:${time.minute}',
+    );
+    state = state.copyWith(
+      checkInReminderEnabled: preference.enabled,
+      checkInReminderTime: time,
+    );
+    if (preference.enabled) {
+      await DailyReminderService.scheduleDaily(time, state.locale);
+    } else {
+      await DailyReminderService.cancel();
+    }
+  }
+
+  Future<void> _saveToBackend() async {
+    try {
+      await ReminderPreferenceApi.save(
+        enabled: state.checkInReminderEnabled,
+        localTime:
+            '${state.checkInReminderTime.hour}:${state.checkInReminderTime.minute}',
+        timezone: DailyReminderService.localTimezone ?? 'Asia/Jakarta',
+        locale: state.locale.languageCode == 'en' ? 'en' : 'id',
+      );
+    } catch (_) {
+      // Syncing is best-effort; the local reminder remains scheduled.
     }
   }
 }

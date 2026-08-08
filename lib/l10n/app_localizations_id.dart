@@ -64,19 +64,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsWhatsappUnverified => 'WhatsApp belum terverifikasi';
 
   @override
-  String get settingsGoogleLinked => 'Google tertaut';
-
-  @override
-  String get settingsGoogleUnlinked => 'Google belum tertaut';
-
-  @override
-  String get settingsLinkGoogle => 'Tautkan akun Google';
-
-  @override
-  String get settingsLinkGoogleDesc =>
-      'Gunakan email Google yang sama dengan akun ini.';
-
-  @override
   String get cancel => 'Batal';
 
   @override
@@ -357,12 +344,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get authForgotPassword => 'Lupa kata sandi?';
 
   @override
-  String get authContinueWithGoogle => 'Lanjutkan dengan Google';
-
-  @override
-  String get authRegisterWithGoogle => 'Daftar dengan Google';
-
-  @override
   String get authPassword => 'Password';
 
   @override
@@ -444,18 +425,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get msgErrGroupCodeRequired => 'Kode grup wajib diisi.';
 
   @override
-  String get msgErrGoogleVerification =>
-      'Verifikasi Google gagal. Silakan coba lagi.';
-
-  @override
-  String get msgErrGoogleLinkRequired =>
-      'Akun ini sudah terdaftar. Masuk dengan kata sandi lalu tautkan Google dari Pengaturan.';
-
-  @override
-  String get msgErrGoogleLinkFailed =>
-      'Akun Google belum dapat ditautkan. Pastikan email Google sama dengan email akun.';
-
-  @override
   String get msgErrPasswordResetInvalid =>
       'Kode pemulihan tidak valid, sudah digunakan, atau telah kedaluwarsa.';
 
@@ -507,7 +476,8 @@ class AppLocalizationsId extends AppLocalizations {
   String get msgErrInvalidEmergencyKey => 'Kunci darurat tidak valid.';
 
   @override
-  String get msgErrTranslationFailed => 'Gagal menerjemahkan konten. Silakan coba lagi.';
+  String get msgErrTranslationFailed =>
+      'Gagal menerjemahkan konten. Silakan coba lagi.';
 
   @override
   String get msgErrTranslationInvalidInput => 'Input translasi tidak valid.';
@@ -609,9 +579,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get msgErrDevLogin => 'Gagal masuk sebagai pengguna demo.';
-
-  @override
-  String get msgErrGoogleTokenRequired => 'Token Google wajib diisi.';
 
   @override
   String get msgErrCreateDevice => 'Gagal mendaftarkan perangkat.';
@@ -1326,9 +1293,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get checkSetupAction => 'Periksa setup';
 
   @override
-  String get linkGoogleTitle => 'Tautkan akun Google';
-
-  @override
   String get continueAction => 'Lanjutkan';
 
   @override
@@ -1414,9 +1378,6 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get recoveryPageOpenError =>
       'Halaman pemulihan belum dapat dibuka. Coba lagi.';
-
-  @override
-  String get settingsGoogleLinkedSuccess => 'Akun Google berhasil ditautkan.';
 
   @override
   String get verifyEmailBody =>
@@ -1635,6 +1596,18 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get reminderNotificationBody =>
       'Luangkan satu menit untuk check-in hari ini. Kapan pun kamu siap.';
+
+  @override
+  String get reminderBodyStreak =>
+      'Jangan putus ritme-mu — isi check-in harianmu.';
+
+  @override
+  String get reminderBodyStep =>
+      'Satu langkah kecil tetap kemajuan. Check-in sebentar saja.';
+
+  @override
+  String get reminderBodyConsistent =>
+      'Tetap tenang, tetap konsisten. Check-in harian menunggumu.';
 
   @override
   String get analyticsMilestoneTitle => 'Perlindunganmu bekerja';

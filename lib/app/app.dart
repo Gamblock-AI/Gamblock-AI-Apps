@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/theme/app_theme.dart';
 import '../core/auth/auth_state.dart';
+import '../core/notifications/daily_reminder_service.dart';
 import '../core/platform/platform_bridge.dart';
 import '../core/settings/app_settings.dart';
 import 'router.dart';
@@ -26,6 +27,10 @@ class _GamblockAppState extends ConsumerState<GamblockApp>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    DailyReminderService.onNotificationTap = () async {
+      if (!mounted) return;
+      ref.read(routerProvider).go('/dashboard');
+    };
     _interventionSub = PlatformBridge.events().listen((event) {
       final router = ref.read(routerProvider);
       if (event.type == 'intervention_shown') {

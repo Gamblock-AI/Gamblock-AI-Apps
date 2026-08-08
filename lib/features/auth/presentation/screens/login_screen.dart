@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/feedback/haptics.dart';
 import '../../../../core/messaging/app_messages.dart';
 import '../../../../core/auth/auth_state.dart';
-import '../../../../core/widgets/google_logo_icon.dart';
 import '../widgets/auth_brand_lockup.dart';
 import '../widgets/auth_form_error.dart';
 import '../widgets/auth_input_field.dart';
@@ -89,25 +88,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           .read(authProvider.notifier)
           .completeInitialPasswordChange(token, _passCtrl.text);
       if (user != null && mounted) context.go('/dashboard');
-    } catch (error) {
-      if (mounted) {
-        setState(() => _error = AppMessages.friendlyMessage(context, error));
-      }
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _googleLogin() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    try {
-      final user = await ref.read(authProvider.notifier).loginWithGoogle();
-      if (user != null && mounted) {
-        context.go('/dashboard');
-      }
     } catch (error) {
       if (mounted) {
         setState(() => _error = AppMessages.friendlyMessage(context, error));
@@ -208,14 +188,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ? _submit
                 : _submitInitialPassword,
           ),
-          const SizedBox(height: 12),
-          if (_passwordChangeToken == null)
-            OutlinedButton.icon(
-              onPressed: _loading ? null : _googleLogin,
-              icon: const GoogleLogoIcon(size: 20),
-              label: Text(l10n.authContinueWithGoogle),
-            ),
-          if (_passwordChangeToken == null) const SizedBox(height: 16),
+          const SizedBox(height: 16),
           if (_passwordChangeToken == null)
             AuthSwitchPrompt(
               prompt: l10n.authNoAccount,

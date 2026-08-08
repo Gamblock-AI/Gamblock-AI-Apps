@@ -14,7 +14,6 @@ class SettingsAccountSection extends StatelessWidget {
     required this.onChangePassword,
     required this.onManagePartner,
     required this.onLogin,
-    required this.onLinkGoogle,
   });
 
   final AuthState auth;
@@ -22,7 +21,6 @@ class SettingsAccountSection extends StatelessWidget {
   final VoidCallback onChangePassword;
   final VoidCallback onManagePartner;
   final VoidCallback onLogin;
-  final VoidCallback onLinkGoogle;
 
   @override
   Widget build(BuildContext context) {
@@ -45,21 +43,6 @@ class SettingsAccountSection extends StatelessWidget {
                   title: l10n.settingsEditProfile,
                   onTap: onEditProfile,
                 ),
-                if (!auth.googleLinked && auth.passwordEnabled) ...[
-                  Divider(
-                    height: 1,
-                    indent: 54,
-                    color: AppColors.border.withValues(alpha: 0.5),
-                  ),
-                  _settingsTile(
-                    context,
-                    icon: Icons.add_link_rounded,
-                    iconColor: AppColors.googleRed,
-                    title: l10n.settingsLinkGoogle,
-                    subtitle: l10n.settingsLinkGoogleDesc,
-                    onTap: onLinkGoogle,
-                  ),
-                ],
                 Divider(
                   height: 1,
                   indent: 54,
