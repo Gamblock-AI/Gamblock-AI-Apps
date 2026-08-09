@@ -80,14 +80,17 @@ class NativeDailyAggregate {
     required this.date,
     required this.eventType,
     required this.count,
+    this.hourly = const [],
   });
 
   final String key;
   final String date;
   final String eventType;
   final int count;
+  final List<int> hourly;
 
   factory NativeDailyAggregate.fromMap(Map<Object?, Object?> map) {
+    final rawHourly = map['hourly'];
     return NativeDailyAggregate(
       key: map['key']?.toString() ?? '',
       date: map['date']?.toString() ?? '',
@@ -95,6 +98,14 @@ class NativeDailyAggregate {
       count: map['count'] is int
           ? map['count'] as int
           : int.tryParse(map['count']?.toString() ?? '') ?? 0,
+      hourly: rawHourly is List
+          ? rawHourly
+              .whereType<Object?>()
+              .map((value) =>
+                  value is int ? value : int.tryParse(value?.toString() ?? '') ?? 0)
+              .take(24)
+              .toList()
+          : const [],
     );
   }
 }

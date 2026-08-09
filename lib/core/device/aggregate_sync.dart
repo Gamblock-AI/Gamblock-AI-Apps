@@ -19,6 +19,8 @@ class AggregateSync {
             'count': aggregate.count,
             'idempotency_key':
                 'daily:$deviceId:${aggregate.date}:${aggregate.eventType}',
+            if (aggregate.hourly.length == 24)
+              'metadata_json': {'hourly': aggregate.hourly},
           },
         );
         acknowledged.add(aggregate.key);

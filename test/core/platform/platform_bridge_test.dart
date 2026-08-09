@@ -34,5 +34,21 @@ void main() {
     expect(aggregate.key, '2026-07-16:intervention_shown');
     expect(aggregate.eventType, 'intervention_shown');
     expect(aggregate.count, 3);
+    expect(aggregate.hourly, isEmpty);
+  });
+
+  test('NativeDailyAggregate parses the hourly histogram', () {
+    final hourly = List.generate(24, (index) => index == 3 ? 5 : 0);
+    final aggregate = NativeDailyAggregate.fromMap({
+      'key': '2026-07-16:block_count_sync',
+      'date': '2026-07-16',
+      'event_type': 'block_count_sync',
+      'count': 5,
+      'hourly': hourly,
+    });
+
+    expect(aggregate.hourly, hasLength(24));
+    expect(aggregate.hourly[3], 5);
+    expect(aggregate.hourly[0], 0);
   });
 }

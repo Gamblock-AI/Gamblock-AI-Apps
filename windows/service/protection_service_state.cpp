@@ -10,6 +10,17 @@
 
 namespace gamblock {
 
+namespace {
+// Local wall-clock hour (0-23). Hourly aggregate histograms are recorded in
+// the service host's local time so "jam rawan" reflects the user's own peak
+// hours. The values remain aggregate counts with no browsing content.
+int LocalHour() {
+  SYSTEMTIME time{};
+  GetLocalTime(&time);
+  return static_cast<int>(time.wHour);
+}
+}  // namespace
+
 std::string ProtectionService::SnapshotJson(const std::string& request_id) {
   std::lock_guard lock(state_mutex_);
   const bool connected = sensor_connections_.load() > 0;
@@ -94,8 +105,17 @@ void ProtectionService::IncrementAggregate(const std::string& type) {
       "intervention_shown", "block_count_sync", "tamper_detected",
       "permission_revoked", "model_updated", "ruleset_updated"};
   if (std::find(allowed.begin(), allowed.end(), type) == allowed.end()) return;
+  static const std::array<std::string, 2> hourly_types = {
+      "block_count_sync", "intervention_shown"};
+  const bool hourly =
+      std::find(hourly_types.begin(), hourly_types.end(), type) !=
+      hourly_types.end();
   std::lock_guard lock(aggregate_mutex_);
-  ++aggregates_[UtcDate() + ":" + type];
+  const std::string date = UtcDate();
+  ++aggregates_[date + ":" + type];
+  if (hourly) {
+    ++aggregates_[date + ":" + type + ":" + std::to_string(LocalHour())];
+  }
   std::ofstream file(DataDirectory() / L"aggregates.txt", std::ios::trunc);
   for (const auto& [key, count] : aggregates_) file << key << ' ' << count << '\n';
 }
@@ -104,6 +124,19 @@ std::string ProtectionService::AggregatesJson(const std::string& request_id,
                                               bool completed_only) {
   std::lock_guard lock(aggregate_mutex_);
   const std::string today = UtcDate();
+  const auto hourly_array = [this](const std::string& date,
+                                   const std::string& event_type) {
+    std::ostringstream out;
+    out << '[';
+    for (int hour = 0; hour < 24; ++hour) {
+      if (hour) out << ',';
+      const auto it = aggregates_.find(
+          date + ":" + event_type + ":" + std::to_string(hour));
+      out << (it == aggregates_.end() ? 0 : it->second);
+    }
+    out << ']';
+    return out.str();
+  };
   std::ostringstream response;
   response << "{\"type\":\"response\",\"request_id\":\""
            << EscapeJson(request_id) << "\",\"items\":[";
@@ -115,12 +148,14 @@ std::string ProtectionService::AggregatesJson(const std::string& request_id,
     if ((completed_only && date >= today) || (!completed_only && date != today)) {
       continue;
     }
+    const std::string remainder = key.substr(separator + 1);
+    if (remainder.find(':') != std::string::npos) continue;
     if (!first) response << ',';
     first = false;
     response << "{\"key\":\"" << EscapeJson(key) << "\",\"date\":\""
              << date << "\",\"event_type\":\""
-             << EscapeJson(key.substr(separator + 1)) << "\",\"count\":"
-             << count << '}';
+             << EscapeJson(remainder) << "\",\"count\":" << count
+             << ",\"hourly\":" << hourly_array(date, remainder) << '}';
   }
   response << "]}";
   return response.str();
@@ -129,7 +164,12 @@ std::string ProtectionService::AggregatesJson(const std::string& request_id,
 void ProtectionService::AcknowledgeAggregates(const std::string& command) {
   const auto keys = JsonStringArray(command, "keys", 128, 64);
   std::lock_guard lock(aggregate_mutex_);
-  for (const auto& key : keys) aggregates_.erase(key);
+  for (const auto& key : keys) {
+    aggregates_.erase(key);
+    for (int hour = 0; hour < 24; ++hour) {
+      aggregates_.erase(key + ":" + std::to_string(hour));
+    }
+  }
   std::ofstream file(DataDirectory() / L"aggregates.txt", std::ios::trunc);
   for (const auto& [key, count] : aggregates_) file << key << ' ' << count << '\n';
 }

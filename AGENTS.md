@@ -19,7 +19,8 @@ capabilities from stubs and target architecture.
   handoffs. Pattern Interrupt may send only locale plus the fixed source
   category—never detected context.
 - Offline aggregate rows contain only an allowlisted category, UTC date,
-  bounded count, optional owned device ID, and deterministic idempotency key.
+  bounded count, optional owned device ID, optional 24-slot hourly histogram
+  (device-local hour, aggregate counts only), and deterministic idempotency key.
 
 ## Start and finish
 
