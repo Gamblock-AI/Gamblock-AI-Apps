@@ -212,10 +212,7 @@ class AppMessages {
       case 'recovery_records_failed':
       case 'recovery_record_save_failed':
       case 'recovery_practice_fetch_failed':
-      case 'recovery_practice_invalid':
       case 'recovery_space_fetch_failed':
-      case 'recovery_space_update_failed':
-      case 'recovery_space_item_locked':
       case 'weekly_review_fetch_failed':
       case 'weekly_review_save_failed':
         return loc.msgErrSaveJournal;
