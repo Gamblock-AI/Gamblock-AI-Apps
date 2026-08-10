@@ -81,6 +81,7 @@ class NativeDailyAggregate {
     required this.eventType,
     required this.count,
     this.hourly = const [],
+    this.blockedEventTimes = const [],
   });
 
   final String key;
@@ -88,9 +89,11 @@ class NativeDailyAggregate {
   final String eventType;
   final int count;
   final List<int> hourly;
+  final List<String> blockedEventTimes;
 
   factory NativeDailyAggregate.fromMap(Map<Object?, Object?> map) {
     final rawHourly = map['hourly'];
+    final rawTimes = map['blocked_event_times'];
     return NativeDailyAggregate(
       key: map['key']?.toString() ?? '',
       date: map['date']?.toString() ?? '',
@@ -104,6 +107,12 @@ class NativeDailyAggregate {
               .map((value) =>
                   value is int ? value : int.tryParse(value?.toString() ?? '') ?? 0)
               .take(24)
+              .toList()
+          : const [],
+      blockedEventTimes: rawTimes is List
+          ? rawTimes
+              .map((value) => value?.toString() ?? '')
+              .where((value) => value.isNotEmpty)
               .toList()
           : const [],
     );

@@ -490,6 +490,25 @@ class AppLocalizationsEn extends AppLocalizations {
       'The translation service is busy. Please try again shortly.';
 
   @override
+  String get msgErrSpkRecommendationFailed =>
+      'The daily recommendation could not be loaded.';
+
+  @override
+  String get msgErrSpkInterventionNotFound =>
+      'The recommendation was not found or does not belong to you.';
+
+  @override
+  String get msgErrSpkInterventionCompleteFailed =>
+      'The recommendation could not be marked as done.';
+
+  @override
+  String get msgErrBlockedEventsRejected =>
+      'The device block-time data could not be accepted.';
+
+  @override
+  String get msgErrSpkPreferenceInvalid => 'The preference is invalid.';
+
+  @override
   String get msgErrCreateGroup => 'The group could not be created.';
 
   @override

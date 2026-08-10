@@ -491,6 +491,25 @@ class AppLocalizationsId extends AppLocalizations {
       'Penerjemahan AI sedang sibuk, coba lagi dalam beberapa saat.';
 
   @override
+  String get msgErrSpkRecommendationFailed =>
+      'Rekomendasi harian belum dapat dimuat.';
+
+  @override
+  String get msgErrSpkInterventionNotFound =>
+      'Rekomendasi tidak ditemukan atau bukan milik Anda.';
+
+  @override
+  String get msgErrSpkInterventionCompleteFailed =>
+      'Rekomendasi belum dapat ditandai selesai.';
+
+  @override
+  String get msgErrBlockedEventsRejected =>
+      'Data waktu blokir perangkat tidak dapat diterima.';
+
+  @override
+  String get msgErrSpkPreferenceInvalid => 'Preferensi belum valid.';
+
+  @override
   String get msgErrCreateGroup => 'Gagal membuat grup.';
 
   @override

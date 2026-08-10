@@ -1010,6 +1010,36 @@ abstract class AppLocalizations {
   /// **'Penerjemahan AI sedang sibuk, coba lagi dalam beberapa saat.'**
   String get msgErrTranslationRateLimited;
 
+  /// No description provided for @msgErrSpkRecommendationFailed.
+  ///
+  /// In id, this message translates to:
+  /// **'Rekomendasi harian belum dapat dimuat.'**
+  String get msgErrSpkRecommendationFailed;
+
+  /// No description provided for @msgErrSpkInterventionNotFound.
+  ///
+  /// In id, this message translates to:
+  /// **'Rekomendasi tidak ditemukan atau bukan milik Anda.'**
+  String get msgErrSpkInterventionNotFound;
+
+  /// No description provided for @msgErrSpkInterventionCompleteFailed.
+  ///
+  /// In id, this message translates to:
+  /// **'Rekomendasi belum dapat ditandai selesai.'**
+  String get msgErrSpkInterventionCompleteFailed;
+
+  /// No description provided for @msgErrBlockedEventsRejected.
+  ///
+  /// In id, this message translates to:
+  /// **'Data waktu blokir perangkat tidak dapat diterima.'**
+  String get msgErrBlockedEventsRejected;
+
+  /// No description provided for @msgErrSpkPreferenceInvalid.
+  ///
+  /// In id, this message translates to:
+  /// **'Preferensi belum valid.'**
+  String get msgErrSpkPreferenceInvalid;
+
   /// No description provided for @msgErrCreateGroup.
   ///
   /// In id, this message translates to:

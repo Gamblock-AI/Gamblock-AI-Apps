@@ -15,12 +15,17 @@ capabilities from stubs and target architecture.
   Windows hardening uses SCM recovery; Android uses Accessibility Service.
 - The client may send aggregate events only. Journal/error catalog contracts
   must stay aligned with the backend and website.
+- Blocked-event timestamps (when a block fired, device-local converted to UTC)
+  may be included in the aggregate payload so the backend can run SPK
+  time-pattern detection. Never send the URL, domain, DOM, or content that was
+  blocked; timestamps are the only addition to the aggregate contract.
 - `WEB_BASE_URL` is the only web-origin source for education and recovery
   handoffs. Pattern Interrupt may send only locale plus the fixed source
   category—never detected context.
 - Offline aggregate rows contain only an allowlisted category, UTC date,
   bounded count, optional owned device ID, optional 24-slot hourly histogram
-  (device-local hour, aggregate counts only), and deterministic idempotency key.
+  (device-local hour, aggregate counts only), optional blocked-event timestamps
+  (UTC), and deterministic idempotency key.
 
 ## Start and finish
 

@@ -278,6 +278,18 @@ class AppMessages {
       case 'translation_rate_limited':
         return loc.msgErrTranslationRateLimited;
 
+      // SPK decision support
+      case 'spk_recommendation_failed':
+        return loc.msgErrSpkRecommendationFailed;
+      case 'spk_intervention_not_found':
+        return loc.msgErrSpkInterventionNotFound;
+      case 'spk_intervention_complete_failed':
+        return loc.msgErrSpkInterventionCompleteFailed;
+      case 'blocked_events_rejected':
+        return loc.msgErrBlockedEventsRejected;
+      case 'spk_preference_invalid':
+        return loc.msgErrSpkPreferenceInvalid;
+
       default:
         return loc.msgErrGeneric;
     }

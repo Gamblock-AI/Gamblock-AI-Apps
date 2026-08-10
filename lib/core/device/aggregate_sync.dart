@@ -21,6 +21,8 @@ class AggregateSync {
                 'daily:$deviceId:${aggregate.date}:${aggregate.eventType}',
             if (aggregate.hourly.length == 24)
               'metadata_json': {'hourly': aggregate.hourly},
+            if (aggregate.blockedEventTimes.isNotEmpty)
+              'blocked_event_times': aggregate.blockedEventTimes,
           },
         );
         acknowledged.add(aggregate.key);
