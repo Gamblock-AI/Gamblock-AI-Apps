@@ -123,7 +123,7 @@ class AppMessages {
       case 'accountability_join_failed':
         return loc.msgErrInvalidGroupCodeSpecific;
       case 'accountability_code_rotate_failed':
-      case 'accountability_group_archive_failed':
+      case 'accountability_group_delete_failed':
       case 'accountability_sharing_update_failed':
       case 'accountability_leave_failed':
       case 'accountability_leave_cancel_failed':
