@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="accessibility_service_description">Gamblock-AI Research reads the URL bar, title, headings, and link text in Chrome and Edge for local classification. On managed research devices, the service also detects attempts to change or remove protection and requests partner approval. URLs and page text are never sent to the backend.</string>
-    <string name="accessibility_disclosure_body">Gamblock-AI Research uses Accessibility Service in the background to read the URL bar, title, headings, and link text in Chrome and Edge. This data is classified only on your device. When gambling content is detected, the app navigates Back and shows a Pattern Interrupt. On managed research devices, the service also detects screens that attempt to change or remove protection and requests partner approval.\n\nURLs, domains, and page text are never sent to the backend. The backend can receive only aggregate protection counts according to your sharing choices.</string>
-</resources>

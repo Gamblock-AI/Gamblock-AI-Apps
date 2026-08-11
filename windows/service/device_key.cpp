@@ -129,7 +129,7 @@ std::optional<PublicKeyMaterial> PublicMaterial(NCRYPT_KEY_HANDLE key) {
 
 std::optional<std::vector<unsigned char>> SignHash(NCRYPT_KEY_HANDLE key,
                                                    const std::string& value) {
-  const auto digest = Sha256Digest(value);
+  auto digest = Sha256Digest(value);
   if (!digest || digest->size() != 32) return std::nullopt;
   DWORD signature_bytes = 0;
   if (NCryptSignHash(key, nullptr, digest->data(),

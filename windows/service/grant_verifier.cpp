@@ -432,7 +432,7 @@ bool VerifyEs256(const std::vector<unsigned char>& public_key_der,
                     header->dwMagic == BCRYPT_ECDSA_PUBLIC_P256_MAGIC &&
                     header->cbKey == 32 &&
                     blob_bytes == sizeof(BCRYPT_ECCKEY_BLOB) + 64;
-  const auto digest = Sha256Digest(signing_input);
+  auto digest = Sha256Digest(signing_input);
   const bool verified =
       p256 && digest && digest->size() == 32 &&
       BCryptVerifySignature(key, nullptr, digest->data(),

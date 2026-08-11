@@ -7,6 +7,7 @@
 namespace {
 
 using gamblock::native_bridge::JsonString;
+using gamblock::native_bridge::JsonBool;
 
 }  // namespace
 
