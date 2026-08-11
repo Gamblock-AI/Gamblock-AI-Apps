@@ -38,7 +38,7 @@ object HealthNotificationPreferences {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             manager.createNotificationChannel(
                 NotificationChannel(
-                    GamblockAccessibilityService.CHANNEL_ID,
+                    BrowserProtectionAccessibilityService.CHANNEL_ID,
                     "Gamblock protection health",
                     NotificationManager.IMPORTANCE_LOW,
                 ).apply {
@@ -47,10 +47,10 @@ object HealthNotificationPreferences {
             )
         }
         manager.notify(
-            GamblockAccessibilityService.NOTIFICATION_ID,
+            BrowserProtectionAccessibilityService.NOTIFICATION_ID,
             NotificationCompat.Builder(
                 context,
-                GamblockAccessibilityService.CHANNEL_ID,
+                BrowserProtectionAccessibilityService.CHANNEL_ID,
             )
                 .setContentTitle("Gamblock AI")
                 .setContentText("Local protection service is running")

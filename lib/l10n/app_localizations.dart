@@ -1076,12 +1076,6 @@ abstract class AppLocalizations {
   /// **'Terjadi kendala, silakan coba beberapa saat lagi.'**
   String get msgErrGeneric;
 
-  /// No description provided for @msgErrReleaseNotFound.
-  ///
-  /// In id, this message translates to:
-  /// **'Rilis tidak ditemukan.'**
-  String get msgErrReleaseNotFound;
-
   /// No description provided for @msgErrInvalidCredentials.
   ///
   /// In id, this message translates to:
@@ -1274,35 +1268,11 @@ abstract class AppLocalizations {
   /// **'Gagal memuat modul admin.'**
   String get msgErrLoadAdminModules;
 
-  /// No description provided for @msgErrLoadAdminModelReleases.
-  ///
-  /// In id, this message translates to:
-  /// **'Gagal memuat rilis model.'**
-  String get msgErrLoadAdminModelReleases;
-
   /// No description provided for @msgErrLoadAdminSupportCases.
   ///
   /// In id, this message translates to:
   /// **'Gagal memuat tiket admin.'**
   String get msgErrLoadAdminSupportCases;
-
-  /// No description provided for @msgErrCreateModelRelease.
-  ///
-  /// In id, this message translates to:
-  /// **'Gagal merilis model.'**
-  String get msgErrCreateModelRelease;
-
-  /// No description provided for @msgErrCreateRulesetRelease.
-  ///
-  /// In id, this message translates to:
-  /// **'Gagal merilis ruleset.'**
-  String get msgErrCreateRulesetRelease;
-
-  /// No description provided for @msgErrCreateNetworkRelease.
-  ///
-  /// In id, this message translates to:
-  /// **'Gagal merilis ruleset jaringan.'**
-  String get msgErrCreateNetworkRelease;
 
   /// No description provided for @msgErrEmergencyKeyRequired.
   ///

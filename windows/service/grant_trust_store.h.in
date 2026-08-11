@@ -1,0 +1,14 @@
+#ifndef GAMBLOCK_SERVICE_GENERATED_GRANT_TRUST_STORE_H_
+#define GAMBLOCK_SERVICE_GENERATED_GRANT_TRUST_STORE_H_
+
+namespace gamblock {
+
+// Public verification material only. The build injects base64(JSON) with
+// kid -> base64(DER SubjectPublicKeyInfo) entries. An empty or malformed value
+// intentionally disables all protection grants.
+inline constexpr char kProtectionGrantTrustStoreBase64[] =
+    "@PROTECTION_GRANT_TRUST_STORE_BASE64@";
+
+}  // namespace gamblock
+
+#endif  // GAMBLOCK_SERVICE_GENERATED_GRANT_TRUST_STORE_H_

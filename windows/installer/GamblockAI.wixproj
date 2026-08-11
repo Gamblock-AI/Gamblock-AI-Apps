@@ -1,0 +1,28 @@
+<Project Sdk="WixToolset.Sdk/7.0.0">
+  <PropertyGroup>
+    <OutputType>Package</OutputType>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <Platform Condition="'$(Platform)' == ''">x64</Platform>
+    <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
+    <OutputName>GamblockAI-$(ProductVersion)-x64</OutputName>
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>BundlePath=$(BundlePath);ProductVersion=$(ProductVersion)</DefineConstants>
+    <DefaultCompressionLevel>high</DefaultCompressionLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Util.wixext" Version="7.0.0" />
+  </ItemGroup>
+
+  <Target Name="ValidateInstallerInputs" BeforeTargets="Build">
+    <Error Condition="'$(BundlePath)' == ''"
+           Text="BundlePath is required and must point to the absolute Flutter Windows release bundle." />
+    <Error Condition="'$(ProductVersion)' == ''"
+           Text="ProductVersion is required and must be an MSI-compatible three-part version." />
+    <Error Condition="!Exists('$(BundlePath)\gamblock_ai_apps.exe')"
+           Text="BundlePath does not contain gamblock_ai_apps.exe." />
+    <Error Condition="!Exists('$(BundlePath)\gamblock_ai_service.exe')"
+           Text="BundlePath does not contain gamblock_ai_service.exe." />
+  </Target>
+</Project>

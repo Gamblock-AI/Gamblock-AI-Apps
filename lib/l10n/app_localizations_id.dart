@@ -531,9 +531,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Terjadi kendala, silakan coba beberapa saat lagi.';
 
   @override
-  String get msgErrReleaseNotFound => 'Rilis tidak ditemukan.';
-
-  @override
   String get msgErrInvalidCredentials =>
       'Email atau kata sandi salah. Silakan periksa kembali.';
 
@@ -634,19 +631,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get msgErrLoadAdminModules => 'Gagal memuat modul admin.';
 
   @override
-  String get msgErrLoadAdminModelReleases => 'Gagal memuat rilis model.';
-
-  @override
   String get msgErrLoadAdminSupportCases => 'Gagal memuat tiket admin.';
-
-  @override
-  String get msgErrCreateModelRelease => 'Gagal merilis model.';
-
-  @override
-  String get msgErrCreateRulesetRelease => 'Gagal merilis ruleset.';
-
-  @override
-  String get msgErrCreateNetworkRelease => 'Gagal merilis ruleset jaringan.';
 
   @override
   String get msgErrEmergencyKeyRequired => 'Kunci darurat wajib diisi.';

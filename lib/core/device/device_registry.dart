@@ -68,8 +68,11 @@ class DeviceRegistry {
     if (deviceId.isEmpty) {
       throw StateError('Backend did not return a device id');
     }
+    if (!await PlatformBridge.setDeviceId(deviceId)) {
+      throw StateError('Native protection service rejected the device binding');
+    }
+    await _enrollGrantKey(deviceId);
     await _storage.write(key: _deviceKey(userId), value: deviceId);
-    await PlatformBridge.setDeviceId(deviceId);
     return RegisteredDevice(
       id: deviceId,
       clientInstanceId: instanceId,
@@ -77,10 +80,46 @@ class DeviceRegistry {
     );
   }
 
+  static Future<void> _enrollGrantKey(String deviceId) async {
+    final challengeResponse = await ApiClient.dio.post(
+      '/v1/devices/$deviceId/grant-key/challenge',
+    );
+    final challengeData =
+        ApiResponse.map(challengeResponse) ?? const <String, dynamic>{};
+    final challengeToken =
+        challengeData['challenge_token']?.toString().trim() ?? '';
+    if (challengeToken.isEmpty) {
+      throw StateError('Backend did not return a device-key challenge');
+    }
+
+    final enrollment = await PlatformBridge.getGrantKeyEnrollment(
+      deviceId: deviceId,
+      challengeToken: challengeToken,
+    );
+    if (enrollment == null) {
+      throw StateError('Native protection service did not enroll a device key');
+    }
+
+    final publicJwkValue = jsonDecode(enrollment['public_jwk'] as String);
+    if (publicJwkValue is! Map) {
+      throw StateError('Native protection service returned an invalid JWK');
+    }
+    await ApiClient.dio.put(
+      '/v1/devices/$deviceId/grant-key',
+      data: {
+        'challenge_token': challengeToken,
+        'public_jwk': Map<String, dynamic>.from(publicJwkValue),
+        'proof': enrollment['proof'],
+      },
+    );
+  }
+
   static Future<void> heartbeat(String? userId) async {
     final deviceId = await deviceIdFor(userId);
     if (deviceId == null) return;
-    await PlatformBridge.setDeviceId(deviceId);
+    if (!await PlatformBridge.setDeviceId(deviceId)) {
+      throw StateError('Native protection service rejected the device binding');
+    }
     final snapshot = await PlatformBridge.getProtectionSnapshot();
     await ApiClient.dio.patch(
       '/v1/devices/$deviceId',

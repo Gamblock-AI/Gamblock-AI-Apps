@@ -1,4 +1,6 @@
 flutter/ephemeral/
+installer/bin/
+installer/obj/
 
 # Visual Studio user-specific files.
 *.suo

@@ -54,7 +54,26 @@ std::string JsonString(const std::string& json,
   const std::regex pattern("\"" + key +
                            "\"\\s*:\\s*\"((?:\\\\.|[^\"])*)\"");
   std::smatch match;
-  return std::regex_search(json, match, pattern) ? match[1].str() : fallback;
+  if (!std::regex_search(json, match, pattern)) return fallback;
+  std::string decoded;
+  decoded.reserve(match[1].length());
+  bool escaped = false;
+  for (const char character : match[1].str()) {
+    if (escaped) {
+      switch (character) {
+        case 'n': decoded.push_back('\n'); break;
+        case 'r': decoded.push_back('\r'); break;
+        case 't': decoded.push_back('\t'); break;
+        default: decoded.push_back(character); break;
+      }
+      escaped = false;
+    } else if (character == '\\') {
+      escaped = true;
+    } else {
+      decoded.push_back(character);
+    }
+  }
+  return escaped ? fallback : decoded;
 }
 
 bool JsonBool(const std::string& json, const std::string& key, bool fallback) {

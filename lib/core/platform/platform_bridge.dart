@@ -1,6 +1,5 @@
 import 'package:flutter/services.dart';
 
-import '../config/app_config.dart';
 import 'platform_models.dart';
 
 export 'platform_models.dart';
@@ -52,11 +51,6 @@ class PlatformBridge {
     }
   }
 
-  static Future<bool> checkArtifactUpdates() => _mapMethod(
-    'checkArtifactUpdates',
-    {'base_url': AppConfig.apiBaseUrl},
-  ).then((result) => result['checked'] == true);
-
   static Future<bool> setHealthNotifications(bool enabled) =>
       _boolMethodWithArguments('setHealthNotifications', {'enabled': enabled});
 
@@ -67,10 +61,42 @@ class PlatformBridge {
     });
   }
 
-  static Future<void> setDeviceId(String deviceId) async {
+  static Future<bool> setDeviceId(String deviceId) async {
+    if (deviceId.isEmpty) return false;
     try {
-      await _channel.invokeMethod<void>('setDeviceId', {'device_id': deviceId});
-    } catch (_) {}
+      return await _channel.invokeMethod<bool>('setDeviceId', {
+            'device_id': deviceId,
+          }) ??
+          false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<Map<String, dynamic>?> getGrantKeyEnrollment({
+    required String deviceId,
+    required String challengeToken,
+  }) async {
+    if (deviceId.isEmpty || challengeToken.isEmpty) return null;
+    try {
+      final result = await _channel.invokeMethod<Map<Object?, Object?>>(
+        'getGrantKeyEnrollment',
+        {'device_id': deviceId, 'challenge_token': challengeToken},
+      );
+      if (result == null) return null;
+      final normalized = <String, dynamic>{
+        for (final entry in result.entries)
+          if (entry.key != null) entry.key.toString(): entry.value,
+      };
+      final publicJwk = normalized['public_jwk']?.toString().trim() ?? '';
+      final thumbprint =
+          normalized['jwk_thumbprint']?.toString().trim() ?? '';
+      final proof = normalized['proof']?.toString().trim() ?? '';
+      if (publicJwk.isEmpty || thumbprint.isEmpty || proof.isEmpty) return null;
+      return normalized;
+    } catch (_) {
+      return null;
+    }
   }
 
   static Future<List<NativeDailyAggregate>> drainDailyAggregates() async {
@@ -109,8 +135,12 @@ class PlatformBridge {
     } catch (_) {}
   }
 
-  static Future<bool> storeProtectionGrant(Map<String, dynamic> grant) {
-    return _boolMethodWithArguments('storeProtectionGrant', {'grant': grant});
+  static Future<bool> storeProtectionGrant(String grantToken) {
+    final token = grantToken.trim();
+    if (token.isEmpty) return Future.value(false);
+    return _boolMethodWithArguments('storeProtectionGrant', {
+      'grant_token': token,
+    });
   }
 
   static Future<String?> getPairingToken() async {
@@ -144,14 +174,4 @@ class PlatformBridge {
     }
   }
 
-  static Future<Map<String, dynamic>> _mapMethod(
-    String method,
-    Map<String, dynamic> arguments,
-  ) async {
-    final result = await _channel.invokeMethod<Map<Object?, Object?>>(
-      method,
-      arguments,
-    );
-    return result == null ? const {} : Map<String, dynamic>.from(result);
-  }
 }

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_description">Gamblock-AI Research membaca URL bar, judul, heading, dan teks tautan di Chrome dan Edge untuk klasifikasi lokal. Pada perangkat penelitian terkelola, service juga mendeteksi upaya perubahan atau penghapusan proteksi dan meminta persetujuan pendamping. URL dan teks halaman tidak pernah dikirim ke backend.</string>
+    <string name="accessibility_disclosure_body">Gamblock-AI Research menggunakan Accessibility Service di latar belakang untuk membaca URL bar, judul, heading, dan teks tautan pada Chrome dan Edge. Data ini diklasifikasikan hanya di perangkat. Jika konten perjudian terdeteksi, aplikasi menekan Kembali dan menampilkan Pattern Interrupt. Pada perangkat penelitian terkelola, service juga mendeteksi layar yang mencoba mengubah atau menghapus proteksi dan meminta persetujuan pendamping.\n\nURL, domain, dan teks halaman tidak pernah dikirim ke backend. Backend hanya dapat menerima hitungan proteksi agregat sesuai pilihan berbagi Anda.</string>
+</resources>

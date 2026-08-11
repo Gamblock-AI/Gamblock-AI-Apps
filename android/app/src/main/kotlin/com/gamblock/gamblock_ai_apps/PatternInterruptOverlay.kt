@@ -151,50 +151,6 @@ class PatternInterruptOverlay(
         tick()
     }
 
-    fun showTamperWarning() {
-        if (root != null) return
-        val isEnglish = Locale.getDefault().language == "en"
-        val container = LinearLayout(service).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER
-            setPadding(dp(24), dp(32), dp(24), dp(32))
-            setBackgroundColor(Color.rgb(13, 27, 53))
-        }
-        container.addView(
-            text(
-                if (isEnglish) "Partner approval required" else "Persetujuan pendamping diperlukan",
-                26f,
-                Color.WHITE,
-            ),
-        )
-        container.addView(
-            text(
-                if (isEnglish) {
-                    "Open Gamblock AI to request a pause, disable, or removal window for this device."
-                } else {
-                    "Buka Gamblock AI untuk meminta jeda, penonaktifan, atau jendela pencopotan pada perangkat ini."
-                },
-                17f,
-                Color.argb(210, 255, 255, 255),
-            ),
-        )
-        container.addView(
-            button(if (isEnglish) "Open Gamblock AI" else "Buka Gamblock AI") {
-                service.startActivity(
-                    Intent(service, MainActivity::class.java).apply {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        putExtra("open_approval", true)
-                    },
-                )
-                dismiss()
-            },
-        )
-        container.addView(
-            button(if (isEnglish) "Go back" else "Kembali") { dismiss() },
-        )
-        attach(container)
-    }
-
     fun dismiss() {
         handler.removeCallbacksAndMessages(null)
         animator?.cancel()

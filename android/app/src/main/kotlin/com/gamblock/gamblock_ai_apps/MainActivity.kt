@@ -2,6 +2,7 @@ package com.gamblock.gamblock_ai_apps
 
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.Manifest
+import android.app.AlertDialog
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
@@ -29,6 +30,7 @@ class MainActivity : FlutterActivity() {
     private lateinit var classifier: HybridClassifier
     private lateinit var aggregates: DailyAggregateStore
     private lateinit var stateStore: ProtectionStateStore
+    private lateinit var consentStore: AccessibilityConsentStore
     private var eventSink: EventChannel.EventSink? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -36,6 +38,7 @@ class MainActivity : FlutterActivity() {
         classifier = HybridClassifier(applicationContext).also { it.load() }
         aggregates = DailyAggregateStore(applicationContext)
         stateStore = ProtectionStateStore(applicationContext)
+        consentStore = AccessibilityConsentStore(applicationContext)
 
         EventChannel(
             flutterEngine.dartExecutor.binaryMessenger,
@@ -58,18 +61,9 @@ class MainActivity : FlutterActivity() {
         ).setMethodCallHandler { call, result ->
             when (call.method) {
                 "getProtectionSnapshot" -> result.success(snapshot())
-                "openPlatformSetup" -> {
-                    startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-                    result.success(true)
-                }
+                "openPlatformSetup" -> openAccessibilitySetupWithDisclosure(result)
                 "runLocalSelfTest" -> background(result) {
                     jsonToFlutter(classifier.runSelfTest())
-                }
-                "checkArtifactUpdates" -> background(result) {
-                    val baseUrl = call.argument<String>("base_url")
-                        ?: NativeConfig.apiBaseUrl(this)
-                    val passed = ArtifactUpdater(this, classifier, aggregates).check(baseUrl)
-                    mapOf("checked" to passed)
                 }
                 "setHealthNotifications" -> {
                     val enabled = call.argument<Boolean>("enabled") == true
@@ -79,13 +73,19 @@ class MainActivity : FlutterActivity() {
                         HealthNotificationPreferences.show(this)
                     } else {
                         val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-                        manager.cancel(GamblockAccessibilityService.NOTIFICATION_ID)
+                        manager.cancel(BrowserProtectionAccessibilityService.NOTIFICATION_ID)
                     }
                     result.success(true)
                 }
                 "setDeviceId" -> {
-                    stateStore.setDeviceId(call.argument<String>("device_id").orEmpty())
-                    result.success(null)
+                    result.success(
+                        stateStore.setDeviceId(call.argument<String>("device_id").orEmpty()),
+                    )
+                }
+                "getGrantKeyEnrollment" -> background(result) {
+                    val deviceId = call.argument<String>("device_id").orEmpty()
+                    val challengeToken = call.argument<String>("challenge_token").orEmpty()
+                    stateStore.grantKeyEnrollment(deviceId, challengeToken)
                 }
                 "recordInterventionCommitted" -> result.success(true)
                 "drainDailyAggregates" -> result.success(aggregates.completedDays())
@@ -95,11 +95,11 @@ class MainActivity : FlutterActivity() {
                     result.success(null)
                 }
                 "storeProtectionGrant" -> {
-                    val grant = call.argument<Map<String, Any?>>("grant")
-                    if (grant == null) {
+                    val grantToken = call.argument<String>("grant_token").orEmpty()
+                    if (grantToken.isBlank()) {
                         result.success(false)
                     } else {
-                        result.success(stateStore.storeGrant(JSONObject(grant)))
+                        background(result) { stateStore.storeGrant(grantToken) }
                     }
                 }
                 "getPairingToken", "rotatePairingToken" -> result.success(null)
@@ -132,10 +132,9 @@ class MainActivity : FlutterActivity() {
 
     private fun snapshot(): Map<String, Any?> {
         val enabled = isAccessibilityEnabled()
-        val grant = stateStore.activeGrant()
         val status = when {
             !enabled -> "inactive"
-            grant != null -> "paused"
+            stateStore.activeGrantAllowsProtectionPause() -> "paused"
             else -> stateStore.status()
         }
         return mapOf(
@@ -173,6 +172,40 @@ class MainActivity : FlutterActivity() {
                 2001,
             )
         }
+    }
+
+    private fun openAccessibilitySetupWithDisclosure(result: MethodChannel.Result) {
+        if (consentStore.hasCurrentConsent()) {
+            startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+            result.success(true)
+            return
+        }
+        var completed = false
+        fun complete(value: Boolean) {
+            if (completed) return
+            completed = true
+            result.success(value)
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.accessibility_disclosure_title)
+            .setMessage(R.string.accessibility_disclosure_body)
+            .setPositiveButton(R.string.accessibility_disclosure_accept) { _, _ ->
+                if (consentStore.recordDecision(accepted = true)) {
+                    startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                    complete(true)
+                } else {
+                    complete(false)
+                }
+            }
+            .setNegativeButton(R.string.accessibility_disclosure_decline) { _, _ ->
+                consentStore.recordDecision(accepted = false)
+                complete(false)
+            }
+            .setOnCancelListener {
+                consentStore.recordDecision(accepted = false)
+                complete(false)
+            }
+            .show()
     }
 
     private fun jsonToFlutter(value: Any?): Any? = when (value) {

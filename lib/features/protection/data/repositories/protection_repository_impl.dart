@@ -26,6 +26,4 @@ class ProtectionRepositoryImpl implements ProtectionRepository {
   Future<Map<String, dynamic>> runLocalSelfTest() =>
       PlatformBridge.runLocalSelfTest();
 
-  @override
-  Future<bool> checkArtifactUpdates() => PlatformBridge.checkArtifactUpdates();
 }

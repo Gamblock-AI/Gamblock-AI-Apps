@@ -529,9 +529,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get msgErrGeneric => 'Something went wrong. Try again shortly.';
 
   @override
-  String get msgErrReleaseNotFound => 'The release was not found.';
-
-  @override
   String get msgErrInvalidCredentials => 'The email or password is incorrect.';
 
   @override
@@ -634,22 +631,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get msgErrLoadAdminModules => 'Failed to load admin modules.';
 
   @override
-  String get msgErrLoadAdminModelReleases => 'Failed to load model releases.';
-
-  @override
   String get msgErrLoadAdminSupportCases =>
       'Failed to load admin support tickets.';
-
-  @override
-  String get msgErrCreateModelRelease => 'Failed to create the model release.';
-
-  @override
-  String get msgErrCreateRulesetRelease =>
-      'Failed to create the ruleset release.';
-
-  @override
-  String get msgErrCreateNetworkRelease =>
-      'Failed to create the network ruleset release.';
 
   @override
   String get msgErrEmergencyKeyRequired => 'An emergency key is required.';

@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstdint>
 #include <map>
 #include <mutex>
 #include <set>
@@ -27,7 +28,7 @@ class ProtectionService {
                                      void* context);
 
   bool Install();
-  bool Uninstall();
+  bool Uninstall(bool require_grant = true);
   int RunConsole();
 
  private:
@@ -47,10 +48,14 @@ class ProtectionService {
   void EnsureUserAgentRunning();
 
   bool LoadArtifacts();
-  bool UpdateArtifacts(const std::string& base_url);
   std::string SnapshotJson(const std::string& request_id);
   std::string PairingToken(bool rotate);
-  bool StoreGrant(const std::string& grant_json);
+  bool LoadDeviceId(const std::string& device_id);
+  bool SetDeviceId(const std::string& device_id);
+  std::string GrantKeyEnrollmentJson(const std::string& request_id,
+                                     const std::string& device_id,
+                                     const std::string& challenge_token);
+  bool StoreGrant(const std::string& compact_jws);
   bool HasActiveGrant(const char* purpose = nullptr);
   void IncrementAggregate(const std::string& type);
   std::string AggregatesJson(const std::string& request_id,
@@ -98,7 +103,12 @@ class ProtectionService {
   std::atomic<unsigned long> phase4_evidence_sequence_{1};
   HybridClassifier classifier_;
   std::string artifact_error_;
+  mutable std::mutex device_mutex_;
   std::string device_id_;
+  mutable std::mutex grant_mutex_;
+  std::string active_grant_action_;
+  std::int64_t active_grant_expires_at_ = 0;
+  std::chrono::steady_clock::time_point active_grant_deadline_{};
 };
 
 }  // namespace gamblock

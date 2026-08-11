@@ -29,17 +29,17 @@ the device; the backend receives aggregate events only.
 | Protection dashboard + Gami | Implemented supporting UI | Dashboard hero, setup/self-test, aggregate appreciation, and first-open mascot state remain. Native missions, EXP/level, journey badges, standalone breathing, pause acknowledgement, and recovery-practice bookkeeping were removed so the client stays a thin protection surface. |
 | Hybrid-v2 local classifier | Implemented trained-artifact prototype; not evaluated | supplied ONNX graph is reproducibly exported without unpickling into 5,664 unigram + 4,336 bigram weights, 14 scaled URL features, LR bias/weights, `0.75/0.25` fusion, and threshold `0.4`; Android and Windows native authorities load the same hashed artifact/rules/fixtures. Supplied metrics remain unverified because dataset card, split/training source, FPR slices, and preprocessing-parity evidence are absent |
 | Pattern Interrupt and recovery handoff | Implemented code path | Seven-second native/Flutter paths, reduced motion, offline grounding/help, and browsing-data-free web handoff are wired; device evidence remains required. |
-| Android protection runtime | Implemented code-complete prototype | active manifest service, Chrome/Edge extraction, local decision, Back/overlay, settings friction, Keystore grant, aggregate sync, and artifact checks are wired; daily aggregates now carry a privacy-preserving 24-slot hourly histogram (`block_count_sync`/`intervention_shown`) recorded in device-local time and synced via `metadata_json.hourly` to feed role dashboards; the Dart contract also forwards optional system-generated blocked-event timestamps (`blocked_event_times`, UTC) to the backend SPK time-pattern detection, and the native side must still populate them (contract wired, native population is a follow-up). Android compile/device runs and reviewed scenario evidence remain external gates. |
+| Android protection runtime | Implemented code-complete prototype; flavor build/device evidence pending | compile-time `play`/`research` source sets share Chrome/Edge extraction, local decision, Back/overlay, versioned prominent disclosure, aggregate sync, and local artifact integrity checks. Only Research compiles Settings/package-installer friction; Play restricts both native dispatch and Accessibility XML to Chrome/Edge. Native grants now require a compact ES256 token, pinned `kid`, strict claims/TTL, immutable device ID, and a matching RFC 7638 thumbprint for a non-exportable Android Keystore P-256 key; an empty trust store fails closed. Daily aggregates carry a privacy-preserving 24-slot hourly histogram, while optional blocked-event timestamp population remains a follow-up. Android flavor compilation, real-device runs, Play review, and reviewed scenario evidence remain external gates. |
 | Windows service + user-session agent | Implemented code-complete prototype | separate CMake service target, authenticated loopback WebSocket, DPAPI state, logon-SID pipe, Flutter bridge, SendInput action, SCM recovery, and portable classifier fixture are wired; the aggregate store keeps the same optional hourly histogram so Windows reports consistent "jam rawan" data. A successful runner build and reviewed VM/device matrix remain external evidence gates. |
 | Evaluation | Instrumented; not evaluated | Hybrid/model/rule metrics, FPR slices, native latency, retention, and evidence completeness. No approved dataset, real-device matrix, or reviewer sign-off is present. |
-| Release scaffolding | Implemented operational workflow | every successful `main` commit force-updates the mutable `latest` tag/release with development debug assets and explicitly named `production-debug` assets using the production API/site URLs; signed production jobs remain behind `ENABLE_PRODUCTION_RELEASE=true` with Android keystore and Windows Authenticode inputs; debug/unsigned artifacts are never presented as signed |
+| Release scaffolding | Implemented operational workflow; external signing/build evidence pending | Diagnostic PR/main jobs build both Android flavors, a Windows ZIP, and an unsigned MSI packaging check without production secrets. A semantic-version tag can produce protected workflow artifacts: a separately signed Play AAB, Research APK, and Windows pilot MSI; public Play review, certificate trust, Windows VM evidence, and external publication remain gates. The complete matrix is in `docs/ai/distribution-matrix.md`. |
 
 Target architecture in comments or proposal documents does not change these
 states. Update the table only with code, wiring, and verification evidence.
 
 Windows service implementation is organized by responsibility in
 `windows/service/`: runtime lifecycle, WebSocket transport/handler, named-pipe
-handler, artifact updater, local evidence recorder, local state, user-agent launcher, and small support
+handler, local artifact loader, local evidence recorder, local state, user-agent launcher, and small support
 modules. The Flutter runner mirrors that split in `native_protection_*.{cpp,h}`
 for codec, channels, pipe transport, events, and settings monitoring. The
 split does not change the loopback or Flutter pipe contracts. Pipe operations
@@ -59,7 +59,8 @@ first-login password-change exchange before the normal session is stored.
 Run `./scripts/verify.sh` (`flutter analyze` only). When context changed, also
 run `./scripts/verify-ai-context.sh`. Dependency installation, tests, Android/
 Windows builds, packaging, and full verification run only when explicitly
-requested by the user.
+requested by the user. GitHub Actions uses the diagnostic and signed lanes
+documented in `docs/ai/distribution-matrix.md`.
 
 ## Related repositories and contracts
 

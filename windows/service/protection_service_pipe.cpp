@@ -166,18 +166,18 @@ void ProtectionService::HandlePipeCommand(const std::string& command) {
                    EscapeJson(request_id) + "\",\"pairing_token\":\"" +
                    EscapeJson(token) + "\"}");
   } else if (type == "set_device") {
-    device_id_ = JsonString(command, "device_id").value_or("");
-    std::ofstream(DataDirectory() / L"device-id.txt", std::ios::trunc) << device_id_;
+    const bool stored =
+        SetDeviceId(JsonString(command, "device_id").value_or(""));
     SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
-                   EscapeJson(request_id) + "\",\"ok\":true}");
+                   EscapeJson(request_id) + "\",\"ok\":" +
+                   (stored ? "true" : "false") + "}");
+  } else if (type == "get_grant_key_enrollment") {
+    SendAgentEvent(GrantKeyEnrollmentJson(
+        request_id, JsonString(command, "device_id").value_or(""),
+        JsonString(command, "challenge_token").value_or("")));
   } else if (type == "store_grant") {
-    const auto grant_start = command.find("\"grant\"");
-    const auto object_start = command.find('{', grant_start);
-    const auto object_end = command.rfind('}');
-    const bool stored = object_start != std::string::npos &&
-                        object_end > object_start &&
-                        StoreGrant(command.substr(object_start,
-                                                  object_end - object_start));
+    const bool stored = StoreGrant(
+        JsonString(command, "grant_token").value_or(""));
     SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
                    EscapeJson(request_id) + "\",\"ok\":" +
                    (stored ? "true" : "false") + "}");
@@ -189,21 +189,6 @@ void ProtectionService::HandlePipeCommand(const std::string& command) {
     AcknowledgeAggregates(command);
     SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
                    EscapeJson(request_id) + "\",\"ok\":true}");
-  } else if (type == "check_artifacts") {
-    const bool loaded = UpdateArtifacts(
-        JsonString(command, "base_url").value_or(""));
-    SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
-                   EscapeJson(request_id) + "\",\"checked\":" +
-                   (loaded ? "true" : "false") + "}");
-  } else if (type == "settings_interaction") {
-    const bool allowed = HasActiveGrant("uninstall");
-    if (!allowed) {
-      IncrementAggregate("tamper_detected");
-      SendAgentEvent("{\"type\":\"approval_required\"}");
-    }
-    SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
-                   EscapeJson(request_id) + "\",\"allowed\":" +
-                   (allowed ? "true" : "false") + "}");
   }
 }
 

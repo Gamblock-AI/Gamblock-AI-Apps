@@ -132,8 +132,9 @@ class AccountabilityRepositoryImpl implements AccountabilityRepository {
       '/v1/approval-requests/$requestId/apply',
       data: {'device_id': deviceId},
     );
-    final grant = ApiResponse.map(response) ?? const {};
-    if (!await PlatformBridge.storeProtectionGrant(grant)) {
+    final grantToken =
+        (ApiResponse.map(response)?['grant_token']?.toString() ?? '').trim();
+    if (!await PlatformBridge.storeProtectionGrant(grantToken)) {
       throw StateError('Native protection service did not accept the grant');
     }
   }
@@ -170,11 +171,9 @@ class AccountabilityRepositoryImpl implements AccountabilityRepository {
       '/v1/devices/unlock',
       data: {'emergency_key': emergencyKey.trim(), 'device_id': deviceId},
     );
-    final grant = <String, dynamic>{
-      ...?ApiResponse.map(response),
-      'action': 'emergency_access',
-    };
-    if (!await PlatformBridge.storeProtectionGrant(grant)) {
+    final grantToken =
+        (ApiResponse.map(response)?['grant_token']?.toString() ?? '').trim();
+    if (!await PlatformBridge.storeProtectionGrant(grantToken)) {
       throw StateError('Native protection service did not accept the grant');
     }
   }

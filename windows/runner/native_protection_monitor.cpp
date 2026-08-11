@@ -29,55 +29,6 @@ void Lowercase(std::wstring* value) {
 
 }  // namespace
 
-void NativeProtectionBridge::InstallSettingsMonitor() {
-  foreground_hook_ = SetWinEventHook(
-      EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, nullptr, ForegroundHook,
-      0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS);
-}
-
-void NativeProtectionBridge::RemoveSettingsMonitor() {
-  if (foreground_hook_ != nullptr) {
-    UnhookWinEvent(foreground_hook_);
-    foreground_hook_ = nullptr;
-  }
-}
-
-void CALLBACK NativeProtectionBridge::ForegroundHook(HWINEVENTHOOK,
-                                                      DWORD,
-                                                      HWND window,
-                                                      LONG object_id,
-                                                      LONG,
-                                                      DWORD,
-                                                      DWORD) {
-  std::lock_guard lock(callback_mutex_);
-  if (instance_ != nullptr && object_id == OBJID_WINDOW && window != nullptr) {
-    instance_->InspectForegroundWindow(window);
-  }
-}
-
-void NativeProtectionBridge::InspectForegroundWindow(HWND foreground) {
-  const ULONGLONG now = GetTickCount64();
-  if (now - last_settings_prompt_ < 5000) return;
-  std::wstring executable = ForegroundProcessPath(foreground);
-  Lowercase(&executable);
-  if (executable.find(L"systemsettings.exe") == std::wstring::npos) return;
-  std::array<wchar_t, 512> title{};
-  GetWindowTextW(foreground, title.data(), static_cast<int>(title.size()));
-  std::wstring lowered(title.data());
-  Lowercase(&lowered);
-  const bool removal_surface =
-      lowered.find(L"installed apps") != std::wstring::npos ||
-      lowered.find(L"apps & features") != std::wstring::npos ||
-      lowered.find(L"aplikasi terinstal") != std::wstring::npos;
-  if (!removal_surface) return;
-  last_settings_prompt_ = now;
-  {
-    std::lock_guard lock(event_mutex_);
-    events_.push("{\"type\":\"settings_surface\"}");
-  }
-  PostMessageW(window_, kNativeEventMessage, 0, 0);
-}
-
 void NativeProtectionBridge::SendBrowserBack() {
   const HWND foreground = GetForegroundWindow();
   if (foreground == nullptr) return;
@@ -85,10 +36,6 @@ void NativeProtectionBridge::SendBrowserBack() {
   Lowercase(&executable);
   if (executable.find(L"chrome.exe") == std::wstring::npos &&
       executable.find(L"msedge.exe") == std::wstring::npos) return;
-  SendBackKeystroke();
-}
-
-void NativeProtectionBridge::SendBackKeystroke() {
   INPUT inputs[4]{};
   inputs[0].type = INPUT_KEYBOARD;
   inputs[0].ki.wVk = VK_MENU;

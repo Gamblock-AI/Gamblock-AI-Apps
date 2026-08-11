@@ -1,0 +1,89 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+  <Package Name="Gamblock-AI"
+           Manufacturer="Gamblock-AI"
+           Version="$(ProductVersion)"
+           UpgradeCode="C4E54D37-DF17-4CFF-BBF4-00C2B997CB5C"
+           Scope="perMachine"
+           InstallerVersion="500"
+           Compressed="yes">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Gamblock-AI is already installed." />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" Name="Gamblock-AI">
+        <Component Id="MainApplication" Guid="*" Bitness="always64">
+          <File Id="MainExecutable"
+                Source="$(BundlePath)\gamblock_ai_apps.exe"
+                KeyPath="yes">
+            <Shortcut Id="StartMenuShortcut"
+                      Directory="ProgramMenuFolder"
+                      Name="Gamblock-AI"
+                      Description="Gamblock-AI on-device protection"
+                      WorkingDirectory="INSTALLFOLDER"
+                      Advertise="yes" />
+          </File>
+        </Component>
+
+        <Component Id="ProtectionService" Guid="*" Bitness="always64">
+          <File Id="ProtectionServiceExecutable"
+                Source="$(BundlePath)\gamblock_ai_service.exe"
+                KeyPath="yes" />
+          <ServiceInstall Id="ProtectionServiceInstall"
+                          Name="GamblockAIProtection"
+                          DisplayName="Gamblock AI Protection"
+                          Description="On-device Gamblock-AI protection service"
+                          Type="ownProcess"
+                          Start="auto"
+                          ErrorControl="normal"
+                          Account="LocalSystem"
+                          Arguments="--service"
+                          Vital="yes">
+            <ServiceConfig ServiceSid="unrestricted"
+                           FailureActionsWhen="failedToStopOrReturnedError"
+                           OnInstall="yes"
+                           OnReinstall="yes" />
+            <util:ServiceConfig FirstFailureActionType="restart"
+                                SecondFailureActionType="restart"
+                                ThirdFailureActionType="restart"
+                                RestartServiceDelayInSeconds="5"
+                                ResetPeriodInDays="1" />
+          </ServiceInstall>
+          <ServiceControl Id="ProtectionServiceControl"
+                          Name="GamblockAIProtection"
+                          Start="install"
+                          Stop="both"
+                          Remove="uninstall"
+                          Wait="yes" />
+        </Component>
+
+        <Files Include="$(BundlePath)\**">
+          <Exclude Files="$(BundlePath)\gamblock_ai_apps.exe" />
+          <Exclude Files="$(BundlePath)\gamblock_ai_service.exe" />
+          <Exclude Files="$(BundlePath)\**\*.pdb" />
+          <Exclude Files="$(BundlePath)\**\*.exp" />
+          <Exclude Files="$(BundlePath)\**\*.lib" />
+          <Exclude Files="$(BundlePath)\scripts\**" />
+        </Files>
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="CommonAppDataFolder">
+      <Directory Id="GAMBLOCKDATADIR" Name="GamblockAI">
+        <Component Id="SecureProgramData" Guid="*" Bitness="always64">
+          <CreateFolder>
+            <PermissionEx Sddl="D:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)" />
+          </CreateFolder>
+          <RegistryValue Root="HKLM"
+                         Key="Software\GamblockAI"
+                         Name="DataDirectory"
+                         Value="[GAMBLOCKDATADIR]"
+                         Type="string"
+                         KeyPath="yes" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder" />
+  </Package>
+</Wix>

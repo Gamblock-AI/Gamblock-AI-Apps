@@ -11,13 +11,25 @@ release-readiness claim. Android real-device validation, Windows signed-VM
 validation, accessibility review, performance profiling, and model evaluation
 remain required.
 
+## Distribution and CI versions
+
+The Android `play` and `research` flavors and the Windows pilot have separate
+capability and signing boundaries. Pull requests and `main` build diagnostic
+artifacts without production keys; those artifacts remain short-retention CI
+outputs and are not user-facing releases. Signed Play/Research/Windows
+candidates are built only from immutable version tags in protected GitHub
+Environments. The complete matrix, key names, and artifact contract are in
+[`docs/ai/distribution-matrix.md`](docs/ai/distribution-matrix.md).
+
 ## Run
 
 ```sh
 cp .env.example .env
 flutter pub get
-flutter run
+flutter run --flavor play
 ```
+
+Use `flutter run --flavor research` only on an approved research device.
 
 Flutter `3.41.9` is pinned through `.fvmrc` and CI. Configure
 `API_BASE_URL` and `WEB_BASE_URL` in `.env`; the file contains public client
@@ -88,21 +100,37 @@ dataset/training/evaluation workflow.
 
 ## Android runtime
 
-The Accessibility Service is declared in the active manifest and supports:
+Android has compile-time-separated `play` and `research` flavors. Both declare
+an Accessibility Service that supports:
 
 - Chrome (`com.android.chrome`) and Edge
   (`com.microsoft.emmx`) URL/title/headings/anchor extraction;
 - bounded, debounced, single-threaded local classification;
 - local Back navigation plus an accessibility overlay Pattern Interrupt;
-- settings/uninstall friction tied to bounded approval or emergency grants;
-- AES-GCM Android Keystore protection for local grants;
+- versioned prominent disclosure before the user is sent to Accessibility
+  Settings;
+- signed, device-bound ES256 grants verified against pinned backend public
+  keys and encrypted with Android Keystore after verification;
 - daily allowlisted aggregate counters and last-known-good artifact loading;
 - optional low-priority protection-health notification.
 
-Other browsers and arbitrary Android WebViews are not claimed as covered. A
-sideloaded app cannot make itself impossible to uninstall; the prototype adds
-OS-supported friction and transparent recovery rather than unsafe device-owner
-or critical-process behavior.
+The Play flavor observes Chrome and Edge only; Settings/package-installer
+monitoring is absent from its source set and accessibility configuration. The
+Research flavor additionally contains transparent settings/uninstall friction
+tied to bounded approval or emergency grants. Other browsers and arbitrary
+Android WebViews are not claimed as covered. A sideloaded app cannot make
+itself impossible to uninstall; the research prototype adds OS-supported
+friction and transparent recovery rather than unsafe device-owner behavior.
+
+Release signing is intentionally separate. Play uses
+`PLAY_KEYSTORE_PATH`, `PLAY_KEYSTORE_PASSWORD`, `PLAY_KEY_ALIAS`, and
+`PLAY_KEY_PASSWORD`; Research uses the matching `RESEARCH_` variables. Grant
+verification uses the public `PROTECTION_GRANT_TRUST_STORE_BASE64` build value:
+base64 of a JSON map from `kid` to base64 DER SubjectPublicKeyInfo for each
+current/next P-256 key. Empty or malformed trust configuration rejects grants.
+The standard flavor outputs are `app-play-release.aab` and
+`app-research-release.apk`; no release build or signing evidence is claimed
+until those artifacts are independently verified.
 
 ## Windows runtime
 
@@ -117,17 +145,22 @@ The Windows build contains two native processes:
   Channels.
 
 The browser extension remains a passive sensor. It never receives a block
-command. Install/uninstall scripts are under `windows/scripts/`; uninstall
-requires an active approved removal or emergency grant. Windows runtime and
-signing still require validation on a Windows VM/device.
+command. The supported pilot installer is the per-machine MSI under
+`windows/installer/`: it places immutable binaries under `Program Files`,
+registers the LocalSystem service with SCM recovery, and exposes a normal
+elevated Windows Installer removal path. In-app maintenance remains gated by a
+signed device-bound removal/emergency grant. The PowerShell files under
+`windows/scripts/` are developer/evidence helpers and are not shipped by the
+MSI. Windows runtime, signing, and uninstall behavior still require validation
+on a Windows VM/device.
 
 The Windows service is split by responsibility under `windows/service/`:
 runtime/SCM lifecycle, WebSocket handling, named-pipe commands, local state,
-artifact updates, opt-in evidence capture, user-agent launch, and small
+local artifact loading and integrity checks, opt-in evidence capture, user-agent launch, and small
 platform support modules. The
 Flutter runner similarly uses `native_protection_*.{cpp,h}` modules for codec,
 channels, pipe transport, events, and settings monitoring. This keeps IPC,
-credential storage, and update logic independently reviewable. Pipe operations
+credential storage, and local artifact integrity logic independently reviewable. Pipe operations
 are cancellable during shutdown, and the Windows service joins its socket
 workers before Winsock teardown.
 
@@ -210,15 +243,10 @@ change before accepting the normal access/refresh session.
 checks. The portable Windows Hybrid-v2 fixture can also be compiled directly
 from `windows/protection/hybrid_classifier_test.cpp`.
 
-Every successful `main` commit force-updates one mutable `latest` GitHub
-release. It replaces fixed-name development Android/Windows debug assets and
-separate `production-debug` assets. The latter use
-`APP_ENV=production`, `https://api.gamblock-ai.com`, and
-`https://gamblock-ai.com`, so they remain usable for production integration
-before signing material exists. Concurrent older runs are cancelled so the
-newest commit wins.
-
-Signed production Android and Windows jobs remain disabled until
-`ENABLE_PRODUCTION_RELEASE=true` and the real Android keystore and Windows
-code-signing PFX secrets exist. They do not silently fall back to debug
-signing; production-config debug assets stay explicitly labeled debug.
+CI uploads only clearly labelled, short-retention debug artifacts; it does not
+create a public `latest` release. Tag-triggered signed candidates are gated by
+protected environments and are retained as workflow artifacts only. The
+artifact matrix, signing inputs, Play submission checklist, Research APK
+pilot, and Windows MSI pilot are documented in
+[`docs/release/README.md`](docs/release/README.md). No debug or unsigned file
+is a user-facing release.

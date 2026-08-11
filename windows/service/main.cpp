@@ -11,6 +11,11 @@ int wmain(int argc, wchar_t** argv) {
   if (command == L"--uninstall") {
     return service.Uninstall() ? 0 : 1;
   }
+  if (command == L"--admin-uninstall") {
+    // Windows SCM permissions are the explicit administrator break-glass
+    // boundary. Standard users cannot stop/delete this LocalSystem service.
+    return service.Uninstall(false) ? 0 : 1;
+  }
   if (command == L"--console") {
     return service.RunConsole();
   }

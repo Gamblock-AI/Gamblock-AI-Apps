@@ -6,7 +6,6 @@
 
 namespace {
 
-using gamblock::native_bridge::JsonBool;
 using gamblock::native_bridge::JsonString;
 
 }  // namespace
@@ -20,11 +19,6 @@ void NativeProtectionBridge::HandleWindowMessage() {
   while (!pending.empty()) {
     const std::string message = std::move(pending.front());
     pending.pop();
-    if (JsonString(message, "type") == "settings_surface") {
-      const std::string response = CallService("settings_interaction");
-      if (!JsonBool(response, "allowed", false)) SendBackKeystroke();
-      continue;
-    }
     if (JsonString(message, "type") == "intervention_shown") {
       SendBrowserBack();
       ShowWindow(window_, SW_RESTORE);

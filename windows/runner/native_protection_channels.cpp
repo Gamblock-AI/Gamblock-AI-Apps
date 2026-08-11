@@ -2,7 +2,6 @@
 
 #include <flutter/event_stream_handler_functions.h>
 #include <flutter/standard_method_codec.h>
-#include <shellapi.h>
 
 #include <utility>
 
@@ -13,13 +12,11 @@ namespace {
 using gamblock::native_bridge::AggregateItems;
 using gamblock::native_bridge::Arguments;
 using gamblock::native_bridge::EscapeJson;
-using gamblock::native_bridge::ExecutableDirectory;
 using gamblock::native_bridge::FindArgument;
 using gamblock::native_bridge::JsonBool;
 using gamblock::native_bridge::JsonString;
 using gamblock::native_bridge::SelfTestMap;
 using gamblock::native_bridge::SerializeList;
-using gamblock::native_bridge::SerializeMap;
 using gamblock::native_bridge::SnapshotMap;
 
 }  // namespace
@@ -36,27 +33,13 @@ void NativeProtectionBridge::ConfigureMethodChannel(
         if (call.method_name() == "getProtectionSnapshot") {
           result->Success(flutter::EncodableValue(SnapshotMap(CallService("snapshot"))));
         } else if (call.method_name() == "openPlatformSetup") {
-          const std::wstring script =
-              ExecutableDirectory() + L"\\scripts\\install-service.ps1";
-          const std::wstring shell_arguments =
-              L"-NoProfile -ExecutionPolicy Bypass -File \"" + script + L"\"";
-          const auto launched = reinterpret_cast<INT_PTR>(ShellExecuteW(
-              window_, L"runas", L"powershell.exe", shell_arguments.c_str(),
-              ExecutableDirectory().c_str(), SW_SHOWNORMAL));
-          result->Success(flutter::EncodableValue(launched > 32));
+          // Production setup is owned by the per-machine MSI. Never elevate a
+          // script or register a service binary from a user-writable bundle.
+          result->Success(flutter::EncodableValue(JsonBool(
+              CallService("snapshot"), "service_running", false)));
         } else if (call.method_name() == "runLocalSelfTest") {
           result->Success(flutter::EncodableValue(
               SelfTestMap(CallService("self_test"))));
-        } else if (call.method_name() == "checkArtifactUpdates") {
-          const auto* value = FindArgument(arguments, "base_url");
-          const auto* base_url = value ? std::get_if<std::string>(value) : nullptr;
-          const std::string fields = ",\"base_url\":\"" +
-              EscapeJson(base_url == nullptr ? "" : *base_url) + "\"";
-          const std::string response = CallService("check_artifacts", fields, 30000);
-          result->Success(flutter::EncodableValue(flutter::EncodableMap{
-              {flutter::EncodableValue("checked"),
-               flutter::EncodableValue(JsonBool(response, "checked", false))},
-          }));
         } else if (call.method_name() == "setDeviceId") {
           const auto* value = FindArgument(arguments, "device_id");
           const auto* device = value ? std::get_if<std::string>(value) : nullptr;
@@ -64,6 +47,31 @@ void NativeProtectionBridge::ConfigureMethodChannel(
               EscapeJson(device == nullptr ? "" : *device) + "\"";
           result->Success(flutter::EncodableValue(
               JsonBool(CallService("set_device", fields), "ok")));
+        } else if (call.method_name() == "getGrantKeyEnrollment") {
+          const auto* device_value = FindArgument(arguments, "device_id");
+          const auto* device =
+              device_value ? std::get_if<std::string>(device_value) : nullptr;
+          const auto* challenge_value =
+              FindArgument(arguments, "challenge_token");
+          const auto* challenge = challenge_value
+                                      ? std::get_if<std::string>(challenge_value)
+                                      : nullptr;
+          const std::string fields =
+              ",\"device_id\":\"" +
+              EscapeJson(device == nullptr ? "" : *device) +
+              "\",\"challenge_token\":\"" +
+              EscapeJson(challenge == nullptr ? "" : *challenge) + "\"";
+          const std::string response =
+              CallService("get_grant_key_enrollment", fields);
+          result->Success(flutter::EncodableValue(flutter::EncodableMap{
+              {flutter::EncodableValue("public_jwk"),
+               flutter::EncodableValue(JsonString(response, "public_jwk"))},
+              {flutter::EncodableValue("jwk_thumbprint"),
+               flutter::EncodableValue(
+                   JsonString(response, "jwk_thumbprint"))},
+              {flutter::EncodableValue("proof"),
+               flutter::EncodableValue(JsonString(response, "proof"))},
+          }));
         } else if (call.method_name() == "drainDailyAggregates") {
           result->Success(flutter::EncodableValue(
               AggregateItems(CallService("drain_aggregates"))));
@@ -78,10 +86,11 @@ void NativeProtectionBridge::ConfigureMethodChannel(
           result->Success(flutter::EncodableValue(
               JsonBool(CallService("ack_aggregates", fields), "ok")));
         } else if (call.method_name() == "storeProtectionGrant") {
-          const auto* value = FindArgument(arguments, "grant");
-          const auto* grant = value ? std::get_if<flutter::EncodableMap>(value) : nullptr;
-          const std::string fields = ",\"grant\":" +
-              (grant == nullptr ? std::string("{}") : SerializeMap(*grant));
+          const auto* value = FindArgument(arguments, "grant_token");
+          const auto* token =
+              value ? std::get_if<std::string>(value) : nullptr;
+          const std::string fields = ",\"grant_token\":\"" +
+              EscapeJson(token == nullptr ? "" : *token) + "\"";
           result->Success(flutter::EncodableValue(
               JsonBool(CallService("store_grant", fields), "ok")));
         } else if (call.method_name() == "getPairingToken" ||

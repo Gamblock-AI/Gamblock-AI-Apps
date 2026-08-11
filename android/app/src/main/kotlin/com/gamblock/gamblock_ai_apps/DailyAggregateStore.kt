@@ -16,8 +16,6 @@ class DailyAggregateStore(context: Context) {
             "block_count_sync",
             "tamper_detected",
             "permission_revoked",
-            "model_updated",
-            "ruleset_updated",
         )
         // Hourly histograms stay aggregate counts (no URLs/domains) and feed the
         // "jam rawan" analytics on partner/admin dashboards.

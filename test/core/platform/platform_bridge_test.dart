@@ -1,7 +1,10 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gamblock_ai_apps/core/platform/platform_bridge.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   test('ProtectionSnapshot preserves raw native health state', () {
     final snapshot = ProtectionSnapshot.fromMap({
       'platform': 'windows',
@@ -50,5 +53,51 @@ void main() {
     expect(aggregate.hourly, hasLength(24));
     expect(aggregate.hourly[3], 5);
     expect(aggregate.hourly[0], 0);
+  });
+
+  test('storeProtectionGrant forwards only the compact signed token', () async {
+    const channel = MethodChannel('com.gamblock/protection');
+    MethodCall? captured;
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (call) async {
+          captured = call;
+          return true;
+        });
+    addTearDown(
+      () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, null),
+    );
+
+    expect(await PlatformBridge.storeProtectionGrant('header.body.signature'), isTrue);
+    expect(captured?.method, 'storeProtectionGrant');
+    expect(captured?.arguments, {'grant_token': 'header.body.signature'});
+  });
+
+  test('getGrantKeyEnrollment normalizes a complete native response', () async {
+    const channel = MethodChannel('com.gamblock/protection');
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (call) async {
+          expect(call.method, 'getGrantKeyEnrollment');
+          expect(call.arguments, {
+            'device_id': 'dev_123',
+            'challenge_token': 'challenge',
+          });
+          return <String, Object?>{
+            'public_jwk': '{"kty":"EC","crv":"P-256","x":"x","y":"y"}',
+            'jwk_thumbprint': 'thumbprint',
+            'proof': 'proof',
+          };
+        });
+    addTearDown(
+      () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, null),
+    );
+
+    final enrollment = await PlatformBridge.getGrantKeyEnrollment(
+      deviceId: 'dev_123',
+      challengeToken: 'challenge',
+    );
+    expect(enrollment?['jwk_thumbprint'], 'thumbprint');
+    expect(enrollment?['proof'], 'proof');
   });
 }

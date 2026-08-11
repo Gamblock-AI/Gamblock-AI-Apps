@@ -35,18 +35,7 @@ class NativeProtectionBridge {
                           DWORD timeout_ms = 5000);
   void HandlePipeMessage(const std::string& message);
   void DispatchEvent(const std::string& message);
-  void InstallSettingsMonitor();
-  void RemoveSettingsMonitor();
-  void InspectForegroundWindow(HWND foreground);
-  static void CALLBACK ForegroundHook(HWINEVENTHOOK hook,
-                                      DWORD event,
-                                      HWND window,
-                                      LONG object_id,
-                                      LONG child_id,
-                                      DWORD event_thread,
-                                      DWORD event_time);
   static void SendBrowserBack();
-  static void SendBackKeystroke();
 
   HWND window_;
   HANDLE pipe_ = INVALID_HANDLE_VALUE;
@@ -65,11 +54,6 @@ class NativeProtectionBridge {
   std::unique_ptr<flutter::EventChannel<flutter::EncodableValue>>
       event_channel_;
   std::unique_ptr<flutter::EventSink<flutter::EncodableValue>> event_sink_;
-  HWINEVENTHOOK foreground_hook_ = nullptr;
-  ULONGLONG last_settings_prompt_ = 0;
-
-  static std::mutex callback_mutex_;
-  static NativeProtectionBridge* instance_;
 };
 
 #endif  // RUNNER_NATIVE_PROTECTION_BRIDGE_H_

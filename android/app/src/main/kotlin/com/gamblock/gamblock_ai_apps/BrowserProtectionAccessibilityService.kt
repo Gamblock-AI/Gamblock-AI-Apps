@@ -11,33 +11,36 @@ import android.view.accessibility.AccessibilityNodeInfo
 import java.util.ArrayDeque
 import java.util.concurrent.Executors
 
-class GamblockAccessibilityService : AccessibilityService() {
+/**
+ * Browser-only protection shared by both Android distributions.
+ *
+ * Settings/package-installer monitoring deliberately lives only in the
+ * research source set so it cannot be included in the Play binary.
+ */
+abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
     companion object {
         const val CHANNEL_ID = "gamblock_protection"
         const val NOTIFICATION_ID = 1001
-        private val supportedBrowsers = setOf(
+
+        private val SUPPORTED_BROWSERS = setOf(
             "com.android.chrome",
             "com.microsoft.emmx",
         )
-        private val settingsPackages = setOf(
-            "com.android.settings",
-            "com.google.android.packageinstaller",
-            "com.android.packageinstaller",
-        )
-        private val urlResourceIds = listOf(
+        private val URL_RESOURCE_IDS = listOf(
             "com.android.chrome:id/url_bar",
             "com.microsoft.emmx:id/url_bar",
             "com.microsoft.emmx:id/location_bar_edit_text",
         )
     }
 
+    protected open val additionalObservedPackages: Set<String> = emptySet()
+
     private val worker = Executors.newSingleThreadExecutor()
     private val mainHandler = Handler(Looper.getMainLooper())
     private lateinit var classifier: HybridClassifier
-    private lateinit var aggregateStore: DailyAggregateStore
-    private lateinit var stateStore: ProtectionStateStore
-    private lateinit var overlay: PatternInterruptOverlay
-    private lateinit var artifactUpdater: ArtifactUpdater
+    protected lateinit var aggregateStore: DailyAggregateStore
+    protected lateinit var stateStore: ProtectionStateStore
+    protected lateinit var overlay: PatternInterruptOverlay
     private lateinit var phase4Evidence: Phase4EvidenceRecorder
     private var lastSignature = 0
     private var lastDecisionAt = 0L
@@ -45,7 +48,7 @@ class GamblockAccessibilityService : AccessibilityService() {
 
     override fun onServiceConnected() {
         super.onServiceConnected()
-        serviceInfo = AccessibilityServiceInfo().apply {
+        serviceInfo = serviceInfo.apply {
             eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED or
                 AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED or
                 AccessibilityEvent.TYPE_VIEW_CLICKED
@@ -53,12 +56,12 @@ class GamblockAccessibilityService : AccessibilityService() {
             notificationTimeout = 250
             flags = AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or
                 AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
+            packageNames = (SUPPORTED_BROWSERS + additionalObservedPackages).toTypedArray()
         }
         classifier = HybridClassifier(applicationContext)
         aggregateStore = DailyAggregateStore(applicationContext)
         stateStore = ProtectionStateStore(applicationContext)
         overlay = PatternInterruptOverlay(this, NativeConfig.webBaseUrl(this))
-        artifactUpdater = ArtifactUpdater(applicationContext, classifier, aggregateStore)
         phase4Evidence = Phase4EvidenceRecorder(applicationContext)
         if (classifier.load()) {
             stateStore.setStatus("active")
@@ -67,22 +70,27 @@ class GamblockAccessibilityService : AccessibilityService() {
         }
         HealthNotificationPreferences.show(this)
         NativeEventBus.emit(snapshotEvent())
-        scheduleArtifactUpdate()
+        onProtectionServiceConnected()
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null) return
-        val packageName = event.packageName?.toString() ?: return
-        if (packageName in settingsPackages) {
-            inspectTamperScreen()
+        val sourcePackage = event.packageName?.toString() ?: return
+        if (sourcePackage in SUPPORTED_BROWSERS) {
+            scheduleBrowserScan(event)
             return
         }
-        if (packageName !in supportedBrowsers) return
-        scheduleBrowserScan(event)
+        handleAdditionalAccessibilityEvent(sourcePackage)
     }
 
+    protected open fun handleAdditionalAccessibilityEvent(sourcePackage: String) = Unit
+
+    protected open fun onProtectionServiceConnected() = Unit
+
+    protected open fun onProtectionServiceDestroyed() = Unit
+
     private fun scheduleBrowserScan(event: AccessibilityEvent) {
-        if (stateStore.activeGrant() != null) {
+        if (stateStore.activeGrantAllowsProtectionPause()) {
             stateStore.setStatus("paused")
             NativeEventBus.emit(snapshotEvent())
             return
@@ -153,7 +161,7 @@ class GamblockAccessibilityService : AccessibilityService() {
     ): ClassificationInput? {
         if (root == null) return null
         var url = ""
-        for (resourceId in urlResourceIds) {
+        for (resourceId in URL_RESOURCE_IDS) {
             val node = root.findAccessibilityNodeInfosByViewId(resourceId).firstOrNull()
             val value = node?.text?.toString()?.trim().orEmpty()
             if (value.isNotEmpty()) {
@@ -206,57 +214,6 @@ class GamblockAccessibilityService : AccessibilityService() {
         )
     }
 
-    private fun inspectTamperScreen() {
-        val root = rootInActiveWindow ?: return
-        val texts = mutableListOf<String>()
-        val queue = ArrayDeque<AccessibilityNodeInfo>()
-        queue.add(root)
-        var visited = 0
-        while (queue.isNotEmpty() && visited < 300) {
-            val node = queue.removeFirst()
-            visited++
-            node.text?.toString()?.takeIf(String::isNotBlank)?.let(texts::add)
-            node.contentDescription?.toString()?.takeIf(String::isNotBlank)?.let(texts::add)
-            for (index in 0 until node.childCount) {
-                node.getChild(index)?.let(queue::add)
-            }
-        }
-        val combined = texts.joinToString(" ").lowercase()
-        val targetsGamblock = combined.contains("gamblock") || combined.contains(packageName.lowercase())
-        val removalAttempt = listOf(
-            "uninstall",
-            "copot",
-            "hapus aplikasi",
-        ).any(combined::contains)
-        val dangerous = listOf(
-            "uninstall",
-            "copot",
-            "hapus aplikasi",
-            "force stop",
-            "paksa berhenti",
-            "disable",
-            "nonaktifkan",
-            "accessibility",
-            "aksesibilitas",
-        ).any(combined::contains)
-        if (!targetsGamblock || !dangerous) return
-        if (stateStore.activeGrantAllowsSettingsAction(removalAttempt)) return
-        aggregateStore.increment("tamper_detected")
-        performGlobalAction(GLOBAL_ACTION_BACK)
-        overlay.showTamperWarning()
-        NativeEventBus.emit(mapOf("type" to "approval_required"))
-    }
-
-    private fun scheduleArtifactUpdate() {
-        worker.execute {
-            if (!artifactUpdater.check(NativeConfig.apiBaseUrl(this))) {
-                stateStore.setStatus("degraded", "artifact_update_failed")
-            }
-            NativeEventBus.emit(snapshotEvent())
-        }
-        mainHandler.postDelayed(::scheduleArtifactUpdate, 24 * 60 * 60 * 1000L)
-    }
-
     private fun snapshotEvent(): Map<String, Any?> {
         return mapOf(
             "type" to "protection_status",
@@ -284,6 +241,7 @@ class GamblockAccessibilityService : AccessibilityService() {
     }
 
     override fun onDestroy() {
+        onProtectionServiceDestroyed()
         pendingScan?.let(mainHandler::removeCallbacks)
         mainHandler.removeCallbacksAndMessages(null)
         overlay.dismiss()

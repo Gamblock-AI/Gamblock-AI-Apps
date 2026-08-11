@@ -1,6 +1,7 @@
 package com.gamblock.gamblock_ai_apps
 
 import android.content.Context
+import android.os.SystemClock
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
@@ -18,14 +19,25 @@ import javax.crypto.spec.GCMParameterSpec
 class ProtectionStateStore(private val context: Context) {
     companion object {
         private const val PREFS = "gamblock_protection_state"
-        private const val KEY_ALIAS = "gamblock_approval_grant"
+        private const val ENCRYPTION_KEY_ALIAS = "gamblock_approval_grant"
         private const val GRANT_KEY = "encrypted_grant"
+        private const val CLOCK_ROLLBACK_TOLERANCE_MS = 2 * 60 * 1000L
     }
 
     private val preferences = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    private val deviceGrantKey = DeviceGrantKey()
+    private val grantVerifier = ProtectionGrantVerifier(
+        BuildConfig.PROTECTION_GRANT_TRUST_STORE_BASE64,
+    )
 
-    fun setDeviceId(deviceId: String) {
-        preferences.edit().putString("device_id", deviceId).apply()
+    /** Binds once and remains idempotent for the same backend device ID. */
+    @Synchronized
+    fun setDeviceId(deviceId: String): Boolean {
+        val normalized = deviceId.trim()
+        if (normalized.isEmpty() || normalized.length > 128) return false
+        val current = this.deviceId()
+        if (current.isNotEmpty()) return current == normalized
+        return preferences.edit().putString("device_id", normalized).commit()
     }
 
     fun deviceId(): String = preferences.getString("device_id", "") ?: ""
@@ -47,34 +59,37 @@ class ProtectionStateStore(private val context: Context) {
 
     fun lastEventAt(): String? = preferences.getString("last_event_at", null)
 
-    fun storeGrant(grant: JSONObject): Boolean {
-        val action = grant.optString("action")
-        val allowed = setOf(
-            "pause_protection",
-            "disable_protection",
-            "uninstall_detected",
-            "emergency_access",
-        )
+    fun grantKeyEnrollment(deviceId: String, challengeToken: String): Map<String, String>? {
+        if (!setDeviceId(deviceId) || this.deviceId() != deviceId.trim()) return null
+        return deviceGrantKey.enrollment(deviceId.trim(), challengeToken)
+    }
+
+    fun storeGrant(compactToken: String): Boolean {
         val expectedDevice = deviceId()
-        val expiry = parseIsoMillis(grant.optString("grant_expires_at"))
-        if (
-            action !in allowed ||
-            expectedDevice.isEmpty() ||
-            grant.optString("device_id") != expectedDevice ||
-            expiry == null ||
-            expiry <= System.currentTimeMillis()
-        ) {
-            return false
-        }
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey())
-        val payload = cipher.doFinal(grant.toString().toByteArray(Charsets.UTF_8))
-        val packed = JSONObject().apply {
-            put("iv", Base64.encodeToString(cipher.iv, Base64.NO_WRAP))
-            put("payload", Base64.encodeToString(payload, Base64.NO_WRAP))
-        }
-        preferences.edit().putString(GRANT_KEY, packed.toString()).apply()
-        return true
+        val thumbprint = runCatching { deviceGrantKey.jwkThumbprint() }.getOrNull() ?: return false
+        val nowWall = System.currentTimeMillis()
+        val payload = grantVerifier.verify(
+            compactToken = compactToken.trim(),
+            expectedDeviceId = expectedDevice,
+            expectedJwkThumbprint = thumbprint,
+            nowMillis = nowWall,
+        ) ?: return false
+        return runCatching {
+            val clearState = JSONObject().apply {
+                put("token", compactToken.trim())
+                put("accepted_wall_ms", nowWall)
+                put("accepted_elapsed_ms", SystemClock.elapsedRealtime())
+                put("action", payload.getString("action"))
+            }
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey())
+            val encrypted = cipher.doFinal(clearState.toString().toByteArray(Charsets.UTF_8))
+            val packed = JSONObject().apply {
+                put("iv", Base64.encodeToString(cipher.iv, Base64.NO_WRAP))
+                put("payload", Base64.encodeToString(encrypted, Base64.NO_WRAP))
+            }
+            preferences.edit().putString(GRANT_KEY, packed.toString()).commit()
+        }.getOrDefault(false)
     }
 
     fun activeGrant(): JSONObject? {
@@ -93,41 +108,71 @@ class ProtectionStateStore(private val context: Context) {
             val clear = cipher.doFinal(
                 Base64.decode(packed.getString("payload"), Base64.NO_WRAP),
             )
-            val grant = JSONObject(String(clear, Charsets.UTF_8))
-            val expiry = parseIsoMillis(grant.getString("grant_expires_at"))
-            if (
-                grant.optString("device_id") == deviceId() &&
-                expiry != null &&
-                System.currentTimeMillis() < expiry
-            ) {
-                grant
-            } else {
-                preferences.edit().remove(GRANT_KEY).apply()
+            val clearState = JSONObject(String(clear, Charsets.UTF_8))
+            val acceptedWall = clearState.getLong("accepted_wall_ms")
+            val acceptedElapsed = clearState.getLong("accepted_elapsed_ms")
+            val currentElapsed = SystemClock.elapsedRealtime()
+            val currentWall = System.currentTimeMillis()
+            if (currentElapsed < acceptedElapsed) {
+                clearGrant()
+                return null
+            }
+            val expectedWall = acceptedWall + (currentElapsed - acceptedElapsed)
+            if (currentWall + CLOCK_ROLLBACK_TOLERANCE_MS < expectedWall) {
+                clearGrant()
+                return null
+            }
+            val thumbprint = deviceGrantKey.jwkThumbprint() ?: run {
+                clearGrant()
+                return null
+            }
+            grantVerifier.verify(
+                compactToken = clearState.getString("token"),
+                expectedDeviceId = deviceId(),
+                expectedJwkThumbprint = thumbprint,
+                nowMillis = currentWall,
+            ) ?: run {
+                clearGrant()
                 null
             }
         } catch (_: Exception) {
-            preferences.edit().remove(GRANT_KEY).apply()
+            clearGrant()
             null
         }
     }
 
-    fun activeGrantAllowsSettingsAction(removal: Boolean): Boolean {
-        val action = activeGrant()?.optString("action").orEmpty()
-        return action == "emergency_access" ||
-            (removal && action == "uninstall_detected") ||
-            (!removal && action == "disable_protection")
+    fun activeGrantAllowsProtectionPause(): Boolean {
+        return when (activeGrant()?.optString("action")) {
+            "pause_protection", "emergency_access" -> true
+            else -> false
+        }
+    }
+
+    /** Only a removal/emergency window may authorize a Settings intervention.
+     * A pause grant is deliberately scoped to browser protection and cannot
+     * approve disabling Accessibility or force-stopping the app.
+     */
+    fun activeGrantAllowsSettingsAction(): Boolean {
+        return when (activeGrant()?.optString("action")) {
+            "emergency_access", "uninstall_detected" -> true
+            else -> false
+        }
+    }
+
+    private fun clearGrant() {
+        preferences.edit().remove(GRANT_KEY).apply()
     }
 
     private fun secretKey(): SecretKey {
         val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
-        (keyStore.getKey(KEY_ALIAS, null) as? SecretKey)?.let { return it }
+        (keyStore.getKey(ENCRYPTION_KEY_ALIAS, null) as? SecretKey)?.let { return it }
         val generator = KeyGenerator.getInstance(
             KeyProperties.KEY_ALGORITHM_AES,
             "AndroidKeyStore",
         )
         generator.init(
             KeyGenParameterSpec.Builder(
-                KEY_ALIAS,
+                ENCRYPTION_KEY_ALIAS,
                 KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT,
             )
                 .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
@@ -135,21 +180,6 @@ class ProtectionStateStore(private val context: Context) {
                 .build(),
         )
         return generator.generateKey()
-    }
-
-    private fun parseIsoMillis(value: String): Long? {
-        val match = Regex(
-            "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})(?:\\.(\\d+))?(Z|[+-]\\d{2}:\\d{2})$",
-        ).matchEntire(value) ?: return null
-        val fraction = (match.groupValues[2] + "000").take(3)
-        val normalized = "${match.groupValues[1]}.$fraction${match.groupValues[3]}"
-        return try {
-            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US).apply {
-                isLenient = false
-            }.parse(normalized)?.time
-        } catch (_: Exception) {
-            null
-        }
     }
 
     private fun isoDateFormat(): SimpleDateFormat {

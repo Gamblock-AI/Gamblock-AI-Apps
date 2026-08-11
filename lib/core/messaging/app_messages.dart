@@ -170,6 +170,16 @@ class AppMessages {
       case 'learning_hub_admin_validation_failed':
       case 'learning_hub_admin_conflict':
       case 'learning_hub_taxonomy_conflict':
+      case 'artifact_unavailable':
+      case 'create_model_release_failed':
+      case 'create_network_release_failed':
+      case 'create_ruleset_release_failed':
+      case 'fetch_admin_model_releases_failed':
+      case 'fetch_admin_releases_failed':
+      case 'release_not_found':
+      case 'release_rollout_create_failed':
+      case 'release_rollout_transition_failed':
+      case 'release_validation_failed':
         return loc.msgErrGeneric;
       case 'fetch_reflections_failed':
         return loc.msgErrLoadJournal;
@@ -228,11 +238,8 @@ class AppMessages {
         return loc.msgErrTypeRequired;
       case 'fetch_admin_modules_failed':
         return loc.msgErrLoadAdminModules;
-      case 'fetch_admin_model_releases_failed':
-        return loc.msgErrLoadAdminModelReleases;
       case 'fetch_admin_support_cases_failed':
         return loc.msgErrLoadAdminSupportCases;
-      case 'fetch_admin_releases_failed':
       case 'admin_overview_failed':
       case 'site_social_links_failed':
       case 'audit_events_failed':
@@ -242,19 +249,7 @@ class AppMessages {
       case 'operator_invitation_revoke_failed':
       case 'operator_invitation_invalid':
       case 'operator_invitation_accept_failed':
-      case 'release_rollout_create_failed':
-      case 'release_rollout_transition_failed':
         return loc.msgErrGeneric;
-      case 'create_model_release_failed':
-        return loc.msgErrCreateModelRelease;
-      case 'create_ruleset_release_failed':
-        return loc.msgErrCreateRulesetRelease;
-      case 'create_network_release_failed':
-        return loc.msgErrCreateNetworkRelease;
-      case 'release_not_found':
-        return loc.msgErrReleaseNotFound;
-      case 'release_validation_failed':
-      case 'artifact_unavailable':
       case 'portal_overview_failed':
         return loc.msgErrGeneric;
       case 'generate_key_failed':

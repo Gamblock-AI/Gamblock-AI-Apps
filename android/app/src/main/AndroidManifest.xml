@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
-        android:label="Gamblock-AI"
+        android:label="${appLabel}"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -26,7 +26,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Accessibility Service — local Chrome/Edge signals and safe settings friction. -->
+        <!-- Accessibility Service — local Chrome/Edge sensing and intervention. -->
         <service
             android:name=".GamblockAccessibilityService"
             android:exported="true"

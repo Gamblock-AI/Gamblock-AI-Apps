@@ -1,10 +1,36 @@
 #include "protection_service.h"
 
+#include <algorithm>
+#include <array>
+#include <cwctype>
 #include <fstream>
+
+#include <shlobj.h>
 
 #include "service_support.h"
 
 namespace gamblock {
+namespace {
+
+bool IsInstalledUnderProgramFiles(const std::filesystem::path& executable) {
+  std::array<wchar_t, MAX_PATH> program_files{};
+  if (SHGetFolderPathW(nullptr, CSIDL_PROGRAM_FILES, nullptr,
+                       SHGFP_TYPE_CURRENT, program_files.data()) != S_OK) {
+    return false;
+  }
+  std::wstring root =
+      std::filesystem::path(program_files.data()).lexically_normal().wstring();
+  std::wstring candidate = executable.lexically_normal().wstring();
+  std::transform(root.begin(), root.end(), root.begin(),
+                 [](wchar_t value) { return std::towlower(value); });
+  std::transform(candidate.begin(), candidate.end(), candidate.begin(),
+                 [](wchar_t value) { return std::towlower(value); });
+  if (!root.empty() && root.back() != L'\\') root.push_back(L'\\');
+  return candidate.size() > root.size() &&
+         candidate.compare(0, root.size(), root) == 0;
+}
+
+}  // namespace
 
 ProtectionService& ProtectionService::Instance() {
   static ProtectionService service;
@@ -52,10 +78,9 @@ DWORD WINAPI ProtectionService::ControlHandler(DWORD control,
     return NO_ERROR;
   }
   if (control == SERVICE_CONTROL_STOP) {
-    if (!service->HasActiveGrant("stop")) {
-      service->SendAgentEvent("{\"type\":\"approval_required\"}");
-      return ERROR_ACCESS_DENIED;
-    }
+    // SCM access control is the administrative break-glass boundary. Normal
+    // app maintenance remains grant-gated, while an elevated MSI/admin can
+    // always stop the service cleanly without UI interception.
     service->status_.dwCurrentState = SERVICE_STOP_PENDING;
     SetServiceStatus(service->status_handle_, &service->status_);
     service->running_ = false;
@@ -70,6 +95,10 @@ DWORD WINAPI ProtectionService::ControlHandler(DWORD control,
 
 bool ProtectionService::Install() {
   const auto service_path = ExecutableDirectory() / L"gamblock_ai_service.exe";
+  if (!IsInstalledUnderProgramFiles(service_path)) {
+    SetLastError(ERROR_ACCESS_DENIED);
+    return false;
+  }
   const std::wstring command = L"\"" + service_path.wstring() + L"\" --service";
   SC_HANDLE manager = OpenSCManagerW(nullptr, nullptr, SC_MANAGER_CREATE_SERVICE);
   if (manager == nullptr) return false;
@@ -77,7 +106,7 @@ bool ProtectionService::Install() {
       manager, kServiceName, L"Gamblock AI Protection",
       SERVICE_CHANGE_CONFIG | SERVICE_START | SERVICE_QUERY_STATUS,
       SERVICE_WIN32_OWN_PROCESS, SERVICE_AUTO_START, SERVICE_ERROR_NORMAL,
-      command.c_str(), nullptr, nullptr, nullptr, nullptr, nullptr);
+      command.c_str(), nullptr, nullptr, nullptr, L"LocalSystem", nullptr);
   if (service == nullptr && GetLastError() == ERROR_SERVICE_EXISTS) {
     service = OpenServiceW(manager, kServiceName,
                            SERVICE_CHANGE_CONFIG | SERVICE_START |
@@ -87,6 +116,11 @@ bool ProtectionService::Install() {
     CloseServiceHandle(manager);
     return false;
   }
+  const bool configured =
+      ChangeServiceConfigW(service, SERVICE_NO_CHANGE, SERVICE_AUTO_START,
+                           SERVICE_ERROR_NORMAL, command.c_str(), nullptr,
+                           nullptr, nullptr, L"LocalSystem", nullptr,
+                           L"Gamblock AI Protection") != FALSE;
   SC_ACTION actions[3] = {
       {SC_ACTION_RESTART, 5000},
       {SC_ACTION_RESTART, 30000},
@@ -96,18 +130,27 @@ bool ProtectionService::Install() {
   failure_actions.dwResetPeriod = 86400;
   failure_actions.cActions = 3;
   failure_actions.lpsaActions = actions;
-  ChangeServiceConfig2W(service, SERVICE_CONFIG_FAILURE_ACTIONS,
-                        &failure_actions);
+  const bool recovery_configured =
+      ChangeServiceConfig2W(service, SERVICE_CONFIG_FAILURE_ACTIONS,
+                            &failure_actions) != FALSE;
+  SERVICE_FAILURE_ACTIONS_FLAG failure_flag{TRUE};
+  const bool recovery_enabled =
+      ChangeServiceConfig2W(service, SERVICE_CONFIG_FAILURE_ACTIONS_FLAG,
+                            &failure_flag) != FALSE;
   SERVICE_SID_INFO sid_info{SERVICE_SID_TYPE_UNRESTRICTED};
-  ChangeServiceConfig2W(service, SERVICE_CONFIG_SERVICE_SID_INFO, &sid_info);
-  StartServiceW(service, 0, nullptr);
+  const bool sid_configured =
+      ChangeServiceConfig2W(service, SERVICE_CONFIG_SERVICE_SID_INFO,
+                            &sid_info) != FALSE;
+  const bool started = StartServiceW(service, 0, nullptr) != FALSE ||
+                       GetLastError() == ERROR_SERVICE_ALREADY_RUNNING;
   CloseServiceHandle(service);
   CloseServiceHandle(manager);
-  return true;
+  return configured && recovery_configured && recovery_enabled &&
+         sid_configured && started;
 }
 
-bool ProtectionService::Uninstall() {
-  if (!HasActiveGrant("uninstall")) {
+bool ProtectionService::Uninstall(bool require_grant) {
+  if (require_grant && !HasActiveGrant("uninstall")) {
     SetLastError(ERROR_ACCESS_DENIED);
     return false;
   }
@@ -147,8 +190,15 @@ bool ProtectionService::StartRuntime() {
     int count = 0;
     while (file >> key >> count) aggregates_[key] = count;
   }
-  if (const auto stored_device = ReadTextFile(DataDirectory() / L"device-id.txt")) {
-    device_id_ = *stored_device;
+  if (const auto stored_device =
+          ReadProtected(DataDirectory() / L"device-id.bin")) {
+    LoadDeviceId(*stored_device);
+  } else if (const auto legacy_device =
+                 ReadTextFile(DataDirectory() / L"device-id.txt")) {
+    if (SetDeviceId(*legacy_device)) {
+      std::error_code error;
+      std::filesystem::remove(DataDirectory() / L"device-id.txt", error);
+    }
   }
   websocket_thread_ = std::thread(&ProtectionService::WebSocketLoop, this);
   pipe_thread_ = std::thread(&ProtectionService::PipeLoop, this);

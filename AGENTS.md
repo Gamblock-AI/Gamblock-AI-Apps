@@ -2,8 +2,9 @@
 
 
 This standalone repository contains the Android and Windows protection client.
-Read `docs/ai/README.md` before changing behavior; it distinguishes working
-capabilities from stubs and target architecture.
+Read `docs/ai/README.md` and `docs/ai/distribution-matrix.md` before changing
+behavior or workflows; they distinguish working capabilities, distribution
+variants, and target architecture.
 
 ## Non-negotiable boundaries
 
@@ -91,7 +92,7 @@ Do not hardcode URLs in features or call Dio from presentation code.
 - Windows uses `windows/service/` for the LocalSystem authority and the
   small `windows/runner/native_protection_*.{cpp,h}` modules for the
   user-session agent.
-  Source/CMake/install/release wiring is present; a Windows build and VM/device
+  Source/CMake/MSI/release wiring is present; a Windows build and VM/device
   trace are still required before calling it runtime-verified.
 - Any WebSocket shape change must be coordinated with the browser extension
   implementation/tests/README without moving blocking authority into it.
@@ -132,14 +133,20 @@ Mirror `lib/` under `test/` when tests are in scope. Use `mocktail` for
 repository tests and `flutter_test` for widgets. Never call real backend or
 external services.
 
+CI builds the `play` and `research` Android flavors, the Windows debug bundle,
+and a diagnostic MSI without production keys. Signed release builds are
+restricted to immutable semantic-version tags and protected environments. See
+`docs/ai/distribution-matrix.md` for the exact artifact and key contract.
+
 ## Protected and external actions
 
 - Do not edit `.env`, credentials, keystores, generated build output, or
   platform dependency caches.
-- The mutable `latest` release always contains fixed-name development debug
-  assets plus clearly named `production-debug` assets that use public
-  production URLs. Signed production assets additionally require
-  `ENABLE_PRODUCTION_RELEASE=true` and successful platform signing; never
-  present a debug/unsigned artifact as signed or store a secret in client config.
+- CI debug artifacts are clearly labelled and short-retention; CI must not
+  create or mutate a public `latest` release. Tag-triggered candidates remain
+  gated workflow artifacts: Play receives a signed AAB, the Research pilot a
+  separately signed APK, and the Windows pilot a signed MSI only after the
+  protected signing environments succeed. Never present a debug/unsigned
+  artifact as signed or store a secret in client config.
 - Do not deploy, publish, sign releases, push, or change secrets without
   explicit user authorization.

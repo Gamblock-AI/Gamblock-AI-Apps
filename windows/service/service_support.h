@@ -28,9 +28,6 @@ std::string Sha256File(const std::filesystem::path& path);
 std::string Sha256Bytes(const std::vector<unsigned char>& bytes);
 std::optional<std::pair<std::filesystem::path, std::filesystem::path>>
 VerifiedArtifactPair(const std::filesystem::path& directory);
-std::optional<std::vector<unsigned char>> HttpGet(const std::string& base_url,
-                                                  const std::string& path);
-
 std::string Narrow(const std::wstring& value);
 std::wstring Widen(const std::string& value);
 std::string EscapeJson(const std::string& value);
