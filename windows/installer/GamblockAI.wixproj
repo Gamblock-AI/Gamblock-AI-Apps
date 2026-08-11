@@ -1,5 +1,7 @@
 <Project Sdk="WixToolset.Sdk/7.0.0">
   <PropertyGroup>
+    <!-- WiX v7 requires explicit CI acknowledgement of the OSMF EULA. -->
+    <AcceptEula>wix7</AcceptEula>
     <OutputType>Package</OutputType>
     <InstallerPlatform>x64</InstallerPlatform>
     <Platform Condition="'$(Platform)' == ''">x64</Platform>
