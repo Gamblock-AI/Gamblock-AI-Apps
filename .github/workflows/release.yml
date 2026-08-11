@@ -127,9 +127,15 @@ jobs:
           # without treating the lack of a public CA chain as an error;
           # Google Play validates the upload key separately during upload.
           jarsigner -verify "$play_aab" > /dev/null
-          apksigner verify --verbose --print-certs "$research_apk"
-          test "$(apkanalyzer manifest debuggable "$research_apk")" = "false"
-          apkanalyzer manifest permissions "$research_apk" > android-research-permissions.txt
+          sdk_root="${ANDROID_HOME:-${ANDROID_SDK_ROOT:?ANDROID_HOME or ANDROID_SDK_ROOT is required}}"
+          build_tools_dir="$(find "$sdk_root/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
+          apksigner_path="$build_tools_dir/apksigner"
+          apkanalyzer_path="$(find "$sdk_root" -type f -name apkanalyzer -perm -u+x | sort -V | tail -n 1)"
+          test -x "$apksigner_path"
+          test -x "$apkanalyzer_path"
+          "$apksigner_path" verify --verbose --print-certs "$research_apk"
+          test "$("$apkanalyzer_path" manifest debuggable "$research_apk")" = "false"
+          "$apkanalyzer_path" manifest permissions "$research_apk" > android-research-permissions.txt
           cp "$play_aab" "gamblock-ai-play-${version_name}+${GITHUB_RUN_NUMBER}.aab"
           cp "$research_apk" "gamblock-ai-research-${version_name}+${GITHUB_RUN_NUMBER}.apk"
           sha256sum gamblock-ai-* android-research-permissions.txt > android-SHA256SUMS.txt
