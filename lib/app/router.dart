@@ -18,6 +18,7 @@ import '../features/settings/presentation/screens/settings_help_screen.dart';
 import '../features/settings/presentation/screens/settings_privacy_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/setup/presentation/screens/setup_screen.dart';
+import 'boot_gate.dart';
 import 'shell.dart';
 
 Page<void> _page({required LocalKey key, required Widget child}) {
@@ -118,10 +119,8 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: '/',
-        pageBuilder: (_, state) => _page(
-          key: state.pageKey,
-          child: const Scaffold(body: SizedBox.shrink()),
-        ),
+        pageBuilder: (_, state) =>
+            _page(key: state.pageKey, child: const BootGate()),
       ),
       GoRoute(
         path: '/intro',

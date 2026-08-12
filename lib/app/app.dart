@@ -8,7 +8,6 @@ import '../core/notifications/daily_reminder_service.dart';
 import '../core/platform/platform_bridge.dart';
 import '../core/settings/app_settings.dart';
 import 'router.dart';
-import '../features/intro/data/onboarding_state.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
@@ -67,9 +66,7 @@ class _GamblockAppState extends ConsumerState<GamblockApp>
   @override
   Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
-    final authState = ref.watch(authProvider);
     final settings = ref.watch(appSettingsProvider);
-    final onboarding = ref.watch(onboardingProvider);
 
     final localizationsDelegates = const [
       AppLocalizations.delegate,
@@ -80,19 +77,11 @@ class _GamblockAppState extends ConsumerState<GamblockApp>
 
     final supportedLocales = const [Locale('id', ''), Locale('en', '')];
 
-    if (authState.isLoading || settings.isLoading || onboarding.isLoading) {
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        themeMode: ThemeMode.light,
-        localizationsDelegates: localizationsDelegates,
-        supportedLocales: supportedLocales,
-        locale: settings.locale,
-        home: const Scaffold(body: Center(child: CircularProgressIndicator())),
-      );
-    }
-
+    // Single-phase boot: the router exists from the first frame. While boot
+    // providers load, the root route shows [BootGate]'s spinner and the
+    // redirect handles the real destination. This keeps a non-router
+    // MaterialApp (which would read the web URL fragment as an initial
+    // named route) from ever mounting.
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       onGenerateTitle: (context) => AppLocalizations.of(context)!.appName,

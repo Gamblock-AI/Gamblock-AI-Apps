@@ -1384,113 +1384,57 @@ class AppLocalizationsId extends AppLocalizations {
   String get onboardingGroupCode => 'Kode Grup';
 
   @override
-  String get introHeroTitle => 'putuskan siklus\njudi online.';
-
-  @override
-  String get introHeroDesc =>
-      'deteksi cerdas berbasis on-device ai, intervensi psikologis otomatis, dan rehabilitasi mandiri — untuk mahasiswa indonesia.';
-
-  @override
-  String get introAiShield => 'perlindungan AI di perangkat';
-
-  @override
-  String get introHowItWorksStep1 => 'unduh & pasang';
-
-  @override
-  String get introHowItWorksStep1Desc =>
-      'instal di android atau windows. gratis, tanpa kartu kredit.';
-
-  @override
-  String get introHowItWorksStep3 => 'pulihkan & bangkit';
-
-  @override
-  String get introHowItWorksStep2 => 'deteksi otomatis';
-
-  @override
-  String get introHowItWorksStep3Desc =>
-      'pattern interrupt memutus dorongan, lalu psikoedukasi memandu pemulihan.';
-
-  @override
-  String get introHowItWorksStep2Desc =>
-      'hybrid ai menganalisis dom, bow, dan pola url di latar belakang.';
-
-  @override
-  String get introHowItWorksTitle => 'tiga langkah\nmenuju kendali diri.';
-
-  @override
-  String get introHowItWorksSubtitle => 'cara kerja';
-
-  @override
-  String get introFeature1 => 'on-device ai & privasi';
-
-  @override
-  String get introFeaturesTitle => 'ekosistem yang\nmendukung kepulihan.';
-
-  @override
-  String get introFeature3 => 'accountability partner';
-
-  @override
-  String get introFeature2 => 'deteksi real-time berbasis konten';
-
-  @override
-  String get introFeature4 => 'pattern interrupt visual';
-
-  @override
-  String get introCtaTitle => 'ambil kendali atas\nhidup anda, sekarang.';
-
-  @override
-  String get introCtaBtn => 'unduh sekarang';
-
-  @override
-  String get introCtaDesc =>
-      'prototipe berprinsip privasi yang dirancang untuk membantu mahasiswa Indonesia mengambil jeda dan memilih langkah konstruktif.';
-
-  @override
-  String get introCrisisSubtitle => 'darurat nasional';
-
-  @override
-  String get introCrisisStat1 => '5,5 jt+';
-
-  @override
-  String get introCrisisStat1Desc => 'konten judi ditangani sejak 2017';
-
-  @override
-  String get introCrisisStat2 => '12,3 jt';
-
-  @override
-  String get introCrisisTitle =>
-      'judi online bukan hiburan.\nini krisis generasi.';
-
-  @override
-  String get introCrisisSource => '(PPATK 2026 · Kemkomdigi 2025)';
-
-  @override
-  String get introCrisisDesc =>
-      '440 rb pemain usia 10–20 tahun dan 520 rb usia 21–30 tahun terlibat. mahasiswa berada di jantung krisis ini.';
-
-  @override
-  String get introCrisisStat3Desc => 'orang tercatat deposit judi';
-
-  @override
-  String get introCrisisStat2Desc => 'perputaran dana judi online 2025';
-
-  @override
-  String get introStartBtn => 'Mulai Sekarang';
-
-  @override
-  String get roleLecturerPartner => 'Dosen / Pendamping';
-
-  @override
   String get introSkip => 'Lewati';
 
   @override
   String get introNext => 'Lanjut';
 
   @override
-  String get introPlatformAndroid => 'android';
+  String get introStartBtn => 'Mulai Sekarang';
 
   @override
-  String get introPlatformWindows => 'windows';
+  String introStepOf(int n, int total) {
+    return 'LANGKAH $n DARI $total';
+  }
+
+  @override
+  String get introSlide1Lead => 'JANGAN LUPA';
+
+  @override
+  String get introSlide1Highlight => 'LINDUNGI';
+
+  @override
+  String get introSlide1Tail => 'DIRIMU';
+
+  @override
+  String get introSlide1Subtitle =>
+      'Perlindungan AI di perangkatmu menjaga setiap langkah — tanpa mengintip datamu.';
+
+  @override
+  String get introSlide2Lead => 'TIDAK APA-APA';
+
+  @override
+  String get introSlide2Highlight => 'BERHENTI SEJENAK';
+
+  @override
+  String get introSlide2Tail => '';
+
+  @override
+  String get introSlide2Subtitle =>
+      'Pattern Interrupt memberi ruang bernapas saat dorongan itu datang.';
+
+  @override
+  String get introSlide3Lead => 'BERJEDA SEJENAK.';
+
+  @override
+  String get introSlide3Highlight => 'AMBIL KENDALI';
+
+  @override
+  String get introSlide3Tail => '';
+
+  @override
+  String get introSlide3Subtitle =>
+      'Deteksi lokal, dukungan pemulihan, dan partner akuntabilitas dalam satu aplikasi.';
 
   @override
   String get setupTitle => 'Setup perangkat';

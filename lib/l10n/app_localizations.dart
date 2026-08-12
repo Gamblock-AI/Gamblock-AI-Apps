@@ -2600,186 +2600,6 @@ abstract class AppLocalizations {
   /// **'Kode Grup'**
   String get onboardingGroupCode;
 
-  /// No description provided for @introHeroTitle.
-  ///
-  /// In id, this message translates to:
-  /// **'putuskan siklus\njudi online.'**
-  String get introHeroTitle;
-
-  /// No description provided for @introHeroDesc.
-  ///
-  /// In id, this message translates to:
-  /// **'deteksi cerdas berbasis on-device ai, intervensi psikologis otomatis, dan rehabilitasi mandiri — untuk mahasiswa indonesia.'**
-  String get introHeroDesc;
-
-  /// No description provided for @introAiShield.
-  ///
-  /// In id, this message translates to:
-  /// **'perlindungan AI di perangkat'**
-  String get introAiShield;
-
-  /// No description provided for @introHowItWorksStep1.
-  ///
-  /// In id, this message translates to:
-  /// **'unduh & pasang'**
-  String get introHowItWorksStep1;
-
-  /// No description provided for @introHowItWorksStep1Desc.
-  ///
-  /// In id, this message translates to:
-  /// **'instal di android atau windows. gratis, tanpa kartu kredit.'**
-  String get introHowItWorksStep1Desc;
-
-  /// No description provided for @introHowItWorksStep3.
-  ///
-  /// In id, this message translates to:
-  /// **'pulihkan & bangkit'**
-  String get introHowItWorksStep3;
-
-  /// No description provided for @introHowItWorksStep2.
-  ///
-  /// In id, this message translates to:
-  /// **'deteksi otomatis'**
-  String get introHowItWorksStep2;
-
-  /// No description provided for @introHowItWorksStep3Desc.
-  ///
-  /// In id, this message translates to:
-  /// **'pattern interrupt memutus dorongan, lalu psikoedukasi memandu pemulihan.'**
-  String get introHowItWorksStep3Desc;
-
-  /// No description provided for @introHowItWorksStep2Desc.
-  ///
-  /// In id, this message translates to:
-  /// **'hybrid ai menganalisis dom, bow, dan pola url di latar belakang.'**
-  String get introHowItWorksStep2Desc;
-
-  /// No description provided for @introHowItWorksTitle.
-  ///
-  /// In id, this message translates to:
-  /// **'tiga langkah\nmenuju kendali diri.'**
-  String get introHowItWorksTitle;
-
-  /// No description provided for @introHowItWorksSubtitle.
-  ///
-  /// In id, this message translates to:
-  /// **'cara kerja'**
-  String get introHowItWorksSubtitle;
-
-  /// No description provided for @introFeature1.
-  ///
-  /// In id, this message translates to:
-  /// **'on-device ai & privasi'**
-  String get introFeature1;
-
-  /// No description provided for @introFeaturesTitle.
-  ///
-  /// In id, this message translates to:
-  /// **'ekosistem yang\nmendukung kepulihan.'**
-  String get introFeaturesTitle;
-
-  /// No description provided for @introFeature3.
-  ///
-  /// In id, this message translates to:
-  /// **'accountability partner'**
-  String get introFeature3;
-
-  /// No description provided for @introFeature2.
-  ///
-  /// In id, this message translates to:
-  /// **'deteksi real-time berbasis konten'**
-  String get introFeature2;
-
-  /// No description provided for @introFeature4.
-  ///
-  /// In id, this message translates to:
-  /// **'pattern interrupt visual'**
-  String get introFeature4;
-
-  /// No description provided for @introCtaTitle.
-  ///
-  /// In id, this message translates to:
-  /// **'ambil kendali atas\nhidup anda, sekarang.'**
-  String get introCtaTitle;
-
-  /// No description provided for @introCtaBtn.
-  ///
-  /// In id, this message translates to:
-  /// **'unduh sekarang'**
-  String get introCtaBtn;
-
-  /// No description provided for @introCtaDesc.
-  ///
-  /// In id, this message translates to:
-  /// **'prototipe berprinsip privasi yang dirancang untuk membantu mahasiswa Indonesia mengambil jeda dan memilih langkah konstruktif.'**
-  String get introCtaDesc;
-
-  /// No description provided for @introCrisisSubtitle.
-  ///
-  /// In id, this message translates to:
-  /// **'darurat nasional'**
-  String get introCrisisSubtitle;
-
-  /// No description provided for @introCrisisStat1.
-  ///
-  /// In id, this message translates to:
-  /// **'5,5 jt+'**
-  String get introCrisisStat1;
-
-  /// No description provided for @introCrisisStat1Desc.
-  ///
-  /// In id, this message translates to:
-  /// **'konten judi ditangani sejak 2017'**
-  String get introCrisisStat1Desc;
-
-  /// No description provided for @introCrisisStat2.
-  ///
-  /// In id, this message translates to:
-  /// **'12,3 jt'**
-  String get introCrisisStat2;
-
-  /// No description provided for @introCrisisTitle.
-  ///
-  /// In id, this message translates to:
-  /// **'judi online bukan hiburan.\nini krisis generasi.'**
-  String get introCrisisTitle;
-
-  /// No description provided for @introCrisisSource.
-  ///
-  /// In id, this message translates to:
-  /// **'(PPATK 2026 · Kemkomdigi 2025)'**
-  String get introCrisisSource;
-
-  /// No description provided for @introCrisisDesc.
-  ///
-  /// In id, this message translates to:
-  /// **'440 rb pemain usia 10–20 tahun dan 520 rb usia 21–30 tahun terlibat. mahasiswa berada di jantung krisis ini.'**
-  String get introCrisisDesc;
-
-  /// No description provided for @introCrisisStat3Desc.
-  ///
-  /// In id, this message translates to:
-  /// **'orang tercatat deposit judi'**
-  String get introCrisisStat3Desc;
-
-  /// No description provided for @introCrisisStat2Desc.
-  ///
-  /// In id, this message translates to:
-  /// **'perputaran dana judi online 2025'**
-  String get introCrisisStat2Desc;
-
-  /// No description provided for @introStartBtn.
-  ///
-  /// In id, this message translates to:
-  /// **'Mulai Sekarang'**
-  String get introStartBtn;
-
-  /// No description provided for @roleLecturerPartner.
-  ///
-  /// In id, this message translates to:
-  /// **'Dosen / Pendamping'**
-  String get roleLecturerPartner;
-
   /// No description provided for @introSkip.
   ///
   /// In id, this message translates to:
@@ -2792,17 +2612,89 @@ abstract class AppLocalizations {
   /// **'Lanjut'**
   String get introNext;
 
-  /// No description provided for @introPlatformAndroid.
+  /// No description provided for @introStartBtn.
   ///
   /// In id, this message translates to:
-  /// **'android'**
-  String get introPlatformAndroid;
+  /// **'Mulai Sekarang'**
+  String get introStartBtn;
 
-  /// No description provided for @introPlatformWindows.
+  /// No description provided for @introStepOf.
   ///
   /// In id, this message translates to:
-  /// **'windows'**
-  String get introPlatformWindows;
+  /// **'LANGKAH {n} DARI {total}'**
+  String introStepOf(int n, int total);
+
+  /// No description provided for @introSlide1Lead.
+  ///
+  /// In id, this message translates to:
+  /// **'JANGAN LUPA'**
+  String get introSlide1Lead;
+
+  /// No description provided for @introSlide1Highlight.
+  ///
+  /// In id, this message translates to:
+  /// **'LINDUNGI'**
+  String get introSlide1Highlight;
+
+  /// No description provided for @introSlide1Tail.
+  ///
+  /// In id, this message translates to:
+  /// **'DIRIMU'**
+  String get introSlide1Tail;
+
+  /// No description provided for @introSlide1Subtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Perlindungan AI di perangkatmu menjaga setiap langkah — tanpa mengintip datamu.'**
+  String get introSlide1Subtitle;
+
+  /// No description provided for @introSlide2Lead.
+  ///
+  /// In id, this message translates to:
+  /// **'TIDAK APA-APA'**
+  String get introSlide2Lead;
+
+  /// No description provided for @introSlide2Highlight.
+  ///
+  /// In id, this message translates to:
+  /// **'BERHENTI SEJENAK'**
+  String get introSlide2Highlight;
+
+  /// No description provided for @introSlide2Tail.
+  ///
+  /// In id, this message translates to:
+  /// **''**
+  String get introSlide2Tail;
+
+  /// No description provided for @introSlide2Subtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Pattern Interrupt memberi ruang bernapas saat dorongan itu datang.'**
+  String get introSlide2Subtitle;
+
+  /// No description provided for @introSlide3Lead.
+  ///
+  /// In id, this message translates to:
+  /// **'BERJEDA SEJENAK.'**
+  String get introSlide3Lead;
+
+  /// No description provided for @introSlide3Highlight.
+  ///
+  /// In id, this message translates to:
+  /// **'AMBIL KENDALI'**
+  String get introSlide3Highlight;
+
+  /// No description provided for @introSlide3Tail.
+  ///
+  /// In id, this message translates to:
+  /// **''**
+  String get introSlide3Tail;
+
+  /// No description provided for @introSlide3Subtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Deteksi lokal, dukungan pemulihan, dan partner akuntabilitas dalam satu aplikasi.'**
+  String get introSlide3Subtitle;
 
   /// No description provided for @setupTitle.
   ///

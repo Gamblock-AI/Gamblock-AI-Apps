@@ -1389,114 +1389,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingGroupCode => 'Group code';
 
   @override
-  String get introHeroTitle => 'break the cycle of\nonline gambling.';
-
-  @override
-  String get introHeroDesc =>
-      'on-device intelligent detection, timely behavioral intervention, and a self-regulation journey for university students.';
-
-  @override
-  String get introAiShield => 'On-device AI Shield';
-
-  @override
-  String get introHowItWorksStep1 => 'download & install';
-
-  @override
-  String get introHowItWorksStep1Desc =>
-      'install on Android or Windows with transparent platform permissions.';
-
-  @override
-  String get introHowItWorksStep3 => 'pause & recover';
-
-  @override
-  String get introHowItWorksStep2 => 'detect locally';
-
-  @override
-  String get introHowItWorksStep3Desc =>
-      'Pattern Interrupt creates a pause, then psychoeducation supports your next step.';
-
-  @override
-  String get introHowItWorksStep2Desc =>
-      'Hybrid AI analyzes bounded URL and DOM signals on your device.';
-
-  @override
-  String get introHowItWorksTitle => 'three steps toward\nmore control.';
-
-  @override
-  String get introHowItWorksSubtitle => 'how it works';
-
-  @override
-  String get introFeature1 => 'on-device AI & privacy';
-
-  @override
-  String get introFeaturesTitle => 'an ecosystem that\nsupports recovery.';
-
-  @override
-  String get introFeature3 => 'accountability partner';
-
-  @override
-  String get introFeature2 => 'content-based local detection';
-
-  @override
-  String get introFeature4 => 'accessible Pattern Interrupt';
-
-  @override
-  String get introCtaTitle => 'take the next step\ntoward control.';
-
-  @override
-  String get introCtaBtn => 'get started';
-
-  @override
-  String get introCtaDesc =>
-      'A privacy-first prototype designed to help Indonesian university students pause and choose a constructive next step.';
-
-  @override
-  String get introCrisisSubtitle => 'a national challenge';
-
-  @override
-  String get introCrisisStat1 => '5.5M+';
-
-  @override
-  String get introCrisisStat1Desc => 'gambling content handled since 2017';
-
-  @override
-  String get introCrisisStat2 => '12.3M';
-
-  @override
-  String get introCrisisTitle =>
-      'online gambling is not harmless.\nit affects a generation.';
-
-  @override
-  String get introCrisisSource => '(PPATK 2026 · Kemkomdigi 2025)';
-
-  @override
-  String get introCrisisDesc =>
-      'Young people are heavily represented in reported online-gambling activity. University students need practical, privacy-respecting support.';
-
-  @override
-  String get introCrisisStat3Desc => 'people recorded making gambling deposits';
-
-  @override
-  String get introCrisisStat2Desc =>
-      'reported online-gambling turnover in 2025';
-
-  @override
-  String get introStartBtn => 'Get started';
-
-  @override
-  String get roleLecturerPartner => 'Dosen / Pendamping';
-
-  @override
   String get introSkip => 'Skip';
 
   @override
   String get introNext => 'Next';
 
   @override
-  String get introPlatformAndroid => 'android';
+  String get introStartBtn => 'Get started';
 
   @override
-  String get introPlatformWindows => 'windows';
+  String introStepOf(int n, int total) {
+    return 'STEP $n OF $total';
+  }
+
+  @override
+  String get introSlide1Lead => 'DON\'T FORGET TO';
+
+  @override
+  String get introSlide1Highlight => 'PROTECT';
+
+  @override
+  String get introSlide1Tail => 'YOURSELF';
+
+  @override
+  String get introSlide1Subtitle =>
+      'On-device AI protection watches over every step — without peeking at your data.';
+
+  @override
+  String get introSlide2Lead => 'IT\'S OKAY TO';
+
+  @override
+  String get introSlide2Highlight => 'TAKE A PAUSE';
+
+  @override
+  String get introSlide2Tail => '';
+
+  @override
+  String get introSlide2Subtitle =>
+      'Pattern Interrupt gives you breathing room right when the urge hits.';
+
+  @override
+  String get introSlide3Lead => 'TAKE A BREATH.';
+
+  @override
+  String get introSlide3Highlight => 'TAKE BACK CONTROL';
+
+  @override
+  String get introSlide3Tail => '';
+
+  @override
+  String get introSlide3Subtitle =>
+      'Local detection, recovery support, and an accountability partner in one app.';
 
   @override
   String get setupTitle => 'Device setup';
