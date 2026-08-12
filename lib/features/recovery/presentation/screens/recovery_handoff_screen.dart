@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/feedback/feedback.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/widgets/brand_widgets.dart';
 
 /// Hands the recovery journey off to the website with a warm, branded pause
@@ -20,7 +21,8 @@ class RecoveryHandoffScreen extends StatelessWidget {
     final disableAnimations = MediaQuery.disableAnimationsOf(context);
 
     final card = SurfaceCard(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacing.xl),
+      radius: AppRadius.md,
       child: Column(
         children: [
           Image.asset(
@@ -35,7 +37,7 @@ class RecoveryHandoffScreen extends StatelessWidget {
               excludeFromSemantics: true,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           EyebrowPill(label: l10n.recoveryWebEyebrow, color: AppColors.blueAccent),
           const SizedBox(height: 14),
           Text(

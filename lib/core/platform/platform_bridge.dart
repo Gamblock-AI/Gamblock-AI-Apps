@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'platform_models.dart';
@@ -10,7 +11,14 @@ class PlatformBridge {
   static const _channel = MethodChannel('com.gamblock/protection');
   static const _eventChannel = EventChannel('com.gamblock/intervention');
 
+  /// Stream of native protection events.
+  ///
+  /// On the web there is no native bridge, so the event channel must not be
+  /// activated: activating it would surface a `MissingPluginException` through
+  /// the FlutterError facility (not as a stream error). Return an empty stream
+  /// instead so app-shell listeners stay inert.
   static Stream<NativeProtectionEvent> events() {
+    if (kIsWeb) return const Stream.empty();
     return _eventChannel
         .receiveBroadcastStream()
         .map(NativeProtectionEvent.fromDynamic)

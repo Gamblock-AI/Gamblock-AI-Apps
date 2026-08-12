@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -7,6 +5,8 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
+
+import '../platform/platform_info.dart';
 
 /// Opt-in, once-a-day check-in reminder (Android and Windows).
 ///
@@ -34,7 +34,7 @@ class DailyReminderService {
   static Future<void> Function()? onNotificationTap;
 
   static bool get isSupported =>
-      !kIsWeb && (Platform.isAndroid || Platform.isWindows);
+      !kIsWeb && (PlatformInfo.isAndroid || PlatformInfo.isWindows);
 
   static Future<void> init() async {
     if (!isSupported || _initialized) return;
@@ -63,7 +63,7 @@ class DailyReminderService {
   static Future<bool> requestPermission() async {
     if (!isSupported) return false;
     await init();
-    if (Platform.isWindows) return true;
+    if (PlatformInfo.isWindows) return true;
     try {
       final android = _plugin
           .resolvePlatformSpecificImplementation<
@@ -106,7 +106,7 @@ class DailyReminderService {
         ),
         windows: const WindowsNotificationDetails(),
       );
-      if (Platform.isWindows) {
+      if (PlatformInfo.isWindows) {
         // Windows has no repeating notifications: schedule one shot for the
         // next occurrence. The next app launch (boot agent) re-schedules.
         await _plugin.zonedSchedule(

@@ -1,0 +1,30 @@
+{
+  "@@locale": "en",
+  "setupTitle": "Device setup",
+  "setupIntro": "Complete this checklist so protection status is truthful and each permission is granted with your consent.",
+  "setupPrivacyTitle": "Understand the privacy boundary",
+  "setupPrivacyBody": "Pages are checked on your device. Only private, aggregated counts are shared.",
+  "setupAccountTitle": "Connect an account",
+  "setupAccountBody": "An account is needed to register this device and manage approvals.",
+  "setupAccountReady": "The account is connected.",
+  "setupDeviceTitle": "Register the device",
+  "setupDeviceBody": "The device needs a stable ID before you can request approvals.",
+  "setupDeviceReady": "This device is registered.",
+  "@setupDeviceReady": {
+    "placeholders": {
+      "deviceId": {
+        "type": "String"
+      }
+    }
+  },
+  "setupDeviceAction": "Register device",
+  "setupDeviceRegistered": "The device was registered.",
+  "setupPlatformTitle": "Enable protection",
+  "setupPlatformBody": "Android needs Accessibility access. Windows needs the protection service and a paired browser extension.",
+  "setupPlatformReady": "Protection is active on this device.",
+  "setupPlatformAction": "Open settings",
+  "setupSelfTestTitle": "Run a quick check",
+  "setupSelfTestBody": "The quick check runs on your device and never uploads page content.",
+  "setupFinishAction": "Open protection status",
+  "setupLimitations": "Standard installs add friction, not an absolute uninstall block. Device administrators keep control of the device."
+}

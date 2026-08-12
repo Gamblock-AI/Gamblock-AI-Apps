@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
-import '../../../../core/platform/platform_bridge.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_section_label.dart';
 
-/// Shows local artifact provenance and static support links.
+/// Shows static support links.
 class SettingsAboutSection extends StatelessWidget {
   const SettingsAboutSection({
     super.key,
-    required this.snapshot,
     required this.onOpenPrivacy,
     required this.onOpenHelp,
   });
 
-  final ProtectionSnapshot snapshot;
   final VoidCallback onOpenPrivacy;
   final VoidCallback onOpenHelp;
 
@@ -31,19 +28,6 @@ class SettingsAboutSection extends StatelessWidget {
           ),
           child: Column(
             children: [
-              _settingsTile(
-                context,
-                icon: Icons.memory_rounded,
-                iconColor: AppColors.mutedForeground,
-                title: l10n.settingsArtifacts,
-                subtitle: '${snapshot.modelVersion} · ${snapshot.rulesetVersion}',
-                showChevron: false,
-              ),
-              Divider(
-                height: 1,
-                indent: 54,
-                color: AppColors.border.withValues(alpha: 0.5),
-              ),
               _settingsTile(
                 context,
                 icon: Icons.privacy_tip_outlined,

@@ -239,7 +239,8 @@ change before accepting the normal access/refresh session.
 ./scripts/verify-ai-context.sh
 ```
 
-`verify.sh` runs `flutter analyze`. Unit tests and platform builds are explicit
+`verify.sh` runs the l10n module merge check (`scripts/merge_l10n.py --check`)
+and then `flutter analyze`. Unit tests and platform builds are explicit
 checks. The portable Windows Hybrid-v2 fixture can also be compiled directly
 from `windows/protection/hybrid_classifier_test.cpp`.
 

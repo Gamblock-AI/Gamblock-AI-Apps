@@ -155,7 +155,8 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
         ),
         const SizedBox(height: 10),
         SurfaceCard(
-          padding: const EdgeInsets.all(16),
+          radius: AppRadius.md,
+          padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             children: [
               _privacyInfoRow(

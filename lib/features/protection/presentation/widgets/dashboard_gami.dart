@@ -18,5 +18,8 @@ DashboardGamiPresentation resolveDashboardGami({
       (l10n) => l10n.dashboardGamiFirstOpen,
     );
   }
-  return const DashboardGamiPresentation('assets/images/gami.webp', null);
+  return const DashboardGamiPresentation(
+    'assets/images/gami-dashboard-companion.webp',
+    null,
+  );
 }

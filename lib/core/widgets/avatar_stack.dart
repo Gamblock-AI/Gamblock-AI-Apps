@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 import 'monogram_avatar.dart';
 
 /// Overlapping stack of small round avatars with a white ring on each —
-/// mirrors the wireframe workspace-card avatar stack (20px, ring border).
+/// mirrors the website workspace-card avatar stack (20px, ring border).
 class AvatarStack extends StatelessWidget {
   final List<String> labels;
   final Color color;
@@ -12,7 +13,7 @@ class AvatarStack extends StatelessWidget {
   const AvatarStack({
     super.key,
     required this.labels,
-    this.color = const Color(0xFF48CAE4),
+    this.color = AppColors.sky,
     this.size = 20,
     this.maxShown = 3,
   });

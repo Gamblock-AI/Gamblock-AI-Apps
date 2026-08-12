@@ -6,6 +6,8 @@ import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/feedback/haptics.dart';
 import '../../../../core/messaging/app_messages.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
 import '../widgets/auth_brand_lockup.dart';
 import '../widgets/auth_form_error.dart';
 import '../widgets/auth_input_field.dart';
@@ -35,6 +37,7 @@ class _VerifyPhoneScreenState extends ConsumerState<VerifyPhoneScreen> {
   bool _loading = false;
   bool _resending = false;
   String? _error;
+  String? _previewCode;
 
   @override
   void dispose() {
@@ -89,14 +92,17 @@ class _VerifyPhoneScreenState extends ConsumerState<VerifyPhoneScreen> {
     setState(() {
       _resending = true;
       _error = null;
+      _previewCode = null;
     });
     try {
-      final ok = await ref.read(authProvider.notifier).resendPhone(token);
-      if (mounted && ok) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.authVerifySent)),
-        );
-      }
+      final previewCode = await ref
+          .read(authProvider.notifier)
+          .resendPhone(token);
+      if (!mounted) return;
+      setState(() => _previewCode = previewCode);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.authVerifySent)),
+      );
     } catch (e) {
       if (mounted) {
         setState(() => _error = AppMessages.friendlyMessage(context, e));
@@ -152,6 +158,36 @@ class _VerifyPhoneScreenState extends ConsumerState<VerifyPhoneScreen> {
               icon: const Icon(Icons.refresh, size: 18),
               label: Text(_resending ? l10n.authVerifyResending : l10n.authVerifyResend),
             ),
+            if (_previewCode != null && _previewCode!.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.azure,
+                  borderRadius: BorderRadius.circular(AppRadius.banner),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.shield_outlined, size: 18),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        l10n.authVerifyPreviewCodeHint(_previewCode!),
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.navy,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ] else ...[
             TextButton(
               onPressed: () => context.go('/login'),

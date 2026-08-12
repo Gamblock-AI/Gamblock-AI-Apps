@@ -16,6 +16,7 @@ export 'mesh_background.dart';
 export 'section_heading.dart';
 export 'stat_tile.dart';
 export 'monogram_avatar.dart';
+export 'user_avatar.dart';
 export 'avatar_stack.dart';
 export 'radial_blob_background.dart';
 export 'app_section_header.dart';

@@ -1,0 +1,25 @@
+{
+  "@@locale": "en",
+  "patternBreatheDesc": "Take a slow breath.\nThis urge will pass.",
+  "patternContinuePsychoeducation": "Continue to psychoeducation",
+  "patternInterruptTitle": "Take a pause before continuing",
+  "patternBreatheLabel": "Slow breathing animation",
+  "patternSecondsRemaining": "{seconds} seconds remaining",
+  "@patternSecondsRemaining": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "patternReady": "The pause is complete. Choose your next step.",
+  "patternGroundingAction": "Offline grounding exercise",
+  "patternHelpAction": "I need help",
+  "patternLaterAction": "Return to protection",
+  "patternGroundingTitle": "Notice five things around you",
+  "patternReturnProtection": "Finish and return",
+  "patternWaitHint": "Almost there — take a breath first.",
+  "patternPhaseInhale": "Breathe in…",
+  "patternPhaseExhale": "Breathe out slowly…",
+  "patternPhaseStatic": "Breathe in slowly, then let it out."
+}

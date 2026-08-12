@@ -27,7 +27,7 @@ class PartnerStatusCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppRadius.banner),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: AppColors.background),
         boxShadow: AppColors.cardSoftShadow,
       ),
@@ -36,12 +36,12 @@ class PartnerStatusCard extends StatelessWidget {
           const Positioned(
             top: -50,
             left: -40,
-            child: RadialBlob(color: AppColors.blueAccent, size: 190, alpha: 0.14),
+            child: RadialBlob(color: AppColors.sky, size: 190, alpha: 0.14),
           ),
           const Positioned(
             bottom: -60,
             right: -40,
-            child: RadialBlob(color: AppColors.violetAccent, size: 180, alpha: 0.10),
+            child: RadialBlob(color: AppColors.azure, size: 180, alpha: 0.10),
           ),
           Padding(
             padding: const EdgeInsets.all(AppSpacing.xl),
@@ -95,7 +95,7 @@ class PartnerStatusCard extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.sage.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
                       border: Border.all(
                         color: AppColors.sage.withValues(alpha: 0.25),
                       ),

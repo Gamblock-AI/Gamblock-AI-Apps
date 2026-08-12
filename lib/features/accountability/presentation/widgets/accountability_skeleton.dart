@@ -16,7 +16,7 @@ class AccountabilitySkeleton extends StatelessWidget {
         SkeletonBox(
           width: double.infinity,
           height: 140,
-          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
         const SizedBox(height: 14),
         for (var i = 0; i < 3; i++) ...[

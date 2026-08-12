@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_dimens.dart';
 
@@ -44,7 +45,7 @@ class AppSectionHeader extends StatelessWidget {
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             child: Text(
-              viewAllLabel ?? 'View all',
+              viewAllLabel ?? AppLocalizations.of(context)!.viewAll,
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,

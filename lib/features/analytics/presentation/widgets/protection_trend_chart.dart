@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/widgets/glass_card.dart';
 import '../../domain/entities/protection_analytics.dart';
 
@@ -32,6 +33,7 @@ class ProtectionTrendChart extends StatelessWidget {
       label: summary,
       child: SurfaceCard(
         elevated: false,
+        radius: AppRadius.md,
         padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,9 +66,9 @@ class ProtectionTrendChart extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    _legendDot(AppColors.crimson, l10n.analyticsLegendBlocked),
+                    _legendDot(AppColors.navy, l10n.analyticsLegendBlocked),
                     const SizedBox(width: 10),
-                    _legendDot(AppColors.navy, l10n.analyticsLegendInterventions),
+                    _legendDot(AppColors.crimson, l10n.analyticsLegendInterventions),
                   ],
                 ),
               ],
@@ -107,7 +109,7 @@ class ProtectionTrendChart extends StatelessWidget {
                                 shape: BoxShape.circle,
                               ),
                               child: Image.asset(
-                                'assets/images/gami.webp',
+                                'assets/images/gami-peek.webp',
                                 height: 48,
                                 excludeFromSemantics: true,
                               ),
@@ -191,8 +193,8 @@ class ProtectionTrendChart extends StatelessWidget {
                                                             : 8,
                                                         decoration:
                                                             BoxDecoration(
-                                                          color: AppColors
-                                                              .crimson,
+                                                          color:
+                                                              AppColors.navy,
                                                           borderRadius:
                                                               const BorderRadius
                                                                   .vertical(
@@ -220,7 +222,7 @@ class ProtectionTrendChart extends StatelessWidget {
                                                         decoration:
                                                             BoxDecoration(
                                                           color:
-                                                              AppColors.navy,
+                                                              AppColors.crimson,
                                                           borderRadius:
                                                               const BorderRadius
                                                                   .vertical(

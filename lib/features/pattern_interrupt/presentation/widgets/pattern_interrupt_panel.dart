@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
 import 'pattern_breathing_orb.dart';
 import 'pattern_interrupt_actions.dart';
 
@@ -51,7 +52,7 @@ class PatternInterruptPanel extends StatelessWidget {
         // Fixed-height slot: the breath-phase cue crossfades without moving
         // anything below it.
         SizedBox(
-          height: 24,
+          height: AppSpacing.xl,
           child: Center(
             child: AnimatedSwitcher(
               duration: disableAnimations
@@ -68,7 +69,7 @@ class PatternInterruptPanel extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         Text(
           l10n.patternInterruptTitle,
           textAlign: TextAlign.center,
@@ -77,7 +78,7 @@ class PatternInterruptPanel extends StatelessWidget {
             fontWeight: FontWeight.w800,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         Text(
           l10n.patternBreatheDesc,
           textAlign: TextAlign.center,
@@ -118,10 +119,13 @@ class PatternInterruptPanel extends StatelessWidget {
     int secondsRemaining,
   ) => Container(
     constraints: const BoxConstraints(minWidth: 180),
-    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+    padding: const EdgeInsets.symmetric(
+      horizontal: AppSpacing.xl,
+      vertical: AppSpacing.md,
+    ),
     decoration: BoxDecoration(
       color: Colors.white.withValues(alpha: 0.1),
-      borderRadius: BorderRadius.circular(30),
+      borderRadius: BorderRadius.circular(AppRadius.pill),
       border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1),
     ),
     child: Text(

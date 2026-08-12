@@ -22,6 +22,7 @@ class ProtectionWeeklyAppreciation extends ConsumerWidget {
       child: GamiCard(
         title: l10n.dashboardAppreciationTitle,
         message: l10n.dashboardAppreciationBody(count),
+        asset: 'assets/images/gami-celebrate.webp',
       ),
     );
   }

@@ -1,0 +1,64 @@
+{
+  "@@locale": "en",
+  "analyticsTitle": "Analytics",
+  "analyticsSignInTitle": "Sign in to view analytics",
+  "analyticsSignInBody": "Analytics contain device-level aggregate counts only and never include URLs or browsing history.",
+  "analyticsSevenDays": "7 days",
+  "analyticsThirtyDays": "30 days",
+  "analyticsErrorTitle": "Analytics could not be loaded",
+  "analyticsPrivacyNote": "Only daily counts are shown. URLs, domains, page titles, and DOM text are never stored or uploaded.",
+  "analyticsDataSynced": "Completed-day counts are synchronized to your account.",
+  "analyticsDataLocalOnly": "The backend is unavailable or data is insufficient; this view uses available local counts.",
+  "analyticsBlocked": "Content blocked",
+  "analyticsInterventions": "Interventions",
+  "analyticsTamper": "Change attempts",
+  "analyticsPermission": "Permission revoked",
+  "analyticsSummaryTitle": "Protection Summary",
+  "analyticsSummaryDesc": "Track automated blocks, behavioral interventions, and local protection statistics.",
+  "analyticsChartTitle": "Protection Activity Trend",
+  "analytics7Days": "Last 7 Days",
+  "analytics30Days": "Last 30 Days",
+  "analyticsLegendBlocked": "Blocked",
+  "analyticsLegendInterventions": "Interventions",
+  "analyticsNoActivityTitle": "No Activity Detected Yet",
+  "analyticsNoActivityDesc": "The chart will automatically update when blocks or interventions occur.",
+  "analyticsPrivacySectionTitle": "Privacy & Data Security Assurance",
+  "analyticsOnDeviceTitle": "Private by design",
+  "analyticsOnDeviceDesc": "Everything is analysed on your device, never in the cloud.",
+  "analyticsNoBrowsingHistoryTitle": "No Browsing History Stored",
+  "analyticsNoBrowsingHistoryDesc": "Your browsing history never leaves this device.",
+  "analyticsChartSummary": "{blocked} blocked, {interventions} pause moments",
+  "@analyticsChartSummary": {
+    "placeholders": {
+      "blocked": {
+        "type": "int"
+      },
+      "interventions": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsDayTooltip": "{blocked} blocked · {interventions} pause moments",
+  "@analyticsDayTooltip": {
+    "placeholders": {
+      "blocked": {
+        "type": "int"
+      },
+      "interventions": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsMilestoneTitle": "Your protection is working",
+  "analyticsMilestoneBody": "Protection helped you {count} times in the last {days} days. Every pause is room to choose again.",
+  "@analyticsMilestoneBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "@@locale": "id",
+  "msgErrLoadPartner": "Gagal memuat data pendamping.",
+  "msgErrRejectRequest": "Gagal menolak permohonan.",
+  "msgErrInvalidRequest": "Permintaan tidak valid. Periksa kembali isian Anda.",
+  "msgErrGroupCodeRequired": "Kode grup wajib diisi.",
+  "msgErrProcessRequest": "Gagal memproses permohonan.",
+  "msgErrApproveRequest": "Gagal menyetujui permohonan.",
+  "msgErrGroupNotFound": "Grup tidak ditemukan.",
+  "msgErrSubmitRequest": "Gagal mengajukan permohonan.",
+  "msgErrInvalidEmergencyKey": "Kunci darurat tidak valid.",
+  "msgErrBlockedEventsRejected": "Data waktu blokir perangkat tidak dapat diterima.",
+  "msgErrCreateGroup": "Gagal membuat grup.",
+  "msgErrCreateEmergencyKey": "Gagal membuat kunci darurat.",
+  "msgErrRemoveMember": "Gagal mengeluarkan anggota.",
+  "msgErrLoadDataRequest": "Gagal memuat permintaan data.",
+  "msgErrLoadGroupAnalytics": "Gagal memuat analitik grup.",
+  "msgErrSubmitDataRequest": "Gagal mengajukan permintaan data.",
+  "msgErrNotInGroup": "Anda belum bergabung dengan grup mana pun.",
+  "msgErrTooManyRequests": "Terlalu banyak permintaan. Coba lagi sebentar lagi.",
+  "msgErrDisconnectPartner": "Gagal memutuskan hubungan pendamping.",
+  "msgErrLoadRequests": "Gagal memuat daftar permohonan.",
+  "msgErrCancelRequest": "Gagal membatalkan permohonan.",
+  "msgErrPartnerEmailRequired": "Email pendamping wajib diisi.",
+  "msgErrGroupNameRequired": "Nama grup wajib diisi.",
+  "msgErrLoadMembers": "Gagal memuat daftar anggota.",
+  "msgErrInvalidGroupCodeSpecific": "Kode grup tidak valid. Coba lagi.",
+  "msgErrAcceptInvite": "Gagal menerima undangan pendamping.",
+  "msgErrSendInvite": "Gagal mengirim undangan pendamping.",
+  "msgErrEmergencyKeyRequired": "Kunci darurat wajib diisi.",
+  "msgErrPrivacyPayloadRejected": "Permintaan ditolak karena memuat data yang tidak boleh dikirim.",
+  "partnerTitle": "Pendamping",
+  "partnerSignInTitle": "Masuk untuk mengelola pendamping",
+  "partnerSignInBody": "Hubungan pendamping dan permintaan persetujuan disimpan pada akun Anda.",
+  "partnerErrorTitle": "Data pendamping belum dapat dimuat",
+  "partnerInviteCreated": "Undangan pendamping berhasil dibuat.",
+  "partnerNone": "Belum ada pendamping aktif",
+  "partnerNoneBody": "Masukkan kode dari pendamping tepercaya. Pendamping tidak dapat melihat URL, riwayat penjelajahan, atau catatan pemulihan pribadi.",
+  "partnerActiveBody": "Pendamping aktif dapat menyetujui perubahan proteksi untuk perangkat yang terdaftar.",
+  "partnerEmailLabel": "Email pendamping",
+  "partnerEmailHelp": "Gunakan email orang tepercaya yang memahami dan menyetujui peran ini.",
+  "partnerInviteAction": "Buat undangan",
+  "partnerInviteLink": "Tautan undangan",
+  "partnerInviteCopied": "Tautan undangan tersalin.",
+  "partnerRequestHistory": "Riwayat permintaan",
+  "partnerNoRequests": "Belum ada permintaan",
+  "partnerNoRequestsBody": "Permintaan perubahan proteksi dari perangkat akan muncul di sini.",
+  "partnerManageAction": "Kelola pendamping",
+  "accountabilityJoinTitle": "Hubungkan pendamping dengan kode grup",
+  "accountabilityJoinBody": "Tinjau nama grup dan pendamping sebelum bergabung. Satu akun hanya dapat memiliki satu grup aktif.",
+  "accountabilityPreviewAction": "Tinjau grup",
+  "accountabilityManagedBy": "Dikelola oleh {name}",
+  "@accountabilityManagedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "accountabilityJoinConfirmTitle": "Bergabung ke grup ini?",
+  "accountabilityJoinConfirmBody": "{name} akan menjadi pendamping Anda. Ringkasan agregat awal dapat Anda matikan dari portal web kapan saja.",
+  "@accountabilityJoinConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "accountabilityJoinAction": "Konfirmasi dan bergabung",
+  "accountabilityJoinSuccess": "Grup akuntabilitas berhasil dihubungkan.",
+  "accountabilityActiveGroup": "Terhubung melalui grup {name}. Pendamping hanya menerima agregat yang Anda izinkan.",
+  "@accountabilityActiveGroup": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerSharingPrivacy": "Privasi Berbagi",
+  "partnerSharingDesc": "Atur jenis ringkasan agregat yang dapat dilihat pendamping.",
+  "partnerLeaveSection": "Keluar dari Pendampingan",
+  "partnerLeaveNormal": "Ajukan keluar normal",
+  "partnerLeaveUnsafe": "Situasi tidak aman",
+  "partnerPrivacyBadge": "Privasi Terlindungi · Hanya Agregat",
+  "accSharingTitle": "Data Agregat Dibagikan",
+  "accSharingSubtitle": "Atur preferensi data agregat anonim untuk pendamping.",
+  "accShareHealthTitle": "Kesehatan Perlindungan",
+  "accShareHealthSubtitle": "Status aktif, degradasi, & izin (tanpa URL).",
+  "accShareActivityTitle": "Aktivitas Perlindungan",
+  "accShareActivitySubtitle": "Hitungan pemblokiran & intervensi agregat.",
+  "accShareEngagementTitle": "Keterlibatan Pemulihan",
+  "accShareEngagementSubtitle": "Ringkasan partisipasi (bukan isi jurnal).",
+  "accShareEducationTitle": "Progres Edukasi",
+  "accShareEducationSubtitle": "Penyelesaian modul psikoedukasi harian.",
+  "accSharingUpdated": "Preferensi berbagi diperbarui.",
+  "accUnsafeExitTitle": "Keluar Situasi Tidak Aman",
+  "accNormalExitTitle": "Ajukan Keluar Pendampingan",
+  "accUnsafeExitDesc": "Berbagi data segera dihentikan dan permintaan normal dibatalkan.",
+  "accNormalExitDesc": "Pendamping memiliki waktu 72 jam untuk meninjau permintaan.",
+  "accReasonLabel": "Alasan (opsional)",
+  "accReasonHint": "Berikan penjelasan singkat...",
+  "accSendRequest": "Kirim Permintaan",
+  "accExitRequestSent": "Permintaan keluar dikirim.",
+  "accExitRequestCancelled": "Permintaan keluar dibatalkan.",
+  "accApprovalCancelled": "Permintaan persetujuan dibatalkan.",
+  "accExitPendingTitle": "Permintaan keluar sedang ditinjau",
+  "accExitPendingBody": "Anda dapat membatalkan permintaan normal selama masih tertunda.",
+  "accExitChoose": "Pilih alur normal atau hentikan berbagi segera bila situasi tidak aman.",
+  "accCodeRequired": "Masukkan kode grup terlebih dahulu.",
+  "accountabilityGroupCodeHint": "Contoh: ABCD234567"
+}

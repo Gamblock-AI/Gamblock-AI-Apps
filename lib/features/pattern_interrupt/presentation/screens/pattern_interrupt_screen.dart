@@ -9,6 +9,7 @@ import '../../../../core/feedback/haptics.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
 import '../widgets/pattern_grounding_panel.dart';
 import '../widgets/pattern_interrupt_panel.dart';
 
@@ -129,7 +130,7 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
             child: Center(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
+                  horizontal: AppSpacing.xl,
                   vertical: 28,
                 ),
                 child: ConstrainedBox(

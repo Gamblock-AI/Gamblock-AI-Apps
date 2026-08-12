@@ -1,0 +1,30 @@
+{
+  "@@locale": "id",
+  "setupTitle": "Setup perangkat",
+  "setupIntro": "Selesaikan checklist ini agar status proteksi ditampilkan secara jujur dan setiap izin diberikan dengan persetujuan Anda.",
+  "setupPrivacyTitle": "Pahami batas privasi",
+  "setupPrivacyBody": "URL dan teks halaman hanya diproses lokal. Backend menerima hitungan agregat saja.",
+  "setupAccountTitle": "Hubungkan akun",
+  "setupAccountBody": "Akun diperlukan untuk registrasi perangkat, pendamping, dan sinkronisasi agregat.",
+  "setupAccountReady": "Akun telah terhubung.",
+  "setupDeviceTitle": "Daftarkan perangkat",
+  "setupDeviceBody": "Perangkat harus memiliki ID akun yang stabil sebelum membuat permintaan persetujuan.",
+  "setupDeviceReady": "Perangkat terdaftar sebagai {deviceId}.",
+  "@setupDeviceReady": {
+    "placeholders": {
+      "deviceId": {
+        "type": "String"
+      }
+    }
+  },
+  "setupDeviceAction": "Daftarkan perangkat",
+  "setupDeviceRegistered": "Perangkat berhasil didaftarkan.",
+  "setupPlatformTitle": "Aktifkan proteksi platform",
+  "setupPlatformBody": "Android memerlukan Accessibility Service. Windows memerlukan service, user-session agent, serta ekstensi Chrome/Edge yang dipasangkan dengan token lokal.",
+  "setupPlatformReady": "Runtime proteksi platform aktif.",
+  "setupPlatformAction": "Buka pengaturan platform",
+  "setupSelfTestTitle": "Verifikasi model lokal",
+  "setupSelfTestBody": "Self-test menggunakan fixture lokal dan tidak mengirim konten halaman.",
+  "setupFinishAction": "Buka status proteksi",
+  "setupLimitations": "Sideload normal memberikan friksi, bukan perlindungan uninstall absolut. Administrator perangkat tetap memiliki kendali OS."
+}

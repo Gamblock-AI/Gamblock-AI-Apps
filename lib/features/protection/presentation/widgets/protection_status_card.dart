@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/widgets/glass_card.dart';
 import '../../domain/entities/protection_status.dart';
 
-/// Displays the native protection state in a compact, structured card.
+/// Displays the native protection state in a compact, premium card.
 class ProtectionStatusCard extends StatelessWidget {
   const ProtectionStatusCard({super.key, required this.status});
 
@@ -32,6 +33,28 @@ class ProtectionStatusCard extends StatelessWidget {
                 ? l10n.protectionStatusDegraded
                 : l10n.protectionStatusInactive;
 
+    final subtitle = _formatDegradedReason(
+          context,
+          status?.degradedReasonCode,
+        ) ??
+        (active
+            ? l10n.protectionStatusLocal
+            : l10n.protectionInactiveTitle);
+
+    final chipText = active
+        ? l10n.statusChipOk
+        : degraded || paused
+            ? l10n.statusChipWarn
+            : l10n.statusChipOff;
+
+    final iconData = active
+        ? Icons.shield_rounded
+        : paused
+            ? Icons.pause_circle_outline_rounded
+            : degraded
+                ? Icons.gpp_maybe_rounded
+                : Icons.shield_outlined;
+
     return Semantics(
       liveRegion: true,
       label: title,
@@ -44,16 +67,27 @@ class ProtectionStatusCard extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  width: 42,
-                  height: 42,
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        color.withValues(alpha: 0.16),
+                        color.withValues(alpha: 0.05),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(13),
+                    border: Border.all(
+                      color: color.withValues(alpha: 0.25),
+                      width: 1.2,
+                    ),
                   ),
                   child: Icon(
-                    active ? Icons.shield_rounded : Icons.shield_outlined,
+                    iconData,
                     color: color,
-                    size: 20,
+                    size: 22,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -65,53 +99,62 @@ class ProtectionStatusCard extends StatelessWidget {
                         title,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w700,
-                              color: AppColors.navy,
+                              color: AppColors.ink,
+                              letterSpacing: -0.2,
+                              fontSize: 15,
                             ),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        _formatDegradedReason(
-                              context,
-                              status?.degradedReasonCode,
-                            ) ??
-                            l10n.protectionStatusLocal,
+                        subtitle,
                         style: const TextStyle(
                           color: AppColors.mutedForeground,
                           fontSize: 12,
+                          height: 1.3,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ),
+                const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4.5),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: color.withValues(alpha: 0.3)),
+                    color: color.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                    border: Border.all(
+                      color: color.withValues(alpha: 0.28),
+                      width: 1,
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        width: 6,
-                        height: 6,
+                        width: 6.5,
+                        height: 6.5,
                         decoration: BoxDecoration(
                           color: color,
                           shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: color.withValues(alpha: 0.45),
+                              blurRadius: 3,
+                              spreadRadius: 0.5,
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        active
-                            ? l10n.statusChipOk
-                            : degraded || paused
-                                ? l10n.statusChipWarn
-                                : l10n.statusChipOff,
+                        chipText,
                         style: TextStyle(
                           color: color,
-                          fontSize: 10,
+                          fontSize: 10.5,
                           fontWeight: FontWeight.w800,
+                          letterSpacing: 0.4,
                         ),
                       ),
                     ],
@@ -119,37 +162,75 @@ class ProtectionStatusCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 13),
 
-            // Model & Ruleset compact footer bar
+            // Privacy-first on-device assurance footer bar
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8.5),
               decoration: BoxDecoration(
-                color: AppColors.surfaceLight.withValues(alpha: 0.7),
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: AppColors.border.withValues(alpha: 0.6),
+                  color: AppColors.border.withValues(alpha: 0.8),
                 ),
               ),
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.memory_rounded,
-                    size: 16,
-                    color: AppColors.mutedForeground,
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: AppColors.navy.withValues(alpha: 0.07),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Icon(
+                      Icons.psychology_outlined,
+                      size: 14,
+                      color: AppColors.navy,
+                    ),
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      '${status?.modelVersion ?? l10n.protectionArtifactUnavailable} · '
-                      '${status?.rulesetVersion ?? l10n.protectionArtifactUnavailable}',
-                      style: TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 10,
-                        color: AppColors.navy.withValues(alpha: 0.75),
+                      active
+                          ? l10n.protectionStatusLocalActive
+                          : l10n.protectionStatusLocalInactive,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.navy,
                       ),
                       overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.sage.withValues(alpha: 0.09),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: AppColors.sage.withValues(alpha: 0.22),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.lock_rounded,
+                          size: 9.5,
+                          color: AppColors.sage,
+                        ),
+                        const SizedBox(width: 3.5),
+                        Text(
+                          l10n.protectionStatusPrivateChip,
+                          style: const TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.4,
+                            color: AppColors.sage,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -176,11 +257,13 @@ String? _formatDegradedReason(BuildContext context, String? code) {
       return l10n.degradedPermissionRevoked;
     case 'sensor_disconnected':
       return l10n.degradedSensorDisconnected;
+    case 'native_bridge_unavailable':
+      return l10n.selfTestNativeUnavailable;
     default:
       return code
           .split('_')
           .where((w) => w.isNotEmpty)
-          .map((w) => '${w[0].toUpperCase()}${w.substring(1)}')
+          .map((w) => '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
           .join(' ');
   }
 }

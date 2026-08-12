@@ -25,6 +25,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _emailCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+  final _confirmPassCtrl = TextEditingController();
   bool _submitted = false;
   bool _loading = false;
   String? _error;
@@ -35,6 +36,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _emailCtrl.dispose();
     _phoneCtrl.dispose();
     _passCtrl.dispose();
+    _confirmPassCtrl.dispose();
     super.dispose();
   }
 
@@ -155,10 +157,28 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   icon: Icons.lock_outlined,
                   obscureText: true,
                   autofillHints: const [AutofillHints.newPassword],
-                  textInputAction: TextInputAction.done,
+                  textInputAction: TextInputAction.next,
                   validator: (value) => (value?.length ?? 0) < 8
                       ? l10n.authPasswordMinimum
                       : null,
+                ),
+                const SizedBox(height: 14),
+                AuthInputField(
+                  controller: _confirmPassCtrl,
+                  label: l10n.authConfirmPassword,
+                  icon: Icons.lock_outline,
+                  obscureText: true,
+                  autofillHints: const [AutofillHints.newPassword],
+                  textInputAction: TextInputAction.done,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return l10n.authPasswordRequired;
+                    }
+                    if (value != _passCtrl.text) {
+                      return l10n.authConfirmPasswordMismatch;
+                    }
+                    return null;
+                  },
                 ),
               ],
             ),

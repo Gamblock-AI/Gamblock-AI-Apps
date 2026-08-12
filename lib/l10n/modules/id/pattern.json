@@ -1,0 +1,25 @@
+{
+  "@@locale": "id",
+  "patternBreatheDesc": "Tarik napas dalam-dalam.\nDorongan ini akan lewat.",
+  "patternContinuePsychoeducation": "Lanjut ke Psikoedukasi",
+  "patternInterruptTitle": "Ambil jeda sebelum melanjutkan",
+  "patternBreatheLabel": "Animasi napas perlahan",
+  "patternSecondsRemaining": "{seconds} detik tersisa",
+  "@patternSecondsRemaining": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "patternReady": "Jeda selesai. Pilih langkah berikutnya.",
+  "patternGroundingAction": "Latihan grounding offline",
+  "patternHelpAction": "Butuh bantuan",
+  "patternLaterAction": "Kembali ke proteksi",
+  "patternGroundingTitle": "Perhatikan lima hal di sekitar Anda",
+  "patternReturnProtection": "Selesai dan kembali",
+  "patternWaitHint": "Sebentar lagi — tarik napas dulu.",
+  "patternPhaseInhale": "Tarik napas…",
+  "patternPhaseExhale": "Hembuskan perlahan…",
+  "patternPhaseStatic": "Tarik napas perlahan, lalu hembuskan."
+}

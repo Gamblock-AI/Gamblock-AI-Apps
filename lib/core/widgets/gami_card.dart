@@ -11,7 +11,7 @@ class GamiCard extends StatelessWidget {
     super.key,
     this.title,
     required this.message,
-    this.asset = 'assets/images/gami.webp',
+    this.asset = 'assets/images/gami-thumbsup.webp',
     this.action,
   });
 

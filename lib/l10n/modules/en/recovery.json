@@ -1,0 +1,51 @@
+{
+  "@@locale": "en",
+  "msgErrUpdateMission": "The daily mission could not be updated.",
+  "msgErrLoadPsychoeducation": "Psychoeducation modules could not be loaded.",
+  "msgErrSaveJournal": "The reflection could not be saved.",
+  "msgErrLoadMissions": "Daily missions could not be loaded.",
+  "msgErrLoadJournal": "Reflections could not be loaded.",
+  "msgErrTranslationFailed": "Could not translate the content. Please try again.",
+  "msgErrTranslationUnavailable": "The AI translation service is unavailable.",
+  "msgErrTranslationRateLimited": "The translation service is busy. Please try again shortly.",
+  "msgErrSpkRecommendationFailed": "The daily recommendation could not be loaded.",
+  "msgErrSpkInterventionNotFound": "The recommendation was not found or does not belong to you.",
+  "msgErrSpkInterventionCompleteFailed": "The recommendation could not be marked as done.",
+  "msgErrSpkPreferenceInvalid": "The preference is invalid.",
+  "msgErrInvalidMission": "The mission number must be between 1 and 5.",
+  "msgErrTextRequired": "Reflection text is required.",
+  "msgErrSummaryRequired": "A ticket summary is required.",
+  "msgErrTypeRequired": "Please select a request type.",
+  "recoveryWebTitle": "Recovery is available on the website",
+  "recoveryWebBody": "Journals, check-ins, missions, and psychoeducation stay on the website so this app can focus on device protection.",
+  "recoveryWebAction": "Open web recovery",
+  "backToProtection": "Back to protection",
+  "webPageOpenError": "The page could not be opened yet. Try again.",
+  "recoveryPageOpenError": "The recovery page could not be opened yet. Try again.",
+  "groundingStep1Title": "See",
+  "groundingStep1Body": "Name five things you can see around you.",
+  "groundingStep2Title": "Feel",
+  "groundingStep2Body": "Name four things you can touch or feel.",
+  "groundingStep3Title": "Hear",
+  "groundingStep3Body": "Name three sounds you can hear right now.",
+  "groundingStep4Title": "Smell",
+  "groundingStep4Body": "Name two scents you can smell.",
+  "groundingStep5Title": "Protect",
+  "groundingStep5Body": "Name one thing you want to protect today.",
+  "groundingStepProgress": "Step {current} of {total}",
+  "@groundingStepProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "groundingNext": "Next",
+  "groundingDone": "Done",
+  "groundingCompleteTitle": "Exercise complete",
+  "groundingCompleteBody": "You brought yourself fully into this moment. Choose your next step calmly.",
+  "recoveryWebEyebrow": "continue on the web"
+}

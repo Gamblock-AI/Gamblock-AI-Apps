@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
 
 /// Collects an emergency key without retaining it outside the active dialog.
 Future<String?> showEmergencyKeyDialog(BuildContext context) {
@@ -37,9 +38,6 @@ class _EmergencyKeyDialogState extends State<_EmergencyKeyDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-      ),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 380),
         padding: const EdgeInsets.all(18),
@@ -58,7 +56,7 @@ class _EmergencyKeyDialogState extends State<_EmergencyKeyDialog> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
                     boxShadow: [
                       BoxShadow(
                         color: AppColors.amber.withValues(alpha: 0.3),
@@ -100,13 +98,13 @@ class _EmergencyKeyDialogState extends State<_EmergencyKeyDialog> {
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.border),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                    borderSide: const BorderSide(color: AppColors.border),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide:
-                      const BorderSide(color: AppColors.navy, width: 1.5),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                    borderSide:
+                        const BorderSide(color: AppColors.navy, width: 1.5),
                 ),
               ),
             ),
@@ -122,9 +120,6 @@ class _EmergencyKeyDialogState extends State<_EmergencyKeyDialog> {
                         foregroundColor: AppColors.navy,
                         elevation: 0,
                         padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
                       ),
                       onPressed: () => Navigator.pop(context),
                       child: Text(
@@ -144,9 +139,6 @@ class _EmergencyKeyDialogState extends State<_EmergencyKeyDialog> {
                         backgroundColor: AppColors.crimson,
                         elevation: 0,
                         padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
                       ),
                       onPressed: () =>
                           Navigator.pop(context, _controller.text.trim()),

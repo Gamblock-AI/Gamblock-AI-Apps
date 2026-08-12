@@ -8,6 +8,8 @@ import '../../../../core/feedback/feedback.dart';
 import '../../../../core/messaging/app_messages.dart';
 import '../../../../core/platform/platform_bridge.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
+import '../../../../core/widgets/app_bar_title.dart';
 import '../models/setup_step.dart';
 import '../widgets/setup_step_card.dart';
 
@@ -131,9 +133,11 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.setupTitle)),
+      appBar: AppBar(
+        title: AppBarTitle(icon: Icons.fact_check_rounded, title: l10n.setupTitle),
+      ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: AppSpacing.screenPadding,
         children: [
           Text(
             l10n.setupIntro,

@@ -3,6 +3,7 @@ import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/feedback/haptics.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
 
 /// Keeps the available recovery choices in a predictable vertical action
 /// group. Every slot is height-reserved so nothing jumps when the pause ends.
@@ -43,7 +44,7 @@ class PatternInterruptActions extends StatelessWidget {
           curve: Curves.easeOut,
           height: 52,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.pill),
             gradient: ready
                 ? const LinearGradient(
                     colors: [AppColors.sky, AppColors.skyDark],
@@ -58,7 +59,7 @@ class PatternInterruptActions extends StatelessWidget {
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
               ),
             ),
             onPressed: ready ? _withHaptic(onContinue) : null,
@@ -69,7 +70,7 @@ class PatternInterruptActions extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         SizedBox(
           height: 52,
           child: OutlinedButton.icon(
@@ -77,7 +78,7 @@ class PatternInterruptActions extends StatelessWidget {
               foregroundColor: Colors.white,
               side: BorderSide(color: Colors.white.withValues(alpha: 0.25)),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
               ),
             ),
             onPressed: ready ? _withHaptic(onOpenGrounding) : null,
@@ -88,7 +89,7 @@ class PatternInterruptActions extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         SizedBox(
           height: 48,
           child: TextButton.icon(

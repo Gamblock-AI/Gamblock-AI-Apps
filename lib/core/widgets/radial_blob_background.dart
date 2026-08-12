@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
-/// A single soft radial blob (mirrors the wireframe corner blobs):
+/// A single soft radial blob (mirrors the website pastel corner blobs):
 /// `radial-gradient(circle, color 0%, transparent 70%)`.
 class RadialBlob extends StatelessWidget {
   final Color color;
@@ -30,7 +31,8 @@ class RadialBlob extends StatelessWidget {
 }
 
 /// Full-screen decor backdrop with two soft corner blobs behind the content —
-/// mirrors the wireframe `bg-blob-*` sections. Content sits above the blobs.
+/// mirrors the website pastel mesh (`#EAF6FD` base with cyan/azure blobs).
+/// Content sits above the blobs.
 class BlobBackground extends StatelessWidget {
   final Widget child;
   final Color? blobColor;
@@ -40,26 +42,28 @@ class BlobBackground extends StatelessWidget {
   const BlobBackground({
     super.key,
     required this.child,
-    this.blobColor = const Color(0xFF48CAE4),
-    this.secondaryColor = const Color(0xFF9D4EDD),
+    this.blobColor = AppColors.skyLight,
+    this.secondaryColor = AppColors.azure,
     this.backgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(color: backgroundColor ?? const Color(0xFFF9FAFB)),
+      decoration: BoxDecoration(
+        color: backgroundColor ?? AppColors.background,
+      ),
       child: Stack(
         children: [
           Positioned(
             top: -50,
             left: -50,
-            child: RadialBlob(color: blobColor!, size: 300, alpha: 0.18),
+            child: RadialBlob(color: blobColor!, size: 300, alpha: 0.35),
           ),
           Positioned(
             top: -20,
             right: -60,
-            child: RadialBlob(color: secondaryColor!, size: 250, alpha: 0.14),
+            child: RadialBlob(color: secondaryColor!, size: 250, alpha: 0.3),
           ),
           child,
         ],

@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -19,6 +21,8 @@ class AuthState {
     this.userId,
     this.email,
     this.displayName,
+    this.avatarUrl,
+    this.avatarVersion = 0,
     this.role,
     this.deviceId,
     this.isLoading = true,
@@ -31,6 +35,11 @@ class AuthState {
   final String? userId;
   final String? email;
   final String? displayName;
+  final String? avatarUrl;
+
+  /// Incremented whenever the avatar is uploaded or deleted so widgets can add
+  /// a cache-busting query parameter (the backend returns a stable route).
+  final int avatarVersion;
   final String? role;
   final String? deviceId;
   final bool isLoading;
@@ -43,6 +52,8 @@ class AuthState {
     String? userId,
     String? email,
     String? displayName,
+    String? avatarUrl,
+    int? avatarVersion,
     String? role,
     String? deviceId,
     bool? isLoading,
@@ -55,6 +66,8 @@ class AuthState {
       userId: userId ?? this.userId,
       email: email ?? this.email,
       displayName: displayName ?? this.displayName,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      avatarVersion: avatarVersion ?? this.avatarVersion,
       role: role ?? this.role,
       deviceId: deviceId ?? this.deviceId,
       isLoading: isLoading ?? this.isLoading,
@@ -100,6 +113,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         userId: userId,
         email: user['email']?.toString(),
         displayName: user['display_name']?.toString(),
+        avatarUrl: user['avatar_url']?.toString(),
         role: user['role']?.toString(),
         deviceId: deviceId,
         phone: user['phone_e164']?.toString(),
@@ -199,12 +213,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   /// Requests a fresh WhatsApp code for the verification token's account.
-  Future<bool> resendPhone(String verificationToken) async {
+  /// Returns the demo-mode preview code when the backend delivers one, or null
+  /// when no preview is available (mirrors [startPhoneVerification]).
+  Future<String?> resendPhone(String verificationToken) async {
     final response = await ApiClient.dio.post(
       '/v1/auth/phone-verification/verify/resend',
       data: {'verification_token': verificationToken},
     );
-    return ApiResponse.map(response)?['sent'] == true;
+    return ApiResponse.map(response)?['preview_code']?.toString();
   }
 
   Future<void> requestPasswordReset(String email) async {
@@ -269,6 +285,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       userId: userId,
       email: user['email']?.toString(),
       displayName: user['display_name']?.toString(),
+      avatarUrl: user['avatar_url']?.toString(),
       role: user['role']?.toString(),
       deviceId: deviceId,
       phone: user['phone_e164']?.toString(),
@@ -292,10 +309,52 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(
       email: user['email']?.toString(),
       displayName: user['display_name']?.toString(),
+      avatarUrl: user['avatar_url']?.toString(),
       phone: user['phone_e164']?.toString(),
       phoneVerified: user['phone_verified_at'] != null,
       passwordEnabled: user['_password_enabled'] == true,
     );
+  }
+
+  /// Applies an avatar change returned by the backend (upload or delete).
+  /// Persists the full updated user so a later session restore shows the new
+  /// avatar, and updates state even when [avatarUrl] is null (avatar deleted).
+  Future<void> applyAvatar(String? avatarUrl) async {
+    final user = await _readStoredUser();
+    if (user != null) {
+      user['avatar_url'] = avatarUrl == null || avatarUrl.isEmpty
+          ? null
+          : avatarUrl;
+      await _storage.write(key: _userKey, value: jsonEncode(user));
+    }
+    final normalized = avatarUrl == null || avatarUrl.isEmpty ? null : avatarUrl;
+    state = AuthState(
+      isAuthenticated: state.isAuthenticated,
+      isLoading: state.isLoading,
+      userId: state.userId,
+      email: state.email,
+      displayName: state.displayName,
+      avatarUrl: normalized,
+      avatarVersion: state.avatarVersion + 1,
+      role: state.role,
+      deviceId: state.deviceId,
+      phone: state.phone,
+      phoneVerified: state.phoneVerified,
+      passwordEnabled: state.passwordEnabled,
+    );
+  }
+
+  Future<Map<String, dynamic>?> _readStoredUser() async {
+    try {
+      final userJson = await _storage.read(key: _userKey);
+      if (userJson == null) return null;
+      final decoded = jsonDecode(userJson);
+      return decoded is Map
+          ? Map<String, dynamic>.from(decoded)
+          : null;
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<String?> startPhoneVerification([String? phone]) async {
@@ -324,7 +383,40 @@ class AuthNotifier extends StateNotifier<AuthState> {
     if (user == null) throw StateError('Profile response is empty');
     user['_password_enabled'] = state.passwordEnabled;
     await _storage.write(key: _userKey, value: jsonEncode(user));
-    state = state.copyWith(displayName: user['display_name']?.toString());
+    state = state.copyWith(
+      displayName: user['display_name']?.toString(),
+      avatarUrl: user['avatar_url']?.toString(),
+    );
+  }
+
+  /// Uploads a square WebP avatar (≤2 MiB) as multipart field `avatar`.
+  /// The backend returns the updated user, whose `avatar_url` is applied.
+  Future<void> uploadAvatar(Uint8List webpBytes) async {
+    final formData = FormData.fromMap({
+      'avatar': MultipartFile.fromBytes(
+        webpBytes,
+        filename: 'avatar.webp',
+        contentType: DioMediaType('image', 'webp'),
+      ),
+    });
+    final response = await ApiClient.dio.post(
+      '/v1/me/avatar',
+      data: formData,
+      options: Options(contentType: 'multipart/form-data'),
+    );
+    final user = ApiResponse.map(response);
+    if (user == null) throw StateError('Avatar response is empty');
+    await applyAvatar(user['avatar_url']?.toString());
+    await refreshProfile();
+  }
+
+  /// Deletes the current avatar. The backend returns the updated user.
+  Future<void> deleteAvatar() async {
+    final response = await ApiClient.dio.delete('/v1/me/avatar');
+    final user = ApiResponse.map(response);
+    if (user == null) throw StateError('Avatar response is empty');
+    await applyAvatar(user['avatar_url']?.toString());
+    await refreshProfile();
   }
 
   Future<void> ensureDeviceRegistered() async {

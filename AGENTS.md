@@ -37,7 +37,7 @@ variants, and target architecture.
 3. Read adjacent implementation/tests and identify whether the area is
    `implemented`, `stub`, `not wired`, or `planned`.
 4. Keep one feature unit per change and follow the feature architecture below.
-5. Run `./scripts/verify.sh` (Flutter analyze only) before handoff and
+ 5. Run `./scripts/verify.sh` (l10n merge check + Flutter analyze) before handoff and
    `./scripts/verify-ai-context.sh` when context changed. Do not run tests or
    builds unless the user explicitly requests them in the current conversation.
 
@@ -120,8 +120,13 @@ The repository pins Flutter `3.41.9` in `.fvmrc` and CI.
 ```sh
 cp .env.example .env      # once per fresh clone
 flutter pub get            # bootstrap/setup, when dependencies are absent
-./scripts/verify.sh        # default AI check: flutter analyze only
+./scripts/verify.sh        # default AI check: l10n merge check + flutter analyze
 ./scripts/verify-ai-context.sh  # additionally when context changed
+
+# l10n workflow (source of truth is lib/l10n/modules/<locale>/*.json):
+python3 scripts/merge_l10n.py       # merge modules -> app_<locale>.arb
+python3 scripts/merge_l10n.py --check  # validate parity only
+flutter gen-l10n                    # regenerate Dart localization classes
 
 # Explicit user request only:
 flutter test

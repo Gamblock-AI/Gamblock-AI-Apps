@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
 
 String _formatReasonCode(BuildContext context, String? rawCode) {
   if (rawCode == null || rawCode.isEmpty) {
@@ -49,9 +50,6 @@ Future<void> showSelfTestResultDialog(
   return showDialog<void>(
     context: context,
     builder: (context) => Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-      ),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 380),
         padding: const EdgeInsets.all(16),
@@ -98,7 +96,7 @@ Future<void> showSelfTestResultDialog(
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: AppColors.navy.withValues(alpha: 0.04),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                   border: Border.all(
                       color: AppColors.border.withValues(alpha: 0.6)),
                 ),
@@ -134,9 +132,6 @@ Future<void> showSelfTestResultDialog(
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.navy,
                   padding: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
                 ),
                 onPressed: () => Navigator.pop(context),
                 child: Text(

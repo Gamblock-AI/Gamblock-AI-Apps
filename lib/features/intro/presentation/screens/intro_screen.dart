@@ -66,7 +66,7 @@ class _IntroScreenState extends ConsumerState<IntroScreen> {
                 children: const [HeroSlide(), HowItWorksSlide(), CtaSlide()],
               ),
               Positioned(
-                top: 10,
+                top: 8,
                 left: 16,
                 right: 16,
                 child: Row(
@@ -77,6 +77,9 @@ class _IntroScreenState extends ConsumerState<IntroScreen> {
                       onPressed: _finish,
                       style: TextButton.styleFrom(
                         foregroundColor: AppColors.navy,
+                        backgroundColor: AppColors.surface.withValues(
+                          alpha: 0.78,
+                        ),
                         minimumSize: const Size(48, 44),
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         shape: RoundedRectangleBorder(
@@ -92,49 +95,65 @@ class _IntroScreenState extends ConsumerState<IntroScreen> {
                   ],
                 ),
               ),
-              Positioned.fill(
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 460),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(_pages, (i) {
-                              final active = i == _page;
-                              return AnimatedContainer(
-                                duration:
-                                    MediaQuery.disableAnimationsOf(context)
-                                    ? Duration.zero
-                                    : const Duration(milliseconds: 250),
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                ),
-                                width: active ? 28 : 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  color: active
-                                      ? AppColors.blueAccent
-                                      : AppColors.navy.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                              );
-                            }),
-                          ),
-                          const SizedBox(height: 18),
-                          darkCtaButton(
-                            context,
-                            _page == _pages - 1
-                                ? l10n.introStartBtn
-                                : l10n.introNext,
-                            _next,
-                          ),
-                        ],
-                      ),
+              Positioned(
+                left: 16,
+                right: 16,
+                bottom: 14,
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 840),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isWide = constraints.maxWidth >= 640;
+                        final pageIndicator = Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(_pages, (i) {
+                            final active = i == _page;
+                            return AnimatedContainer(
+                              duration: MediaQuery.disableAnimationsOf(context)
+                                  ? Duration.zero
+                                  : const Duration(milliseconds: 250),
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: active ? 28 : 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: active
+                                    ? AppColors.blueAccent
+                                    : AppColors.navy.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                            );
+                          }),
+                        );
+                        final action = darkCtaButton(
+                          context,
+                          _page == _pages - 1
+                              ? l10n.introStartBtn
+                              : l10n.introNext,
+                          _next,
+                        );
+
+                        if (isWide) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              pageIndicator,
+                              SizedBox(width: 220, child: action),
+                            ],
+                          );
+                        }
+
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            pageIndicator,
+                            const SizedBox(height: 10),
+                            action,
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),

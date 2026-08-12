@@ -1,18 +1,15 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../core/widgets/app_bar_title.dart';
 import '../../core/auth/auth_state.dart';
-import '../../core/config/app_config.dart';
 import '../../core/feedback/feedback.dart';
 import '../../core/messaging/app_messages.dart';
 import '../../core/platform/platform_bridge.dart';
+import '../../core/platform/platform_info.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_dimens.dart';
@@ -34,7 +31,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  ProtectionSnapshot _snapshot = ProtectionSnapshot.fallback;
   String? _pairingToken;
 
   @override
@@ -44,18 +40,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _loadNativeInfo() async {
-    final values = await Future.wait<Object?>([
-      PlatformBridge.getProtectionSnapshot(),
-      if (Platform.isWindows)
-        PlatformBridge.getPairingToken()
-      else
-        Future<String?>.value(),
-    ]);
+    if (!PlatformInfo.isWindows) return;
+    final token = await PlatformBridge.getPairingToken();
     if (!mounted) return;
-    setState(() {
-      _snapshot = values[0] as ProtectionSnapshot;
-      _pairingToken = values[1] as String?;
-    });
+    setState(() => _pairingToken = token);
   }
 
   Future<void> _editProfile() async {
@@ -161,19 +149,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
-  Future<void> _openWebPath(String path) async {
-    final opened = await launchUrl(
-      AppConfig.webUri('${Localizations.localeOf(context).languageCode}/$path'),
-      mode: LaunchMode.externalApplication,
-    );
-    if (!opened && mounted) {
-      AppFeedback.error(
-        context,
-        AppLocalizations.of(context)!.webPageOpenError,
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -192,26 +167,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             auth: auth,
             onEditProfile: _editProfile,
             onChangePassword: _changePassword,
-            onManagePartner: () => context.go('/accountability'),
             onLogin: () => context.go('/login'),
           ),
           SettingsPreferencesSection(
             locale: settings.locale,
             hapticsEnabled: settings.hapticsEnabled,
             healthNotificationsEnabled: settings.healthNotificationsEnabled,
-            showHealthNotifications: Platform.isAndroid,
+            showHealthNotifications: PlatformInfo.isAndroid,
             onLocaleChanged: (locale) =>
                 ref.read(appSettingsProvider.notifier).setLocale(locale),
             onHapticsChanged: (enabled) =>
                 ref.read(appSettingsProvider.notifier).setHaptics(enabled),
             onHealthNotificationsChanged: _setHealthNotifications,
-            showCheckInReminder: Platform.isAndroid || Platform.isWindows,
+            showCheckInReminder:
+                PlatformInfo.isAndroid || PlatformInfo.isWindows,
             checkInReminderEnabled: settings.checkInReminderEnabled,
             checkInReminderTime: settings.checkInReminderTime,
             onCheckInReminderChanged: _setCheckInReminder,
             onCheckInReminderTimeTap: _pickCheckInReminderTime,
           ),
-          if (Platform.isWindows) ...[
+          if (PlatformInfo.isWindows) ...[
             WindowsSettingsSection(
               pairingToken: _pairingToken,
               onCopyToken: _copyPairingToken,
@@ -219,9 +194,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ],
           SettingsAboutSection(
-            snapshot: _snapshot,
-            onOpenPrivacy: () => _openWebPath('privacy'),
-            onOpenHelp: () => _openWebPath('help'),
+            onOpenPrivacy: () => context.go('/settings/privacy'),
+            onOpenHelp: () => context.go('/settings/help'),
           ),
           if (auth.isAuthenticated) ...[
             const SizedBox(height: 24),

@@ -14,6 +14,8 @@ import '../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../features/pattern_interrupt/presentation/screens/pattern_interrupt_screen.dart';
 import '../features/protection/presentation/screens/protection_screen.dart';
 import '../features/recovery/presentation/screens/recovery_handoff_screen.dart';
+import '../features/settings/presentation/screens/settings_help_screen.dart';
+import '../features/settings/presentation/screens/settings_privacy_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/setup/presentation/screens/setup_screen.dart';
 import 'shell.dart';
@@ -47,9 +49,8 @@ class RouterNotifier extends ChangeNotifier {
     _ref.listen<AuthState>(
       authProvider,
       (previous, next) {
-        if (previous == null ||
-            previous.isAuthenticated != next.isAuthenticated ||
-            previous.isLoading != next.isLoading) {
+        if (previous?.isAuthenticated != next.isAuthenticated ||
+            previous?.isLoading != next.isLoading) {
           notifyListeners();
         }
       },
@@ -57,9 +58,8 @@ class RouterNotifier extends ChangeNotifier {
     _ref.listen<OnboardingState>(
       onboardingProvider,
       (previous, next) {
-        if (previous == null ||
-            previous.isCompleted != next.isCompleted ||
-            previous.isLoading != next.isLoading) {
+        if (previous?.isCompleted != next.isCompleted ||
+            previous?.isLoading != next.isLoading) {
           notifyListeners();
         }
       },
@@ -84,8 +84,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       final onboarding = ref.read(onboardingProvider);
       final path = state.uri.path;
       if (authState.isLoading || onboarding.isLoading) return null;
-      if (path == '/') {
-        if (!onboarding.isCompleted) return '/intro';
+
+      // Onboarding gate: until the intro is completed, only `/intro` is
+      // reachable. This must take priority over auth routing so an
+      // authenticated session cannot bounce `/intro` -> `/dashboard` -> `/intro`.
+      if (!onboarding.isCompleted) {
+        return path == '/intro' ? null : '/intro';
+      }
+
+      if (path == '/' || path == '/intro') {
         return authState.isAuthenticated ? '/dashboard' : '/login';
       }
       if (path == '/protection') return '/dashboard';
@@ -96,15 +103,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           path == '/register' ||
           path == '/forgot-password' ||
           path == '/verify-phone';
-      if (!onboarding.isCompleted && path != '/intro') {
-        return '/intro';
-      }
-      if (authState.isAuthenticated && (authEntry || path == '/intro')) {
+      if (authState.isAuthenticated && authEntry) {
         return '/dashboard';
       }
       final publicPath =
           authEntry ||
-          path == '/intro' ||
           path == '/pattern-interrupt' ||
           path == '/recovery';
       if (!authState.isAuthenticated && !publicPath) {
@@ -168,6 +171,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/recovery',
         pageBuilder: (_, state) =>
             _page(key: state.pageKey, child: const RecoveryHandoffScreen()),
+      ),
+      GoRoute(
+        path: '/settings/privacy',
+        pageBuilder: (_, state) =>
+            _page(key: state.pageKey, child: const SettingsPrivacyScreen()),
+      ),
+      GoRoute(
+        path: '/settings/help',
+        pageBuilder: (_, state) =>
+            _page(key: state.pageKey, child: const SettingsHelpScreen()),
       ),
       ShellRoute(
         builder: (_, __, child) => AppShell(child: child),

@@ -1,0 +1,64 @@
+{
+  "@@locale": "id",
+  "analyticsTitle": "Analitik",
+  "analyticsSignInTitle": "Masuk untuk melihat analitik",
+  "analyticsSignInBody": "Analitik hanya berisi hitungan agregat perangkat dan tidak memuat URL atau riwayat penjelajahan.",
+  "analyticsSevenDays": "7 hari",
+  "analyticsThirtyDays": "30 hari",
+  "analyticsErrorTitle": "Analitik belum dapat dimuat",
+  "analyticsPrivacyNote": "Hanya hitungan harian yang ditampilkan. URL, domain, judul halaman, dan teks DOM tidak disimpan atau dikirim.",
+  "analyticsDataSynced": "Hitungan hari yang selesai sudah disinkronkan ke akun Anda.",
+  "analyticsDataLocalOnly": "Backend tidak tersedia atau data belum cukup; tampilan ini memakai hitungan lokal yang tersedia.",
+  "analyticsBlocked": "Konten diblokir",
+  "analyticsInterventions": "Intervensi",
+  "analyticsTamper": "Upaya perubahan",
+  "analyticsPermission": "Izin dicabut",
+  "analyticsSummaryTitle": "Ringkasan Perlindungan",
+  "analyticsSummaryDesc": "Pantau tren pemblokiran otomatis, intervensi perilaku, dan statistik proteksi lokal.",
+  "analyticsChartTitle": "Tren Aktivitas Proteksi",
+  "analytics7Days": "7 Hari Terakhir",
+  "analytics30Days": "30 Hari Terakhir",
+  "analyticsLegendBlocked": "Blokir",
+  "analyticsLegendInterventions": "Intervensi",
+  "analyticsNoActivityTitle": "Belum Ada Aktivitas Terdeteksi",
+  "analyticsNoActivityDesc": "Grafik akan terisi otomatis saat terjadi pemblokiran atau intervensi.",
+  "analyticsPrivacySectionTitle": "Jaminan Privasi & Keamanan Data",
+  "analyticsOnDeviceTitle": "Privasi terjaga",
+  "analyticsOnDeviceDesc": "Semua dianalisis di perangkat Anda, tidak pernah di cloud.",
+  "analyticsNoBrowsingHistoryTitle": "Tanpa Riwayat Penelusuran",
+  "analyticsNoBrowsingHistoryDesc": "Riwayat penelusuran Anda tidak pernah meninggalkan perangkat ini.",
+  "analyticsChartSummary": "{blocked} diblokir, {interventions} intervensi",
+  "@analyticsChartSummary": {
+    "placeholders": {
+      "blocked": {
+        "type": "int"
+      },
+      "interventions": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsDayTooltip": "{blocked} diblokir · {interventions} intervensi",
+  "@analyticsDayTooltip": {
+    "placeholders": {
+      "blocked": {
+        "type": "int"
+      },
+      "interventions": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsMilestoneTitle": "Perlindunganmu bekerja",
+  "analyticsMilestoneBody": "Perlindungan membantumu {count} kali dalam {days} hari terakhir. Setiap jeda adalah ruang untuk memilih ulang.",
+  "@analyticsMilestoneBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  }
+}

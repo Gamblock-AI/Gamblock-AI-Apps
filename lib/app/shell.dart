@@ -123,10 +123,7 @@ class AppShell extends StatelessWidget {
         }
         return Scaffold(
           extendBody: true,
-          body: Padding(
-            padding: const EdgeInsets.only(bottom: 84),
-            child: content,
-          ),
+          body: content,
           bottomNavigationBar: _GlassBottomNav(
             selectedIndex: selectedIndex,
             destinations: destinations,
@@ -204,6 +201,13 @@ class _GlassBottomNav extends StatelessWidget {
                           destination: destinations[i],
                           selected: i == selectedIndex,
                           onTap: () => onSelect(i),
+                          // Keep the two items beside the center FAB clear of
+                          // the 60px raised button (16px symmetric inset).
+                          padding: i == 1
+                              ? const EdgeInsets.only(right: AppSpacing.lg)
+                              : i == 2
+                              ? const EdgeInsets.only(left: AppSpacing.lg)
+                              : EdgeInsets.zero,
                         ),
                       ),
                   ],
@@ -227,46 +231,51 @@ class _NavItem extends StatelessWidget {
   final _Destination destination;
   final bool selected;
   final VoidCallback onTap;
+  final EdgeInsets padding;
 
   const _NavItem({
     required this.destination,
     required this.selected,
     required this.onTap,
+    this.padding = EdgeInsets.zero,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const SizedBox(height: 8),
-          Icon(
-            selected ? destination.selectedIcon : destination.icon,
-            size: AppIconSize.lg,
-            color: selected ? AppColors.navy : AppColors.inkMuted,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            destination.label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+      child: Padding(
+        padding: padding,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 8),
+            Icon(
+              selected ? destination.selectedIcon : destination.icon,
+              size: AppIconSize.lg,
               color: selected ? AppColors.navy : AppColors.inkMuted,
             ),
-          ),
-          const Spacer(),
-          Container(
-            width: 4,
-            height: 4,
-            margin: const EdgeInsets.only(bottom: 6),
-            decoration: BoxDecoration(
-              color: selected ? AppColors.blueAccent : Colors.transparent,
-              shape: BoxShape.circle,
+            const SizedBox(height: 4),
+            Text(
+              destination.label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                color: selected ? AppColors.navy : AppColors.inkMuted,
+              ),
             ),
-          ),
-        ],
+            const Spacer(),
+            Container(
+              width: 4,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 6),
+              decoration: BoxDecoration(
+                color: selected ? AppColors.blueAccent : Colors.transparent,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -290,11 +299,7 @@ class _CenterFab extends StatelessWidget {
           border: Border.all(color: Colors.white, width: 4),
           boxShadow: AppColors.fabGlow,
         ),
-        child: const Icon(
-          Icons.add_rounded,
-          color: Colors.white,
-          size: 30,
-        ),
+        child: const Icon(Icons.add_rounded, color: Colors.white, size: 30),
       ),
     );
   }

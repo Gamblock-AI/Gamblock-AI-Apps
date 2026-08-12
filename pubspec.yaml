@@ -22,6 +22,8 @@ dependencies:
   flutter_local_notifications: ^19.4.0
   timezone: ^0.10.1
   flutter_timezone: ^4.1.1
+  image: ^4.9.1
+  image_picker: ^1.2.1
 
 dev_dependencies:
   flutter_test:
@@ -29,6 +31,13 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   mocktail: ^1.0.4
   flutter_launcher_icons: ^0.14.4
+
+# image 4.9.x needs xml ^7 for its WebP encoder, while
+# flutter_local_notifications_windows pins xml ^6.5.0. The Windows plugin only
+# uses XmlBuilder.element/buildDocument/toXmlString, which are unchanged in
+# xml 7, so we align the whole graph on 7.0.1.
+dependency_overrides:
+  xml: 7.0.1
 
 flutter:
   uses-material-design: true

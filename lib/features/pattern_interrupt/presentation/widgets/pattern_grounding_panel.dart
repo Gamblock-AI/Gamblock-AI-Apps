@@ -3,6 +3,7 @@ import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/feedback/haptics.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
 
 class _GroundingStep {
   const _GroundingStep(this.count, this.icon);
@@ -103,7 +104,7 @@ class _PatternGroundingPanelState extends State<PatternGroundingPanel> {
             fontWeight: FontWeight.w800,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         if (!_completed)
           Text(
             l10n.groundingStepProgress(_stepIndex + 1, _steps.length),
@@ -135,39 +136,47 @@ class _PatternGroundingPanelState extends State<PatternGroundingPanel> {
                 duration: disableAnimations
                     ? Duration.zero
                     : const Duration(milliseconds: 250),
-                margin: const EdgeInsets.symmetric(horizontal: 4),
+                margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
                 width: (!_completed && i == _stepIndex) ? 24 : 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: i < _stepIndex || _completed
+                  color: _completed
+                      ? AppColors.sage
+                      : i < _stepIndex
                       ? AppColors.sky
-                      : (!_completed && i == _stepIndex)
+                      : i == _stepIndex
                       ? AppColors.skyLight
                       : Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
                 ),
               ),
           ],
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.xl),
         SizedBox(
           height: 52,
           width: double.infinity,
           child: DecoratedBox(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              gradient: const LinearGradient(
-                colors: [AppColors.sky, AppColors.skyDark],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+              gradient: _completed
+                  ? const LinearGradient(
+                      colors: [AppColors.sage, AppColors.sageDark],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : const LinearGradient(
+                      colors: [AppColors.sky, AppColors.skyDark],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
             ),
             child: FilledButton.icon(
               style: FilledButton.styleFrom(
                 backgroundColor: Colors.transparent,
                 shadowColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
                 ),
               ),
               onPressed: _completed
@@ -262,7 +271,7 @@ class _StepContent extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.sky,
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
                 ),
                 child: Text(
                   '${step.count}',
@@ -276,7 +285,7 @@ class _StepContent extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.lg),
         Text(
           title,
           textAlign: TextAlign.center,
@@ -285,9 +294,9 @@ class _StepContent extends StatelessWidget {
             fontWeight: FontWeight.w800,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           child: Text(
             body,
             textAlign: TextAlign.center,
@@ -324,7 +333,7 @@ class _CompletionContent extends StatelessWidget {
             excludeFromSemantics: true,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.lg),
         Text(
           l10n.groundingCompleteTitle,
           textAlign: TextAlign.center,
@@ -333,9 +342,9 @@ class _CompletionContent extends StatelessWidget {
             fontWeight: FontWeight.w800,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           child: Text(
             l10n.groundingCompleteBody,
             textAlign: TextAlign.center,

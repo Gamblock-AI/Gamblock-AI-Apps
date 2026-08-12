@@ -12,14 +12,12 @@ class SettingsAccountSection extends StatelessWidget {
     required this.auth,
     required this.onEditProfile,
     required this.onChangePassword,
-    required this.onManagePartner,
     required this.onLogin,
   });
 
   final AuthState auth;
   final VoidCallback onEditProfile;
   final VoidCallback onChangePassword;
-  final VoidCallback onManagePartner;
   final VoidCallback onLogin;
 
   @override
@@ -54,18 +52,6 @@ class SettingsAccountSection extends StatelessWidget {
                   iconColor: AppColors.navy,
                   title: l10n.settingsChangePassword,
                   onTap: onChangePassword,
-                ),
-                Divider(
-                  height: 1,
-                  indent: 54,
-                  color: AppColors.border.withValues(alpha: 0.5),
-                ),
-                _settingsTile(
-                  context,
-                  icon: Icons.people_outline_rounded,
-                  iconColor: AppColors.sage,
-                  title: l10n.settingsAccountabilityPartner,
-                  onTap: onManagePartner,
                 ),
               ] else
                 _settingsTile(

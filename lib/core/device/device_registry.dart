@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -7,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../network/api_client.dart';
 import '../network/api_response.dart';
 import '../platform/platform_bridge.dart';
+import '../platform/platform_info.dart';
 
 class RegisteredDevice {
   const RegisteredDevice({
@@ -53,12 +53,12 @@ class DeviceRegistry {
       '/v1/devices',
       data: {
         'client_instance_id': instanceId,
-        'platform': Platform.isWindows ? 'windows' : 'android',
+        'platform': PlatformInfo.isWindows ? 'windows' : 'android',
         'label': displayName.isEmpty
-            ? (Platform.isWindows ? 'Windows device' : 'Android device')
-            : '${displayName.trim()} ${Platform.isWindows ? 'Windows' : 'Android'}',
+            ? (PlatformInfo.isWindows ? 'Windows device' : 'Android device')
+            : '${displayName.trim()} ${PlatformInfo.isWindows ? 'Windows' : 'Android'}',
         'app_version': '1.0.0',
-        'os_version': Platform.operatingSystemVersion,
+        'os_version': PlatformInfo.osVersion,
         'model_version': snapshot.modelVersion,
         'ruleset_version': snapshot.rulesetVersion,
       },
@@ -125,7 +125,7 @@ class DeviceRegistry {
       '/v1/devices/$deviceId',
       data: {
         'app_version': '1.0.0',
-        'os_version': Platform.operatingSystemVersion,
+        'os_version': PlatformInfo.osVersion,
         'protection_status': snapshot.status,
         'model_version': snapshot.modelVersion,
         'ruleset_version': snapshot.rulesetVersion,

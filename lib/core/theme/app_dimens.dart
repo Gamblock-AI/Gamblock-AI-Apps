@@ -12,13 +12,15 @@ class AppSpacing {
   static const double xxl = 32;
 
   /// Unified scrollable-tab padding (protection/analytics/accountability/
-  /// settings all share this).
-  static const EdgeInsets screenPadding = EdgeInsets.fromLTRB(lg, md, lg, xxl);
+  /// settings all share this). Bottom inset (104) ensures the lowest card
+  /// scrolls fully clear of the floating glass bottom navigation bar and center FAB.
+  static const EdgeInsets screenPadding = EdgeInsets.fromLTRB(lg, md, lg, 104);
 }
 
-/// Shared corner-radius scale. Cards use [lg], inputs and small panels [md],
-/// inner tiles and dialog controls [sm], chips/badges [xs], buttons [pill],
-/// hero banners and date tracks [banner].
+/// Shared corner-radius scale. Cards use [md] (16, web `rounded-2xl`),
+/// inputs and small panels [sm] (12, web dashboard base), inner tiles and
+/// dialog controls [sm], chips/badges [xs], buttons [pill], hero banners and
+/// date tracks [banner].
 class AppRadius {
   AppRadius._();
 

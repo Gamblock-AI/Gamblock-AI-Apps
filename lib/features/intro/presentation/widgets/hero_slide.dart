@@ -1,7 +1,6 @@
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'slide_shell.dart';
-import 'intro_asset_stage.dart';
+import 'intro_hero_surface.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/eyebrow_pill.dart';
 import '../../../../core/widgets/brand_helpers.dart';
@@ -12,33 +11,28 @@ class HeroSlide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SlideShell(
+    return IntroHeroSurface(
+      asset: 'assets/images/gami-wave.webp',
+      fallbackAsset: 'assets/images/gami.webp',
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const IntroAssetStage(
-            asset: 'assets/images/gami-wave.webp',
-            fallbackAsset: 'assets/images/gami.webp',
-            minImageSize: 188,
-            maxImageSize: 240,
-          ),
-          const SizedBox(height: 20),
           EyebrowPill(
             label: AppLocalizations.of(context)!.introAiShield,
             color: AppColors.blueAccent,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           Text(
             AppLocalizations.of(context)!.introHeroTitle,
-            textAlign: TextAlign.center,
+            textAlign: TextAlign.left,
             style: displayStyle(context),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 430),
+            constraints: const BoxConstraints(maxWidth: 480),
             child: Text(
               AppLocalizations.of(context)!.introHeroDesc,
-              textAlign: TextAlign.center,
+              textAlign: TextAlign.left,
               style: const TextStyle(
                 color: AppColors.mutedForeground,
                 fontSize: 15,

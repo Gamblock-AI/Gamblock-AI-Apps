@@ -1,0 +1,111 @@
+{
+  "@@locale": "en",
+  "msgErrLoadPartner": "Partner data could not be loaded.",
+  "msgErrRejectRequest": "The request could not be denied.",
+  "msgErrInvalidRequest": "The request is invalid. Check the fields and try again.",
+  "msgErrGroupCodeRequired": "A group code is required.",
+  "msgErrProcessRequest": "The request could not be processed.",
+  "msgErrApproveRequest": "The request could not be approved.",
+  "msgErrGroupNotFound": "The group was not found.",
+  "msgErrSubmitRequest": "The request could not be submitted.",
+  "msgErrInvalidEmergencyKey": "The emergency key is invalid.",
+  "msgErrBlockedEventsRejected": "The device block-time data could not be accepted.",
+  "msgErrCreateGroup": "The group could not be created.",
+  "msgErrCreateEmergencyKey": "Emergency recovery could not be processed.",
+  "msgErrRemoveMember": "The member could not be removed.",
+  "msgErrLoadDataRequest": "Data requests could not be loaded.",
+  "msgErrLoadGroupAnalytics": "Group analytics could not be loaded.",
+  "msgErrSubmitDataRequest": "The data request could not be submitted.",
+  "msgErrNotInGroup": "You have not joined a group.",
+  "msgErrTooManyRequests": "Too many requests. Try again shortly.",
+  "msgErrDisconnectPartner": "The partner relationship could not be ended.",
+  "msgErrLoadRequests": "Approval requests could not be loaded.",
+  "msgErrCancelRequest": "The request could not be cancelled.",
+  "msgErrPartnerEmailRequired": "Partner email is required.",
+  "msgErrGroupNameRequired": "A group name is required.",
+  "msgErrLoadMembers": "Group members could not be loaded.",
+  "msgErrInvalidGroupCodeSpecific": "The group code is invalid.",
+  "msgErrAcceptInvite": "The partner invitation could not be accepted.",
+  "msgErrSendInvite": "The partner invitation could not be sent.",
+  "msgErrEmergencyKeyRequired": "An emergency key is required.",
+  "msgErrPrivacyPayloadRejected": "The request was rejected because it included data that must not be sent.",
+  "partnerTitle": "Partner",
+  "partnerSignInTitle": "Sign in to manage your partner",
+  "partnerSignInBody": "Partner relationships and approval requests are stored with your account.",
+  "partnerErrorTitle": "Partner data could not be loaded",
+  "partnerInviteCreated": "The partner invitation was created.",
+  "partnerNone": "No active partner",
+  "partnerNoneBody": "Enter a code from a trusted partner. Partners cannot see URLs, browsing history, or private recovery notes.",
+  "partnerActiveBody": "The active partner can approve protection changes for registered devices.",
+  "partnerEmailLabel": "Partner email",
+  "partnerEmailHelp": "Use the email of a trusted person who understands and accepts this role.",
+  "partnerInviteAction": "Create invitation",
+  "partnerInviteLink": "Invitation link",
+  "partnerInviteCopied": "Invitation link copied.",
+  "partnerRequestHistory": "Request history",
+  "partnerNoRequests": "No requests yet",
+  "partnerNoRequestsBody": "Protection-change requests from the device will appear here.",
+  "partnerManageAction": "Manage partner",
+  "accountabilityJoinTitle": "Connect a partner with a group code",
+  "accountabilityJoinBody": "Review the group and partner name before joining. One account can only have one active group.",
+  "accountabilityPreviewAction": "Review group",
+  "accountabilityManagedBy": "Managed by {name}",
+  "@accountabilityManagedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "accountabilityJoinConfirmTitle": "Join this group?",
+  "accountabilityJoinConfirmBody": "{name} will become your partner. You can disable each initial aggregate category from the web portal at any time.",
+  "@accountabilityJoinConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "accountabilityJoinAction": "Confirm and join",
+  "accountabilityJoinSuccess": "The accountability group is connected.",
+  "accountabilityActiveGroup": "Connected through {name}. Your partner only receives aggregates you allow.",
+  "@accountabilityActiveGroup": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerSharingPrivacy": "Sharing Privacy",
+  "partnerSharingDesc": "Manage the types of aggregate summaries visible to your partner.",
+  "partnerLeaveSection": "Leave Accountability",
+  "partnerLeaveNormal": "Request normal leave",
+  "partnerLeaveUnsafe": "Unsafe situation leave",
+  "partnerPrivacyBadge": "Private · Totals only",
+  "accSharingTitle": "Shared Aggregate Data",
+  "accSharingSubtitle": "Manage anonymous aggregate data preferences for your partner.",
+  "accShareHealthTitle": "Protection Health",
+  "accShareHealthSubtitle": "Active status, degradation, & permissions (no URLs).",
+  "accShareActivityTitle": "Protection Activity",
+  "accShareActivitySubtitle": "Aggregate block & intervention counts.",
+  "accShareEngagementTitle": "Recovery Engagement",
+  "accShareEngagementSubtitle": "Participation summary (not journal content).",
+  "accShareEducationTitle": "Education Progress",
+  "accShareEducationSubtitle": "Daily psychoeducation module completion.",
+  "accSharingUpdated": "Sharing preferences updated.",
+  "accUnsafeExitTitle": "Unsafe-Situation Exit",
+  "accNormalExitTitle": "Request to Leave Partnership",
+  "accUnsafeExitDesc": "Data sharing stops immediately and any normal request is cancelled.",
+  "accNormalExitDesc": "Your partner has 72 hours to review the request.",
+  "accReasonLabel": "Reason (optional)",
+  "accReasonHint": "Give a short explanation...",
+  "accSendRequest": "Send Request",
+  "accExitRequestSent": "Exit request sent.",
+  "accExitRequestCancelled": "Exit request cancelled.",
+  "accApprovalCancelled": "Approval request cancelled.",
+  "accExitPendingTitle": "Exit request under review",
+  "accExitPendingBody": "You can cancel a normal request while it is still pending.",
+  "accExitChoose": "Choose the normal flow, or stop sharing immediately if the situation is unsafe.",
+  "accCodeRequired": "Enter the group code first.",
+  "accountabilityGroupCodeHint": "Example: ABCD234567"
+}

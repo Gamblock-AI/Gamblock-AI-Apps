@@ -1,0 +1,15 @@
+{
+  "@@locale": "id",
+  "quickActionsTitle": "Tindakan Cepat",
+  "quickActionBreathe": "Jeda & Tarik Napas",
+  "quickActionBreatheSubtitle": "Latihan napas singkat sebelum melanjutkan",
+  "quickActionRecovery": "Pemulihan & Dukungan",
+  "quickActionRecoverySubtitle": "Buka panduan dan dukungan pemulihan",
+  "reminderChannelName": "Pengingat harian",
+  "reminderChannelDesc": "Pengingat check-in sekali sehari",
+  "reminderNotificationTitle": "Waktu untuk dirimu",
+  "reminderNotificationBody": "Luangkan satu menit untuk check-in hari ini. Kapan pun kamu siap.",
+  "reminderBodyStreak": "Jangan putus ritme-mu — isi check-in harianmu.",
+  "reminderBodyStep": "Satu langkah kecil tetap kemajuan. Check-in sebentar saja.",
+  "reminderBodyConsistent": "Tetap tenang, tetap konsisten. Check-in harian menunggumu."
+}

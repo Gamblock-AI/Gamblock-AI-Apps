@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
 import '../models/setup_step.dart';
 
 /// Renders one numbered, optionally actionable setup checklist item.
@@ -33,7 +34,7 @@ class SetupStepCard extends StatelessWidget {
                   height: 44,
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
                   child: Icon(
                     step.isComplete ? Icons.check : step.icon,
@@ -50,7 +51,7 @@ class SetupStepCard extends StatelessWidget {
                           children: [
                             TextSpan(
                               text: '${index + 1}. ',
-                              style: const TextStyle(color: AppColors.blueAccent),
+                              style: const TextStyle(color: AppColors.navy),
                             ),
                             TextSpan(text: step.title),
                           ],

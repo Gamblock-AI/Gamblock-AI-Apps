@@ -296,7 +296,28 @@ class AppMessages {
 
     if (code != null) return forCode(context, code);
     if (status != null) return _statusMessage(context, status);
+    if (_isConnectionError(error)) {
+      return AppLocalizations.of(context)!.msgErrConnection;
+    }
     return generic(context);
+  }
+
+  static bool _isConnectionError(Object error) {
+    if (error is DioException) {
+      switch (error.type) {
+        case DioExceptionType.connectionError:
+        case DioExceptionType.connectionTimeout:
+        case DioExceptionType.receiveTimeout:
+        case DioExceptionType.sendTimeout:
+          return true;
+        case DioExceptionType.badCertificate:
+        case DioExceptionType.badResponse:
+        case DioExceptionType.cancel:
+        case DioExceptionType.unknown:
+          return false;
+      }
+    }
+    return false;
   }
 
   static String? codeOf(Object error) {

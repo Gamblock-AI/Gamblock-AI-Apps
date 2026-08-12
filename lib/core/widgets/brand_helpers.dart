@@ -22,7 +22,7 @@ Widget darkCtaButton(
   bool accent = false,
   IconData? icon,
 }) {
-  final bg = accent ? AppColors.blueAccent : AppColors.navy;
+  final bg = accent ? AppColors.crimson : AppColors.navy;
   if (!primary) {
     return SizedBox(
       width: double.infinity,

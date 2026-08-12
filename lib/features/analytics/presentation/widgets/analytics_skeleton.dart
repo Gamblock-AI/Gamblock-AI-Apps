@@ -27,7 +27,7 @@ class AnalyticsSkeleton extends StatelessWidget {
         SkeletonBox(
           width: double.infinity,
           height: 240,
-          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
       ],
     );

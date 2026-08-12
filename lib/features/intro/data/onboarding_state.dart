@@ -3,6 +3,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const _onboardingKey = 'onboarding_completed_v1';
 
+/// Public storage key for the onboarding-completed flag. Exposed so
+/// development tooling (e.g. `--dart-define=RESET_ONBOARDING=true`) can clear
+/// it without duplicating the string.
+const onboardingCompletedKey = _onboardingKey;
+
 class OnboardingState {
   const OnboardingState({this.isLoading = true, this.isCompleted = false});
 

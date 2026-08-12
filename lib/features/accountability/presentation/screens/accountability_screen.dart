@@ -105,7 +105,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
       context: context,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
         child: Container(
           constraints: const BoxConstraints(maxWidth: 380),
@@ -175,7 +175,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                           elevation: 0,
                           padding: EdgeInsets.zero,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppRadius.pill),
                           ),
                         ),
                         onPressed: () => Navigator.pop(context, false),
@@ -197,7 +197,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                           elevation: 0,
                           padding: EdgeInsets.zero,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppRadius.pill),
                           ),
                         ),
                         onPressed: () => Navigator.pop(context, true),
@@ -384,7 +384,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             side: BorderSide(
                                 color: AppColors.border.withValues(alpha: 0.8)),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.pill),
                             ),
                           ),
                           onPressed: () => Navigator.pop(dialogContext),
@@ -405,7 +406,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             backgroundColor: AppColors.navy,
                             padding: EdgeInsets.zero,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.pill),
                             ),
                           ),
                           onPressed: () => Navigator.pop(dialogContext, draft),
@@ -512,7 +514,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
       context: context,
       builder: (dialogContext) => Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
         child: Container(
           constraints: const BoxConstraints(maxWidth: 380),
@@ -630,7 +632,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             elevation: 0,
                             padding: EdgeInsets.zero,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.pill),
                             ),
                           ),
                           onPressed: () => Navigator.pop(dialogContext, false),
@@ -654,7 +657,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             elevation: 0,
                             padding: EdgeInsets.zero,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.pill),
                             ),
                           ),
                           onPressed: () => Navigator.pop(dialogContext, true),
@@ -765,6 +769,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
               if (membership != null) ...[
                 const SizedBox(height: 14),
                 SurfaceCard(
+                  radius: AppRadius.md,
                   padding: EdgeInsets.zero,
                   child: Column(
                     children: [
@@ -927,6 +932,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
               if (membership == null) ...[
                 const SizedBox(height: 14),
                 SurfaceCard(
+                  radius: AppRadius.md,
                   padding: const EdgeInsets.all(18),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -982,7 +988,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                         },
                         decoration: InputDecoration(
                           labelText: l10n.onboardingGroupCode,
-                          hintText: 'ABCD234567',
+                          hintText: l10n.accountabilityGroupCodeHint,
                           errorText: _codeError,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -996,7 +1002,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                           style: FilledButton.styleFrom(
                             backgroundColor: AppColors.navy,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.pill),
                             ),
                           ),
                           onPressed: _loading ? null : _previewGroup,
@@ -1013,6 +1020,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                 if (_preview case final preview?) ...[
                   const SizedBox(height: 14),
                   SurfaceCard(
+                    radius: AppRadius.md,
                     padding: const EdgeInsets.all(18),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1049,7 +1057,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             style: FilledButton.styleFrom(
                               backgroundColor: AppColors.sage,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius:
+                                    BorderRadius.circular(AppRadius.pill),
                               ),
                             ),
                             onPressed: _loading ? null : _joinGroup,
