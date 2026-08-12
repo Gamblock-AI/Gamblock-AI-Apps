@@ -17,21 +17,24 @@ class HowItWorksSlide extends StatelessWidget {
     final steps = [
       (
         '01',
-        Icons.download,
+        Icons.download_rounded,
         AppLocalizations.of(context)!.introHowItWorksStep1,
         AppLocalizations.of(context)!.introHowItWorksStep1Desc,
+        AppColors.blueAccent,
       ),
       (
         '02',
-        Icons.auto_awesome,
+        Icons.auto_awesome_rounded,
         AppLocalizations.of(context)!.introHowItWorksStep2,
         AppLocalizations.of(context)!.introHowItWorksStep2Desc,
+        AppColors.skyDark,
       ),
       (
         '03',
-        Icons.favorite,
+        Icons.favorite_rounded,
         AppLocalizations.of(context)!.introHowItWorksStep3,
         AppLocalizations.of(context)!.introHowItWorksStep3Desc,
+        AppColors.violetAccent,
       ),
     ];
     return SlideShell(
@@ -42,61 +45,64 @@ class HowItWorksSlide extends StatelessWidget {
             label: AppLocalizations.of(context)!.introHowItWorksSubtitle,
             color: AppColors.navyLight,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
           Text(
             AppLocalizations.of(context)!.introHowItWorksTitle,
             style: displayStyle(context),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 22),
           ...steps.indexed.map((entry) {
             final s = entry.$2;
             final card = Padding(
-                padding: const EdgeInsets.only(bottom: 14),
-                child: GlassCard(
-                  padding: const EdgeInsets.all(18),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      IconChip(icon: s.$2, color: AppColors.crimson),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              s.$1,
-                              style: TextStyle(
-                                color: AppColors.mutedForeground,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 1.5,
-                              ),
+              padding: EdgeInsets.only(
+                bottom: entry.$1 == steps.length - 1 ? 0 : 12,
+              ),
+              child: GlassCard(
+                padding: const EdgeInsets.all(17),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    IconChip(icon: s.$2, color: s.$5, size: 46),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            s.$1,
+                            style: TextStyle(
+                              color: AppColors.navyLight,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.7,
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              s.$3,
-                              style: const TextStyle(
-                                color: AppColors.navy,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            s.$3,
+                            style: const TextStyle(
+                              color: AppColors.navy,
+                              fontSize: 16.5,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.1,
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              s.$4,
-                              style: TextStyle(
-                                color: AppColors.mutedForeground,
-                                fontSize: 13,
-                                height: 1.4,
-                              ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            s.$4,
+                            style: const TextStyle(
+                              color: AppColors.mutedForeground,
+                              fontSize: 13.5,
+                              height: 1.38,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              );
+              ),
+            );
             if (MediaQuery.disableAnimationsOf(context)) return card;
             return card
                 .animate(delay: (100 + 60 * entry.$1).ms)

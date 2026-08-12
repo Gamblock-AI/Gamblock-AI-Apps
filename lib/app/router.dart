@@ -7,6 +7,7 @@ import '../features/accountability/presentation/screens/accountability_screen.da
 import '../features/analytics/presentation/screens/analytics_screen.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/register_screen.dart';
+import '../features/auth/presentation/screens/verify_phone_screen.dart';
 import '../features/intro/presentation/screens/intro_screen.dart';
 import '../features/intro/data/onboarding_state.dart';
 import '../features/auth/presentation/screens/forgot_password_screen.dart';
@@ -91,8 +92,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (path == '/onboarding' || path == '/onboarding/create-group') {
         return '/intro';
       }
-      final authEntry =
-          path == '/login' || path == '/register' || path == '/forgot-password';
+      final authEntry = path == '/login' ||
+          path == '/register' ||
+          path == '/forgot-password' ||
+          path == '/verify-phone';
       if (!onboarding.isCompleted && path != '/intro') {
         return '/intro';
       }
@@ -136,6 +139,20 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/forgot-password',
         pageBuilder: (_, state) =>
             _page(key: state.pageKey, child: const ForgotPasswordScreen()),
+      ),
+      GoRoute(
+        path: '/verify-phone',
+        pageBuilder: (_, state) {
+          final extra = state.extra;
+          return _page(
+            key: state.pageKey,
+            child: VerifyPhoneScreen(
+              verificationToken:
+                  extra is Map ? extra['verification_token']?.toString() : null,
+              phone: extra is Map ? extra['phone']?.toString() ?? '' : '',
+            ),
+          );
+        },
       ),
       GoRoute(
         path: '/setup',

@@ -9,6 +9,7 @@ import '../../../../core/messaging/app_messages.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/widgets/app_bar_title.dart';
+import '../../../../core/widgets/brand_widgets.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../data/providers.dart';
 import '../../domain/entities/protection_analytics.dart';
@@ -62,7 +63,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final auth = ref.watch(authProvider);
-    if (!auth.isAuthenticated || auth.deviceId == null) {
+    if (!auth.isAuthenticated) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.analyticsTitle)),
         body: EmptyState(
@@ -71,6 +72,18 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
           hint: l10n.analyticsSignInBody,
           actionLabel: l10n.authLoginBtn,
           onAction: () => context.go('/login'),
+        ),
+      );
+    }
+    if (auth.deviceId == null) {
+      return Scaffold(
+        appBar: AppBar(title: Text(l10n.analyticsTitle)),
+        body: EmptyState(
+          icon: Icons.phonelink_erase,
+          title: l10n.deviceRegistrationMissing,
+          hint: l10n.deviceRegistrationMissingBody,
+          actionLabel: l10n.setupTitle,
+          onAction: () => context.go('/setup'),
         ),
       );
     }
@@ -135,32 +148,30 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       children: [
         Text(
           l10n.analyticsPrivacySectionTitle,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppColors.navy,
+                color: AppColors.ink,
               ),
         ),
         const SizedBox(height: 10),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                _privacyInfoRow(
-                  context,
-                  icon: Icons.shield_outlined,
-                  title: l10n.analyticsOnDeviceTitle,
-                  description: l10n.analyticsOnDeviceDesc,
-                ),
-                const Divider(height: 24),
-                _privacyInfoRow(
-                  context,
-                  icon: Icons.lock_outline,
-                  title: l10n.analyticsNoBrowsingHistoryTitle,
-                  description: l10n.analyticsNoBrowsingHistoryDesc,
-                ),
-              ],
-            ),
+        SurfaceCard(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              _privacyInfoRow(
+                context,
+                icon: Icons.shield_outlined,
+                title: l10n.analyticsOnDeviceTitle,
+                description: l10n.analyticsOnDeviceDesc,
+              ),
+              const Divider(height: 24),
+              _privacyInfoRow(
+                context,
+                icon: Icons.lock_outline,
+                title: l10n.analyticsNoBrowsingHistoryTitle,
+                description: l10n.analyticsNoBrowsingHistoryDesc,
+              ),
+            ],
           ),
         ),
       ],

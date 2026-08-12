@@ -46,6 +46,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTitle => 'Settings';
 
   @override
+  String get quickActionsTitle => 'Quick actions';
+
+  @override
+  String get quickActionBreathe => 'Pause & Breathe';
+
+  @override
+  String get quickActionBreatheSubtitle =>
+      'A short breathing exercise before continuing';
+
+  @override
+  String get quickActionRecovery => 'Recovery & Support';
+
+  @override
+  String get quickActionRecoverySubtitle => 'Open recovery guides and support';
+
+  @override
   String get settingsAboutApp => 'About';
 
   @override
@@ -91,6 +107,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get protectionActiveTitle => 'Device protection active';
+
+  @override
+  String get protectionSensorsTitle => 'Devices & Sensors';
 
   @override
   String get protectionActiveDays => 'Hari Aktif';
@@ -1363,6 +1382,46 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get authPasswordChangeMin =>
       'The new password must be at least 8 characters.';
+
+  @override
+  String get authVerifyPhoneTitle => 'Verify WhatsApp Number';
+
+  @override
+  String authVerifyPhoneDesc(String phone) {
+    return 'A 6-digit code was sent to WhatsApp $phone. Enter it to finish verification.';
+  }
+
+  @override
+  String get authVerifyCodeLabel => 'Verification Code';
+
+  @override
+  String get authVerifyCodeHint => '6 digits';
+
+  @override
+  String get authVerifyCodeInvalid => 'Enter the 6-digit code.';
+
+  @override
+  String get authVerifyButton => 'Verify';
+
+  @override
+  String get authVerifyResend => 'Resend code';
+
+  @override
+  String get authVerifyResending => 'Sending...';
+
+  @override
+  String get authVerifySent => 'A new code was sent.';
+
+  @override
+  String get authVerifyError =>
+      'Verification did not succeed. Check the code or request a new one.';
+
+  @override
+  String get authVerifyMissingTitle => 'Verification not found';
+
+  @override
+  String get authVerifyMissingBody =>
+      'The verification session has expired. Sign in again to request a new code.';
 
   @override
   String get authSaveAndLogin => 'Save and sign in';

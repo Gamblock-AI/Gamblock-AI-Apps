@@ -32,9 +32,6 @@ class ProtectionStatusCard extends StatelessWidget {
                 ? l10n.protectionStatusDegraded
                 : l10n.protectionStatusInactive;
 
-    final sensorLower = status?.sensorStatus.toLowerCase();
-    final permissionLower = status?.permissionStatus.toLowerCase();
-
     return Semantics(
       liveRegion: true,
       label: title,
@@ -124,42 +121,6 @@ class ProtectionStatusCard extends StatelessWidget {
             ),
             const SizedBox(height: 14),
 
-            // Compact 3-Column Status Indicators
-            Row(
-              children: [
-                Expanded(
-                  child: _metricBox(
-                    context,
-                    label: l10n.protectionServiceLabel,
-                    value: status?.serviceRunning == true
-                        ? l10n.statusConnected
-                        : l10n.statusDisconnected,
-                    isGood: status?.serviceRunning == true,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _metricBox(
-                    context,
-                    label: l10n.protectionSensorLabel,
-                    value: _formatStatusValue(context, status?.sensorStatus),
-                    isGood: sensorLower == 'connected' || sensorLower == 'running',
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _metricBox(
-                    context,
-                    label: l10n.protectionPermissionLabel,
-                    value: _formatStatusValue(context, status?.permissionStatus),
-                    isGood: permissionLower == 'granted',
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
             // Model & Ruleset compact footer bar
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -199,67 +160,6 @@ class ProtectionStatusCard extends StatelessWidget {
       ),
     );
   }
-
-  Widget _metricBox(
-    BuildContext context, {
-    required String label,
-    required String value,
-    required bool isGood,
-  }) {
-    final statusColor = isGood ? AppColors.sage : AppColors.crimson;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.border.withValues(alpha: 0.5),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: AppColors.mutedForeground,
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Container(
-                width: 5,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: statusColor,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  value,
-                  style: TextStyle(
-                    color: statusColor,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 String? _formatDegradedReason(BuildContext context, String? code) {
@@ -278,37 +178,6 @@ String? _formatDegradedReason(BuildContext context, String? code) {
       return l10n.degradedSensorDisconnected;
     default:
       return code
-          .split('_')
-          .where((w) => w.isNotEmpty)
-          .map((w) => '${w[0].toUpperCase()}${w.substring(1)}')
-          .join(' ');
-  }
-}
-
-String _formatStatusValue(BuildContext context, String? value) {
-  final l10n = AppLocalizations.of(context)!;
-  if (value == null || value.isEmpty) return l10n.statusDisconnected;
-  switch (value.toLowerCase()) {
-    case 'connected':
-    case 'running':
-    case 'active':
-      return l10n.statusConnected;
-    case 'disconnected':
-    case 'stopped':
-    case 'inactive':
-      return l10n.statusDisconnected;
-    case 'granted':
-      return l10n.statusGranted;
-    case 'revoked':
-    case 'permission_revoked':
-      return l10n.statusRevoked;
-    case 'disabled':
-    case 'accessibility_disabled':
-      return l10n.statusDisabled;
-    case 'unknown':
-      return l10n.statusUnknown;
-    default:
-      return value
           .split('_')
           .where((w) => w.isNotEmpty)
           .map((w) => '${w[0].toUpperCase()}${w.substring(1)}')

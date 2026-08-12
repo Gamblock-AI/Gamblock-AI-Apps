@@ -55,6 +55,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           _passCtrl.clear();
           _submitted = false;
         });
+      } else if (user?['verification_required'] == true && mounted) {
+        _goToPhoneVerification(user);
       } else if (user != null && mounted) {
         context.go('/dashboard');
       }
@@ -87,7 +89,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final user = await ref
           .read(authProvider.notifier)
           .completeInitialPasswordChange(token, _passCtrl.text);
-      if (user != null && mounted) context.go('/dashboard');
+      if (user?['verification_required'] == true && mounted) {
+        _goToPhoneVerification(user);
+      } else if (user != null && mounted) {
+        context.go('/dashboard');
+      }
     } catch (error) {
       if (mounted) {
         setState(() => _error = AppMessages.friendlyMessage(context, error));
@@ -95,6 +101,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  void _goToPhoneVerification(Map<String, dynamic>? data) {
+    final token = data?['verification_token']?.toString();
+    if (token == null || token.isEmpty) return;
+    final user = data?['user'];
+    context.go(
+      '/verify-phone',
+      extra: {
+        'verification_token': token,
+        'phone': user is Map ? user['phone_e164']?.toString() ?? '' : '',
+      },
+    );
   }
 
   @override

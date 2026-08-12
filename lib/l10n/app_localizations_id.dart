@@ -46,6 +46,23 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsTitle => 'Pengaturan';
 
   @override
+  String get quickActionsTitle => 'Tindakan Cepat';
+
+  @override
+  String get quickActionBreathe => 'Jeda & Tarik Napas';
+
+  @override
+  String get quickActionBreatheSubtitle =>
+      'Latihan napas singkat sebelum melanjutkan';
+
+  @override
+  String get quickActionRecovery => 'Pemulihan & Dukungan';
+
+  @override
+  String get quickActionRecoverySubtitle =>
+      'Buka panduan dan dukungan pemulihan';
+
+  @override
   String get settingsAboutApp => 'Tentang Aplikasi';
 
   @override
@@ -91,6 +108,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get protectionActiveTitle => 'Perlindungan perangkat aktif';
+
+  @override
+  String get protectionSensorsTitle => 'Perangkat & Sensor';
 
   @override
   String get protectionActiveDays => 'Hari Aktif';
@@ -1356,6 +1376,46 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get authPasswordChangeMin => 'Kata sandi baru minimal 8 karakter.';
+
+  @override
+  String get authVerifyPhoneTitle => 'Verifikasi Nomor WhatsApp';
+
+  @override
+  String authVerifyPhoneDesc(String phone) {
+    return 'Kode 6 digit telah dikirim ke WhatsApp $phone. Masukkan kode untuk menyelesaikan verifikasi.';
+  }
+
+  @override
+  String get authVerifyCodeLabel => 'Kode Verifikasi';
+
+  @override
+  String get authVerifyCodeHint => '6 digit';
+
+  @override
+  String get authVerifyCodeInvalid => 'Masukkan kode 6 digit.';
+
+  @override
+  String get authVerifyButton => 'Verifikasi';
+
+  @override
+  String get authVerifyResend => 'Kirim ulang kode';
+
+  @override
+  String get authVerifyResending => 'Mengirim ulang...';
+
+  @override
+  String get authVerifySent => 'Kode baru telah dikirim.';
+
+  @override
+  String get authVerifyError =>
+      'Verifikasi belum berhasil. Periksa kode atau minta kode baru.';
+
+  @override
+  String get authVerifyMissingTitle => 'Verifikasi tidak ditemukan';
+
+  @override
+  String get authVerifyMissingBody =>
+      'Sesi verifikasi sudah berakhir. Silakan masuk kembali untuk meminta kode baru.';
 
   @override
   String get authSaveAndLogin => 'Simpan dan masuk';

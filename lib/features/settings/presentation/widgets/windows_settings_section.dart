@@ -40,7 +40,7 @@ class WindowsSettingsSection extends StatelessWidget {
                   l10n.settingsPairingToken,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.navy,
+                        color: AppColors.ink,
                       ),
                 ),
                 subtitle: Text(
@@ -69,7 +69,7 @@ class WindowsSettingsSection extends StatelessWidget {
                   l10n.settingsRotatePairing,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.navy,
+                        color: AppColors.ink,
                       ),
                 ),
                 onTap: onRotateToken,

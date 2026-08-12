@@ -139,7 +139,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
       data: {'email': email, 'password': password},
     );
     final data = ApiResponse.map(response);
-    if (data?['password_change_required'] == true) return data;
+    if (data == null) return null;
+    if (data['password_change_required'] == true) return data;
+    if (data['verification_required'] == true) return data;
     return _completeSession(data);
   }
 
@@ -151,9 +153,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
       '/v1/auth/first-login/password',
       data: {'token': token, 'new_password': newPassword},
     );
-    return _completeSession(ApiResponse.map(response));
+    final data = ApiResponse.map(response);
+    if (data == null) return null;
+    if (data['verification_required'] == true) return data;
+    return _completeSession(data);
   }
 
+  /// Registers an account. The backend issues no session: it returns the
+  /// verification response so the caller can route to the WhatsApp OTP screen.
   Future<Map<String, dynamic>?> register(
     String email,
     String password,
@@ -170,7 +177,34 @@ class AuthNotifier extends StateNotifier<AuthState> {
         'role': 'user',
       },
     );
-    return _completeSession(ApiResponse.map(response));
+    return ApiResponse.map(response);
+  }
+
+  /// Finalizes a session from a legacy/fallback response that still carries
+  /// access tokens (for example the login path for an already-verified phone).
+  Future<Map<String, dynamic>?> completeSession(
+    Map<String, dynamic>? data,
+  ) {
+    return _completeSession(data);
+  }
+
+  /// Completes the public WhatsApp OTP flow using the short-lived verification
+  /// token issued at registration or sign-in.
+  Future<bool> verifyPhone(String verificationToken, String code) async {
+    final response = await ApiClient.dio.post(
+      '/v1/auth/phone-verification/verify',
+      data: {'verification_token': verificationToken, 'code': code},
+    );
+    return ApiResponse.map(response)?['verified'] == true;
+  }
+
+  /// Requests a fresh WhatsApp code for the verification token's account.
+  Future<bool> resendPhone(String verificationToken) async {
+    final response = await ApiClient.dio.post(
+      '/v1/auth/phone-verification/verify/resend',
+      data: {'verification_token': verificationToken},
+    );
+    return ApiResponse.map(response)?['sent'] == true;
   }
 
   Future<void> requestPasswordReset(String email) async {

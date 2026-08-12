@@ -45,9 +45,20 @@ class SetupStepCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '${index + 1}. ${step.title}',
-                        style: Theme.of(context).textTheme.titleMedium,
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '${index + 1}. ',
+                              style: const TextStyle(color: AppColors.blueAccent),
+                            ),
+                            TextSpan(text: step.title),
+                          ],
+                        ),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: AppColors.ink,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                       const SizedBox(height: 5),
                       Text(

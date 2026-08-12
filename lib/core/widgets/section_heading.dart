@@ -13,7 +13,7 @@ class SectionHeading extends StatelessWidget {
   const SectionHeading({
     super.key,
     this.eyebrow,
-    this.eyebrowColor = AppColors.crimson,
+    this.eyebrowColor = AppColors.blueAccent,
     required this.title,
     this.subtitle,
   });

@@ -4,6 +4,8 @@ import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../core/feedback/haptics.dart';
 import '../core/theme/app_colors.dart';
+import '../core/theme/app_dimens.dart';
+import '../core/widgets/brand_widgets.dart';
 
 class AppShell extends StatelessWidget {
   const AppShell({super.key, required this.child});
@@ -44,6 +46,30 @@ class AppShell extends StatelessWidget {
     void select(int index) {
       Haptics.selection();
       context.go(destinations[index].path);
+    }
+
+    void openQuickActions() {
+      Haptics.selection();
+      showQuickActionsSheet(
+        context,
+        title: l10n.quickActionsTitle,
+        actions: [
+          QuickAction(
+            icon: Icons.self_improvement_rounded,
+            label: l10n.quickActionBreathe,
+            subtitle: l10n.quickActionBreatheSubtitle,
+            color: AppColors.navy,
+            onTap: () => context.go('/pattern-interrupt'),
+          ),
+          QuickAction(
+            icon: Icons.support_agent_rounded,
+            label: l10n.quickActionRecovery,
+            subtitle: l10n.quickActionRecoverySubtitle,
+            color: AppColors.blueAccent,
+            onTap: () => context.go('/recovery'),
+          ),
+        ],
+      );
     }
 
     return LayoutBuilder(
@@ -96,25 +122,16 @@ class AppShell extends StatelessWidget {
           );
         }
         return Scaffold(
-          body: content,
-          bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(color: AppColors.navy.withValues(alpha: 0.08)),
-              ),
-            ),
-            child: NavigationBar(
-              selectedIndex: selectedIndex,
-              onDestinationSelected: select,
-              destinations: [
-                for (final destination in destinations)
-                  NavigationDestination(
-                    icon: Icon(destination.icon),
-                    selectedIcon: Icon(destination.selectedIcon),
-                    label: destination.label,
-                  ),
-              ],
-            ),
+          extendBody: true,
+          body: Padding(
+            padding: const EdgeInsets.only(bottom: 84),
+            child: content,
+          ),
+          bottomNavigationBar: _GlassBottomNav(
+            selectedIndex: selectedIndex,
+            destinations: destinations,
+            onSelect: select,
+            onFab: openQuickActions,
           ),
         );
       },
@@ -135,4 +152,150 @@ class _Destination {
   final IconData selectedIcon;
   final String label;
   final String path;
+}
+
+/// Floating glass bottom bar with four destinations and a raised center FAB —
+/// mirrors the wireframe bottom navigation (blur, hairline border, active dot).
+class _GlassBottomNav extends StatelessWidget {
+  final int selectedIndex;
+  final List<_Destination> destinations;
+  final ValueChanged<int> onSelect;
+  final VoidCallback onFab;
+
+  const _GlassBottomNav({
+    required this.selectedIndex,
+    required this.destinations,
+    required this.onSelect,
+    required this.onFab,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: SizedBox(
+        height: 76,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.glassFill,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(AppRadius.banner),
+                  ),
+                  border: const Border(
+                    top: BorderSide(color: AppColors.glassBorder),
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x0A000000),
+                      blurRadius: 40,
+                      offset: Offset(0, -10),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    for (var i = 0; i < destinations.length; i++)
+                      Expanded(
+                        child: _NavItem(
+                          destination: destinations[i],
+                          selected: i == selectedIndex,
+                          onTap: () => onSelect(i),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              top: -30,
+              left: 0,
+              right: 0,
+              child: Center(child: _CenterFab(onTap: onFab)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  final _Destination destination;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _NavItem({
+    required this.destination,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 8),
+          Icon(
+            selected ? destination.selectedIcon : destination.icon,
+            size: AppIconSize.lg,
+            color: selected ? AppColors.navy : AppColors.inkMuted,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            destination.label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              color: selected ? AppColors.navy : AppColors.inkMuted,
+            ),
+          ),
+          const Spacer(),
+          Container(
+            width: 4,
+            height: 4,
+            margin: const EdgeInsets.only(bottom: 6),
+            decoration: BoxDecoration(
+              color: selected ? AppColors.blueAccent : Colors.transparent,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CenterFab extends StatelessWidget {
+  final VoidCallback onTap;
+  const _CenterFab({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      child: Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          gradient: AppColors.blueAccentGradient,
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white, width: 4),
+          boxShadow: AppColors.fabGlow,
+        ),
+        child: const Icon(
+          Icons.add_rounded,
+          color: Colors.white,
+          size: 30,
+        ),
+      ),
+    );
+  }
 }

@@ -12,6 +12,11 @@
   "settingsManagePartner": "Kelola pendamping",
   "settingsLogoutConfirm": "Are you sure you want to log out?",
   "settingsTitle": "Settings",
+  "quickActionsTitle": "Quick actions",
+  "quickActionBreathe": "Pause & Breathe",
+  "quickActionBreatheSubtitle": "A short breathing exercise before continuing",
+  "quickActionRecovery": "Recovery & Support",
+  "quickActionRecoverySubtitle": "Open recovery guides and support",
   "settingsAboutApp": "About",
   "settingsAccountabilityPartner": "Accountability Partner",
   "settingsEmailVerified": "Email verified",
@@ -27,6 +32,7 @@
   "protectionRecentBlocks": "Blokir Terbaru",
   "protectionInactive": "Perlindungan Nonaktif",
   "protectionActiveTitle": "Device protection active",
+  "protectionSensorsTitle": "Devices & Sensors",
   "protectionActiveDays": "Hari Aktif",
   "protectionMobileRequest": "Pengajuan dari aplikasi mobile",
   "protectionTotalBlocks": "Total Blokir",
@@ -469,6 +475,25 @@
   "authBackToLogin": "Back to login",
   "authTempPasswordDesc": "The temporary password only applies to this step.",
   "authPasswordChangeMin": "The new password must be at least 8 characters.",
+  "authVerifyPhoneTitle": "Verify WhatsApp Number",
+  "authVerifyPhoneDesc": "A 6-digit code was sent to WhatsApp {phone}. Enter it to finish verification.",
+  "@authVerifyPhoneDesc": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "authVerifyCodeLabel": "Verification Code",
+  "authVerifyCodeHint": "6 digits",
+  "authVerifyCodeInvalid": "Enter the 6-digit code.",
+  "authVerifyButton": "Verify",
+  "authVerifyResend": "Resend code",
+  "authVerifyResending": "Sending...",
+  "authVerifySent": "A new code was sent.",
+  "authVerifyError": "Verification did not succeed. Check the code or request a new one.",
+  "authVerifyMissingTitle": "Verification not found",
+  "authVerifyMissingBody": "The verification session has expired. Sign in again to request a new code.",
   "authSaveAndLogin": "Save and sign in",
   "authShowPassword": "Show password",
   "authHidePassword": "Hide password",

@@ -82,6 +82,7 @@ class _GamblockAppState extends ConsumerState<GamblockApp>
 
     if (authState.isLoading || settings.isLoading || onboarding.isLoading) {
       return MaterialApp(
+        debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         themeMode: ThemeMode.light,
@@ -93,6 +94,7 @@ class _GamblockAppState extends ConsumerState<GamblockApp>
     }
 
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       onGenerateTitle: (context) => AppLocalizations.of(context)!.appName,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,

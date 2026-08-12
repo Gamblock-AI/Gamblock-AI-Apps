@@ -17,14 +17,16 @@ class AppSpacing {
 }
 
 /// Shared corner-radius scale. Cards use [lg], inputs and small panels [md],
-/// inner tiles and dialog controls [sm], chips/badges [xs], buttons [pill].
+/// inner tiles and dialog controls [sm], chips/badges [xs], buttons [pill],
+/// hero banners and date tracks [banner].
 class AppRadius {
   AppRadius._();
 
   static const double xs = 8;
   static const double sm = 12;
   static const double md = 16;
-  static const double lg = 22;
+  static const double lg = 20;
+  static const double banner = 24;
   static const double xl = 28;
   static const double pill = 999;
 }

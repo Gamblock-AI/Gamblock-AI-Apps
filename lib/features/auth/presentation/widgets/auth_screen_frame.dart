@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/brand_widgets.dart';
 import '../../../../core/widgets/language_toggle_button.dart';
 
 /// Applies the shared safe-area, surface, and width constraints for auth forms.
@@ -25,14 +25,16 @@ class AuthScreenFrame extends StatelessWidget {
               .slideY(begin: 0.04, end: 0, curve: Curves.easeOutCubic)
         : constrainedChild;
     return Scaffold(
-      backgroundColor: AppColors.surfaceLight,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Stack(
           children: [
-            Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 48, 24, 32),
-                child: content,
+            BlobBackground(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(24, 48, 24, 32),
+                  child: content,
+                ),
               ),
             ),
             const Positioned(

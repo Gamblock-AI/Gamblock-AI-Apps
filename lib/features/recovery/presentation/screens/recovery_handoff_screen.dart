@@ -7,9 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/feedback/feedback.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/eyebrow_pill.dart';
-import '../../../../core/widgets/glass_card.dart';
-import '../../../../core/widgets/mesh_background.dart';
+import '../../../../core/widgets/brand_widgets.dart';
 
 /// Hands the recovery journey off to the website with a warm, branded pause
 /// instead of a bare utility card.
@@ -38,14 +36,14 @@ class RecoveryHandoffScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          EyebrowPill(label: l10n.recoveryWebEyebrow, color: AppColors.crimson),
+          EyebrowPill(label: l10n.recoveryWebEyebrow, color: AppColors.blueAccent),
           const SizedBox(height: 14),
           Text(
             l10n.recoveryWebTitle,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.w800,
-              color: AppColors.navy,
+              color: AppColors.ink,
             ),
           ),
           const SizedBox(height: 10),
@@ -53,7 +51,7 @@ class RecoveryHandoffScreen extends StatelessWidget {
             l10n.recoveryWebBody,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: AppColors.mutedForeground,
+              color: AppColors.inkMuted,
               height: 1.55,
             ),
           ),
@@ -92,7 +90,7 @@ class RecoveryHandoffScreen extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
       ),
-      body: MeshBackground(
+      body: BlobBackground(
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(

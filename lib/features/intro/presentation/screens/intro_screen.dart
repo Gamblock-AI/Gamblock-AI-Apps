@@ -53,6 +53,8 @@ class _IntroScreenState extends ConsumerState<IntroScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: MeshBackground(
         child: SafeArea(
@@ -63,62 +65,78 @@ class _IntroScreenState extends ConsumerState<IntroScreen> {
                 onPageChanged: (i) => setState(() => _page = i),
                 children: const [HeroSlide(), HowItWorksSlide(), CtaSlide()],
               ),
-              const Positioned(
-                top: 12,
+              Positioned(
+                top: 10,
                 left: 16,
-                child: LanguageToggleButton(),
-              ),
-              Positioned(
-                top: 12,
-                right: 12,
-                child: TextButton(
-                  onPressed: _finish,
-                  child: Text(
-                    AppLocalizations.of(context)!.introSkip,
-                    style: const TextStyle(
-                      color: AppColors.mutedForeground,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 24,
-                right: 24,
-                bottom: 24,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                right: 16,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(_pages, (i) {
-                        final active = i == _page;
-                        return AnimatedContainer(
-                          duration: MediaQuery.disableAnimationsOf(context)
-                              ? Duration.zero
-                              : const Duration(milliseconds: 250),
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: active ? 28 : 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: active
-                                ? AppColors.crimson
-                                : AppColors.navy.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                        );
-                      }),
-                    ),
-                    const SizedBox(height: 20),
-                    darkCtaButton(
-                      context,
-                      _page == _pages - 1
-                          ? AppLocalizations.of(context)!.introStartBtn
-                          : AppLocalizations.of(context)!.introNext,
-                      _next,
+                    const LanguageToggleButton(),
+                    TextButton(
+                      onPressed: _finish,
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.navy,
+                        minimumSize: const Size(48, 44),
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      child: Text(l10n.introSkip),
                     ),
                   ],
+                ),
+              ),
+              Positioned.fill(
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 460),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(_pages, (i) {
+                              final active = i == _page;
+                              return AnimatedContainer(
+                                duration:
+                                    MediaQuery.disableAnimationsOf(context)
+                                    ? Duration.zero
+                                    : const Duration(milliseconds: 250),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
+                                width: active ? 28 : 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: active
+                                      ? AppColors.blueAccent
+                                      : AppColors.navy.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                              );
+                            }),
+                          ),
+                          const SizedBox(height: 18),
+                          darkCtaButton(
+                            context,
+                            _page == _pages - 1
+                                ? l10n.introStartBtn
+                                : l10n.introNext,
+                            _next,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],

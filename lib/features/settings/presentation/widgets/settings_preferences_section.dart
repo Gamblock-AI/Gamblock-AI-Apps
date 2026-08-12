@@ -67,7 +67,7 @@ class SettingsPreferencesSection extends StatelessWidget {
                   l10n.settingsLanguage,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.navy,
+                        color: AppColors.ink,
                       ),
                 ),
                 trailing: Container(
@@ -82,7 +82,7 @@ class SettingsPreferencesSection extends StatelessWidget {
                       value: locale.languageCode,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: AppColors.navy,
+                            color: AppColors.ink,
                           ),
                       items: [
                         DropdownMenuItem(
@@ -124,7 +124,7 @@ class SettingsPreferencesSection extends StatelessWidget {
                   l10n.settingsHaptics,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.navy,
+                        color: AppColors.ink,
                       ),
                 ),
                 value: hapticsEnabled,
@@ -155,7 +155,7 @@ class SettingsPreferencesSection extends StatelessWidget {
                     l10n.settingsHealthNotifications,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: AppColors.navy,
+                          color: AppColors.ink,
                         ),
                   ),
                   subtitle: Text(
@@ -194,7 +194,7 @@ class SettingsPreferencesSection extends StatelessWidget {
                     l10n.settingsReminderTitle,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: AppColors.navy,
+                      color: AppColors.ink,
                     ),
                   ),
                   subtitle: Text(
@@ -216,14 +216,14 @@ class SettingsPreferencesSection extends StatelessWidget {
                       l10n.settingsReminderTime,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.navy,
+                        color: AppColors.ink,
                       ),
                     ),
                     trailing: Text(
                       checkInReminderTime.format(context),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: AppColors.navy,
+                        color: AppColors.ink,
                       ),
                     ),
                     onTap: onCheckInReminderTimeTap,

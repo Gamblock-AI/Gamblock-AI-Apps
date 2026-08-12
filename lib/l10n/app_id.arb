@@ -12,6 +12,11 @@
   "settingsManagePartner": "Kelola pendamping",
   "settingsLogoutConfirm": "Apakah Anda yakin ingin keluar?",
   "settingsTitle": "Pengaturan",
+  "quickActionsTitle": "Tindakan Cepat",
+  "quickActionBreathe": "Jeda & Tarik Napas",
+  "quickActionBreatheSubtitle": "Latihan napas singkat sebelum melanjutkan",
+  "quickActionRecovery": "Pemulihan & Dukungan",
+  "quickActionRecoverySubtitle": "Buka panduan dan dukungan pemulihan",
   "settingsAboutApp": "Tentang Aplikasi",
   "settingsAccountabilityPartner": "Pendamping Akuntabilitas",
   "settingsEmailVerified": "Email terverifikasi",
@@ -27,6 +32,7 @@
   "protectionRecentBlocks": "Blokir Terbaru",
   "protectionInactive": "Perlindungan Nonaktif",
   "protectionActiveTitle": "Perlindungan perangkat aktif",
+  "protectionSensorsTitle": "Perangkat & Sensor",
   "protectionActiveDays": "Hari Aktif",
   "protectionMobileRequest": "Pengajuan dari aplikasi mobile",
   "protectionTotalBlocks": "Total Blokir",
@@ -469,6 +475,25 @@
   "authBackToLogin": "Kembali ke login",
   "authTempPasswordDesc": "Kata sandi sementara hanya berlaku untuk langkah ini.",
   "authPasswordChangeMin": "Kata sandi baru minimal 8 karakter.",
+  "authVerifyPhoneTitle": "Verifikasi Nomor WhatsApp",
+  "authVerifyPhoneDesc": "Kode 6 digit telah dikirim ke WhatsApp {phone}. Masukkan kode untuk menyelesaikan verifikasi.",
+  "@authVerifyPhoneDesc": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "authVerifyCodeLabel": "Kode Verifikasi",
+  "authVerifyCodeHint": "6 digit",
+  "authVerifyCodeInvalid": "Masukkan kode 6 digit.",
+  "authVerifyButton": "Verifikasi",
+  "authVerifyResend": "Kirim ulang kode",
+  "authVerifyResending": "Mengirim ulang...",
+  "authVerifySent": "Kode baru telah dikirim.",
+  "authVerifyError": "Verifikasi belum berhasil. Periksa kode atau minta kode baru.",
+  "authVerifyMissingTitle": "Verifikasi tidak ditemukan",
+  "authVerifyMissingBody": "Sesi verifikasi sudah berakhir. Silakan masuk kembali untuk meminta kode baru.",
   "authSaveAndLogin": "Simpan dan masuk",
   "authShowPassword": "Tampilkan kata sandi",
   "authHidePassword": "Sembunyikan kata sandi",

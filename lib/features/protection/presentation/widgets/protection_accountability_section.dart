@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/auth/auth_state.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../accountability/domain/entities/accountability_models.dart';
 import 'protection_accountability_card.dart';
@@ -45,7 +46,11 @@ class ProtectionAccountabilitySection extends StatelessWidget {
       children: [
         Text(
           l10n.protectionAccountabilityTitle,
-          style: Theme.of(context).textTheme.titleLarge,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: AppColors.ink,
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+          ),
         ),
         const SizedBox(height: 10),
         if (!auth.isAuthenticated)

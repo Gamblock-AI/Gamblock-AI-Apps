@@ -170,6 +170,36 @@ abstract class AppLocalizations {
   /// **'Pengaturan'**
   String get settingsTitle;
 
+  /// No description provided for @quickActionsTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Tindakan Cepat'**
+  String get quickActionsTitle;
+
+  /// No description provided for @quickActionBreathe.
+  ///
+  /// In id, this message translates to:
+  /// **'Jeda & Tarik Napas'**
+  String get quickActionBreathe;
+
+  /// No description provided for @quickActionBreatheSubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Latihan napas singkat sebelum melanjutkan'**
+  String get quickActionBreatheSubtitle;
+
+  /// No description provided for @quickActionRecovery.
+  ///
+  /// In id, this message translates to:
+  /// **'Pemulihan & Dukungan'**
+  String get quickActionRecovery;
+
+  /// No description provided for @quickActionRecoverySubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka panduan dan dukungan pemulihan'**
+  String get quickActionRecoverySubtitle;
+
   /// No description provided for @settingsAboutApp.
   ///
   /// In id, this message translates to:
@@ -259,6 +289,12 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Perlindungan perangkat aktif'**
   String get protectionActiveTitle;
+
+  /// No description provided for @protectionSensorsTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Perangkat & Sensor'**
+  String get protectionSensorsTitle;
 
   /// No description provided for @protectionActiveDays.
   ///
@@ -2575,6 +2611,78 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Kata sandi baru minimal 8 karakter.'**
   String get authPasswordChangeMin;
+
+  /// No description provided for @authVerifyPhoneTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Verifikasi Nomor WhatsApp'**
+  String get authVerifyPhoneTitle;
+
+  /// No description provided for @authVerifyPhoneDesc.
+  ///
+  /// In id, this message translates to:
+  /// **'Kode 6 digit telah dikirim ke WhatsApp {phone}. Masukkan kode untuk menyelesaikan verifikasi.'**
+  String authVerifyPhoneDesc(String phone);
+
+  /// No description provided for @authVerifyCodeLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Kode Verifikasi'**
+  String get authVerifyCodeLabel;
+
+  /// No description provided for @authVerifyCodeHint.
+  ///
+  /// In id, this message translates to:
+  /// **'6 digit'**
+  String get authVerifyCodeHint;
+
+  /// No description provided for @authVerifyCodeInvalid.
+  ///
+  /// In id, this message translates to:
+  /// **'Masukkan kode 6 digit.'**
+  String get authVerifyCodeInvalid;
+
+  /// No description provided for @authVerifyButton.
+  ///
+  /// In id, this message translates to:
+  /// **'Verifikasi'**
+  String get authVerifyButton;
+
+  /// No description provided for @authVerifyResend.
+  ///
+  /// In id, this message translates to:
+  /// **'Kirim ulang kode'**
+  String get authVerifyResend;
+
+  /// No description provided for @authVerifyResending.
+  ///
+  /// In id, this message translates to:
+  /// **'Mengirim ulang...'**
+  String get authVerifyResending;
+
+  /// No description provided for @authVerifySent.
+  ///
+  /// In id, this message translates to:
+  /// **'Kode baru telah dikirim.'**
+  String get authVerifySent;
+
+  /// No description provided for @authVerifyError.
+  ///
+  /// In id, this message translates to:
+  /// **'Verifikasi belum berhasil. Periksa kode atau minta kode baru.'**
+  String get authVerifyError;
+
+  /// No description provided for @authVerifyMissingTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Verifikasi tidak ditemukan'**
+  String get authVerifyMissingTitle;
+
+  /// No description provided for @authVerifyMissingBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Sesi verifikasi sudah berakhir. Silakan masuk kembali untuk meminta kode baru.'**
+  String get authVerifyMissingBody;
 
   /// No description provided for @authSaveAndLogin.
   ///

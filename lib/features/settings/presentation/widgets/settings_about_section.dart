@@ -107,7 +107,7 @@ class SettingsAboutSection extends StatelessWidget {
         title,
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: AppColors.navy,
+              color: AppColors.ink,
             ),
       ),
       subtitle: subtitle != null

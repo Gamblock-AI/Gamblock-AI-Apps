@@ -49,7 +49,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       _error = null;
     });
     try {
-      final user = await ref
+      final data = await ref
           .read(authProvider.notifier)
           .register(
             _emailCtrl.text.trim(),
@@ -57,8 +57,24 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             _nameCtrl.text.trim(),
             _phoneCtrl.text.trim(),
           );
-      if (user != null && mounted) {
-        context.go('/dashboard');
+      if (!mounted) return;
+      final verificationToken = data?['verification_token']?.toString();
+      if (data?['verification_required'] == true &&
+          verificationToken != null &&
+          verificationToken.isNotEmpty) {
+        final user = data?['user'];
+        context.go(
+          '/verify-phone',
+          extra: {
+            'verification_token': verificationToken,
+            'phone': user is Map
+                ? user['phone_e164']?.toString() ?? ''
+                : '',
+          },
+        );
+      } else if (data?['access_token'] != null) {
+        await ref.read(authProvider.notifier).completeSession(data);
+        if (mounted) context.go('/dashboard');
       }
     } catch (e) {
       if (mounted) {

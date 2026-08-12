@@ -21,8 +21,7 @@ class AppTheme {
       colorScheme: scheme,
       textTheme: _brandedText(scheme.onSurface),
       scaffoldBackgroundColor: AppColors.background,
-      canvasColor: AppColors.background,
-      // Subtle pointer feedback for every InkWell-based surface — this is the
+      canvasColor: AppColors.background,      // Subtle pointer feedback for every InkWell-based surface — this is the
       // primary hover/focus affordance on the Windows desktop target.
       hoverColor: AppColors.navy.withValues(alpha: 0.04),
       focusColor: AppColors.sky.withValues(alpha: 0.18),

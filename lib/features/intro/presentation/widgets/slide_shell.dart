@@ -7,8 +7,18 @@ class SlideShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.sizeOf(context);
+    final compactHeight = screenSize.height < 720;
+    final horizontalPadding = screenSize.width >= 600 ? 32.0 : 24.0;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(24, 56, 24, 130),
+      physics: const ClampingScrollPhysics(),
+      padding: EdgeInsets.fromLTRB(
+        horizontalPadding,
+        compactHeight ? 28 : 46,
+        horizontalPadding,
+        compactHeight ? 116 : 132,
+      ),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 460),

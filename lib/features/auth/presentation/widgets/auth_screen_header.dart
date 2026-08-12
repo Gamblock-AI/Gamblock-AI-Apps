@@ -23,13 +23,13 @@ class AuthScreenHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (showEyebrow) ...[
-          EyebrowPill(label: eyebrow!, color: AppColors.crimson),
+          EyebrowPill(label: eyebrow!, color: AppColors.blueAccent),
           const SizedBox(height: 14),
         ],
         Text(
           title,
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
-            color: AppColors.navy,
+            color: AppColors.ink,
             letterSpacing: -1.0,
             height: 1.05,
           ),
@@ -38,7 +38,7 @@ class AuthScreenHeader extends StatelessWidget {
         Text(
           description,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppColors.navy.withValues(alpha: 0.55),
+            color: AppColors.inkMuted,
           ),
         ),
       ],

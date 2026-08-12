@@ -74,7 +74,7 @@ class _CompactStatTile extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppRadius.sm),
         border: Border.all(color: AppColors.border),
-        boxShadow: AppColors.softShadow,
+        boxShadow: AppColors.cardSoftShadow,
       ),
       child: Row(
         children: [
@@ -96,7 +96,7 @@ class _CompactStatTile extends StatelessWidget {
                 Text(
                   value,
                   style: const TextStyle(
-                    color: AppColors.navy,
+                    color: AppColors.ink,
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
                     height: 1.1,

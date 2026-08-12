@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/messaging/app_messages.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
+import '../../../../core/widgets/brand_widgets.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../accountability/domain/entities/accountability_models.dart';
 import '../../data/daily_presence_store.dart';
 import '../../domain/entities/protection_status.dart';
-import 'protection_accountability_section.dart';
 import 'dashboard_gami.dart';
+import 'protection_accountability_section.dart';
 import 'protection_actions.dart';
 import 'protection_screen_skeleton.dart';
+import 'protection_sensors_carousel.dart';
 import 'protection_status_card.dart';
 import 'protection_weekly_appreciation.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_dimens.dart';
 
 /// Scrollable Protection content, kept separate from native state orchestration.
 class ProtectionScreenBody extends StatelessWidget {
@@ -79,25 +82,31 @@ class ProtectionScreenBody extends StatelessWidget {
       child: ListView(
         padding: AppSpacing.screenPadding,
         children: [
-          _entrance(
-            context,
-            0,
-            _DashboardHero(
-              auth: auth,
-              status: status,
-              onOpenSetup: onOpenSetup,
-              onRefresh: onRefresh,
-              refreshing: isLoading,
-            ),
+          _DashboardProfileHeader(
+            auth: auth,
+            status: status,
+            onRefresh: onRefresh,
+            refreshing: isLoading,
           ),
           const SizedBox(height: 16),
           if (auth.isAuthenticated && !auth.phoneVerified) ...[
             const _VerificationNotice(),
             const SizedBox(height: 16),
           ],
+          const SizedBox(height: 4),
           if (isLoading && status == null)
             const ProtectionScreenSkeleton()
           else ...[
+            _entrance(
+              context,
+              0,
+              _StatusBanner(
+                auth: auth,
+                status: status,
+                onOpenSetup: onOpenSetup,
+              ),
+            ),
+            const SizedBox(height: 16),
             _entrance(context, 1, ProtectionStatusCard(status: status)),
             const SizedBox(height: 16),
             const ProtectionWeeklyAppreciation(),
@@ -110,8 +119,10 @@ class ProtectionScreenBody extends StatelessWidget {
                 onRunSelfTest: onRunSelfTest,
               ),
             ),
+            const SizedBox(height: 24),
+            _entrance(context, 3, ProtectionSensorsCarousel(status: status)),
+            const SizedBox(height: 24),
             if (error != null) ...[
-              const SizedBox(height: 16),
               EmptyState(
                 icon: Icons.cloud_off,
                 title: l10n.protectionSyncError,
@@ -119,8 +130,8 @@ class ProtectionScreenBody extends StatelessWidget {
                 actionLabel: l10n.retry,
                 onAction: onRefresh,
               ),
+              const SizedBox(height: 24),
             ],
-            const SizedBox(height: 24),
             ProtectionAccountabilitySection(
               auth: auth,
               accountability: accountability,
@@ -142,162 +153,293 @@ class ProtectionScreenBody extends StatelessWidget {
   }
 }
 
-class _DashboardHero extends ConsumerWidget {
-  const _DashboardHero({
+/// Wireframe profile header: monogram avatar + greeting/name/status + settings.
+class _DashboardProfileHeader extends StatelessWidget {
+  const _DashboardProfileHeader({
     required this.auth,
     required this.status,
-    required this.onOpenSetup,
     required this.onRefresh,
     required this.refreshing,
   });
 
   final AuthState auth;
   final ProtectionStatus? status;
-  final VoidCallback onOpenSetup;
   final Future<void> Function() onRefresh;
   final bool refreshing;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final name = auth.displayName?.trim() ?? '';
+    final firstName = name.split(' ').first;
+    final greeting = name.isNotEmpty
+        ? l10n.dashboardHello(firstName)
+        : l10n.dashboardHelloGuest;
+    final active = status?.isActive == true;
+    final role = active
+        ? l10n.protectionStatusActive
+        : l10n.protectionStatusInactive;
+
+    return Row(
+      children: [
+        MonogramAvatar(
+          label: name.isNotEmpty ? name : 'G',
+          color: AppColors.navy,
+          size: 48,
+          boxShadow: AppColors.cardSoftShadow,
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                greeting,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.inkMuted,
+                ),
+              ),
+              Text(
+                name.isNotEmpty ? name : l10n.dashboardHelloGuest,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.ink,
+                ),
+              ),
+              Text(
+                role,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.inkMuted,
+                ),
+              ),
+            ],
+          ),
+        ),
+        _HeaderIconButton(
+          tooltip: l10n.refresh,
+          icon: Icons.refresh_rounded,
+          onPressed: refreshing ? null : () => onRefresh(),
+        ),
+        const SizedBox(width: 8),
+        _HeaderIconButton(
+          tooltip: l10n.settingsTitle,
+          icon: Icons.settings_rounded,
+          onPressed: () => context.go('/settings'),
+        ),
+      ],
+    );
+  }
+}
+
+class _HeaderIconButton extends StatelessWidget {
+  final String tooltip;
+  final IconData icon;
+  final VoidCallback? onPressed;
+
+  const _HeaderIconButton({
+    required this.tooltip,
+    required this.icon,
+    this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onPressed,
+      customBorder: const CircleBorder(),
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          shape: BoxShape.circle,
+          border: Border.all(color: AppColors.glassBorder),
+          boxShadow: AppColors.cardSoftShadow,
+        ),
+        child: Icon(
+          icon,
+          size: AppIconSize.md,
+          color: onPressed == null ? AppColors.inkMuted : AppColors.ink,
+        ),
+      ),
+    );
+  }
+}
+
+/// Light "overview banner": status headline + Gami illustration with a
+/// gradient fade, plus a setup CTA (mirrors the wireframe banner + hero).
+class _StatusBanner extends ConsumerWidget {
+  const _StatusBanner({
+    required this.auth,
+    required this.status,
+    required this.onOpenSetup,
+  });
+
+  final AuthState auth;
+  final ProtectionStatus? status;
+  final VoidCallback onOpenSetup;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final firstOpenToday =
         ref.watch(firstOpenTodayProvider).valueOrNull ?? false;
-    final gami = resolveDashboardGami(
-      firstOpenToday: firstOpenToday,
-    );
+    final gami = resolveDashboardGami(firstOpenToday: firstOpenToday);
+    final l10n = AppLocalizations.of(context)!;
+    final active = status?.isActive == true;
+
     return Container(
       clipBehavior: Clip.antiAlias,
-      padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
       decoration: BoxDecoration(
-        gradient: AppColors.navyGradient,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.navy.withValues(alpha: 0.25),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.banner),
+        border: Border.all(color: AppColors.background),
+        boxShadow: AppColors.cardSoftShadow,
       ),
       child: Stack(
         children: [
+          const Positioned(
+            top: -50,
+            left: -50,
+            child: RadialBlob(color: AppColors.blueAccent, size: 220, alpha: 0.16),
+          ),
+          const Positioned(
+            top: -30,
+            right: -50,
+            child: RadialBlob(color: AppColors.violetAccent, size: 190, alpha: 0.12),
+          ),
           Positioned(
-            right: -6,
-            bottom: -10,
-            child: Opacity(
-              opacity: 0.9,
-              child: Image.asset(
-                gami.asset,
-                height: 88,
-                cacheWidth: 264,
+            right: -8,
+            bottom: -12,
+            child: Image.asset(
+              gami.asset,
+              height: 118,
+              cacheWidth: 300,
+              excludeFromSemantics: true,
+              errorBuilder: (context, error, stackTrace) => Image.asset(
+                'assets/images/gami.webp',
+                height: 118,
+                cacheWidth: 300,
                 excludeFromSemantics: true,
-                errorBuilder: (context, error, stackTrace) => Image.asset(
-                  'assets/images/gami.webp',
-                  height: 88,
-                  cacheWidth: 264,
-                  excludeFromSemantics: true,
+              ),
+            ),
+          ),
+          Positioned(
+            right: 0,
+            top: 0,
+            bottom: 0,
+            width: 150,
+            child: const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [Color(0xFFFFFFFF), Color(0xCCFFFFFF), Color(0x00FFFFFF)],
+                  stops: [0, 0.5, 1],
                 ),
               ),
             ),
           ),
-          _heroContent(context, gami),
-        ],
-      ),
-    );
-  }
-
-  Widget _heroContent(BuildContext context, DashboardGamiPresentation gami) {
-    final l10n = AppLocalizations.of(context)!;
-    final name = auth.displayName?.trim().split(' ').first;
-    final active = status?.isActive == true;
-    final greeting = name?.isNotEmpty == true
-        ? l10n.dashboardHello(name!)
-        : l10n.dashboardHelloGuest;
-    final l10nRefresh = l10n.refresh;
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  greeting,
-                  style: const TextStyle(
-                    color: AppColors.skyLight,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.2,
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: active ? AppColors.sage : AppColors.crimson,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      active
+                          ? l10n.protectionStatusActive
+                          : l10n.protectionStatusInactive,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.4,
+                        color: AppColors.inkMuted,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: MediaQuery.sizeOf(context).width * 0.55,
+                  child: Text(
+                    active
+                        ? l10n.protectionActiveTitle
+                        : l10n.protectionInactiveTitle,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          color: AppColors.ink,
+                          fontWeight: FontWeight.w800,
+                          height: 1.2,
+                          fontSize: 22,
+                        ),
                   ),
                 ),
-              ),
-              IconButton(
-                tooltip: l10nRefresh,
-                onPressed: refreshing ? null : () => onRefresh(),
-                visualDensity: VisualDensity.compact,
-                constraints: const BoxConstraints(
-                  minWidth: 36,
-                  minHeight: 36,
+                const SizedBox(height: 6),
+                SizedBox(
+                  width: MediaQuery.sizeOf(context).width * 0.56,
+                  child: Text(
+                    l10n.protectionOnDevicePrivacyDesc,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      height: 1.45,
+                      color: AppColors.inkMuted,
+                    ),
+                  ),
                 ),
-                iconSize: 20,
-                color: Colors.white.withValues(alpha: 0.85),
-                disabledColor: Colors.white.withValues(alpha: 0.35),
-                icon: const Icon(Icons.refresh_rounded),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            active
-                ? l10n.protectionActiveTitle
-                : l10n.protectionInactiveTitle,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  height: 1.15,
+                if (gami.lineBuilder != null) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    gami.lineBuilder!(l10n),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.blueAccent,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 14),
+                SizedBox(
+                  height: 38,
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.navy,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                      ),
+                    ),
+                    onPressed: onOpenSetup,
+                    icon: const Icon(Icons.tune_rounded, size: 16),
+                    label: Text(
+                      l10n.checkSetupAction,
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                    ),
+                  ),
                 ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.protectionOnDevicePrivacyDesc,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.8),
-              fontSize: 13,
-              height: 1.45,
-            ),
-          ),
-          if (gami.lineBuilder != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              gami.lineBuilder!(l10n),
-              style: const TextStyle(
-                color: AppColors.skyLight,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                height: 1.4,
-              ),
-            ),
-          ],
-          const SizedBox(height: 14),
-          SizedBox(
-            height: 38,
-            child: FilledButton.icon(
-              style: FilledButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: AppColors.navy,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onPressed: onOpenSetup,
-              icon: const Icon(Icons.tune_rounded, size: 16),
-              label: Text(
-                l10n.checkSetupAction,
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-              ),
+              ],
             ),
           ),
         ],
+      ),
     );
   }
 }
@@ -312,7 +454,6 @@ class _VerificationNotice extends ConsumerStatefulWidget {
 class _VerificationNoticeState extends ConsumerState<_VerificationNotice> {
   final _phoneController = TextEditingController();
   final _codeController = TextEditingController();
-  String? _previewCode;
 
   @override
   void dispose() {
@@ -365,14 +506,13 @@ class _VerificationNoticeState extends ConsumerState<_VerificationNotice> {
                 FilledButton(
                   onPressed: () async {
                     try {
-                      _previewCode = await ref
+                      await ref
                           .read(authProvider.notifier)
                           .startPhoneVerification(_phoneController.text);
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(l10n.verifyEmailSent)),
                         );
-                        setState(() {});
                       }
                     } catch (error) {
                       if (context.mounted) {
@@ -390,7 +530,6 @@ class _VerificationNoticeState extends ConsumerState<_VerificationNotice> {
                 ),
               ],
             ),
-            if (_previewCode != null) Text('Demo code: $_previewCode'),
             const SizedBox(height: 8),
             OutlinedButton(
               onPressed: () async {

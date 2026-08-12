@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_dimens.dart';
 
 /// Light surface card — white background, hairline border, soft shadow,
-/// large radius (mirrors the website's `rounded-2xl` + `shadow-card` panels).
+/// large radius (mirrors the wireframe dashboard cards).
 class SurfaceCard extends StatelessWidget {
   final Widget child;
   final EdgeInsets padding;
@@ -15,7 +16,7 @@ class SurfaceCard extends StatelessWidget {
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(20),
-    this.radius = 22,
+    this.radius = AppRadius.lg,
     this.color,
     this.elevated = true,
     this.onTap,
@@ -30,7 +31,7 @@ class SurfaceCard extends StatelessWidget {
         color: color ?? AppColors.surface,
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(color: AppColors.border),
-        boxShadow: elevated ? AppColors.softShadow : null,
+        boxShadow: elevated ? AppColors.cardSoftShadow : null,
       ),
       child: child,
     );

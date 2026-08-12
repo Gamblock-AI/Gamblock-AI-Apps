@@ -138,7 +138,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
           Text(
             l10n.setupIntro,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: AppColors.mutedForeground,
+              color: AppColors.inkMuted,
               height: 1.55,
             ),
           ),

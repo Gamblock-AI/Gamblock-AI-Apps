@@ -22,7 +22,7 @@ Widget darkCtaButton(
   bool accent = false,
   IconData? icon,
 }) {
-  final bg = accent ? AppColors.crimson : AppColors.navy;
+  final bg = accent ? AppColors.blueAccent : AppColors.navy;
   if (!primary) {
     return SizedBox(
       width: double.infinity,
@@ -36,7 +36,10 @@ Widget darkCtaButton(
       style: FilledButton.styleFrom(
         backgroundColor: bg,
         foregroundColor: Colors.white,
+        elevation: 0,
+        shadowColor: Colors.transparent,
         minimumSize: const Size.fromHeight(54),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
       ),
       child: _label(label, icon),
