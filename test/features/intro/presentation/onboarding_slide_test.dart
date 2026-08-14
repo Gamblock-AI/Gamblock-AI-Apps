@@ -50,7 +50,7 @@ String _backgroundAsset(WidgetTester tester) {
 void main() {
   testWidgets('wide layout selects the landscape background', (tester) async {
     await tester.pumpWidget(_wrap(width: 760, height: 480));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(_backgroundAsset(tester), _landscapeAsset);
     expect(find.text("DON'T FORGET TO"), findsOneWidget);
@@ -64,7 +64,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(_wrap(width: 360, height: 560));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(_backgroundAsset(tester), _portraitAsset);
     expect(
@@ -76,8 +76,15 @@ void main() {
   });
 
   testWidgets('portrait tablet keeps the portrait composition', (tester) async {
+    // The 800x1000 target is taller than the default 600px test surface; give
+    // the viewport enough height so the SizedBox size is not clamped.
+    tester.view.physicalSize = const Size(800, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     await tester.pumpWidget(_wrap(width: 800, height: 1000));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(_backgroundAsset(tester), _portraitAsset);
     expect(tester.takeException(), isNull);

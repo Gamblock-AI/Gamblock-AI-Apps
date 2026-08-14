@@ -32,11 +32,15 @@ class PictureForgeReferenceCard extends StatelessWidget {
             children: [
               const Icon(Icons.visibility_rounded, color: AppColors.sageDark),
               const SizedBox(width: AppSpacing.sm),
-              Text(
-                title,
-                style: const TextStyle(
-                  color: AppColors.navy,
-                  fontWeight: FontWeight.w900,
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppColors.navy,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
               ),
             ],

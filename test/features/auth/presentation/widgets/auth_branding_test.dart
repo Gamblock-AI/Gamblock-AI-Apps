@@ -14,7 +14,6 @@ void main() {
     tester,
   ) async {
     final semantics = tester.ensureSemantics();
-    addTearDown(semantics.dispose);
 
     await tester.pumpWidget(
       _wrap(const Scaffold(body: Center(child: AuthBrandLockup()))),
@@ -40,6 +39,10 @@ void main() {
       closeTo(tester.getCenter(wordmarkFinder).dx, 0.1),
     );
     expect(tester.takeException(), isNull);
+
+    // The end-of-test semantics check runs before package teardowns, so the
+    // handle must be disposed inside the test body as well.
+    semantics.dispose();
   });
 
   testWidgets(

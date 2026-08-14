@@ -36,10 +36,18 @@ void main() {
     await tester.pumpWidget(_buildScreen());
     await tester.pump();
 
-    await tester.tap(find.text('Mulai permainan'));
+    final startButton = find.text('Mulai permainan');
+    await tester.ensureVisible(startButton);
+    await tester.pumpAndSettle();
+    await tester.tap(startButton);
     await tester.pump();
 
     expect(find.byType(PictureForgeReferenceCard), findsOneWidget);
     expect(find.text('Gambar referensi'), findsOneWidget);
+
+    // Unmount the screen so the in-game periodic timer is cancelled before
+    // the end-of-test pending-timer check runs.
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
   });
 }

@@ -27,16 +27,22 @@ class AvatarStack extends StatelessWidget {
       height: size,
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           for (var i = 0; i < shown.length; i++)
-            Container(
-              margin: EdgeInsets.only(left: i == 0 ? 0 : -size * 0.3),
-              decoration: BoxDecoration(shape: BoxShape.circle, border: ring),
-              child: MonogramAvatar(
-                label: shown[i],
-                color: color,
-                size: size,
-                fontSize: size * 0.5,
+            Transform.translate(
+              offset: Offset(i == 0 ? 0 : -size * 0.3, 0),
+              child: Padding(
+                padding: EdgeInsets.only(right: i == 0 ? 0 : size * 0.3),
+                child: Container(
+                  decoration: BoxDecoration(shape: BoxShape.circle, border: ring),
+                  child: MonogramAvatar(
+                    label: shown[i],
+                    color: color,
+                    size: size,
+                    fontSize: size * 0.5,
+                  ),
+                ),
               ),
             ),
         ],
