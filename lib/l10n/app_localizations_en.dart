@@ -447,6 +447,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'You do not have permission for this action.';
 
   @override
+  String get msgErrStudentOnly =>
+      'This app is only available for student accounts.';
+
+  @override
   String get msgErrDevLogin => 'Failed to sign in as the demo user.';
 
   @override
@@ -2355,4 +2359,66 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get miniGamesBrainRouterD => 'Storing passwords';
+
+  @override
+  String get tourLabel => 'Dashboard guide';
+
+  @override
+  String get tourWelcomeTitle => 'Your dashboard';
+
+  @override
+  String get tourWelcomeBody =>
+      'This is your personal dashboard. Check your protection status, your recovery rhythm, and the day\'s progress at a glance.';
+
+  @override
+  String get tourHeroTitle => 'Protection health';
+
+  @override
+  String get tourHeroBody =>
+      'Monitor whether the protection system on your device is active and healthy.';
+
+  @override
+  String get tourProtectionTitle => 'Sensor status';
+
+  @override
+  String get tourProtectionBody =>
+      'Check the status of the service, browser, accessibility permission, and AI model on your device.';
+
+  @override
+  String get tourFabTitle => 'Mini games';
+
+  @override
+  String get tourFabBody =>
+      'The center button opens cheerful mini games whenever you need a break.';
+
+  @override
+  String get tourNavTitle => 'Quick navigation';
+
+  @override
+  String get tourNavBody =>
+      'The bottom bar keeps the most used menus within thumb\'s reach.';
+
+  @override
+  String get tourProfileTitle => 'Profile menu';
+
+  @override
+  String get tourProfileBody =>
+      'Your profile picture leads to your account settings and personal data.';
+
+  @override
+  String get tourSkip => 'Skip';
+
+  @override
+  String get tourBack => 'Back';
+
+  @override
+  String get tourNext => 'Next';
+
+  @override
+  String get tourDone => 'Done';
+
+  @override
+  String tourStepOf(int current, int total) {
+    return '$current of $total';
+  }
 }

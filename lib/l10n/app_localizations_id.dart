@@ -450,6 +450,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get msgErrUnauthorized => 'Anda tidak memiliki izin untuk aksi ini.';
 
   @override
+  String get msgErrStudentOnly => 'Aplikasi ini hanya untuk akun mahasiswa.';
+
+  @override
   String get msgErrDevLogin => 'Gagal masuk sebagai pengguna demo.';
 
   @override
@@ -2354,4 +2357,66 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get miniGamesBrainRouterD => 'Menyimpan kata sandi';
+
+  @override
+  String get tourLabel => 'Panduan dashboard';
+
+  @override
+  String get tourWelcomeTitle => 'Dashboard kamu';
+
+  @override
+  String get tourWelcomeBody =>
+      'Ini dashboard pribadimu. Pantau status perlindungan, ritme pemulihan, dan progres hari ini dalam satu layar.';
+
+  @override
+  String get tourHeroTitle => 'Kesehatan proteksi';
+
+  @override
+  String get tourHeroBody =>
+      'Pantau apakah sistem proteksi di perangkatmu aktif dan sehat.';
+
+  @override
+  String get tourProtectionTitle => 'Status sensor';
+
+  @override
+  String get tourProtectionBody =>
+      'Cek status layanan, browser, izin aksesibilitas, dan model AI di perangkatmu.';
+
+  @override
+  String get tourFabTitle => 'Mini games';
+
+  @override
+  String get tourFabBody =>
+      'Tombol tengah membuka mini games penyemangat saat kamu butuh jeda.';
+
+  @override
+  String get tourNavTitle => 'Navigasi cepat';
+
+  @override
+  String get tourNavBody =>
+      'Bar bawah menempatkan menu yang paling sering dipakai dalam jangkauan ibu jari.';
+
+  @override
+  String get tourProfileTitle => 'Menu profil';
+
+  @override
+  String get tourProfileBody =>
+      'Foto profil mengarah ke pengaturan akun dan data pribadimu.';
+
+  @override
+  String get tourSkip => 'Lewati';
+
+  @override
+  String get tourBack => 'Kembali';
+
+  @override
+  String get tourNext => 'Lanjut';
+
+  @override
+  String get tourDone => 'Selesai';
+
+  @override
+  String tourStepOf(int current, int total) {
+    return '$current dari $total';
+  }
 }

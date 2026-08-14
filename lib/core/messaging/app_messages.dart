@@ -59,6 +59,8 @@ class AppMessages {
       case 'phone_verification_required':
       case 'recent_auth_required':
         return loc.msgErrInvalidRequest;
+      case 'student_only':
+        return loc.msgErrStudentOnly;
       case 'device_create_failed':
         return loc.msgErrCreateDevice;
       case 'device_id_required':

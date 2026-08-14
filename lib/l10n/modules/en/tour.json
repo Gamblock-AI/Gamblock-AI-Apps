@@ -1,0 +1,31 @@
+{
+  "@@locale": "en",
+  "tourLabel": "Dashboard guide",
+  "tourWelcomeTitle": "Your dashboard",
+  "tourWelcomeBody": "This is your personal dashboard. Check your protection status, your recovery rhythm, and the day's progress at a glance.",
+  "tourHeroTitle": "Protection health",
+  "tourHeroBody": "Monitor whether the protection system on your device is active and healthy.",
+  "tourProtectionTitle": "Sensor status",
+  "tourProtectionBody": "Check the status of the service, browser, accessibility permission, and AI model on your device.",
+  "tourFabTitle": "Mini games",
+  "tourFabBody": "The center button opens cheerful mini games whenever you need a break.",
+  "tourNavTitle": "Quick navigation",
+  "tourNavBody": "The bottom bar keeps the most used menus within thumb's reach.",
+  "tourProfileTitle": "Profile menu",
+  "tourProfileBody": "Your profile picture leads to your account settings and personal data.",
+  "tourSkip": "Skip",
+  "tourBack": "Back",
+  "tourNext": "Next",
+  "tourDone": "Done",
+  "tourStepOf": "{current} of {total}",
+  "@tourStepOf": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
+}

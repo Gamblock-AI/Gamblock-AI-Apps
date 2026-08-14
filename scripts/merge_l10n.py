@@ -47,6 +47,7 @@ MODULE_ORDER = [
     "recovery",
     "engagement",
     "mini_games",
+    "tour",
 ]
 
 

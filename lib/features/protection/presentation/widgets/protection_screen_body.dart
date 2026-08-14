@@ -10,6 +10,7 @@ import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/widgets/brand_widgets.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../accountability/domain/entities/accountability_models.dart';
+import '../../../tour/presentation/tour_target.dart';
 import '../../data/daily_presence_store.dart';
 import '../../domain/entities/protection_status.dart';
 import 'dashboard_gami.dart';
@@ -89,7 +90,10 @@ class ProtectionScreenBody extends StatelessWidget {
               112,
             ),
             children: [
-              _DashboardProfileHeader(auth: auth, status: status),
+              TourTarget(
+                id: 'tour-welcome',
+                child: _DashboardProfileHeader(auth: auth, status: status),
+              ),
               const SizedBox(height: 20),
               if (auth.isAuthenticated && !auth.phoneVerified) ...[
                 const _VerificationNotice(),
@@ -101,7 +105,13 @@ class ProtectionScreenBody extends StatelessWidget {
                 _entrance(
                   context,
                   0,
-                  _StatusBanner(status: status, onOpenSetup: onOpenSetup),
+                  TourTarget(
+                    id: 'tour-hero',
+                    child: _StatusBanner(
+                      status: status,
+                      onOpenSetup: onOpenSetup,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 18),
                 const ProtectionWeeklyAppreciation(),
@@ -115,7 +125,14 @@ class ProtectionScreenBody extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 28),
-                _entrance(context, 2, ProtectionSensorsGrid(status: status)),
+                _entrance(
+                  context,
+                  2,
+                  TourTarget(
+                    id: 'tour-protection',
+                    child: ProtectionSensorsGrid(status: status),
+                  ),
+                ),
                 const SizedBox(height: 28),
                 if (error != null) ...[
                   EmptyState(
@@ -173,13 +190,16 @@ class _DashboardProfileHeader extends StatelessWidget {
       constraints: const BoxConstraints(minHeight: 58),
       child: Row(
         children: [
-          UserAvatar(
-            name: name.isNotEmpty ? name : 'G',
-            avatarUrl: auth.avatarUrl,
-            avatarVersion: auth.avatarVersion,
-            color: AppColors.navy,
-            size: 50,
-            boxShadow: AppColors.cardSoftShadow,
+          TourTarget(
+            id: 'tour-profile',
+            child: UserAvatar(
+              name: name.isNotEmpty ? name : 'G',
+              avatarUrl: auth.avatarUrl,
+              avatarVersion: auth.avatarVersion,
+              color: AppColors.navy,
+              size: 50,
+              boxShadow: AppColors.cardSoftShadow,
+            ),
           ),
           const SizedBox(width: 14),
           Expanded(

@@ -1,0 +1,31 @@
+{
+  "@@locale": "id",
+  "tourLabel": "Panduan dashboard",
+  "tourWelcomeTitle": "Dashboard kamu",
+  "tourWelcomeBody": "Ini dashboard pribadimu. Pantau status perlindungan, ritme pemulihan, dan progres hari ini dalam satu layar.",
+  "tourHeroTitle": "Kesehatan proteksi",
+  "tourHeroBody": "Pantau apakah sistem proteksi di perangkatmu aktif dan sehat.",
+  "tourProtectionTitle": "Status sensor",
+  "tourProtectionBody": "Cek status layanan, browser, izin aksesibilitas, dan model AI di perangkatmu.",
+  "tourFabTitle": "Mini games",
+  "tourFabBody": "Tombol tengah membuka mini games penyemangat saat kamu butuh jeda.",
+  "tourNavTitle": "Navigasi cepat",
+  "tourNavBody": "Bar bawah menempatkan menu yang paling sering dipakai dalam jangkauan ibu jari.",
+  "tourProfileTitle": "Menu profil",
+  "tourProfileBody": "Foto profil mengarah ke pengaturan akun dan data pribadimu.",
+  "tourSkip": "Lewati",
+  "tourBack": "Kembali",
+  "tourNext": "Lanjut",
+  "tourDone": "Selesai",
+  "tourStepOf": "{current} dari {total}",
+  "@tourStepOf": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
+}

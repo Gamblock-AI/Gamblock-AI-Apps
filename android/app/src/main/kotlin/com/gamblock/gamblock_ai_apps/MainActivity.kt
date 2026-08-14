@@ -35,7 +35,13 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        classifier = HybridClassifier(applicationContext).also { it.load() }
+        classifier = HybridClassifier(applicationContext)
+        // Model parsing + SHA-256 integrity verification are heavy; run them
+        // on the single worker so later tasks (e.g. runLocalSelfTest) start
+        // only after the load finishes, while startup stays responsive.
+        worker.execute {
+            classifier.load()
+        }
         aggregates = DailyAggregateStore(applicationContext)
         stateStore = ProtectionStateStore(applicationContext)
         consentStore = AccessibilityConsentStore(applicationContext)

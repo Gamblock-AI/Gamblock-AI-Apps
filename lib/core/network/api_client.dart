@@ -17,6 +17,11 @@ class ApiClient {
   static Future<bool>? _refreshInFlight;
   static Future<void> Function()? onSessionExpired;
 
+  /// In-memory access-token cache so the Dio interceptor does not hit the
+  /// platform Keystore on every request. Written on save/refresh, cleared on
+  /// clearTokens; falls back to secure storage on process start.
+  static String? _cachedAccessToken;
+
   /// Initialize the Dio instance with interceptors. Must be called once after
   /// `AppConfig` is available (i.e. after `dotenv.load()` in main).
   static Future<void> init() async {
@@ -26,14 +31,21 @@ class ApiClient {
         baseUrl: AppConfig.apiBaseUrl,
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          // Marks this client as the shipped Android/Windows app so the backend
+          // restricts session issuance to student (`user`) accounts.
+          'X-Client-Type': 'native',
+        },
       ),
     );
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final token = await _storage.read(key: _accessTokenKey);
+          final token = _cachedAccessToken ??
+              await _storage.read(key: _accessTokenKey);
           if (token != null) {
+            _cachedAccessToken = token;
             options.headers['Authorization'] = 'Bearer $token';
           }
           handler.next(options);
@@ -91,7 +103,11 @@ class ApiClient {
       ).post('/v1/auth/refresh', data: {'refresh_token': refreshToken});
       final data = response.data['data'];
       if (data != null) {
-        await _storage.write(key: _accessTokenKey, value: data['access_token']);
+        final accessToken = data['access_token']?.toString();
+        if (accessToken != null) {
+          _cachedAccessToken = accessToken;
+          await _storage.write(key: _accessTokenKey, value: accessToken);
+        }
         await _storage.write(
           key: _refreshTokenKey,
           value: data['refresh_token'],
@@ -122,17 +138,19 @@ class ApiClient {
   }
 
   static Future<void> saveTokens(String access, String refresh) async {
+    _cachedAccessToken = access;
     await _storage.write(key: _accessTokenKey, value: access);
     await _storage.write(key: _refreshTokenKey, value: refresh);
   }
 
   static Future<void> clearTokens() async {
+    _cachedAccessToken = null;
     await _storage.delete(key: _accessTokenKey);
     await _storage.delete(key: _refreshTokenKey);
   }
 
   static Future<String?> getAccessToken() async {
-    return _storage.read(key: _accessTokenKey);
+    return _cachedAccessToken ?? _storage.read(key: _accessTokenKey);
   }
 
   static Future<String?> getRefreshToken() async {

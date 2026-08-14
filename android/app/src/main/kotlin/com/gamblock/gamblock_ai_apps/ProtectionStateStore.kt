@@ -22,6 +22,15 @@ class ProtectionStateStore(private val context: Context) {
         private const val ENCRYPTION_KEY_ALIAS = "gamblock_approval_grant"
         private const val GRANT_KEY = "encrypted_grant"
         private const val CLOCK_ROLLBACK_TOLERANCE_MS = 2 * 60 * 1000L
+
+        /**
+         * activeGrant() performs AES-GCM decryption plus a full JWS signature
+         * verification, so frequent callers (accessibility events, Flutter
+         * status polls) would pay that cost repeatedly. The result is cached
+         * for a short window; storeGrant/clearGrant invalidate it. A pause or
+         * emergency grant can therefore outlive its expiry by at most this TTL.
+         */
+        private const val GRANT_CACHE_TTL_MS = 3_000L
     }
 
     private val preferences = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -29,6 +38,11 @@ class ProtectionStateStore(private val context: Context) {
     private val grantVerifier = ProtectionGrantVerifier(
         BuildConfig.PROTECTION_GRANT_TRUST_STORE_BASE64,
     )
+
+    @Volatile
+    private var cachedGrant: JSONObject? = null
+    @Volatile
+    private var cachedGrantAtElapsedMs = 0L
 
     /** Binds once and remains idempotent for the same backend device ID. */
     @Synchronized
@@ -89,12 +103,25 @@ class ProtectionStateStore(private val context: Context) {
                 put("payload", Base64.encodeToString(encrypted, Base64.NO_WRAP))
             }
             preferences.edit().putString(GRANT_KEY, packed.toString()).commit()
-        }.getOrDefault(false)
+        }.getOrDefault(false).also { committed ->
+            if (committed) {
+                cachedGrant = null
+                cachedGrantAtElapsedMs = 0L
+            }
+        }
     }
 
     fun activeGrant(): JSONObject? {
-        val encoded = preferences.getString(GRANT_KEY, null) ?: return null
-        return try {
+        val nowElapsed = SystemClock.elapsedRealtime()
+        if (nowElapsed - cachedGrantAtElapsedMs < GRANT_CACHE_TTL_MS) {
+            return cachedGrant
+        }
+        val encoded = preferences.getString(GRANT_KEY, null) ?: run {
+            cachedGrant = null
+            cachedGrantAtElapsedMs = nowElapsed
+            return null
+        }
+        val result = try {
             val packed = JSONObject(encoded)
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
             cipher.init(
@@ -139,6 +166,9 @@ class ProtectionStateStore(private val context: Context) {
             clearGrant()
             null
         }
+        cachedGrant = result
+        cachedGrantAtElapsedMs = SystemClock.elapsedRealtime()
+        return result
     }
 
     fun activeGrantAllowsProtectionPause(): Boolean {
@@ -161,6 +191,8 @@ class ProtectionStateStore(private val context: Context) {
 
     private fun clearGrant() {
         preferences.edit().remove(GRANT_KEY).apply()
+        cachedGrant = null
+        cachedGrantAtElapsedMs = 0L
     }
 
     private fun secretKey(): SecretKey {

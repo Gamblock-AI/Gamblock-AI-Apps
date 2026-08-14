@@ -10,6 +10,8 @@ import '../core/theme/app_colors.dart';
 import '../core/theme/app_dimens.dart';
 import '../core/widgets/brand_widgets.dart';
 import '../features/mini_games/presentation/mini_game_exit.dart';
+import '../features/tour/presentation/dashboard_tour_host.dart';
+import '../features/tour/presentation/tour_target.dart';
 
 class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.child});
@@ -72,91 +74,105 @@ class AppShell extends ConsumerWidget {
           ),
         );
         if (useRail) {
-          return MeshBackground(
-            child: Scaffold(
-              backgroundColor: Colors.transparent,
-              body: SafeArea(
-                child: Row(
-                  children: [
-                    NavigationRail(
-                      backgroundColor: Colors.white.withValues(alpha: 0.74),
-                      selectedIndex: selectedIndex,
-                      onDestinationSelected: select,
-                      labelType: constraints.maxWidth >= 1000
-                          ? NavigationRailLabelType.none
-                          : NavigationRailLabelType.all,
-                      extended: constraints.maxWidth >= 1000,
-                      leading: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 18,
-                          horizontal: 12,
-                        ),
-                        child: constraints.maxWidth >= 1000
-                            ? Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Image.asset(
+          return Stack(
+            children: [
+              MeshBackground(
+                child: Scaffold(
+                  backgroundColor: Colors.transparent,
+                  body: SafeArea(
+                    child: Row(
+                      children: [
+                        NavigationRail(
+                          backgroundColor: Colors.white.withValues(alpha: 0.74),
+                          selectedIndex: selectedIndex,
+                          onDestinationSelected: select,
+                          labelType: constraints.maxWidth >= 1000
+                              ? NavigationRailLabelType.none
+                              : NavigationRailLabelType.all,
+                          extended: constraints.maxWidth >= 1000,
+                          leading: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 18,
+                              horizontal: 12,
+                            ),
+                            child: constraints.maxWidth >= 1000
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/gamblock-1.png',
+                                        key: const ValueKey('sidebar-brand-logo'),
+                                        width: 32,
+                                        height: 32,
+                                        fit: BoxFit.contain,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      const Text(
+                                        'Gamblock AI',
+                                        key: ValueKey('sidebar-brand-title'),
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w800,
+                                          color: AppColors.navy,
+                                          letterSpacing: -0.3,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Image.asset(
                                     'assets/images/gamblock-1.png',
                                     key: const ValueKey('sidebar-brand-logo'),
                                     width: 32,
                                     height: 32,
                                     fit: BoxFit.contain,
                                   ),
-                                  const SizedBox(width: 10),
-                                  const Text(
-                                    'Gamblock AI',
-                                    key: ValueKey('sidebar-brand-title'),
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w800,
-                                      color: AppColors.navy,
-                                      letterSpacing: -0.3,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : Image.asset(
-                                'assets/images/gamblock-1.png',
-                                key: const ValueKey('sidebar-brand-logo'),
-                                width: 32,
-                                height: 32,
-                                fit: BoxFit.contain,
-                              ),
-                      ),
-                      destinations: [
-                        for (final destination in destinations)
-                          NavigationRailDestination(
-                            icon: Icon(destination.icon),
-                            selectedIcon: Icon(destination.selectedIcon),
-                            label: Text(destination.label),
                           ),
+                          destinations: [
+                            for (final destination in destinations)
+                              NavigationRailDestination(
+                                icon: Icon(destination.icon),
+                                selectedIcon: Icon(destination.selectedIcon),
+                                label: Text(destination.label),
+                              ),
+                          ],
+                        ),
+                        VerticalDivider(
+                          width: 1,
+                          color: AppColors.navy.withValues(alpha: .08),
+                        ),
+                        Expanded(child: content),
                       ],
                     ),
-                    VerticalDivider(
-                      width: 1,
-                      color: AppColors.navy.withValues(alpha: .08),
-                    ),
-                    Expanded(child: content),
-                  ],
+                  ),
+                ),
+              ),
+              Positioned.fill(
+                child: DashboardTourHost(currentPath: location),
+              ),
+            ],
+          );
+        }
+        return Stack(
+          children: [
+            MeshBackground(
+              child: Scaffold(
+                backgroundColor: Colors.transparent,
+                extendBody: true,
+                body: content,
+                bottomNavigationBar: _GlassBottomNav(
+                  selectedIndex: selectedIndex,
+                  destinations: destinations,
+                  onSelect: select,
+                  onMiniGames: openMiniGames,
+                  miniGamesActive: location.startsWith('/mini-games'),
+                  miniGamesLabel: l10n.miniGamesTitle,
                 ),
               ),
             ),
-          );
-        }
-        return MeshBackground(
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            extendBody: true,
-            body: content,
-            bottomNavigationBar: _GlassBottomNav(
-              selectedIndex: selectedIndex,
-              destinations: destinations,
-              onSelect: select,
-              onMiniGames: openMiniGames,
-              miniGamesActive: location.startsWith('/mini-games'),
-              miniGamesLabel: l10n.miniGamesTitle,
+            Positioned.fill(
+              child: DashboardTourHost(currentPath: location),
             ),
-          ),
+          ],
         );
       },
     );
@@ -213,41 +229,44 @@ class _GlassBottomNav extends StatelessWidget {
               right: 0,
               bottom: 0,
               height: 76,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.glassFill,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(AppRadius.banner),
-                  ),
-                  border: const Border(
-                    top: BorderSide(color: AppColors.glassBorder),
-                  ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x0A000000),
-                      blurRadius: 40,
-                      offset: Offset(0, -10),
+              child: TourTarget(
+                id: 'tour-nav',
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.glassFill,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(AppRadius.banner),
                     ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    for (var i = 0; i < destinations.length; i++)
-                      Expanded(
-                        child: _NavItem(
-                          destination: destinations[i],
-                          selected: i == selectedIndex,
-                          onTap: () => onSelect(i),
-                          // Keep the two items beside the center FAB clear of
-                          // the 60px raised button (16px symmetric inset).
-                          padding: i == 1
-                              ? const EdgeInsets.only(right: AppSpacing.lg)
-                              : i == 2
-                              ? const EdgeInsets.only(left: AppSpacing.lg)
-                              : EdgeInsets.zero,
-                        ),
+                    border: const Border(
+                      top: BorderSide(color: AppColors.glassBorder),
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x0A000000),
+                        blurRadius: 40,
+                        offset: Offset(0, -10),
                       ),
-                  ],
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      for (var i = 0; i < destinations.length; i++)
+                        Expanded(
+                          child: _NavItem(
+                            destination: destinations[i],
+                            selected: i == selectedIndex,
+                            onTap: () => onSelect(i),
+                            // Keep the two items beside the center FAB clear of
+                            // the 60px raised button (16px symmetric inset).
+                            padding: i == 1
+                                ? const EdgeInsets.only(right: AppSpacing.lg)
+                                : i == 2
+                                ? const EdgeInsets.only(left: AppSpacing.lg)
+                                : EdgeInsets.zero,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -256,10 +275,13 @@ class _GlassBottomNav extends StatelessWidget {
               left: 0,
               right: 0,
               child: Center(
-                child: _CenterFab(
-                  onTap: onMiniGames,
-                  active: miniGamesActive,
-                  label: miniGamesLabel,
+                child: TourTarget(
+                  id: 'tour-fab',
+                  child: _CenterFab(
+                    onTap: onMiniGames,
+                    active: miniGamesActive,
+                    label: miniGamesLabel,
+                  ),
                 ),
               ),
             ),

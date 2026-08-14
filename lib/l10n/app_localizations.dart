@@ -914,6 +914,12 @@ abstract class AppLocalizations {
   /// **'Anda tidak memiliki izin untuk aksi ini.'**
   String get msgErrUnauthorized;
 
+  /// No description provided for @msgErrStudentOnly.
+  ///
+  /// In id, this message translates to:
+  /// **'Aplikasi ini hanya untuk akun mahasiswa.'**
+  String get msgErrStudentOnly;
+
   /// No description provided for @msgErrDevLogin.
   ///
   /// In id, this message translates to:
@@ -4369,6 +4375,114 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Menyimpan kata sandi'**
   String get miniGamesBrainRouterD;
+
+  /// No description provided for @tourLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Panduan dashboard'**
+  String get tourLabel;
+
+  /// No description provided for @tourWelcomeTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Dashboard kamu'**
+  String get tourWelcomeTitle;
+
+  /// No description provided for @tourWelcomeBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Ini dashboard pribadimu. Pantau status perlindungan, ritme pemulihan, dan progres hari ini dalam satu layar.'**
+  String get tourWelcomeBody;
+
+  /// No description provided for @tourHeroTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Kesehatan proteksi'**
+  String get tourHeroTitle;
+
+  /// No description provided for @tourHeroBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Pantau apakah sistem proteksi di perangkatmu aktif dan sehat.'**
+  String get tourHeroBody;
+
+  /// No description provided for @tourProtectionTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Status sensor'**
+  String get tourProtectionTitle;
+
+  /// No description provided for @tourProtectionBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Cek status layanan, browser, izin aksesibilitas, dan model AI di perangkatmu.'**
+  String get tourProtectionBody;
+
+  /// No description provided for @tourFabTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Mini games'**
+  String get tourFabTitle;
+
+  /// No description provided for @tourFabBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Tombol tengah membuka mini games penyemangat saat kamu butuh jeda.'**
+  String get tourFabBody;
+
+  /// No description provided for @tourNavTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Navigasi cepat'**
+  String get tourNavTitle;
+
+  /// No description provided for @tourNavBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Bar bawah menempatkan menu yang paling sering dipakai dalam jangkauan ibu jari.'**
+  String get tourNavBody;
+
+  /// No description provided for @tourProfileTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Menu profil'**
+  String get tourProfileTitle;
+
+  /// No description provided for @tourProfileBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Foto profil mengarah ke pengaturan akun dan data pribadimu.'**
+  String get tourProfileBody;
+
+  /// No description provided for @tourSkip.
+  ///
+  /// In id, this message translates to:
+  /// **'Lewati'**
+  String get tourSkip;
+
+  /// No description provided for @tourBack.
+  ///
+  /// In id, this message translates to:
+  /// **'Kembali'**
+  String get tourBack;
+
+  /// No description provided for @tourNext.
+  ///
+  /// In id, this message translates to:
+  /// **'Lanjut'**
+  String get tourNext;
+
+  /// No description provided for @tourDone.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesai'**
+  String get tourDone;
+
+  /// No description provided for @tourStepOf.
+  ///
+  /// In id, this message translates to:
+  /// **'{current} dari {total}'**
+  String tourStepOf(int current, int total);
 }
 
 class _AppLocalizationsDelegate

@@ -63,24 +63,54 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         stateStore = ProtectionStateStore(applicationContext)
         overlay = PatternInterruptOverlay(this, NativeConfig.webBaseUrl(this))
         phase4Evidence = Phase4EvidenceRecorder(applicationContext)
-        if (classifier.load()) {
-            stateStore.setStatus("active")
-        } else {
-            stateStore.setStatus("degraded", "artifact_invalid")
-        }
         HealthNotificationPreferences.show(this)
         NativeEventBus.emit(snapshotEvent())
         onProtectionServiceConnected()
+        // Model parsing + SHA-256 integrity verification are heavy; keep them
+        // off the accessibility main thread. The single worker guarantees the
+        // load finishes before the first classification.
+        worker.execute {
+            val loaded = classifier.load()
+            mainHandler.post {
+                if (loaded) {
+                    stateStore.setStatus("active")
+                } else {
+                    stateStore.setStatus("degraded", "artifact_invalid")
+                }
+                NativeEventBus.emit(snapshotEvent())
+            }
+        }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null) return
         val sourcePackage = event.packageName?.toString() ?: return
         if (sourcePackage in SUPPORTED_BROWSERS) {
+            // AI activates only on committed navigation (Enter/submit/link
+            // click/page change), never on keystrokes or plain text edits.
+            if (!isNavigationLike(event)) return
             scheduleBrowserScan(event)
             return
         }
         handleAdditionalAccessibilityEvent(sourcePackage)
+    }
+
+    private fun isNavigationLike(event: AccessibilityEvent): Boolean {
+        return when (event.eventType) {
+            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED,
+            AccessibilityEvent.TYPE_VIEW_CLICKED -> true
+
+            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {
+                val changeTypes = event.contentChangeTypes
+                (changeTypes and (
+                    AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE or
+                        AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_APPEARED or
+                        AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED
+                    )) != 0
+            }
+
+            else -> false
+        }
     }
 
     protected open fun handleAdditionalAccessibilityEvent(sourcePackage: String) = Unit
