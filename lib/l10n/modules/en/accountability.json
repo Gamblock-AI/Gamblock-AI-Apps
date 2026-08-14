@@ -107,5 +107,28 @@
   "accExitPendingBody": "You can cancel a normal request while it is still pending.",
   "accExitChoose": "Choose the normal flow, or stop sharing immediately if the situation is unsafe.",
   "accCodeRequired": "Enter the group code first.",
-  "accountabilityGroupCodeHint": "Example: ABCD234567"
+  "accountabilityGroupCodeHint": "Example: ABCD234567",
+  "accActionUninstall": "Allow protected app removal",
+  "accActionPause": "Pause protection",
+  "accActionPauseDuration": "Pause protection for {minutes} minutes",
+  "@accActionPauseDuration": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "accActionDisable": "Disable protection",
+  "accActionEmergency": "Emergency access",
+  "accStatusApproved": "Approved",
+  "accStatusPending": "Pending",
+  "accStatusDenied": "Denied",
+  "accStatusExpired": "Expired",
+  "accStatusCancelled": "Cancelled",
+  "accReasonAccessibilityDisabled": "Accessibility service disabled",
+  "accReasonTroubleshooting": "Troubleshooting app setup",
+  "accReasonDeviceAdminDisabled": "Device administrator disabled",
+  "accReasonAppUpdate": "App update required",
+  "accReasonTesting": "Testing protection"
 }
+

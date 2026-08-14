@@ -1,10 +1,5 @@
 {
   "@@locale": "en",
-  "quickActionsTitle": "Quick actions",
-  "quickActionBreathe": "Pause & Breathe",
-  "quickActionBreatheSubtitle": "A short breathing exercise before continuing",
-  "quickActionRecovery": "Recovery & Support",
-  "quickActionRecoverySubtitle": "Open recovery guides and support",
   "reminderChannelName": "Daily reminder",
   "reminderChannelDesc": "Once-a-day check-in reminder",
   "reminderNotificationTitle": "A moment for yourself",

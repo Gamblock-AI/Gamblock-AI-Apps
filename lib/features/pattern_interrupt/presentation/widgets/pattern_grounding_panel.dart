@@ -4,6 +4,7 @@ import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import '../../../../core/feedback/haptics.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimens.dart';
+import '../../../../core/widgets/gami_image.dart';
 
 class _GroundingStep {
   const _GroundingStep(this.count, this.icon);
@@ -321,17 +322,10 @@ class _CompletionContent extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     return Column(
       children: [
-        Image.asset(
-          'assets/images/gami-meditate.webp',
+        const GamiImage(
+          asset: 'assets/images/gami-meditate.webp',
           height: 110,
           cacheWidth: 330,
-          excludeFromSemantics: true,
-          errorBuilder: (context, error, stackTrace) => Image.asset(
-            'assets/images/gami.webp',
-            height: 110,
-            cacheWidth: 330,
-            excludeFromSemantics: true,
-          ),
         ),
         const SizedBox(height: AppSpacing.lg),
         Text(

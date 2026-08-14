@@ -160,7 +160,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get protectionPermissionLabel => 'Permission';
 
   @override
-  String get protectionArtifactLabel => 'Protection model';
+  String get protectionArtifactLabel => 'AI Protection Engine';
+
+  @override
+  String get protectionModelReady => 'Active & ready';
+
+  @override
+  String get sensorServiceActive => 'Service is running';
+
+  @override
+  String get sensorServiceAction => 'Enable via setup';
+
+  @override
+  String get sensorBrowserActive => 'Browser extension connected';
+
+  @override
+  String get sensorBrowserDegraded => 'Sensor connection degraded';
+
+  @override
+  String get sensorBrowserAction => 'Install browser extension';
+
+  @override
+  String get sensorPermissionActive => 'System permission granted';
+
+  @override
+  String get sensorPermissionAction => 'Grant accessibility permission';
+
+  @override
+  String get sensorModelActive => 'Local AI model is ready';
 
   @override
   String get protectionPartnerRequired =>
@@ -609,6 +636,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsAvatarRemove => 'Remove photo';
+
+  @override
+  String get settingsAvatarDialogTitle => 'Profile photo';
+
+  @override
+  String get settingsAvatarDialogBody =>
+      'Choose how you want to update your profile photo.';
+
+  @override
+  String get settingsAvatarChooseGallery => 'Choose from gallery';
+
+  @override
+  String get settingsAvatarUseCamera => 'Take photo';
+
+  @override
+  String get settingsAvatarDeleteTitle => 'Remove profile photo?';
+
+  @override
+  String get settingsAvatarDeleteBody =>
+      'Your profile photo will be removed and replaced with your initials.';
+
+  @override
+  String get settingsAvatarEditorTitle => 'Adjust profile photo';
+
+  @override
+  String get settingsAvatarEditorBody =>
+      'Move or zoom the photo, then rotate it if needed.';
+
+  @override
+  String get settingsAvatarRotateLeft => 'Rotate left';
+
+  @override
+  String get settingsAvatarRotateRight => 'Rotate right';
+
+  @override
+  String get settingsAvatarZoom => 'Zoom';
+
+  @override
+  String get settingsAvatarReset => 'Reset';
+
+  @override
+  String get settingsAvatarUsePhoto => 'Use photo';
+
+  @override
+  String get settingsAvatarSaving => 'Preparing...';
+
+  @override
+  String get settingsAvatarEditorFailed =>
+      'The photo could not be cropped. Try another photo.';
+
+  @override
+  String get settingsAvatarSourceTooLarge =>
+      'Choose an image no larger than 8 MB.';
 
   @override
   String get settingsAvatarUpdated => 'Profile photo updated.';
@@ -1383,6 +1463,53 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountabilityGroupCodeHint => 'Example: ABCD234567';
 
   @override
+  String get accActionUninstall => 'Allow protected app removal';
+
+  @override
+  String get accActionPause => 'Pause protection';
+
+  @override
+  String accActionPauseDuration(int minutes) {
+    return 'Pause protection for $minutes minutes';
+  }
+
+  @override
+  String get accActionDisable => 'Disable protection';
+
+  @override
+  String get accActionEmergency => 'Emergency access';
+
+  @override
+  String get accStatusApproved => 'Approved';
+
+  @override
+  String get accStatusPending => 'Pending';
+
+  @override
+  String get accStatusDenied => 'Denied';
+
+  @override
+  String get accStatusExpired => 'Expired';
+
+  @override
+  String get accStatusCancelled => 'Cancelled';
+
+  @override
+  String get accReasonAccessibilityDisabled => 'Accessibility service disabled';
+
+  @override
+  String get accReasonTroubleshooting => 'Troubleshooting app setup';
+
+  @override
+  String get accReasonDeviceAdminDisabled => 'Device administrator disabled';
+
+  @override
+  String get accReasonAppUpdate => 'App update required';
+
+  @override
+  String get accReasonTesting => 'Testing protection';
+
+  @override
   String get roleMember => 'Member';
 
   @override
@@ -1406,10 +1533,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get introSlide1Lead => 'DON\'T FORGET TO';
 
   @override
-  String get introSlide1Highlight => 'PROTECT';
+  String get introSlide1Highlight => 'PROTECT YOURSELF';
 
   @override
-  String get introSlide1Tail => 'YOURSELF';
+  String get introSlide1Tail => '';
 
   @override
   String get introSlide1Subtitle =>
@@ -1614,24 +1741,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get msgErrTypeRequired => 'Please select a request type.';
 
   @override
-  String get recoveryWebTitle => 'Recovery is available on the website';
-
-  @override
-  String get recoveryWebBody =>
-      'Journals, check-ins, missions, and psychoeducation stay on the website so this app can focus on device protection.';
-
-  @override
-  String get recoveryWebAction => 'Open web recovery';
-
-  @override
-  String get backToProtection => 'Back to protection';
-
-  @override
   String get webPageOpenError => 'The page could not be opened yet. Try again.';
-
-  @override
-  String get recoveryPageOpenError =>
-      'The recovery page could not be opened yet. Try again.';
 
   @override
   String get groundingStep1Title => 'See';
@@ -1682,25 +1792,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'You brought yourself fully into this moment. Choose your next step calmly.';
 
   @override
-  String get recoveryWebEyebrow => 'continue on the web';
-
-  @override
-  String get quickActionsTitle => 'Quick actions';
-
-  @override
-  String get quickActionBreathe => 'Pause & Breathe';
-
-  @override
-  String get quickActionBreatheSubtitle =>
-      'A short breathing exercise before continuing';
-
-  @override
-  String get quickActionRecovery => 'Recovery & Support';
-
-  @override
-  String get quickActionRecoverySubtitle => 'Open recovery guides and support';
-
-  @override
   String get reminderChannelName => 'Daily reminder';
 
   @override
@@ -1724,4 +1815,544 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get reminderBodyConsistent =>
       'Stay calm, stay consistent. Your daily check-in awaits.';
+
+  @override
+  String get miniGamesEyebrow => 'MINI GAMES';
+
+  @override
+  String get miniGamesTitle => 'Mini games';
+
+  @override
+  String get miniGamesDescription =>
+      'Take a light, focused break with four small activities.';
+
+  @override
+  String get miniGamesSessionOnly =>
+      'Games stay on this device and only for this session. Scores and choices are not saved or shared.';
+
+  @override
+  String get miniGamesSpectrumTitle => 'Spectrum Sprint';
+
+  @override
+  String get miniGamesSpectrumDescription =>
+      'Name the ink colour, not the word.';
+
+  @override
+  String get miniGamesSpectrumInstruction =>
+      'Move through 12 quick rounds. Choose the colour used to draw each word before time runs out.';
+
+  @override
+  String get miniGamesPictureTitle => 'Picture Forge';
+
+  @override
+  String get miniGamesPictureDescription =>
+      'Rebuild a fruit picture by swapping tiles.';
+
+  @override
+  String get miniGamesPictureInstruction =>
+      'Select two tiles to swap them. Put every part back in its original place.';
+
+  @override
+  String get miniGamesTwinTitle => 'Twin Trace';
+
+  @override
+  String get miniGamesTwinDescription =>
+      'Remember where each matching fruit pair is.';
+
+  @override
+  String get miniGamesTwinInstruction =>
+      'Turn over two cards at a time and find every matching pair.';
+
+  @override
+  String get miniGamesTwinPreview =>
+      'Remember the card positions. The board will turn over in a moment.';
+
+  @override
+  String get miniGamesBrainTitle => 'Brain Summit';
+
+  @override
+  String get miniGamesBrainDescription =>
+      'Try eight short questions from a shuffled quiz.';
+
+  @override
+  String get miniGamesBrainInstruction =>
+      'Choose the answer you think is right. The next question appears after your choice.';
+
+  @override
+  String miniGamesRound(int current, int total) {
+    return 'Round $current of $total';
+  }
+
+  @override
+  String miniGamesSeconds(int seconds) {
+    return '${seconds}s left';
+  }
+
+  @override
+  String get miniGamesReadWord => 'Read the word, then name its ink colour.';
+
+  @override
+  String get miniGamesChooseInk => 'Which ink colour is it?';
+
+  @override
+  String get miniGamesColorBlue => 'Blue';
+
+  @override
+  String get miniGamesColorYellow => 'Yellow';
+
+  @override
+  String get miniGamesColorRed => 'Red';
+
+  @override
+  String get miniGamesColorGreen => 'Green';
+
+  @override
+  String get miniGamesPause => 'Pause';
+
+  @override
+  String get miniGamesResume => 'Resume';
+
+  @override
+  String get miniGamesEasy => 'Easy';
+
+  @override
+  String get miniGamesMedium => 'Medium';
+
+  @override
+  String get miniGamesHard => 'Hard';
+
+  @override
+  String get miniGamesPictureSelect => 'Select two tiles to swap.';
+
+  @override
+  String get miniGamesCompleteTitle => 'Nice work';
+
+  @override
+  String get miniGamesPlayAgain => 'Play again';
+
+  @override
+  String get miniGamesBackToHub => 'All mini games';
+
+  @override
+  String get miniGamesExitTitle => 'Leave this game?';
+
+  @override
+  String get miniGamesExitBody =>
+      'Your current progress will be reset when you leave.';
+
+  @override
+  String get miniGamesExitStay => 'Keep playing';
+
+  @override
+  String get miniGamesExitConfirm => 'Leave & reset';
+
+  @override
+  String get miniGamesStart => 'Start game';
+
+  @override
+  String get miniGamesDifficultyLabel => 'Choose difficulty';
+
+  @override
+  String miniGamesPieceCount(int count) {
+    return '$count pieces';
+  }
+
+  @override
+  String miniGamesPairCount(int pairs, int cards) {
+    return '$pairs pairs · $cards cards';
+  }
+
+  @override
+  String get miniGamesMoves => 'Moves';
+
+  @override
+  String get miniGamesPieces => 'Pieces';
+
+  @override
+  String get miniGamesTime => 'Time';
+
+  @override
+  String get miniGamesPairs => 'Pairs';
+
+  @override
+  String get miniGamesReset => 'Reset';
+
+  @override
+  String get miniGamesShuffle => 'Shuffle';
+
+  @override
+  String get miniGamesChangeChallenge => 'Change challenge';
+
+  @override
+  String get miniGamesChangeDifficulty => 'Change difficulty';
+
+  @override
+  String get miniGamesPictureReadyTitle => 'Set up your puzzle';
+
+  @override
+  String get miniGamesPictureReadyDescription =>
+      'Choose an image and a grid size before you begin.';
+
+  @override
+  String get miniGamesPictureImageChoiceLabel => 'Choose an image';
+
+  @override
+  String get miniGamesPictureReferenceLabel => 'Reference image';
+
+  @override
+  String get miniGamesPictureCompleteTitle => 'Puzzle complete';
+
+  @override
+  String miniGamesPictureCompleteDescription(int moves, String time) {
+    return 'You put the picture together in $moves moves and $time.';
+  }
+
+  @override
+  String get miniGamesPictureStudyCorner => 'Study corner';
+
+  @override
+  String get miniGamesPictureFruitMarket => 'Fruit market';
+
+  @override
+  String get miniGamesPictureBerryGarden => 'Berry garden';
+
+  @override
+  String get miniGamesPictureTropicalPlatter => 'Tropical platter';
+
+  @override
+  String get miniGamesPictureOrchardBasket => 'Orchard basket';
+
+  @override
+  String get miniGamesPictureCitrusTable => 'Citrus table';
+
+  @override
+  String get miniGamesTwinReadyTitle => 'Ready to trace pairs?';
+
+  @override
+  String get miniGamesTwinReadyDescription =>
+      'Choose a board size, remember the cards, then find every pair.';
+
+  @override
+  String get miniGamesTwinCompleteTitle => 'All pairs found';
+
+  @override
+  String miniGamesTwinCompleteDescription(int moves, String time) {
+    return 'You found every pair in $moves moves and $time.';
+  }
+
+  @override
+  String miniGamesTwinHiddenCard(int position) {
+    return 'Hidden card $position';
+  }
+
+  @override
+  String miniGamesTwinRevealedCard(int position, String fruit) {
+    return 'Card $position, $fruit';
+  }
+
+  @override
+  String miniGamesTwinMatchedCard(int position, String fruit) {
+    return 'Matched card $position, $fruit';
+  }
+
+  @override
+  String get miniGamesTwinApple => 'Apple';
+
+  @override
+  String get miniGamesTwinBanana => 'Banana';
+
+  @override
+  String get miniGamesTwinOrange => 'Orange';
+
+  @override
+  String get miniGamesTwinKiwi => 'Kiwi';
+
+  @override
+  String get miniGamesTwinBlueberry => 'Blueberry';
+
+  @override
+  String get miniGamesTwinGrapes => 'Grapes';
+
+  @override
+  String get miniGamesTwinDragonfruit => 'Dragon fruit';
+
+  @override
+  String get miniGamesTwinPineapple => 'Pineapple';
+
+  @override
+  String get miniGamesTwinCoconut => 'Coconut';
+
+  @override
+  String get miniGamesTwinPeach => 'Peach';
+
+  @override
+  String get miniGamesTwinPear => 'Pear';
+
+  @override
+  String get miniGamesTwinWatermelon => 'Watermelon';
+
+  @override
+  String miniGamesSpectrumResult(int correct, int total) {
+    return 'You identified $correct of $total ink colours.';
+  }
+
+  @override
+  String get miniGamesPictureResult => 'The picture is back together.';
+
+  @override
+  String get miniGamesTwinResult => 'You found every matching pair.';
+
+  @override
+  String miniGamesBrainResult(int correct, int total) {
+    return 'You answered $correct of $total questions correctly.';
+  }
+
+  @override
+  String get miniGamesBrainEverestQ =>
+      'What is the highest mountain above sea level?';
+
+  @override
+  String get miniGamesBrainEverestA => 'Mount Everest';
+
+  @override
+  String get miniGamesBrainEverestB => 'K2';
+
+  @override
+  String get miniGamesBrainEverestC => 'Kilimanjaro';
+
+  @override
+  String get miniGamesBrainEverestD => 'Denali';
+
+  @override
+  String get miniGamesBrainPacificQ => 'What is the largest ocean on Earth?';
+
+  @override
+  String get miniGamesBrainPacificA => 'Pacific Ocean';
+
+  @override
+  String get miniGamesBrainPacificB => 'Atlantic Ocean';
+
+  @override
+  String get miniGamesBrainPacificC => 'Indian Ocean';
+
+  @override
+  String get miniGamesBrainPacificD => 'Arctic Ocean';
+
+  @override
+  String get miniGamesBrainTokyoQ => 'What is the capital city of Japan?';
+
+  @override
+  String get miniGamesBrainTokyoA => 'Tokyo';
+
+  @override
+  String get miniGamesBrainTokyoB => 'Kyoto';
+
+  @override
+  String get miniGamesBrainTokyoC => 'Osaka';
+
+  @override
+  String get miniGamesBrainTokyoD => 'Sapporo';
+
+  @override
+  String get miniGamesBrainGizaQ =>
+      'The Great Pyramid of Giza is in which country?';
+
+  @override
+  String get miniGamesBrainGizaA => 'Egypt';
+
+  @override
+  String get miniGamesBrainGizaB => 'Jordan';
+
+  @override
+  String get miniGamesBrainGizaC => 'Morocco';
+
+  @override
+  String get miniGamesBrainGizaD => 'Turkey';
+
+  @override
+  String get miniGamesBrainJupiterQ =>
+      'Which planet is the largest in our solar system?';
+
+  @override
+  String get miniGamesBrainJupiterA => 'Jupiter';
+
+  @override
+  String get miniGamesBrainJupiterB => 'Saturn';
+
+  @override
+  String get miniGamesBrainJupiterC => 'Earth';
+
+  @override
+  String get miniGamesBrainJupiterD => 'Neptune';
+
+  @override
+  String get miniGamesBrainMarsQ => 'Which planet is known as the Red Planet?';
+
+  @override
+  String get miniGamesBrainMarsA => 'Mars';
+
+  @override
+  String get miniGamesBrainMarsB => 'Venus';
+
+  @override
+  String get miniGamesBrainMarsC => 'Mercury';
+
+  @override
+  String get miniGamesBrainMarsD => 'Uranus';
+
+  @override
+  String get miniGamesBrainCarbonQ =>
+      'Which gas is represented by the formula CO₂?';
+
+  @override
+  String get miniGamesBrainCarbonA => 'Carbon dioxide';
+
+  @override
+  String get miniGamesBrainCarbonB => 'Oxygen';
+
+  @override
+  String get miniGamesBrainCarbonC => 'Nitrogen';
+
+  @override
+  String get miniGamesBrainCarbonD => 'Hydrogen';
+
+  @override
+  String get miniGamesBrainHeartQ => 'Which organ pumps blood around the body?';
+
+  @override
+  String get miniGamesBrainHeartA => 'Heart';
+
+  @override
+  String get miniGamesBrainHeartB => 'Lungs';
+
+  @override
+  String get miniGamesBrainHeartC => 'Liver';
+
+  @override
+  String get miniGamesBrainHeartD => 'Kidneys';
+
+  @override
+  String get miniGamesBrainIndependenceQ =>
+      'In what year did Indonesia proclaim independence?';
+
+  @override
+  String get miniGamesBrainIndependenceA => '1945';
+
+  @override
+  String get miniGamesBrainIndependenceB => '1942';
+
+  @override
+  String get miniGamesBrainIndependenceC => '1949';
+
+  @override
+  String get miniGamesBrainIndependenceD => '1950';
+
+  @override
+  String get miniGamesBrainBorobudurQ =>
+      'Borobudur Temple is in which Indonesian province?';
+
+  @override
+  String get miniGamesBrainBorobudurA => 'Central Java';
+
+  @override
+  String get miniGamesBrainBorobudurB => 'East Java';
+
+  @override
+  String get miniGamesBrainBorobudurC => 'West Java';
+
+  @override
+  String get miniGamesBrainBorobudurD => 'Bali';
+
+  @override
+  String get miniGamesBrainLaskarQ => 'Who wrote the novel Laskar Pelangi?';
+
+  @override
+  String get miniGamesBrainLaskarA => 'Andrea Hirata';
+
+  @override
+  String get miniGamesBrainLaskarB => 'Pramoedya Ananta Toer';
+
+  @override
+  String get miniGamesBrainLaskarC => 'Dee Lestari';
+
+  @override
+  String get miniGamesBrainLaskarD => 'Tere Liye';
+
+  @override
+  String get miniGamesBrainPancasilaQ =>
+      'How many principles are in Pancasila?';
+
+  @override
+  String get miniGamesBrainPancasilaA => 'Five';
+
+  @override
+  String get miniGamesBrainPancasilaB => 'Three';
+
+  @override
+  String get miniGamesBrainPancasilaC => 'Four';
+
+  @override
+  String get miniGamesBrainPancasilaD => 'Six';
+
+  @override
+  String get miniGamesBrainCpuQ =>
+      'What is the main processing component of a computer called?';
+
+  @override
+  String get miniGamesBrainCpuA => 'Processor';
+
+  @override
+  String get miniGamesBrainCpuB => 'Storage';
+
+  @override
+  String get miniGamesBrainCpuC => 'Monitor';
+
+  @override
+  String get miniGamesBrainCpuD => 'Keyboard';
+
+  @override
+  String get miniGamesBrainHttpsQ =>
+      'What does HTTPS help provide on a website?';
+
+  @override
+  String get miniGamesBrainHttpsA => 'An encrypted connection';
+
+  @override
+  String get miniGamesBrainHttpsB => 'Larger images';
+
+  @override
+  String get miniGamesBrainHttpsC => 'Offline access';
+
+  @override
+  String get miniGamesBrainHttpsD => 'A faster processor';
+
+  @override
+  String get miniGamesBrainBinaryQ => 'Which digits are used in binary?';
+
+  @override
+  String get miniGamesBrainBinaryA => '0 and 1';
+
+  @override
+  String get miniGamesBrainBinaryB => '1 and 2';
+
+  @override
+  String get miniGamesBrainBinaryC => 'A and Z';
+
+  @override
+  String get miniGamesBrainBinaryD => '0 through 9';
+
+  @override
+  String get miniGamesBrainRouterQ => 'What is a router primarily used for?';
+
+  @override
+  String get miniGamesBrainRouterA => 'Connecting networks';
+
+  @override
+  String get miniGamesBrainRouterB => 'Printing documents';
+
+  @override
+  String get miniGamesBrainRouterC => 'Editing photos';
+
+  @override
+  String get miniGamesBrainRouterD => 'Storing passwords';
 }

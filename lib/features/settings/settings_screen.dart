@@ -155,9 +155,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final auth = ref.watch(authProvider);
     final settings = ref.watch(appSettingsProvider);
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         titleSpacing: 16,
-        title: AppBarTitle(icon: Icons.settings_rounded, title: l10n.settingsTitle),
+        title: AppBarTitle(
+          icon: Icons.settings_rounded,
+          title: l10n.settingsTitle,
+        ),
       ),
       body: ListView(
         padding: AppSpacing.screenPadding,
@@ -222,9 +226,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 title: Text(
                   l10n.settingsLogout,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.crimson,
-                      ),
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.crimson,
+                  ),
                 ),
                 trailing: const Icon(
                   Icons.chevron_right_rounded,
@@ -238,4 +242,3 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 }
-

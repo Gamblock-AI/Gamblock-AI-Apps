@@ -203,13 +203,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   /// Completes the public WhatsApp OTP flow using the short-lived verification
-  /// token issued at registration or sign-in.
-  Future<bool> verifyPhone(String verificationToken, String code) async {
+  /// token issued at registration or sign-in. Returns the full response data:
+  /// when the backend issues a session for a login-origin flow, the caller can
+  /// pass it to [completeSession] to land on the dashboard without re-login.
+  Future<Map<String, dynamic>?> verifyPhone(
+    String verificationToken,
+    String code,
+  ) async {
     final response = await ApiClient.dio.post(
       '/v1/auth/phone-verification/verify',
       data: {'verification_token': verificationToken, 'code': code},
     );
-    return ApiResponse.map(response)?['verified'] == true;
+    return ApiResponse.map(response);
   }
 
   /// Requests a fresh WhatsApp code for the verification token's account.

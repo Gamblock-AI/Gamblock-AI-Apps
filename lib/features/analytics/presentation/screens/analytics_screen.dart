@@ -65,33 +65,71 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     final auth = ref.watch(authProvider);
     if (!auth.isAuthenticated) {
       return Scaffold(
-        appBar: AppBar(title: Text(l10n.analyticsTitle)),
-        body: EmptyState(
-          icon: Icons.lock_outline,
-          title: l10n.analyticsSignInTitle,
-          hint: l10n.analyticsSignInBody,
-          actionLabel: l10n.authLoginBtn,
-          onAction: () => context.go('/login'),
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          titleSpacing: 16,
+          title: AppBarTitle(
+            icon: Icons.auto_graph_rounded,
+            title: l10n.analyticsTitle,
+          ),
+        ),
+        body: ListView(
+          padding: AppSpacing.screenPadding,
+          children: [
+            EmptyState(
+              icon: Icons.lock_outline,
+              title: l10n.analyticsSignInTitle,
+              hint: l10n.analyticsSignInBody,
+              tone: AppStateTone.protected,
+              mascotAsset: 'assets/images/gami-thumbsup.webp',
+              radius: AppRadius.banner,
+              actionLabel: l10n.authLoginBtn,
+              onAction: () => context.go('/login'),
+            ),
+            const SizedBox(height: 18),
+            _buildPrivacyInfoSection(context),
+          ],
         ),
       );
     }
     if (auth.deviceId == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(l10n.analyticsTitle)),
-        body: EmptyState(
-          icon: Icons.phonelink_erase,
-          title: l10n.deviceRegistrationMissing,
-          hint: l10n.deviceRegistrationMissingBody,
-          actionLabel: l10n.setupTitle,
-          onAction: () => context.go('/setup'),
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          titleSpacing: 16,
+          title: AppBarTitle(
+            icon: Icons.auto_graph_rounded,
+            title: l10n.analyticsTitle,
+          ),
+        ),
+        body: ListView(
+          padding: AppSpacing.screenPadding,
+          children: [
+            EmptyState(
+              icon: Icons.phonelink_erase,
+              title: l10n.deviceRegistrationMissing,
+              hint: l10n.deviceRegistrationMissingBody,
+              tone: AppStateTone.warning,
+              mascotAsset: 'assets/images/gami-device-register.webp',
+              radius: AppRadius.banner,
+              actionLabel: l10n.setupTitle,
+              onAction: () => context.go('/setup'),
+            ),
+            const SizedBox(height: 18),
+            _buildPrivacyInfoSection(context),
+          ],
         ),
       );
     }
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         titleSpacing: 16,
-        title: AppBarTitle(icon: Icons.auto_graph_rounded, title: l10n.analyticsTitle),
+        title: AppBarTitle(
+          icon: Icons.auto_graph_rounded,
+          title: l10n.analyticsTitle,
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: _load,
@@ -113,6 +151,8 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                 icon: Icons.cloud_off,
                 title: l10n.analyticsErrorTitle,
                 hint: AppMessages.friendlyMessage(context, _error!),
+                tone: AppStateTone.error,
+                radius: AppRadius.banner,
                 actionLabel: l10n.retry,
                 onAction: _load,
               )
@@ -149,9 +189,9 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
         Text(
           l10n.analyticsPrivacySectionTitle,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: AppColors.ink,
-              ),
+            fontWeight: FontWeight.w700,
+            color: AppColors.ink,
+          ),
         ),
         const SizedBox(height: 10),
         SurfaceCard(
@@ -197,17 +237,17 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
               Text(
                 title,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.navy,
-                    ),
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.navy,
+                ),
               ),
               const SizedBox(height: 2),
               Text(
                 description,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.mutedForeground,
-                      height: 1.4,
-                    ),
+                  color: AppColors.mutedForeground,
+                  height: 1.4,
+                ),
               ),
             ],
           ),

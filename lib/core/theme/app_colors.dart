@@ -19,6 +19,8 @@ class AppColors {
   static const sage = Color(0xFF2F9E6F);
   static const sageLight = Color(0xFF3CB381);
   static const sageDark = Color(0xFF20805C);
+  static const emerald = Color(0xFF10B981);
+  static const emeraldLight = Color(0xFF34D399);
   static const amber = Color(0xFFE0A516);
 
   // Deep ramp ends used by feature gradients/accents.

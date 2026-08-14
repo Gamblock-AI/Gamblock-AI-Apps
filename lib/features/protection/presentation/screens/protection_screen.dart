@@ -21,7 +21,8 @@ class ProtectionScreen extends ConsumerStatefulWidget {
   ConsumerState<ProtectionScreen> createState() => _ProtectionScreenState();
 }
 
-class _ProtectionScreenState extends ConsumerState<ProtectionScreen> with WidgetsBindingObserver {
+class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
+    with WidgetsBindingObserver {
   ProtectionStatus? _status;
   AccountabilityOverview? _accountability;
   List<ApprovalRequest> _requests = const [];
@@ -171,26 +172,27 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen> with Widget
     // Slim header: the navy hero is the dashboard's only header; the refresh
     // affordance lives inside it (mouse/Windows parity for pull-to-refresh).
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: ProtectionScreenBody(
-        isLoading: _loading,
-        isActionLoading: _actionLoading,
-        status: _status,
-        error: _error,
-        auth: auth,
-        accountability: _accountability,
-        requests: _requests,
-        emergencyRequest: _emergencyRequest,
-        onRefresh: _load,
-        onOpenSetup: _openSetup,
-        onRunSelfTest: _runSelfTest,
-        onRequestApproval: _requestApproval,
-        onApplyApproval: _applyApproval,
-        onManagePartner: () => context.go('/accountability'),
-        onRequestEmergency: _requestEmergency,
-        onEnterEmergencyKey: _enterEmergencyKey,
-        onLogin: () => context.go('/login'),
-        onOpenAccountSetup: () => context.go('/setup'),
+          isLoading: _loading,
+          isActionLoading: _actionLoading,
+          status: _status,
+          error: _error,
+          auth: auth,
+          accountability: _accountability,
+          requests: _requests,
+          emergencyRequest: _emergencyRequest,
+          onRefresh: _load,
+          onOpenSetup: _openSetup,
+          onRunSelfTest: _runSelfTest,
+          onRequestApproval: _requestApproval,
+          onApplyApproval: _applyApproval,
+          onManagePartner: () => context.go('/accountability'),
+          onRequestEmergency: _requestEmergency,
+          onEnterEmergencyKey: _enterEmergencyKey,
+          onLogin: () => context.go('/login'),
+          onOpenAccountSetup: () => context.go('/setup'),
         ),
       ),
     );

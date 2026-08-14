@@ -112,6 +112,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       extra: {
         'verification_token': token,
         'phone': user is Map ? user['phone_e164']?.toString() ?? '' : '',
+        'origin': 'login',
       },
     );
   }

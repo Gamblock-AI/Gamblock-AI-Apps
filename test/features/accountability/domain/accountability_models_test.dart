@@ -15,13 +15,28 @@ void main() {
           'education_progress': true,
         },
       },
-      {'name': 'Kelompok Pulih', 'owner_name': 'Pendamping'},
+      {
+        'name': 'Kelompok Pulih',
+        'owner_name': 'Pendamping',
+        'owner_avatar_url': '/v1/users/partner/avatar',
+      },
     );
 
     expect(membership.groupName, 'Kelompok Pulih');
+    expect(membership.partnerName, 'Pendamping');
+    expect(membership.partnerAvatarUrl, '/v1/users/partner/avatar');
     expect(membership.sharing.protectionHealth, isTrue);
     expect(membership.sharing.protectionActivity, isFalse);
     expect(membership.sharing.toJson()['education_progress'], isTrue);
+  });
+
+  test('workspace membership keeps avatar optional for monogram fallback', () {
+    final membership = AccountabilityMembership.fromWorkspace(
+      {'id': 'mbr_2', 'group_id': 'grp_2', 'sharing': const <String, bool>{}},
+      {'name': 'Kelompok Aman', 'owner_name': 'Suci'},
+    );
+
+    expect(membership.partnerAvatarUrl, isNull);
   });
 
   test('only pending normal exit can be cancelled', () {

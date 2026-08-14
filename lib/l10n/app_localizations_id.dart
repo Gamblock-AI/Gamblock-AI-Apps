@@ -162,7 +162,34 @@ class AppLocalizationsId extends AppLocalizations {
   String get protectionPermissionLabel => 'Izin';
 
   @override
-  String get protectionArtifactLabel => 'Model dan ruleset';
+  String get protectionArtifactLabel => 'Sistem Proteksi AI';
+
+  @override
+  String get protectionModelReady => 'Aktif & siap';
+
+  @override
+  String get sensorServiceActive => 'Layanan aktif berjalan';
+
+  @override
+  String get sensorServiceAction => 'Perlu diaktifkan via setup';
+
+  @override
+  String get sensorBrowserActive => 'Ekstensi browser terhubung';
+
+  @override
+  String get sensorBrowserDegraded => 'Koneksi sensor terdegradasi';
+
+  @override
+  String get sensorBrowserAction => 'Pasang ekstensi browser';
+
+  @override
+  String get sensorPermissionActive => 'Izin sistem diberikan';
+
+  @override
+  String get sensorPermissionAction => 'Berikan izin aksesibilitas';
+
+  @override
+  String get sensorModelActive => 'Model AI lokal siap bekerja';
 
   @override
   String get protectionPartnerRequired =>
@@ -610,6 +637,59 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get settingsAvatarRemove => 'Hapus foto';
+
+  @override
+  String get settingsAvatarDialogTitle => 'Foto profil';
+
+  @override
+  String get settingsAvatarDialogBody =>
+      'Pilih cara untuk memperbarui foto profil Anda.';
+
+  @override
+  String get settingsAvatarChooseGallery => 'Pilih dari galeri';
+
+  @override
+  String get settingsAvatarUseCamera => 'Ambil foto';
+
+  @override
+  String get settingsAvatarDeleteTitle => 'Hapus foto profil?';
+
+  @override
+  String get settingsAvatarDeleteBody =>
+      'Foto profil Anda akan dihapus dan diganti dengan inisial nama.';
+
+  @override
+  String get settingsAvatarEditorTitle => 'Atur foto profil';
+
+  @override
+  String get settingsAvatarEditorBody =>
+      'Geser atau perbesar foto, lalu putar bila diperlukan.';
+
+  @override
+  String get settingsAvatarRotateLeft => 'Putar ke kiri';
+
+  @override
+  String get settingsAvatarRotateRight => 'Putar ke kanan';
+
+  @override
+  String get settingsAvatarZoom => 'Perbesar';
+
+  @override
+  String get settingsAvatarReset => 'Atur ulang';
+
+  @override
+  String get settingsAvatarUsePhoto => 'Gunakan foto';
+
+  @override
+  String get settingsAvatarSaving => 'Menyiapkan...';
+
+  @override
+  String get settingsAvatarEditorFailed =>
+      'Foto belum dapat dipotong. Coba foto lain.';
+
+  @override
+  String get settingsAvatarSourceTooLarge =>
+      'Pilih gambar dengan ukuran maksimal 8 MB.';
 
   @override
   String get settingsAvatarUpdated => 'Foto profil berhasil diperbarui.';
@@ -1378,6 +1458,55 @@ class AppLocalizationsId extends AppLocalizations {
   String get accountabilityGroupCodeHint => 'Contoh: ABCD234567';
 
   @override
+  String get accActionUninstall => 'Izinkan penghapusan aplikasi';
+
+  @override
+  String get accActionPause => 'Jeda perlindungan';
+
+  @override
+  String accActionPauseDuration(int minutes) {
+    return 'Jeda perlindungan $minutes menit';
+  }
+
+  @override
+  String get accActionDisable => 'Nonaktifkan perlindungan';
+
+  @override
+  String get accActionEmergency => 'Akses darurat';
+
+  @override
+  String get accStatusApproved => 'Disetujui';
+
+  @override
+  String get accStatusPending => 'Menunggu';
+
+  @override
+  String get accStatusDenied => 'Ditolak';
+
+  @override
+  String get accStatusExpired => 'Kedaluwarsa';
+
+  @override
+  String get accStatusCancelled => 'Dibatalkan';
+
+  @override
+  String get accReasonAccessibilityDisabled =>
+      'Layanan aksesibilitas dinonaktifkan';
+
+  @override
+  String get accReasonTroubleshooting => 'Perbaikan pengaturan aplikasi';
+
+  @override
+  String get accReasonDeviceAdminDisabled =>
+      'Administrator perangkat dinonaktifkan';
+
+  @override
+  String get accReasonAppUpdate => 'Pembaruan aplikasi diperlukan';
+
+  @override
+  String get accReasonTesting => 'Pengujian perlindungan';
+
+  @override
   String get roleMember => 'Member';
 
   @override
@@ -1401,10 +1530,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get introSlide1Lead => 'JANGAN LUPA';
 
   @override
-  String get introSlide1Highlight => 'LINDUNGI';
+  String get introSlide1Highlight => 'LINDUNGI DIRIMU';
 
   @override
-  String get introSlide1Tail => 'DIRIMU';
+  String get introSlide1Tail => '';
 
   @override
   String get introSlide1Subtitle =>
@@ -1608,24 +1737,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get msgErrTypeRequired => 'Jenis permintaan wajib dipilih.';
 
   @override
-  String get recoveryWebTitle => 'Pemulihan tersedia di website';
-
-  @override
-  String get recoveryWebBody =>
-      'Jurnal, check-in, misi, dan psikoedukasi tetap berada di website agar aplikasi ini fokus pada proteksi perangkat.';
-
-  @override
-  String get recoveryWebAction => 'Buka pemulihan web';
-
-  @override
-  String get backToProtection => 'Kembali ke proteksi';
-
-  @override
   String get webPageOpenError => 'Halaman belum dapat dibuka. Coba lagi.';
-
-  @override
-  String get recoveryPageOpenError =>
-      'Halaman pemulihan belum dapat dibuka. Coba lagi.';
 
   @override
   String get groundingStep1Title => 'Lihat';
@@ -1680,26 +1792,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Anda sudah hadir sepenuhnya di momen ini. Pilih langkah berikutnya dengan tenang.';
 
   @override
-  String get recoveryWebEyebrow => 'lanjutkan di web';
-
-  @override
-  String get quickActionsTitle => 'Tindakan Cepat';
-
-  @override
-  String get quickActionBreathe => 'Jeda & Tarik Napas';
-
-  @override
-  String get quickActionBreatheSubtitle =>
-      'Latihan napas singkat sebelum melanjutkan';
-
-  @override
-  String get quickActionRecovery => 'Pemulihan & Dukungan';
-
-  @override
-  String get quickActionRecoverySubtitle =>
-      'Buka panduan dan dukungan pemulihan';
-
-  @override
   String get reminderChannelName => 'Pengingat harian';
 
   @override
@@ -1723,4 +1815,543 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get reminderBodyConsistent =>
       'Tetap tenang, tetap konsisten. Check-in harian menunggumu.';
+
+  @override
+  String get miniGamesEyebrow => 'MINI GAME';
+
+  @override
+  String get miniGamesTitle => 'Mini game';
+
+  @override
+  String get miniGamesDescription =>
+      'Ambil jeda ringan dan fokus dengan empat aktivitas singkat.';
+
+  @override
+  String get miniGamesSessionOnly =>
+      'Permainan hanya berlangsung di perangkat ini selama sesi berjalan. Skor dan pilihan tidak disimpan atau dibagikan.';
+
+  @override
+  String get miniGamesSpectrumTitle => 'Sprint Spektrum';
+
+  @override
+  String get miniGamesSpectrumDescription =>
+      'Sebutkan warna tinta, bukan kata yang tertulis.';
+
+  @override
+  String get miniGamesSpectrumInstruction =>
+      'Selesaikan 12 ronde singkat. Pilih warna tinta setiap kata sebelum waktu habis.';
+
+  @override
+  String get miniGamesPictureTitle => 'Tempa Gambar';
+
+  @override
+  String get miniGamesPictureDescription =>
+      'Susun kembali gambar buah dengan menukar potongan.';
+
+  @override
+  String get miniGamesPictureInstruction =>
+      'Pilih dua potongan untuk ditukar. Kembalikan setiap bagian ke posisi semula.';
+
+  @override
+  String get miniGamesTwinTitle => 'Jejak Kembar';
+
+  @override
+  String get miniGamesTwinDescription =>
+      'Ingat letak setiap pasangan buah yang sama.';
+
+  @override
+  String get miniGamesTwinInstruction =>
+      'Buka dua kartu setiap giliran dan temukan semua pasangan yang sama.';
+
+  @override
+  String get miniGamesTwinPreview =>
+      'Ingat posisi kartunya. Papan akan tertutup sebentar lagi.';
+
+  @override
+  String get miniGamesBrainTitle => 'Puncak Otak';
+
+  @override
+  String get miniGamesBrainDescription =>
+      'Coba delapan pertanyaan singkat dari kuis yang diacak.';
+
+  @override
+  String get miniGamesBrainInstruction =>
+      'Pilih jawaban yang menurutmu benar. Pertanyaan berikutnya muncul setelah pilihanmu.';
+
+  @override
+  String miniGamesRound(int current, int total) {
+    return 'Ronde $current dari $total';
+  }
+
+  @override
+  String miniGamesSeconds(int seconds) {
+    return 'Sisa $seconds dtk';
+  }
+
+  @override
+  String get miniGamesReadWord => 'Baca kata, lalu sebutkan warna tintanya.';
+
+  @override
+  String get miniGamesChooseInk => 'Apa warna tintanya?';
+
+  @override
+  String get miniGamesColorBlue => 'Biru';
+
+  @override
+  String get miniGamesColorYellow => 'Kuning';
+
+  @override
+  String get miniGamesColorRed => 'Merah';
+
+  @override
+  String get miniGamesColorGreen => 'Hijau';
+
+  @override
+  String get miniGamesPause => 'Jeda';
+
+  @override
+  String get miniGamesResume => 'Lanjutkan';
+
+  @override
+  String get miniGamesEasy => 'Mudah';
+
+  @override
+  String get miniGamesMedium => 'Sedang';
+
+  @override
+  String get miniGamesHard => 'Sulit';
+
+  @override
+  String get miniGamesPictureSelect => 'Pilih dua potongan untuk ditukar.';
+
+  @override
+  String get miniGamesCompleteTitle => 'Bagus sekali';
+
+  @override
+  String get miniGamesPlayAgain => 'Main lagi';
+
+  @override
+  String get miniGamesBackToHub => 'Menu mini game';
+
+  @override
+  String get miniGamesExitTitle => 'Keluar dari permainan?';
+
+  @override
+  String get miniGamesExitBody =>
+      'Progres permainan saat ini akan diulang saat kamu keluar.';
+
+  @override
+  String get miniGamesExitStay => 'Tetap bermain';
+
+  @override
+  String get miniGamesExitConfirm => 'Keluar & ulangi';
+
+  @override
+  String get miniGamesStart => 'Mulai permainan';
+
+  @override
+  String get miniGamesDifficultyLabel => 'Pilih tingkat kesulitan';
+
+  @override
+  String miniGamesPieceCount(int count) {
+    return '$count keping';
+  }
+
+  @override
+  String miniGamesPairCount(int pairs, int cards) {
+    return '$pairs pasang · $cards kartu';
+  }
+
+  @override
+  String get miniGamesMoves => 'Langkah';
+
+  @override
+  String get miniGamesPieces => 'Keping';
+
+  @override
+  String get miniGamesTime => 'Waktu';
+
+  @override
+  String get miniGamesPairs => 'Pasangan';
+
+  @override
+  String get miniGamesReset => 'Atur ulang';
+
+  @override
+  String get miniGamesShuffle => 'Acak';
+
+  @override
+  String get miniGamesChangeChallenge => 'Ubah tantangan';
+
+  @override
+  String get miniGamesChangeDifficulty => 'Ubah kesulitan';
+
+  @override
+  String get miniGamesPictureReadyTitle => 'Siapkan puzzlemu';
+
+  @override
+  String get miniGamesPictureReadyDescription =>
+      'Pilih gambar dan ukuran papan sebelum mulai bermain.';
+
+  @override
+  String get miniGamesPictureImageChoiceLabel => 'Pilih gambar';
+
+  @override
+  String get miniGamesPictureReferenceLabel => 'Gambar referensi';
+
+  @override
+  String get miniGamesPictureCompleteTitle => 'Puzzle selesai';
+
+  @override
+  String miniGamesPictureCompleteDescription(int moves, String time) {
+    return 'Kamu menyusun gambar dalam $moves langkah dan $time.';
+  }
+
+  @override
+  String get miniGamesPictureStudyCorner => 'Sudut belajar';
+
+  @override
+  String get miniGamesPictureFruitMarket => 'Pasar buah';
+
+  @override
+  String get miniGamesPictureBerryGarden => 'Kebun beri';
+
+  @override
+  String get miniGamesPictureTropicalPlatter => 'Hidangan tropis';
+
+  @override
+  String get miniGamesPictureOrchardBasket => 'Keranjang kebun';
+
+  @override
+  String get miniGamesPictureCitrusTable => 'Meja sitrus';
+
+  @override
+  String get miniGamesTwinReadyTitle => 'Siap melacak pasangan?';
+
+  @override
+  String get miniGamesTwinReadyDescription =>
+      'Pilih ukuran papan, ingat kartunya, lalu temukan semua pasangan.';
+
+  @override
+  String get miniGamesTwinCompleteTitle => 'Semua pasangan ditemukan';
+
+  @override
+  String miniGamesTwinCompleteDescription(int moves, String time) {
+    return 'Kamu menemukan semua pasangan dalam $moves langkah dan $time.';
+  }
+
+  @override
+  String miniGamesTwinHiddenCard(int position) {
+    return 'Kartu tersembunyi $position';
+  }
+
+  @override
+  String miniGamesTwinRevealedCard(int position, String fruit) {
+    return 'Kartu $position, $fruit';
+  }
+
+  @override
+  String miniGamesTwinMatchedCard(int position, String fruit) {
+    return 'Kartu cocok $position, $fruit';
+  }
+
+  @override
+  String get miniGamesTwinApple => 'Apel';
+
+  @override
+  String get miniGamesTwinBanana => 'Pisang';
+
+  @override
+  String get miniGamesTwinOrange => 'Jeruk';
+
+  @override
+  String get miniGamesTwinKiwi => 'Kiwi';
+
+  @override
+  String get miniGamesTwinBlueberry => 'Blueberi';
+
+  @override
+  String get miniGamesTwinGrapes => 'Anggur';
+
+  @override
+  String get miniGamesTwinDragonfruit => 'Buah naga';
+
+  @override
+  String get miniGamesTwinPineapple => 'Nanas';
+
+  @override
+  String get miniGamesTwinCoconut => 'Kelapa';
+
+  @override
+  String get miniGamesTwinPeach => 'Persik';
+
+  @override
+  String get miniGamesTwinPear => 'Pir';
+
+  @override
+  String get miniGamesTwinWatermelon => 'Semangka';
+
+  @override
+  String miniGamesSpectrumResult(int correct, int total) {
+    return 'Kamu mengenali $correct dari $total warna tinta.';
+  }
+
+  @override
+  String get miniGamesPictureResult => 'Gambar sudah tersusun kembali.';
+
+  @override
+  String get miniGamesTwinResult => 'Kamu menemukan semua pasangan yang sama.';
+
+  @override
+  String miniGamesBrainResult(int correct, int total) {
+    return 'Kamu menjawab benar $correct dari $total pertanyaan.';
+  }
+
+  @override
+  String get miniGamesBrainEverestQ =>
+      'Gunung tertinggi di atas permukaan laut adalah?';
+
+  @override
+  String get miniGamesBrainEverestA => 'Gunung Everest';
+
+  @override
+  String get miniGamesBrainEverestB => 'K2';
+
+  @override
+  String get miniGamesBrainEverestC => 'Kilimanjaro';
+
+  @override
+  String get miniGamesBrainEverestD => 'Denali';
+
+  @override
+  String get miniGamesBrainPacificQ => 'Samudra terbesar di Bumi adalah?';
+
+  @override
+  String get miniGamesBrainPacificA => 'Samudra Pasifik';
+
+  @override
+  String get miniGamesBrainPacificB => 'Samudra Atlantik';
+
+  @override
+  String get miniGamesBrainPacificC => 'Samudra Hindia';
+
+  @override
+  String get miniGamesBrainPacificD => 'Samudra Arktik';
+
+  @override
+  String get miniGamesBrainTokyoQ => 'Ibu kota Jepang adalah?';
+
+  @override
+  String get miniGamesBrainTokyoA => 'Tokyo';
+
+  @override
+  String get miniGamesBrainTokyoB => 'Kyoto';
+
+  @override
+  String get miniGamesBrainTokyoC => 'Osaka';
+
+  @override
+  String get miniGamesBrainTokyoD => 'Sapporo';
+
+  @override
+  String get miniGamesBrainGizaQ => 'Piramida Agung Giza berada di negara?';
+
+  @override
+  String get miniGamesBrainGizaA => 'Mesir';
+
+  @override
+  String get miniGamesBrainGizaB => 'Yordania';
+
+  @override
+  String get miniGamesBrainGizaC => 'Maroko';
+
+  @override
+  String get miniGamesBrainGizaD => 'Turki';
+
+  @override
+  String get miniGamesBrainJupiterQ =>
+      'Planet terbesar dalam tata surya adalah?';
+
+  @override
+  String get miniGamesBrainJupiterA => 'Jupiter';
+
+  @override
+  String get miniGamesBrainJupiterB => 'Saturnus';
+
+  @override
+  String get miniGamesBrainJupiterC => 'Bumi';
+
+  @override
+  String get miniGamesBrainJupiterD => 'Neptunus';
+
+  @override
+  String get miniGamesBrainMarsQ =>
+      'Planet yang dikenal sebagai Planet Merah adalah?';
+
+  @override
+  String get miniGamesBrainMarsA => 'Mars';
+
+  @override
+  String get miniGamesBrainMarsB => 'Venus';
+
+  @override
+  String get miniGamesBrainMarsC => 'Merkurius';
+
+  @override
+  String get miniGamesBrainMarsD => 'Uranus';
+
+  @override
+  String get miniGamesBrainCarbonQ => 'Gas dengan rumus CO₂ adalah?';
+
+  @override
+  String get miniGamesBrainCarbonA => 'Karbon dioksida';
+
+  @override
+  String get miniGamesBrainCarbonB => 'Oksigen';
+
+  @override
+  String get miniGamesBrainCarbonC => 'Nitrogen';
+
+  @override
+  String get miniGamesBrainCarbonD => 'Hidrogen';
+
+  @override
+  String get miniGamesBrainHeartQ =>
+      'Organ yang memompa darah ke seluruh tubuh adalah?';
+
+  @override
+  String get miniGamesBrainHeartA => 'Jantung';
+
+  @override
+  String get miniGamesBrainHeartB => 'Paru-paru';
+
+  @override
+  String get miniGamesBrainHeartC => 'Hati';
+
+  @override
+  String get miniGamesBrainHeartD => 'Ginjal';
+
+  @override
+  String get miniGamesBrainIndependenceQ =>
+      'Pada tahun berapa Indonesia memproklamasikan kemerdekaan?';
+
+  @override
+  String get miniGamesBrainIndependenceA => '1945';
+
+  @override
+  String get miniGamesBrainIndependenceB => '1942';
+
+  @override
+  String get miniGamesBrainIndependenceC => '1949';
+
+  @override
+  String get miniGamesBrainIndependenceD => '1950';
+
+  @override
+  String get miniGamesBrainBorobudurQ => 'Candi Borobudur berada di provinsi?';
+
+  @override
+  String get miniGamesBrainBorobudurA => 'Jawa Tengah';
+
+  @override
+  String get miniGamesBrainBorobudurB => 'Jawa Timur';
+
+  @override
+  String get miniGamesBrainBorobudurC => 'Jawa Barat';
+
+  @override
+  String get miniGamesBrainBorobudurD => 'Bali';
+
+  @override
+  String get miniGamesBrainLaskarQ => 'Siapa penulis novel Laskar Pelangi?';
+
+  @override
+  String get miniGamesBrainLaskarA => 'Andrea Hirata';
+
+  @override
+  String get miniGamesBrainLaskarB => 'Pramoedya Ananta Toer';
+
+  @override
+  String get miniGamesBrainLaskarC => 'Dee Lestari';
+
+  @override
+  String get miniGamesBrainLaskarD => 'Tere Liye';
+
+  @override
+  String get miniGamesBrainPancasilaQ => 'Pancasila memiliki berapa sila?';
+
+  @override
+  String get miniGamesBrainPancasilaA => 'Lima';
+
+  @override
+  String get miniGamesBrainPancasilaB => 'Tiga';
+
+  @override
+  String get miniGamesBrainPancasilaC => 'Empat';
+
+  @override
+  String get miniGamesBrainPancasilaD => 'Enam';
+
+  @override
+  String get miniGamesBrainCpuQ =>
+      'Komponen utama untuk memproses data pada komputer disebut?';
+
+  @override
+  String get miniGamesBrainCpuA => 'Prosesor';
+
+  @override
+  String get miniGamesBrainCpuB => 'Penyimpanan';
+
+  @override
+  String get miniGamesBrainCpuC => 'Monitor';
+
+  @override
+  String get miniGamesBrainCpuD => 'Papan ketik';
+
+  @override
+  String get miniGamesBrainHttpsQ =>
+      'Apa yang dibantu oleh HTTPS pada sebuah situs?';
+
+  @override
+  String get miniGamesBrainHttpsA => 'Koneksi terenkripsi';
+
+  @override
+  String get miniGamesBrainHttpsB => 'Gambar lebih besar';
+
+  @override
+  String get miniGamesBrainHttpsC => 'Akses luring';
+
+  @override
+  String get miniGamesBrainHttpsD => 'Prosesor lebih cepat';
+
+  @override
+  String get miniGamesBrainBinaryQ =>
+      'Angka apa yang digunakan dalam sistem biner?';
+
+  @override
+  String get miniGamesBrainBinaryA => '0 dan 1';
+
+  @override
+  String get miniGamesBrainBinaryB => '1 dan 2';
+
+  @override
+  String get miniGamesBrainBinaryC => 'A dan Z';
+
+  @override
+  String get miniGamesBrainBinaryD => '0 sampai 9';
+
+  @override
+  String get miniGamesBrainRouterQ => 'Router utamanya digunakan untuk?';
+
+  @override
+  String get miniGamesBrainRouterA => 'Menghubungkan jaringan';
+
+  @override
+  String get miniGamesBrainRouterB => 'Mencetak dokumen';
+
+  @override
+  String get miniGamesBrainRouterC => 'Mengedit foto';
+
+  @override
+  String get miniGamesBrainRouterD => 'Menyimpan kata sandi';
 }

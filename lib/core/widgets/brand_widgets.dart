@@ -24,4 +24,5 @@ export 'category_tab_bar.dart';
 export 'glass_search_field.dart';
 export 'accent_carousel_card.dart';
 export 'image_banner_card.dart';
-export 'quick_actions_sheet.dart';
+export 'gami_image.dart';
+export 'app_busy_indicator.dart';

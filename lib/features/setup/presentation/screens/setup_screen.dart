@@ -10,6 +10,7 @@ import '../../../../core/platform/platform_bridge.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/widgets/app_bar_title.dart';
+import '../../../../core/widgets/mesh_background.dart';
 import '../models/setup_step.dart';
 import '../widgets/setup_step_card.dart';
 
@@ -132,45 +133,51 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
       ),
     ];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: AppBarTitle(icon: Icons.fact_check_rounded, title: l10n.setupTitle),
-      ),
-      body: ListView(
-        padding: AppSpacing.screenPadding,
-        children: [
-          Text(
-            l10n.setupIntro,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: AppColors.inkMuted,
-              height: 1.55,
-            ),
+    return MeshBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: AppBarTitle(
+            icon: Icons.fact_check_rounded,
+            title: l10n.setupTitle,
           ),
-          const SizedBox(height: 20),
-          for (var index = 0; index < steps.length; index++)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: SetupStepCard(
-                index: index,
-                step: steps[index],
-                isLoading: _loading,
+        ),
+        body: ListView(
+          padding: AppSpacing.screenPadding,
+          children: [
+            Text(
+              l10n.setupIntro,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: AppColors.inkMuted,
+                height: 1.55,
               ),
             ),
-          const SizedBox(height: 8),
-          FilledButton.icon(
-            onPressed: () => context.go('/dashboard'),
-            icon: const Icon(Icons.shield_outlined),
-            label: Text(l10n.setupFinishAction),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            l10n.setupLimitations,
-            textAlign: TextAlign.center,
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: AppColors.mutedForeground),
-          ),
-        ],
+            const SizedBox(height: 20),
+            for (var index = 0; index < steps.length; index++)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: SetupStepCard(
+                  index: index,
+                  step: steps[index],
+                  isLoading: _loading,
+                ),
+              ),
+            const SizedBox(height: 8),
+            FilledButton.icon(
+              onPressed: () => context.go('/dashboard'),
+              icon: const Icon(Icons.shield_outlined),
+              label: Text(l10n.setupFinishAction),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              l10n.setupLimitations,
+              textAlign: TextAlign.center,
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: AppColors.mutedForeground),
+            ),
+          ],
+        ),
       ),
     );
   }

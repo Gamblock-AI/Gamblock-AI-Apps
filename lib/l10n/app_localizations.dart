@@ -383,8 +383,62 @@ abstract class AppLocalizations {
   /// No description provided for @protectionArtifactLabel.
   ///
   /// In id, this message translates to:
-  /// **'Model dan ruleset'**
+  /// **'Sistem Proteksi AI'**
   String get protectionArtifactLabel;
+
+  /// No description provided for @protectionModelReady.
+  ///
+  /// In id, this message translates to:
+  /// **'Aktif & siap'**
+  String get protectionModelReady;
+
+  /// No description provided for @sensorServiceActive.
+  ///
+  /// In id, this message translates to:
+  /// **'Layanan aktif berjalan'**
+  String get sensorServiceActive;
+
+  /// No description provided for @sensorServiceAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Perlu diaktifkan via setup'**
+  String get sensorServiceAction;
+
+  /// No description provided for @sensorBrowserActive.
+  ///
+  /// In id, this message translates to:
+  /// **'Ekstensi browser terhubung'**
+  String get sensorBrowserActive;
+
+  /// No description provided for @sensorBrowserDegraded.
+  ///
+  /// In id, this message translates to:
+  /// **'Koneksi sensor terdegradasi'**
+  String get sensorBrowserDegraded;
+
+  /// No description provided for @sensorBrowserAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Pasang ekstensi browser'**
+  String get sensorBrowserAction;
+
+  /// No description provided for @sensorPermissionActive.
+  ///
+  /// In id, this message translates to:
+  /// **'Izin sistem diberikan'**
+  String get sensorPermissionActive;
+
+  /// No description provided for @sensorPermissionAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Berikan izin aksesibilitas'**
+  String get sensorPermissionAction;
+
+  /// No description provided for @sensorModelActive.
+  ///
+  /// In id, this message translates to:
+  /// **'Model AI lokal siap bekerja'**
+  String get sensorModelActive;
 
   /// No description provided for @protectionPartnerRequired.
   ///
@@ -1207,6 +1261,102 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Hapus foto'**
   String get settingsAvatarRemove;
+
+  /// No description provided for @settingsAvatarDialogTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Foto profil'**
+  String get settingsAvatarDialogTitle;
+
+  /// No description provided for @settingsAvatarDialogBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih cara untuk memperbarui foto profil Anda.'**
+  String get settingsAvatarDialogBody;
+
+  /// No description provided for @settingsAvatarChooseGallery.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih dari galeri'**
+  String get settingsAvatarChooseGallery;
+
+  /// No description provided for @settingsAvatarUseCamera.
+  ///
+  /// In id, this message translates to:
+  /// **'Ambil foto'**
+  String get settingsAvatarUseCamera;
+
+  /// No description provided for @settingsAvatarDeleteTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus foto profil?'**
+  String get settingsAvatarDeleteTitle;
+
+  /// No description provided for @settingsAvatarDeleteBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Foto profil Anda akan dihapus dan diganti dengan inisial nama.'**
+  String get settingsAvatarDeleteBody;
+
+  /// No description provided for @settingsAvatarEditorTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Atur foto profil'**
+  String get settingsAvatarEditorTitle;
+
+  /// No description provided for @settingsAvatarEditorBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Geser atau perbesar foto, lalu putar bila diperlukan.'**
+  String get settingsAvatarEditorBody;
+
+  /// No description provided for @settingsAvatarRotateLeft.
+  ///
+  /// In id, this message translates to:
+  /// **'Putar ke kiri'**
+  String get settingsAvatarRotateLeft;
+
+  /// No description provided for @settingsAvatarRotateRight.
+  ///
+  /// In id, this message translates to:
+  /// **'Putar ke kanan'**
+  String get settingsAvatarRotateRight;
+
+  /// No description provided for @settingsAvatarZoom.
+  ///
+  /// In id, this message translates to:
+  /// **'Perbesar'**
+  String get settingsAvatarZoom;
+
+  /// No description provided for @settingsAvatarReset.
+  ///
+  /// In id, this message translates to:
+  /// **'Atur ulang'**
+  String get settingsAvatarReset;
+
+  /// No description provided for @settingsAvatarUsePhoto.
+  ///
+  /// In id, this message translates to:
+  /// **'Gunakan foto'**
+  String get settingsAvatarUsePhoto;
+
+  /// No description provided for @settingsAvatarSaving.
+  ///
+  /// In id, this message translates to:
+  /// **'Menyiapkan...'**
+  String get settingsAvatarSaving;
+
+  /// No description provided for @settingsAvatarEditorFailed.
+  ///
+  /// In id, this message translates to:
+  /// **'Foto belum dapat dipotong. Coba foto lain.'**
+  String get settingsAvatarEditorFailed;
+
+  /// No description provided for @settingsAvatarSourceTooLarge.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih gambar dengan ukuran maksimal 8 MB.'**
+  String get settingsAvatarSourceTooLarge;
 
   /// No description provided for @settingsAvatarUpdated.
   ///
@@ -2588,6 +2738,96 @@ abstract class AppLocalizations {
   /// **'Contoh: ABCD234567'**
   String get accountabilityGroupCodeHint;
 
+  /// No description provided for @accActionUninstall.
+  ///
+  /// In id, this message translates to:
+  /// **'Izinkan penghapusan aplikasi'**
+  String get accActionUninstall;
+
+  /// No description provided for @accActionPause.
+  ///
+  /// In id, this message translates to:
+  /// **'Jeda perlindungan'**
+  String get accActionPause;
+
+  /// No description provided for @accActionPauseDuration.
+  ///
+  /// In id, this message translates to:
+  /// **'Jeda perlindungan {minutes} menit'**
+  String accActionPauseDuration(int minutes);
+
+  /// No description provided for @accActionDisable.
+  ///
+  /// In id, this message translates to:
+  /// **'Nonaktifkan perlindungan'**
+  String get accActionDisable;
+
+  /// No description provided for @accActionEmergency.
+  ///
+  /// In id, this message translates to:
+  /// **'Akses darurat'**
+  String get accActionEmergency;
+
+  /// No description provided for @accStatusApproved.
+  ///
+  /// In id, this message translates to:
+  /// **'Disetujui'**
+  String get accStatusApproved;
+
+  /// No description provided for @accStatusPending.
+  ///
+  /// In id, this message translates to:
+  /// **'Menunggu'**
+  String get accStatusPending;
+
+  /// No description provided for @accStatusDenied.
+  ///
+  /// In id, this message translates to:
+  /// **'Ditolak'**
+  String get accStatusDenied;
+
+  /// No description provided for @accStatusExpired.
+  ///
+  /// In id, this message translates to:
+  /// **'Kedaluwarsa'**
+  String get accStatusExpired;
+
+  /// No description provided for @accStatusCancelled.
+  ///
+  /// In id, this message translates to:
+  /// **'Dibatalkan'**
+  String get accStatusCancelled;
+
+  /// No description provided for @accReasonAccessibilityDisabled.
+  ///
+  /// In id, this message translates to:
+  /// **'Layanan aksesibilitas dinonaktifkan'**
+  String get accReasonAccessibilityDisabled;
+
+  /// No description provided for @accReasonTroubleshooting.
+  ///
+  /// In id, this message translates to:
+  /// **'Perbaikan pengaturan aplikasi'**
+  String get accReasonTroubleshooting;
+
+  /// No description provided for @accReasonDeviceAdminDisabled.
+  ///
+  /// In id, this message translates to:
+  /// **'Administrator perangkat dinonaktifkan'**
+  String get accReasonDeviceAdminDisabled;
+
+  /// No description provided for @accReasonAppUpdate.
+  ///
+  /// In id, this message translates to:
+  /// **'Pembaruan aplikasi diperlukan'**
+  String get accReasonAppUpdate;
+
+  /// No description provided for @accReasonTesting.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengujian perlindungan'**
+  String get accReasonTesting;
+
   /// No description provided for @roleMember.
   ///
   /// In id, this message translates to:
@@ -2633,13 +2873,13 @@ abstract class AppLocalizations {
   /// No description provided for @introSlide1Highlight.
   ///
   /// In id, this message translates to:
-  /// **'LINDUNGI'**
+  /// **'LINDUNGI DIRIMU'**
   String get introSlide1Highlight;
 
   /// No description provided for @introSlide1Tail.
   ///
   /// In id, this message translates to:
-  /// **'DIRIMU'**
+  /// **''**
   String get introSlide1Tail;
 
   /// No description provided for @introSlide1Subtitle.
@@ -3002,41 +3242,11 @@ abstract class AppLocalizations {
   /// **'Jenis permintaan wajib dipilih.'**
   String get msgErrTypeRequired;
 
-  /// No description provided for @recoveryWebTitle.
-  ///
-  /// In id, this message translates to:
-  /// **'Pemulihan tersedia di website'**
-  String get recoveryWebTitle;
-
-  /// No description provided for @recoveryWebBody.
-  ///
-  /// In id, this message translates to:
-  /// **'Jurnal, check-in, misi, dan psikoedukasi tetap berada di website agar aplikasi ini fokus pada proteksi perangkat.'**
-  String get recoveryWebBody;
-
-  /// No description provided for @recoveryWebAction.
-  ///
-  /// In id, this message translates to:
-  /// **'Buka pemulihan web'**
-  String get recoveryWebAction;
-
-  /// No description provided for @backToProtection.
-  ///
-  /// In id, this message translates to:
-  /// **'Kembali ke proteksi'**
-  String get backToProtection;
-
   /// No description provided for @webPageOpenError.
   ///
   /// In id, this message translates to:
   /// **'Halaman belum dapat dibuka. Coba lagi.'**
   String get webPageOpenError;
-
-  /// No description provided for @recoveryPageOpenError.
-  ///
-  /// In id, this message translates to:
-  /// **'Halaman pemulihan belum dapat dibuka. Coba lagi.'**
-  String get recoveryPageOpenError;
 
   /// No description provided for @groundingStep1Title.
   ///
@@ -3128,42 +3338,6 @@ abstract class AppLocalizations {
   /// **'Anda sudah hadir sepenuhnya di momen ini. Pilih langkah berikutnya dengan tenang.'**
   String get groundingCompleteBody;
 
-  /// No description provided for @recoveryWebEyebrow.
-  ///
-  /// In id, this message translates to:
-  /// **'lanjutkan di web'**
-  String get recoveryWebEyebrow;
-
-  /// No description provided for @quickActionsTitle.
-  ///
-  /// In id, this message translates to:
-  /// **'Tindakan Cepat'**
-  String get quickActionsTitle;
-
-  /// No description provided for @quickActionBreathe.
-  ///
-  /// In id, this message translates to:
-  /// **'Jeda & Tarik Napas'**
-  String get quickActionBreathe;
-
-  /// No description provided for @quickActionBreatheSubtitle.
-  ///
-  /// In id, this message translates to:
-  /// **'Latihan napas singkat sebelum melanjutkan'**
-  String get quickActionBreatheSubtitle;
-
-  /// No description provided for @quickActionRecovery.
-  ///
-  /// In id, this message translates to:
-  /// **'Pemulihan & Dukungan'**
-  String get quickActionRecovery;
-
-  /// No description provided for @quickActionRecoverySubtitle.
-  ///
-  /// In id, this message translates to:
-  /// **'Buka panduan dan dukungan pemulihan'**
-  String get quickActionRecoverySubtitle;
-
   /// No description provided for @reminderChannelName.
   ///
   /// In id, this message translates to:
@@ -3205,6 +3379,996 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Tetap tenang, tetap konsisten. Check-in harian menunggumu.'**
   String get reminderBodyConsistent;
+
+  /// No description provided for @miniGamesEyebrow.
+  ///
+  /// In id, this message translates to:
+  /// **'MINI GAME'**
+  String get miniGamesEyebrow;
+
+  /// No description provided for @miniGamesTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Mini game'**
+  String get miniGamesTitle;
+
+  /// No description provided for @miniGamesDescription.
+  ///
+  /// In id, this message translates to:
+  /// **'Ambil jeda ringan dan fokus dengan empat aktivitas singkat.'**
+  String get miniGamesDescription;
+
+  /// No description provided for @miniGamesSessionOnly.
+  ///
+  /// In id, this message translates to:
+  /// **'Permainan hanya berlangsung di perangkat ini selama sesi berjalan. Skor dan pilihan tidak disimpan atau dibagikan.'**
+  String get miniGamesSessionOnly;
+
+  /// No description provided for @miniGamesSpectrumTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Sprint Spektrum'**
+  String get miniGamesSpectrumTitle;
+
+  /// No description provided for @miniGamesSpectrumDescription.
+  ///
+  /// In id, this message translates to:
+  /// **'Sebutkan warna tinta, bukan kata yang tertulis.'**
+  String get miniGamesSpectrumDescription;
+
+  /// No description provided for @miniGamesSpectrumInstruction.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesaikan 12 ronde singkat. Pilih warna tinta setiap kata sebelum waktu habis.'**
+  String get miniGamesSpectrumInstruction;
+
+  /// No description provided for @miniGamesPictureTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Tempa Gambar'**
+  String get miniGamesPictureTitle;
+
+  /// No description provided for @miniGamesPictureDescription.
+  ///
+  /// In id, this message translates to:
+  /// **'Susun kembali gambar buah dengan menukar potongan.'**
+  String get miniGamesPictureDescription;
+
+  /// No description provided for @miniGamesPictureInstruction.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih dua potongan untuk ditukar. Kembalikan setiap bagian ke posisi semula.'**
+  String get miniGamesPictureInstruction;
+
+  /// No description provided for @miniGamesTwinTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Jejak Kembar'**
+  String get miniGamesTwinTitle;
+
+  /// No description provided for @miniGamesTwinDescription.
+  ///
+  /// In id, this message translates to:
+  /// **'Ingat letak setiap pasangan buah yang sama.'**
+  String get miniGamesTwinDescription;
+
+  /// No description provided for @miniGamesTwinInstruction.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka dua kartu setiap giliran dan temukan semua pasangan yang sama.'**
+  String get miniGamesTwinInstruction;
+
+  /// No description provided for @miniGamesTwinPreview.
+  ///
+  /// In id, this message translates to:
+  /// **'Ingat posisi kartunya. Papan akan tertutup sebentar lagi.'**
+  String get miniGamesTwinPreview;
+
+  /// No description provided for @miniGamesBrainTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Puncak Otak'**
+  String get miniGamesBrainTitle;
+
+  /// No description provided for @miniGamesBrainDescription.
+  ///
+  /// In id, this message translates to:
+  /// **'Coba delapan pertanyaan singkat dari kuis yang diacak.'**
+  String get miniGamesBrainDescription;
+
+  /// No description provided for @miniGamesBrainInstruction.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih jawaban yang menurutmu benar. Pertanyaan berikutnya muncul setelah pilihanmu.'**
+  String get miniGamesBrainInstruction;
+
+  /// No description provided for @miniGamesRound.
+  ///
+  /// In id, this message translates to:
+  /// **'Ronde {current} dari {total}'**
+  String miniGamesRound(int current, int total);
+
+  /// No description provided for @miniGamesSeconds.
+  ///
+  /// In id, this message translates to:
+  /// **'Sisa {seconds} dtk'**
+  String miniGamesSeconds(int seconds);
+
+  /// No description provided for @miniGamesReadWord.
+  ///
+  /// In id, this message translates to:
+  /// **'Baca kata, lalu sebutkan warna tintanya.'**
+  String get miniGamesReadWord;
+
+  /// No description provided for @miniGamesChooseInk.
+  ///
+  /// In id, this message translates to:
+  /// **'Apa warna tintanya?'**
+  String get miniGamesChooseInk;
+
+  /// No description provided for @miniGamesColorBlue.
+  ///
+  /// In id, this message translates to:
+  /// **'Biru'**
+  String get miniGamesColorBlue;
+
+  /// No description provided for @miniGamesColorYellow.
+  ///
+  /// In id, this message translates to:
+  /// **'Kuning'**
+  String get miniGamesColorYellow;
+
+  /// No description provided for @miniGamesColorRed.
+  ///
+  /// In id, this message translates to:
+  /// **'Merah'**
+  String get miniGamesColorRed;
+
+  /// No description provided for @miniGamesColorGreen.
+  ///
+  /// In id, this message translates to:
+  /// **'Hijau'**
+  String get miniGamesColorGreen;
+
+  /// No description provided for @miniGamesPause.
+  ///
+  /// In id, this message translates to:
+  /// **'Jeda'**
+  String get miniGamesPause;
+
+  /// No description provided for @miniGamesResume.
+  ///
+  /// In id, this message translates to:
+  /// **'Lanjutkan'**
+  String get miniGamesResume;
+
+  /// No description provided for @miniGamesEasy.
+  ///
+  /// In id, this message translates to:
+  /// **'Mudah'**
+  String get miniGamesEasy;
+
+  /// No description provided for @miniGamesMedium.
+  ///
+  /// In id, this message translates to:
+  /// **'Sedang'**
+  String get miniGamesMedium;
+
+  /// No description provided for @miniGamesHard.
+  ///
+  /// In id, this message translates to:
+  /// **'Sulit'**
+  String get miniGamesHard;
+
+  /// No description provided for @miniGamesPictureSelect.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih dua potongan untuk ditukar.'**
+  String get miniGamesPictureSelect;
+
+  /// No description provided for @miniGamesCompleteTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Bagus sekali'**
+  String get miniGamesCompleteTitle;
+
+  /// No description provided for @miniGamesPlayAgain.
+  ///
+  /// In id, this message translates to:
+  /// **'Main lagi'**
+  String get miniGamesPlayAgain;
+
+  /// No description provided for @miniGamesBackToHub.
+  ///
+  /// In id, this message translates to:
+  /// **'Menu mini game'**
+  String get miniGamesBackToHub;
+
+  /// No description provided for @miniGamesExitTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Keluar dari permainan?'**
+  String get miniGamesExitTitle;
+
+  /// No description provided for @miniGamesExitBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Progres permainan saat ini akan diulang saat kamu keluar.'**
+  String get miniGamesExitBody;
+
+  /// No description provided for @miniGamesExitStay.
+  ///
+  /// In id, this message translates to:
+  /// **'Tetap bermain'**
+  String get miniGamesExitStay;
+
+  /// No description provided for @miniGamesExitConfirm.
+  ///
+  /// In id, this message translates to:
+  /// **'Keluar & ulangi'**
+  String get miniGamesExitConfirm;
+
+  /// No description provided for @miniGamesStart.
+  ///
+  /// In id, this message translates to:
+  /// **'Mulai permainan'**
+  String get miniGamesStart;
+
+  /// No description provided for @miniGamesDifficultyLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih tingkat kesulitan'**
+  String get miniGamesDifficultyLabel;
+
+  /// No description provided for @miniGamesPieceCount.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} keping'**
+  String miniGamesPieceCount(int count);
+
+  /// No description provided for @miniGamesPairCount.
+  ///
+  /// In id, this message translates to:
+  /// **'{pairs} pasang · {cards} kartu'**
+  String miniGamesPairCount(int pairs, int cards);
+
+  /// No description provided for @miniGamesMoves.
+  ///
+  /// In id, this message translates to:
+  /// **'Langkah'**
+  String get miniGamesMoves;
+
+  /// No description provided for @miniGamesPieces.
+  ///
+  /// In id, this message translates to:
+  /// **'Keping'**
+  String get miniGamesPieces;
+
+  /// No description provided for @miniGamesTime.
+  ///
+  /// In id, this message translates to:
+  /// **'Waktu'**
+  String get miniGamesTime;
+
+  /// No description provided for @miniGamesPairs.
+  ///
+  /// In id, this message translates to:
+  /// **'Pasangan'**
+  String get miniGamesPairs;
+
+  /// No description provided for @miniGamesReset.
+  ///
+  /// In id, this message translates to:
+  /// **'Atur ulang'**
+  String get miniGamesReset;
+
+  /// No description provided for @miniGamesShuffle.
+  ///
+  /// In id, this message translates to:
+  /// **'Acak'**
+  String get miniGamesShuffle;
+
+  /// No description provided for @miniGamesChangeChallenge.
+  ///
+  /// In id, this message translates to:
+  /// **'Ubah tantangan'**
+  String get miniGamesChangeChallenge;
+
+  /// No description provided for @miniGamesChangeDifficulty.
+  ///
+  /// In id, this message translates to:
+  /// **'Ubah kesulitan'**
+  String get miniGamesChangeDifficulty;
+
+  /// No description provided for @miniGamesPictureReadyTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Siapkan puzzlemu'**
+  String get miniGamesPictureReadyTitle;
+
+  /// No description provided for @miniGamesPictureReadyDescription.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih gambar dan ukuran papan sebelum mulai bermain.'**
+  String get miniGamesPictureReadyDescription;
+
+  /// No description provided for @miniGamesPictureImageChoiceLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih gambar'**
+  String get miniGamesPictureImageChoiceLabel;
+
+  /// No description provided for @miniGamesPictureReferenceLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Gambar referensi'**
+  String get miniGamesPictureReferenceLabel;
+
+  /// No description provided for @miniGamesPictureCompleteTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Puzzle selesai'**
+  String get miniGamesPictureCompleteTitle;
+
+  /// No description provided for @miniGamesPictureCompleteDescription.
+  ///
+  /// In id, this message translates to:
+  /// **'Kamu menyusun gambar dalam {moves} langkah dan {time}.'**
+  String miniGamesPictureCompleteDescription(int moves, String time);
+
+  /// No description provided for @miniGamesPictureStudyCorner.
+  ///
+  /// In id, this message translates to:
+  /// **'Sudut belajar'**
+  String get miniGamesPictureStudyCorner;
+
+  /// No description provided for @miniGamesPictureFruitMarket.
+  ///
+  /// In id, this message translates to:
+  /// **'Pasar buah'**
+  String get miniGamesPictureFruitMarket;
+
+  /// No description provided for @miniGamesPictureBerryGarden.
+  ///
+  /// In id, this message translates to:
+  /// **'Kebun beri'**
+  String get miniGamesPictureBerryGarden;
+
+  /// No description provided for @miniGamesPictureTropicalPlatter.
+  ///
+  /// In id, this message translates to:
+  /// **'Hidangan tropis'**
+  String get miniGamesPictureTropicalPlatter;
+
+  /// No description provided for @miniGamesPictureOrchardBasket.
+  ///
+  /// In id, this message translates to:
+  /// **'Keranjang kebun'**
+  String get miniGamesPictureOrchardBasket;
+
+  /// No description provided for @miniGamesPictureCitrusTable.
+  ///
+  /// In id, this message translates to:
+  /// **'Meja sitrus'**
+  String get miniGamesPictureCitrusTable;
+
+  /// No description provided for @miniGamesTwinReadyTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Siap melacak pasangan?'**
+  String get miniGamesTwinReadyTitle;
+
+  /// No description provided for @miniGamesTwinReadyDescription.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih ukuran papan, ingat kartunya, lalu temukan semua pasangan.'**
+  String get miniGamesTwinReadyDescription;
+
+  /// No description provided for @miniGamesTwinCompleteTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Semua pasangan ditemukan'**
+  String get miniGamesTwinCompleteTitle;
+
+  /// No description provided for @miniGamesTwinCompleteDescription.
+  ///
+  /// In id, this message translates to:
+  /// **'Kamu menemukan semua pasangan dalam {moves} langkah dan {time}.'**
+  String miniGamesTwinCompleteDescription(int moves, String time);
+
+  /// No description provided for @miniGamesTwinHiddenCard.
+  ///
+  /// In id, this message translates to:
+  /// **'Kartu tersembunyi {position}'**
+  String miniGamesTwinHiddenCard(int position);
+
+  /// No description provided for @miniGamesTwinRevealedCard.
+  ///
+  /// In id, this message translates to:
+  /// **'Kartu {position}, {fruit}'**
+  String miniGamesTwinRevealedCard(int position, String fruit);
+
+  /// No description provided for @miniGamesTwinMatchedCard.
+  ///
+  /// In id, this message translates to:
+  /// **'Kartu cocok {position}, {fruit}'**
+  String miniGamesTwinMatchedCard(int position, String fruit);
+
+  /// No description provided for @miniGamesTwinApple.
+  ///
+  /// In id, this message translates to:
+  /// **'Apel'**
+  String get miniGamesTwinApple;
+
+  /// No description provided for @miniGamesTwinBanana.
+  ///
+  /// In id, this message translates to:
+  /// **'Pisang'**
+  String get miniGamesTwinBanana;
+
+  /// No description provided for @miniGamesTwinOrange.
+  ///
+  /// In id, this message translates to:
+  /// **'Jeruk'**
+  String get miniGamesTwinOrange;
+
+  /// No description provided for @miniGamesTwinKiwi.
+  ///
+  /// In id, this message translates to:
+  /// **'Kiwi'**
+  String get miniGamesTwinKiwi;
+
+  /// No description provided for @miniGamesTwinBlueberry.
+  ///
+  /// In id, this message translates to:
+  /// **'Blueberi'**
+  String get miniGamesTwinBlueberry;
+
+  /// No description provided for @miniGamesTwinGrapes.
+  ///
+  /// In id, this message translates to:
+  /// **'Anggur'**
+  String get miniGamesTwinGrapes;
+
+  /// No description provided for @miniGamesTwinDragonfruit.
+  ///
+  /// In id, this message translates to:
+  /// **'Buah naga'**
+  String get miniGamesTwinDragonfruit;
+
+  /// No description provided for @miniGamesTwinPineapple.
+  ///
+  /// In id, this message translates to:
+  /// **'Nanas'**
+  String get miniGamesTwinPineapple;
+
+  /// No description provided for @miniGamesTwinCoconut.
+  ///
+  /// In id, this message translates to:
+  /// **'Kelapa'**
+  String get miniGamesTwinCoconut;
+
+  /// No description provided for @miniGamesTwinPeach.
+  ///
+  /// In id, this message translates to:
+  /// **'Persik'**
+  String get miniGamesTwinPeach;
+
+  /// No description provided for @miniGamesTwinPear.
+  ///
+  /// In id, this message translates to:
+  /// **'Pir'**
+  String get miniGamesTwinPear;
+
+  /// No description provided for @miniGamesTwinWatermelon.
+  ///
+  /// In id, this message translates to:
+  /// **'Semangka'**
+  String get miniGamesTwinWatermelon;
+
+  /// No description provided for @miniGamesSpectrumResult.
+  ///
+  /// In id, this message translates to:
+  /// **'Kamu mengenali {correct} dari {total} warna tinta.'**
+  String miniGamesSpectrumResult(int correct, int total);
+
+  /// No description provided for @miniGamesPictureResult.
+  ///
+  /// In id, this message translates to:
+  /// **'Gambar sudah tersusun kembali.'**
+  String get miniGamesPictureResult;
+
+  /// No description provided for @miniGamesTwinResult.
+  ///
+  /// In id, this message translates to:
+  /// **'Kamu menemukan semua pasangan yang sama.'**
+  String get miniGamesTwinResult;
+
+  /// No description provided for @miniGamesBrainResult.
+  ///
+  /// In id, this message translates to:
+  /// **'Kamu menjawab benar {correct} dari {total} pertanyaan.'**
+  String miniGamesBrainResult(int correct, int total);
+
+  /// No description provided for @miniGamesBrainEverestQ.
+  ///
+  /// In id, this message translates to:
+  /// **'Gunung tertinggi di atas permukaan laut adalah?'**
+  String get miniGamesBrainEverestQ;
+
+  /// No description provided for @miniGamesBrainEverestA.
+  ///
+  /// In id, this message translates to:
+  /// **'Gunung Everest'**
+  String get miniGamesBrainEverestA;
+
+  /// No description provided for @miniGamesBrainEverestB.
+  ///
+  /// In id, this message translates to:
+  /// **'K2'**
+  String get miniGamesBrainEverestB;
+
+  /// No description provided for @miniGamesBrainEverestC.
+  ///
+  /// In id, this message translates to:
+  /// **'Kilimanjaro'**
+  String get miniGamesBrainEverestC;
+
+  /// No description provided for @miniGamesBrainEverestD.
+  ///
+  /// In id, this message translates to:
+  /// **'Denali'**
+  String get miniGamesBrainEverestD;
+
+  /// No description provided for @miniGamesBrainPacificQ.
+  ///
+  /// In id, this message translates to:
+  /// **'Samudra terbesar di Bumi adalah?'**
+  String get miniGamesBrainPacificQ;
+
+  /// No description provided for @miniGamesBrainPacificA.
+  ///
+  /// In id, this message translates to:
+  /// **'Samudra Pasifik'**
+  String get miniGamesBrainPacificA;
+
+  /// No description provided for @miniGamesBrainPacificB.
+  ///
+  /// In id, this message translates to:
+  /// **'Samudra Atlantik'**
+  String get miniGamesBrainPacificB;
+
+  /// No description provided for @miniGamesBrainPacificC.
+  ///
+  /// In id, this message translates to:
+  /// **'Samudra Hindia'**
+  String get miniGamesBrainPacificC;
+
+  /// No description provided for @miniGamesBrainPacificD.
+  ///
+  /// In id, this message translates to:
+  /// **'Samudra Arktik'**
+  String get miniGamesBrainPacificD;
+
+  /// No description provided for @miniGamesBrainTokyoQ.
+  ///
+  /// In id, this message translates to:
+  /// **'Ibu kota Jepang adalah?'**
+  String get miniGamesBrainTokyoQ;
+
+  /// No description provided for @miniGamesBrainTokyoA.
+  ///
+  /// In id, this message translates to:
+  /// **'Tokyo'**
+  String get miniGamesBrainTokyoA;
+
+  /// No description provided for @miniGamesBrainTokyoB.
+  ///
+  /// In id, this message translates to:
+  /// **'Kyoto'**
+  String get miniGamesBrainTokyoB;
+
+  /// No description provided for @miniGamesBrainTokyoC.
+  ///
+  /// In id, this message translates to:
+  /// **'Osaka'**
+  String get miniGamesBrainTokyoC;
+
+  /// No description provided for @miniGamesBrainTokyoD.
+  ///
+  /// In id, this message translates to:
+  /// **'Sapporo'**
+  String get miniGamesBrainTokyoD;
+
+  /// No description provided for @miniGamesBrainGizaQ.
+  ///
+  /// In id, this message translates to:
+  /// **'Piramida Agung Giza berada di negara?'**
+  String get miniGamesBrainGizaQ;
+
+  /// No description provided for @miniGamesBrainGizaA.
+  ///
+  /// In id, this message translates to:
+  /// **'Mesir'**
+  String get miniGamesBrainGizaA;
+
+  /// No description provided for @miniGamesBrainGizaB.
+  ///
+  /// In id, this message translates to:
+  /// **'Yordania'**
+  String get miniGamesBrainGizaB;
+
+  /// No description provided for @miniGamesBrainGizaC.
+  ///
+  /// In id, this message translates to:
+  /// **'Maroko'**
+  String get miniGamesBrainGizaC;
+
+  /// No description provided for @miniGamesBrainGizaD.
+  ///
+  /// In id, this message translates to:
+  /// **'Turki'**
+  String get miniGamesBrainGizaD;
+
+  /// No description provided for @miniGamesBrainJupiterQ.
+  ///
+  /// In id, this message translates to:
+  /// **'Planet terbesar dalam tata surya adalah?'**
+  String get miniGamesBrainJupiterQ;
+
+  /// No description provided for @miniGamesBrainJupiterA.
+  ///
+  /// In id, this message translates to:
+  /// **'Jupiter'**
+  String get miniGamesBrainJupiterA;
+
+  /// No description provided for @miniGamesBrainJupiterB.
+  ///
+  /// In id, this message translates to:
+  /// **'Saturnus'**
+  String get miniGamesBrainJupiterB;
+
+  /// No description provided for @miniGamesBrainJupiterC.
+  ///
+  /// In id, this message translates to:
+  /// **'Bumi'**
+  String get miniGamesBrainJupiterC;
+
+  /// No description provided for @miniGamesBrainJupiterD.
+  ///
+  /// In id, this message translates to:
+  /// **'Neptunus'**
+  String get miniGamesBrainJupiterD;
+
+  /// No description provided for @miniGamesBrainMarsQ.
+  ///
+  /// In id, this message translates to:
+  /// **'Planet yang dikenal sebagai Planet Merah adalah?'**
+  String get miniGamesBrainMarsQ;
+
+  /// No description provided for @miniGamesBrainMarsA.
+  ///
+  /// In id, this message translates to:
+  /// **'Mars'**
+  String get miniGamesBrainMarsA;
+
+  /// No description provided for @miniGamesBrainMarsB.
+  ///
+  /// In id, this message translates to:
+  /// **'Venus'**
+  String get miniGamesBrainMarsB;
+
+  /// No description provided for @miniGamesBrainMarsC.
+  ///
+  /// In id, this message translates to:
+  /// **'Merkurius'**
+  String get miniGamesBrainMarsC;
+
+  /// No description provided for @miniGamesBrainMarsD.
+  ///
+  /// In id, this message translates to:
+  /// **'Uranus'**
+  String get miniGamesBrainMarsD;
+
+  /// No description provided for @miniGamesBrainCarbonQ.
+  ///
+  /// In id, this message translates to:
+  /// **'Gas dengan rumus CO₂ adalah?'**
+  String get miniGamesBrainCarbonQ;
+
+  /// No description provided for @miniGamesBrainCarbonA.
+  ///
+  /// In id, this message translates to:
+  /// **'Karbon dioksida'**
+  String get miniGamesBrainCarbonA;
+
+  /// No description provided for @miniGamesBrainCarbonB.
+  ///
+  /// In id, this message translates to:
+  /// **'Oksigen'**
+  String get miniGamesBrainCarbonB;
+
+  /// No description provided for @miniGamesBrainCarbonC.
+  ///
+  /// In id, this message translates to:
+  /// **'Nitrogen'**
+  String get miniGamesBrainCarbonC;
+
+  /// No description provided for @miniGamesBrainCarbonD.
+  ///
+  /// In id, this message translates to:
+  /// **'Hidrogen'**
+  String get miniGamesBrainCarbonD;
+
+  /// No description provided for @miniGamesBrainHeartQ.
+  ///
+  /// In id, this message translates to:
+  /// **'Organ yang memompa darah ke seluruh tubuh adalah?'**
+  String get miniGamesBrainHeartQ;
+
+  /// No description provided for @miniGamesBrainHeartA.
+  ///
+  /// In id, this message translates to:
+  /// **'Jantung'**
+  String get miniGamesBrainHeartA;
+
+  /// No description provided for @miniGamesBrainHeartB.
+  ///
+  /// In id, this message translates to:
+  /// **'Paru-paru'**
+  String get miniGamesBrainHeartB;
+
+  /// No description provided for @miniGamesBrainHeartC.
+  ///
+  /// In id, this message translates to:
+  /// **'Hati'**
+  String get miniGamesBrainHeartC;
+
+  /// No description provided for @miniGamesBrainHeartD.
+  ///
+  /// In id, this message translates to:
+  /// **'Ginjal'**
+  String get miniGamesBrainHeartD;
+
+  /// No description provided for @miniGamesBrainIndependenceQ.
+  ///
+  /// In id, this message translates to:
+  /// **'Pada tahun berapa Indonesia memproklamasikan kemerdekaan?'**
+  String get miniGamesBrainIndependenceQ;
+
+  /// No description provided for @miniGamesBrainIndependenceA.
+  ///
+  /// In id, this message translates to:
+  /// **'1945'**
+  String get miniGamesBrainIndependenceA;
+
+  /// No description provided for @miniGamesBrainIndependenceB.
+  ///
+  /// In id, this message translates to:
+  /// **'1942'**
+  String get miniGamesBrainIndependenceB;
+
+  /// No description provided for @miniGamesBrainIndependenceC.
+  ///
+  /// In id, this message translates to:
+  /// **'1949'**
+  String get miniGamesBrainIndependenceC;
+
+  /// No description provided for @miniGamesBrainIndependenceD.
+  ///
+  /// In id, this message translates to:
+  /// **'1950'**
+  String get miniGamesBrainIndependenceD;
+
+  /// No description provided for @miniGamesBrainBorobudurQ.
+  ///
+  /// In id, this message translates to:
+  /// **'Candi Borobudur berada di provinsi?'**
+  String get miniGamesBrainBorobudurQ;
+
+  /// No description provided for @miniGamesBrainBorobudurA.
+  ///
+  /// In id, this message translates to:
+  /// **'Jawa Tengah'**
+  String get miniGamesBrainBorobudurA;
+
+  /// No description provided for @miniGamesBrainBorobudurB.
+  ///
+  /// In id, this message translates to:
+  /// **'Jawa Timur'**
+  String get miniGamesBrainBorobudurB;
+
+  /// No description provided for @miniGamesBrainBorobudurC.
+  ///
+  /// In id, this message translates to:
+  /// **'Jawa Barat'**
+  String get miniGamesBrainBorobudurC;
+
+  /// No description provided for @miniGamesBrainBorobudurD.
+  ///
+  /// In id, this message translates to:
+  /// **'Bali'**
+  String get miniGamesBrainBorobudurD;
+
+  /// No description provided for @miniGamesBrainLaskarQ.
+  ///
+  /// In id, this message translates to:
+  /// **'Siapa penulis novel Laskar Pelangi?'**
+  String get miniGamesBrainLaskarQ;
+
+  /// No description provided for @miniGamesBrainLaskarA.
+  ///
+  /// In id, this message translates to:
+  /// **'Andrea Hirata'**
+  String get miniGamesBrainLaskarA;
+
+  /// No description provided for @miniGamesBrainLaskarB.
+  ///
+  /// In id, this message translates to:
+  /// **'Pramoedya Ananta Toer'**
+  String get miniGamesBrainLaskarB;
+
+  /// No description provided for @miniGamesBrainLaskarC.
+  ///
+  /// In id, this message translates to:
+  /// **'Dee Lestari'**
+  String get miniGamesBrainLaskarC;
+
+  /// No description provided for @miniGamesBrainLaskarD.
+  ///
+  /// In id, this message translates to:
+  /// **'Tere Liye'**
+  String get miniGamesBrainLaskarD;
+
+  /// No description provided for @miniGamesBrainPancasilaQ.
+  ///
+  /// In id, this message translates to:
+  /// **'Pancasila memiliki berapa sila?'**
+  String get miniGamesBrainPancasilaQ;
+
+  /// No description provided for @miniGamesBrainPancasilaA.
+  ///
+  /// In id, this message translates to:
+  /// **'Lima'**
+  String get miniGamesBrainPancasilaA;
+
+  /// No description provided for @miniGamesBrainPancasilaB.
+  ///
+  /// In id, this message translates to:
+  /// **'Tiga'**
+  String get miniGamesBrainPancasilaB;
+
+  /// No description provided for @miniGamesBrainPancasilaC.
+  ///
+  /// In id, this message translates to:
+  /// **'Empat'**
+  String get miniGamesBrainPancasilaC;
+
+  /// No description provided for @miniGamesBrainPancasilaD.
+  ///
+  /// In id, this message translates to:
+  /// **'Enam'**
+  String get miniGamesBrainPancasilaD;
+
+  /// No description provided for @miniGamesBrainCpuQ.
+  ///
+  /// In id, this message translates to:
+  /// **'Komponen utama untuk memproses data pada komputer disebut?'**
+  String get miniGamesBrainCpuQ;
+
+  /// No description provided for @miniGamesBrainCpuA.
+  ///
+  /// In id, this message translates to:
+  /// **'Prosesor'**
+  String get miniGamesBrainCpuA;
+
+  /// No description provided for @miniGamesBrainCpuB.
+  ///
+  /// In id, this message translates to:
+  /// **'Penyimpanan'**
+  String get miniGamesBrainCpuB;
+
+  /// No description provided for @miniGamesBrainCpuC.
+  ///
+  /// In id, this message translates to:
+  /// **'Monitor'**
+  String get miniGamesBrainCpuC;
+
+  /// No description provided for @miniGamesBrainCpuD.
+  ///
+  /// In id, this message translates to:
+  /// **'Papan ketik'**
+  String get miniGamesBrainCpuD;
+
+  /// No description provided for @miniGamesBrainHttpsQ.
+  ///
+  /// In id, this message translates to:
+  /// **'Apa yang dibantu oleh HTTPS pada sebuah situs?'**
+  String get miniGamesBrainHttpsQ;
+
+  /// No description provided for @miniGamesBrainHttpsA.
+  ///
+  /// In id, this message translates to:
+  /// **'Koneksi terenkripsi'**
+  String get miniGamesBrainHttpsA;
+
+  /// No description provided for @miniGamesBrainHttpsB.
+  ///
+  /// In id, this message translates to:
+  /// **'Gambar lebih besar'**
+  String get miniGamesBrainHttpsB;
+
+  /// No description provided for @miniGamesBrainHttpsC.
+  ///
+  /// In id, this message translates to:
+  /// **'Akses luring'**
+  String get miniGamesBrainHttpsC;
+
+  /// No description provided for @miniGamesBrainHttpsD.
+  ///
+  /// In id, this message translates to:
+  /// **'Prosesor lebih cepat'**
+  String get miniGamesBrainHttpsD;
+
+  /// No description provided for @miniGamesBrainBinaryQ.
+  ///
+  /// In id, this message translates to:
+  /// **'Angka apa yang digunakan dalam sistem biner?'**
+  String get miniGamesBrainBinaryQ;
+
+  /// No description provided for @miniGamesBrainBinaryA.
+  ///
+  /// In id, this message translates to:
+  /// **'0 dan 1'**
+  String get miniGamesBrainBinaryA;
+
+  /// No description provided for @miniGamesBrainBinaryB.
+  ///
+  /// In id, this message translates to:
+  /// **'1 dan 2'**
+  String get miniGamesBrainBinaryB;
+
+  /// No description provided for @miniGamesBrainBinaryC.
+  ///
+  /// In id, this message translates to:
+  /// **'A dan Z'**
+  String get miniGamesBrainBinaryC;
+
+  /// No description provided for @miniGamesBrainBinaryD.
+  ///
+  /// In id, this message translates to:
+  /// **'0 sampai 9'**
+  String get miniGamesBrainBinaryD;
+
+  /// No description provided for @miniGamesBrainRouterQ.
+  ///
+  /// In id, this message translates to:
+  /// **'Router utamanya digunakan untuk?'**
+  String get miniGamesBrainRouterQ;
+
+  /// No description provided for @miniGamesBrainRouterA.
+  ///
+  /// In id, this message translates to:
+  /// **'Menghubungkan jaringan'**
+  String get miniGamesBrainRouterA;
+
+  /// No description provided for @miniGamesBrainRouterB.
+  ///
+  /// In id, this message translates to:
+  /// **'Mencetak dokumen'**
+  String get miniGamesBrainRouterB;
+
+  /// No description provided for @miniGamesBrainRouterC.
+  ///
+  /// In id, this message translates to:
+  /// **'Mengedit foto'**
+  String get miniGamesBrainRouterC;
+
+  /// No description provided for @miniGamesBrainRouterD.
+  ///
+  /// In id, this message translates to:
+  /// **'Menyimpan kata sandi'**
+  String get miniGamesBrainRouterD;
 }
 
 class _AppLocalizationsDelegate

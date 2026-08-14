@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-import '../../../../core/widgets/brand_widgets.dart';
+import '../../../../core/widgets/mesh_background.dart';
 import '../../../../core/widgets/language_toggle_button.dart';
 
 /// Applies the shared safe-area, surface, and width constraints for auth forms.
@@ -26,23 +26,25 @@ class AuthScreenFrame extends StatelessWidget {
         : constrainedChild;
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            BlobBackground(
-              child: Center(
+      body: MeshBackground(
+        key: const ValueKey('auth-backdrop'),
+        intensity: MeshBackgroundIntensity.strong,
+        child: SafeArea(
+          child: Stack(
+            children: [
+              Center(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(24, 48, 24, 32),
                   child: content,
                 ),
               ),
-            ),
-            const Positioned(
-              top: 12,
-              left: 16,
-              child: LanguageToggleButton(),
-            ),
-          ],
+              const Positioned(
+                top: 12,
+                left: 16,
+                child: LanguageToggleButton(),
+              ),
+            ],
+          ),
         ),
       ),
     );

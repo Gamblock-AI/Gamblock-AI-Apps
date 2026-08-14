@@ -16,12 +16,7 @@
   "msgErrTextRequired": "Teks refleksi wajib diisi.",
   "msgErrSummaryRequired": "Ringkasan tiket wajib diisi.",
   "msgErrTypeRequired": "Jenis permintaan wajib dipilih.",
-  "recoveryWebTitle": "Pemulihan tersedia di website",
-  "recoveryWebBody": "Jurnal, check-in, misi, dan psikoedukasi tetap berada di website agar aplikasi ini fokus pada proteksi perangkat.",
-  "recoveryWebAction": "Buka pemulihan web",
-  "backToProtection": "Kembali ke proteksi",
   "webPageOpenError": "Halaman belum dapat dibuka. Coba lagi.",
-  "recoveryPageOpenError": "Halaman pemulihan belum dapat dibuka. Coba lagi.",
   "groundingStep1Title": "Lihat",
   "groundingStep1Body": "Sebutkan lima hal yang bisa Anda lihat di sekitar Anda.",
   "groundingStep2Title": "Rasakan",
@@ -46,6 +41,5 @@
   "groundingNext": "Lanjut",
   "groundingDone": "Selesai",
   "groundingCompleteTitle": "Latihan selesai",
-  "groundingCompleteBody": "Anda sudah hadir sepenuhnya di momen ini. Pilih langkah berikutnya dengan tenang.",
-  "recoveryWebEyebrow": "lanjutkan di web"
+  "groundingCompleteBody": "Anda sudah hadir sepenuhnya di momen ini. Pilih langkah berikutnya dengan tenang."
 }

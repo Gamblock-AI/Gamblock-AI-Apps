@@ -13,6 +13,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/glass_card.dart';
 import '../../data/providers.dart';
 import '../../domain/entities/accountability_models.dart';
+import '../widgets/accountability_action_panel.dart';
 import '../widgets/accountability_skeleton.dart';
 import '../widgets/approval_request_history.dart';
 import '../widgets/partner_status_card.dart';
@@ -145,10 +146,10 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                     child: Text(
                       l10n.accountabilityJoinConfirmTitle,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.navy,
-                            letterSpacing: -0.3,
-                          ),
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.navy,
+                        letterSpacing: -0.3,
+                      ),
                     ),
                   ),
                 ],
@@ -182,7 +183,9 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                         child: Text(
                           l10n.cancel,
                           style: const TextStyle(
-                              fontWeight: FontWeight.w700, fontSize: 13),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ),
@@ -204,7 +207,9 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                         child: Text(
                           l10n.accountabilityJoinAction,
                           style: const TextStyle(
-                              fontWeight: FontWeight.w700, fontSize: 13),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ),
@@ -277,9 +282,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                         children: [
                           Text(
                             l10n.accSharingTitle,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
+                            style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.navy,
@@ -288,9 +291,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                           const SizedBox(height: 1),
                           Text(
                             l10n.accSharingSubtitle,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
+                            style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
                                   color: AppColors.mutedForeground,
                                   fontSize: 11,
@@ -335,7 +336,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                         subtitle: l10n.accShareActivitySubtitle,
                         value: draft.protectionActivity,
                         onChanged: (value) => setDialogState(
-                          () => draft = draft.copyWith(protectionActivity: value),
+                          () =>
+                              draft = draft.copyWith(protectionActivity: value),
                         ),
                       ),
                       Divider(
@@ -350,7 +352,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                         subtitle: l10n.accShareEngagementSubtitle,
                         value: draft.recoveryEngagement,
                         onChanged: (value) => setDialogState(
-                          () => draft = draft.copyWith(recoveryEngagement: value),
+                          () =>
+                              draft = draft.copyWith(recoveryEngagement: value),
                         ),
                       ),
                       Divider(
@@ -365,7 +368,8 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                         subtitle: l10n.accShareEducationSubtitle,
                         value: draft.educationProgress,
                         onChanged: (value) => setDialogState(
-                          () => draft = draft.copyWith(educationProgress: value),
+                          () =>
+                              draft = draft.copyWith(educationProgress: value),
                         ),
                       ),
                     ],
@@ -382,17 +386,21 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             foregroundColor: AppColors.navy,
                             padding: EdgeInsets.zero,
                             side: BorderSide(
-                                color: AppColors.border.withValues(alpha: 0.8)),
+                              color: AppColors.border.withValues(alpha: 0.8),
+                            ),
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AppRadius.pill),
+                              borderRadius: BorderRadius.circular(
+                                AppRadius.pill,
+                              ),
                             ),
                           ),
                           onPressed: () => Navigator.pop(dialogContext),
                           child: Text(
                             l10n.cancel,
                             style: const TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 13),
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                            ),
                           ),
                         ),
                       ),
@@ -406,8 +414,9 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             backgroundColor: AppColors.navy,
                             padding: EdgeInsets.zero,
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AppRadius.pill),
+                              borderRadius: BorderRadius.circular(
+                                AppRadius.pill,
+                              ),
                             ),
                           ),
                           onPressed: () => Navigator.pop(dialogContext, draft),
@@ -415,7 +424,9 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                           label: Text(
                             l10n.save,
                             style: const TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 13),
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                            ),
                           ),
                         ),
                       ),
@@ -473,17 +484,17 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.navy,
-                        fontSize: 12,
-                      ),
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.navy,
+                    fontSize: 12,
+                  ),
                 ),
                 Text(
                   subtitle,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.mutedForeground,
-                        fontSize: 10,
-                      ),
+                    color: AppColors.mutedForeground,
+                    fontSize: 10,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -533,7 +544,10 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: isUnsafe
-                              ? const [AppColors.crimsonLight, AppColors.crimson]
+                              ? const [
+                                  AppColors.crimsonLight,
+                                  AppColors.crimson,
+                                ]
                               : const [AppColors.amber, AppColors.amberDark],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -541,10 +555,11 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: (isUnsafe
-                                    ? AppColors.crimsonLight
-                                    : AppColors.amber)
-                                .withValues(alpha: 0.3),
+                            color:
+                                (isUnsafe
+                                        ? AppColors.crimsonLight
+                                        : AppColors.amber)
+                                    .withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
                           ),
@@ -567,9 +582,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             isUnsafe
                                 ? l10n.accUnsafeExitTitle
                                 : l10n.accNormalExitTitle,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
+                            style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.navy,
@@ -581,9 +594,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             isUnsafe
                                 ? l10n.accUnsafeExitDesc
                                 : l10n.accNormalExitDesc,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
+                            style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
                                   color: AppColors.mutedForeground,
                                   fontSize: 11,
@@ -607,15 +618,19 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                     filled: true,
                     fillColor: AppColors.background,
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 12),
+                      horizontal: 12,
+                      vertical: 12,
+                    ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: AppColors.border),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide:
-                          const BorderSide(color: AppColors.navy, width: 1.5),
+                      borderSide: const BorderSide(
+                        color: AppColors.navy,
+                        width: 1.5,
+                      ),
                     ),
                   ),
                 ),
@@ -632,15 +647,18 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             elevation: 0,
                             padding: EdgeInsets.zero,
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AppRadius.pill),
+                              borderRadius: BorderRadius.circular(
+                                AppRadius.pill,
+                              ),
                             ),
                           ),
                           onPressed: () => Navigator.pop(dialogContext, false),
                           child: Text(
                             l10n.cancel,
                             style: const TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 13),
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                            ),
                           ),
                         ),
                       ),
@@ -657,15 +675,18 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             elevation: 0,
                             padding: EdgeInsets.zero,
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AppRadius.pill),
+                              borderRadius: BorderRadius.circular(
+                                AppRadius.pill,
+                              ),
                             ),
                           ),
                           onPressed: () => Navigator.pop(dialogContext, true),
                           child: Text(
                             l10n.accSendRequest,
                             style: const TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 13),
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                            ),
                           ),
                         ),
                       ),
@@ -732,22 +753,34 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
     final auth = ref.watch(authProvider);
     if (!auth.isAuthenticated) {
       return Scaffold(
+        backgroundColor: Colors.transparent,
         appBar: AppBar(title: Text(l10n.partnerTitle)),
-        body: EmptyState(
-          icon: Icons.people_outline,
-          title: l10n.partnerSignInTitle,
-          hint: l10n.partnerSignInBody,
-          actionLabel: l10n.authLoginBtn,
-          onAction: () => context.go('/login'),
+        body: Center(
+          child: SingleChildScrollView(
+            padding: AppSpacing.screenPadding,
+            child: EmptyState(
+              icon: Icons.people_outline,
+              title: l10n.partnerSignInTitle,
+              hint: l10n.partnerSignInBody,
+              tone: AppStateTone.protected,
+              actionLabel: l10n.authLoginBtn,
+              onAction: () => context.go('/login'),
+            ),
+          ),
         ),
       );
     }
 
     final membership = _overview?.activeMembership;
+    final exitRequest = _overview?.pendingExitRequest;
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         titleSpacing: 16,
-        title: AppBarTitle(icon: Icons.group_work_rounded, title: l10n.partnerTitle),
+        title: AppBarTitle(
+          icon: Icons.group_work_rounded,
+          title: l10n.partnerTitle,
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: _load,
@@ -761,172 +794,22 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                 icon: Icons.cloud_off,
                 title: l10n.partnerErrorTitle,
                 hint: AppMessages.friendlyMessage(context, _error!),
+                tone: AppStateTone.error,
                 actionLabel: l10n.retry,
                 onAction: _load,
               )
             else ...[
               PartnerStatusCard(membership: membership),
               if (membership != null) ...[
-                const SizedBox(height: 14),
-                SurfaceCard(
-                  radius: AppRadius.md,
-                  padding: EdgeInsets.zero,
-                  child: Column(
-                    children: [
-                      ListTile(
-                        minTileHeight: 64,
-                        leading: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: AppColors.navy.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.privacy_tip_outlined,
-                            color: AppColors.navy,
-                            size: 20,
-                          ),
-                        ),
-                        title: Text(
-                          l10n.partnerSharingPrivacy,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.navy,
-                            fontSize: 14,
-                          ),
-                        ),
-                        subtitle: Text(
-                          l10n.partnerSharingDesc,
-                          style: const TextStyle(
-                            color: AppColors.mutedForeground,
-                            fontSize: 12,
-                          ),
-                        ),
-                        trailing: const Icon(
-                          Icons.chevron_right_rounded,
-                          color: AppColors.mutedForeground,
-                        ),
-                        onTap: _loading
-                            ? null
-                            : () => _manageSharing(membership),
-                      ),
-                      Divider(
-                        height: 1,
-                        color: AppColors.border.withValues(alpha: 0.5),
-                      ),
-                      if (_overview?.pendingExitRequest case final exit?)
-                        ListTile(
-                          minTileHeight: 64,
-                          leading: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: AppColors.amber.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(
-                              Icons.schedule_outlined,
-                              color: AppColors.amber,
-                              size: 20,
-                            ),
-                          ),
-                          title: Text(
-                            l10n.accExitPendingTitle,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.navy,
-                              fontSize: 14,
-                            ),
-                          ),
-                          subtitle: Text(
-                            l10n.accExitPendingBody,
-                            style: const TextStyle(
-                              color: AppColors.mutedForeground,
-                              fontSize: 12,
-                            ),
-                          ),
-                          trailing: exit.canCancel
-                              ? TextButton(
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: AppColors.crimson,
-                                    textStyle: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  onPressed: _loading
-                                      ? null
-                                      : () => _cancelLeave(exit),
-                                  child: Text(l10n.cancel),
-                                )
-                              : null,
-                        )
-                      else
-                        ListTile(
-                          minTileHeight: 64,
-                          leading: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: AppColors.crimson.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(
-                              Icons.logout_outlined,
-                              color: AppColors.crimson,
-                              size: 20,
-                            ),
-                          ),
-                          title: Text(
-                            l10n.partnerLeaveSection,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.navy,
-                              fontSize: 14,
-                            ),
-                          ),
-                          subtitle: Text(
-                            l10n.accExitChoose,
-                            style: const TextStyle(
-                              color: AppColors.mutedForeground,
-                              fontSize: 12,
-                            ),
-                          ),
-                          trailing: PopupMenuButton<String>(
-                            enabled: !_loading,
-                            onSelected: (kind) =>
-                                _requestLeave(membership, kind),
-                            itemBuilder: (_) => [
-                              PopupMenuItem(
-                                value: 'normal',
-                                child: Text(l10n.partnerLeaveNormal),
-                              ),
-                              PopupMenuItem(
-                                value: 'unsafe',
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.warning_amber_rounded,
-                                      size: 16,
-                                      color: AppColors.crimson,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      l10n.partnerLeaveUnsafe,
-                                      style: const TextStyle(
-                                        color: AppColors.crimson,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
+                const SizedBox(height: 12),
+                AccountabilityActionPanel(
+                  pendingExitRequest: _overview?.pendingExitRequest,
+                  isLoading: _loading,
+                  onManageSharing: () => _manageSharing(membership),
+                  onRequestLeave: (kind) => _requestLeave(membership, kind),
+                  onCancelLeave: exitRequest == null
+                      ? null
+                      : () => _cancelLeave(exitRequest),
                 ),
               ],
               if (membership == null) ...[
@@ -956,9 +839,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                           Expanded(
                             child: Text(
                               l10n.accountabilityJoinTitle,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
+                              style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.navy,
@@ -1002,15 +883,15 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                           style: FilledButton.styleFrom(
                             backgroundColor: AppColors.navy,
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AppRadius.pill),
+                              borderRadius: BorderRadius.circular(
+                                AppRadius.pill,
+                              ),
                             ),
                           ),
                           onPressed: _loading ? null : _previewGroup,
                           child: Text(
                             l10n.accountabilityPreviewAction,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w700),
+                            style: const TextStyle(fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),
@@ -1027,9 +908,7 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                       children: [
                         Text(
                           preview.name,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
+                          style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.navy,
@@ -1057,17 +936,21 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                             style: FilledButton.styleFrom(
                               backgroundColor: AppColors.sage,
                               shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(AppRadius.pill),
+                                borderRadius: BorderRadius.circular(
+                                  AppRadius.pill,
+                                ),
                               ),
                             ),
                             onPressed: _loading ? null : _joinGroup,
-                            icon: const Icon(Icons.verified_user_outlined,
-                                size: 20),
+                            icon: const Icon(
+                              Icons.verified_user_outlined,
+                              size: 20,
+                            ),
                             label: Text(
                               l10n.accountabilityJoinAction,
                               style: const TextStyle(
-                                  fontWeight: FontWeight.w700),
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                         ),

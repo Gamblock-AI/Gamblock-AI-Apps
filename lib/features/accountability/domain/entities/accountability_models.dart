@@ -4,6 +4,7 @@ class AccountabilityMembership {
     required this.groupId,
     required this.groupName,
     required this.partnerName,
+    this.partnerAvatarUrl,
     required this.status,
     required this.sharing,
   });
@@ -12,6 +13,7 @@ class AccountabilityMembership {
   final String groupId;
   final String groupName;
   final String partnerName;
+  final String? partnerAvatarUrl;
   final String status;
   final AccountabilitySharing sharing;
 
@@ -26,6 +28,7 @@ class AccountabilityMembership {
       groupId: membership['group_id']?.toString() ?? '',
       groupName: group?['name']?.toString() ?? '',
       partnerName: group?['owner_name']?.toString() ?? '',
+      partnerAvatarUrl: group?['owner_avatar_url']?.toString(),
       status: membership['status']?.toString() ?? 'active',
       sharing: AccountabilitySharing.fromJson(
         membership['sharing'] is Map
