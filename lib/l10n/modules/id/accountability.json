@@ -107,5 +107,28 @@
   "accExitPendingBody": "Anda dapat membatalkan permintaan normal selama masih tertunda.",
   "accExitChoose": "Pilih alur normal atau hentikan berbagi segera bila situasi tidak aman.",
   "accCodeRequired": "Masukkan kode grup terlebih dahulu.",
-  "accountabilityGroupCodeHint": "Contoh: ABCD234567"
+  "accountabilityGroupCodeHint": "Contoh: ABCD234567",
+  "accActionUninstall": "Izinkan penghapusan aplikasi",
+  "accActionPause": "Jeda perlindungan",
+  "accActionPauseDuration": "Jeda perlindungan {minutes} menit",
+  "@accActionPauseDuration": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "accActionDisable": "Nonaktifkan perlindungan",
+  "accActionEmergency": "Akses darurat",
+  "accStatusApproved": "Disetujui",
+  "accStatusPending": "Menunggu",
+  "accStatusDenied": "Ditolak",
+  "accStatusExpired": "Kedaluwarsa",
+  "accStatusCancelled": "Dibatalkan",
+  "accReasonAccessibilityDisabled": "Layanan aksesibilitas dinonaktifkan",
+  "accReasonTroubleshooting": "Perbaikan pengaturan aplikasi",
+  "accReasonDeviceAdminDisabled": "Administrator perangkat dinonaktifkan",
+  "accReasonAppUpdate": "Pembaruan aplikasi diperlukan",
+  "accReasonTesting": "Pengujian perlindungan"
 }
+

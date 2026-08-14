@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/widgets/glass_card.dart';
 import '../../../accountability/domain/entities/accountability_models.dart';
 
@@ -45,6 +46,7 @@ class ProtectionAccountabilityCard extends StatelessWidget {
 
     return SurfaceCard(
       padding: const EdgeInsets.all(16),
+      radius: AppRadius.banner,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -55,13 +57,16 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: (hasPartner ? AppColors.navy : AppColors.mutedForeground)
-                      .withValues(alpha: 0.1),
+                  color:
+                      (hasPartner ? AppColors.navy : AppColors.mutedForeground)
+                          .withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   Icons.people_alt_outlined,
-                  color: hasPartner ? AppColors.navy : AppColors.mutedForeground,
+                  color: hasPartner
+                      ? AppColors.navy
+                      : AppColors.mutedForeground,
                   size: 20,
                 ),
               ),
@@ -73,19 +78,19 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                     Text(
                       membership?.partnerName ?? l10n.partnerNone,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.navy,
-                          ),
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.navy,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       membership == null
                           ? l10n.protectionPartnerRequired
                           : pending != null
-                              ? l10n.protectionRequestPending
-                              : approved != null
-                                  ? l10n.protectionRequestApproved
-                                  : l10n.protectionPartnerReady,
+                          ? l10n.protectionRequestPending
+                          : approved != null
+                          ? l10n.protectionRequestApproved
+                          : l10n.protectionPartnerReady,
                       style: const TextStyle(
                         color: AppColors.mutedForeground,
                         fontSize: 11,
@@ -118,7 +123,10 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                           onPressed: isLoading
                               ? null
                               : () => onApplyApproval(approved),
-                          icon: const Icon(Icons.check_circle_outline, size: 16),
+                          icon: const Icon(
+                            Icons.check_circle_outline,
+                            size: 16,
+                          ),
                           label: FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
@@ -140,8 +148,8 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                           ),
                           onPressed:
                               membership == null || pending != null || isLoading
-                                  ? null
-                                  : onRequestApproval,
+                              ? null
+                              : onRequestApproval,
                           icon: const Icon(Icons.lock_clock_outlined, size: 16),
                           label: FittedBox(
                             fit: BoxFit.scaleDown,
@@ -167,7 +175,8 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 6),
                       foregroundColor: AppColors.navy,
                       side: BorderSide(
-                          color: AppColors.border.withValues(alpha: 0.8)),
+                        color: AppColors.border.withValues(alpha: 0.8),
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -219,16 +228,18 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                     Text(
                       l10n.emergencyTitle,
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.navy,
-                          ),
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.navy,
+                      ),
                     ),
                     Text(
                       emergencyRequest == null
                           ? l10n.emergencyBody
                           : l10n.emergencyStatus(
                               _formatEmergencyStatus(
-                                  context, emergencyRequest!.status),
+                                context,
+                                emergencyRequest!.status,
+                              ),
                             ),
                       style: const TextStyle(
                         color: AppColors.mutedForeground,
@@ -255,7 +266,8 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 6),
                       foregroundColor: AppColors.navy,
                       side: BorderSide(
-                          color: AppColors.border.withValues(alpha: 0.8)),
+                        color: AppColors.border.withValues(alpha: 0.8),
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -267,7 +279,9 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                       l10n.emergencyRequestAction,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                          fontSize: 11, fontWeight: FontWeight.w600),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -282,7 +296,8 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 6),
                       foregroundColor: AppColors.navy,
                       side: BorderSide(
-                          color: AppColors.border.withValues(alpha: 0.8)),
+                        color: AppColors.border.withValues(alpha: 0.8),
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -292,7 +307,9 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                       l10n.emergencyEnterKeyAction,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                          fontSize: 11, fontWeight: FontWeight.w600),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),

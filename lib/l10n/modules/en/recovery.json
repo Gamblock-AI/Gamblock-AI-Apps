@@ -16,12 +16,7 @@
   "msgErrTextRequired": "Reflection text is required.",
   "msgErrSummaryRequired": "A ticket summary is required.",
   "msgErrTypeRequired": "Please select a request type.",
-  "recoveryWebTitle": "Recovery is available on the website",
-  "recoveryWebBody": "Journals, check-ins, missions, and psychoeducation stay on the website so this app can focus on device protection.",
-  "recoveryWebAction": "Open web recovery",
-  "backToProtection": "Back to protection",
   "webPageOpenError": "The page could not be opened yet. Try again.",
-  "recoveryPageOpenError": "The recovery page could not be opened yet. Try again.",
   "groundingStep1Title": "See",
   "groundingStep1Body": "Name five things you can see around you.",
   "groundingStep2Title": "Feel",
@@ -46,6 +41,5 @@
   "groundingNext": "Next",
   "groundingDone": "Done",
   "groundingCompleteTitle": "Exercise complete",
-  "groundingCompleteBody": "You brought yourself fully into this moment. Choose your next step calmly.",
-  "recoveryWebEyebrow": "continue on the web"
+  "groundingCompleteBody": "You brought yourself fully into this moment. Choose your next step calmly."
 }

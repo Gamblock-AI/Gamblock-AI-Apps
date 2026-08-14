@@ -1,17 +1,21 @@
-import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/feedback/haptics.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/language_toggle_button.dart';
+import '../../data/onboarding_state.dart';
 import '../widgets/intro_arrow_button.dart';
 import '../widgets/onboarding_slide.dart';
-import '../../data/onboarding_state.dart';
 
-/// Three-page motivational intro flow. Each page pairs a gradient wave header
-/// (sky → navy → crimson) with an animated Gami pose; swiping triggers a
-/// staggered entrance and a layered parallax so the flow feels alive.
+/// Three-page motivational intro flow with responsive, full-bleed Gami art.
+/// Flutter owns all copy and controls so localization and accessibility remain
+/// independent from the generated background assets.
 class IntroScreen extends ConsumerStatefulWidget {
   const IntroScreen({super.key});
 
@@ -20,10 +24,36 @@ class IntroScreen extends ConsumerStatefulWidget {
 }
 
 class _IntroScreenState extends ConsumerState<IntroScreen> {
+  static const _pages = 3;
+  static const _portraitAssets = [
+    'assets/images/onboarding-protect-portrait.webp',
+    'assets/images/onboarding-pause-portrait.webp',
+    'assets/images/onboarding-control-portrait.webp',
+  ];
+  static const _landscapeAssets = [
+    'assets/images/onboarding-protect-landscape.webp',
+    'assets/images/onboarding-pause-landscape.webp',
+    'assets/images/onboarding-control-landscape.webp',
+  ];
+
   final _ctrl = PageController();
   int _page = 0;
+  bool? _precacheLandscape;
 
-  static const _pages = 3;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final useLandscape = OnboardingSlide.usesLandscapeLayout(
+      MediaQuery.sizeOf(context),
+    );
+    if (_precacheLandscape == useLandscape) return;
+
+    _precacheLandscape = useLandscape;
+    final assets = useLandscape ? _landscapeAssets : _portraitAssets;
+    for (final asset in assets) {
+      unawaited(precacheImage(AssetImage(asset), context));
+    }
+  }
 
   Future<void> _finish() async {
     await ref.read(onboardingProvider.notifier).complete();
@@ -41,7 +71,7 @@ class _IntroScreenState extends ConsumerState<IntroScreen> {
         );
       }
     } else {
-      _finish();
+      unawaited(_finish());
     }
   }
 
@@ -62,163 +92,163 @@ class _IntroScreenState extends ConsumerState<IntroScreen> {
 
     final slides = [
       (
-        header: AppColors.sky,
-        headerDark: const Color(0xFF2BB4D4),
-        text: AppColors.navyDark,
-        asset: 'assets/images/gami-hug-heart.webp',
+        portraitAsset: _portraitAssets[0],
+        landscapeAsset: _landscapeAssets[0],
         lead: l10n.introSlide1Lead,
         highlight: l10n.introSlide1Highlight,
         tail: l10n.introSlide1Tail,
         subtitle: l10n.introSlide1Subtitle,
-        doodleColor: const Color(0xFF2BB4D4),
-        showHeart: true,
+        markerColor: AppColors.sky,
+        actionColor: AppColors.sky,
+        actionForeground: AppColors.navyDark,
       ),
       (
-        header: AppColors.navy,
-        headerDark: AppColors.navyDark,
-        text: Colors.white,
-        asset: 'assets/images/gami-relax.webp',
+        portraitAsset: _portraitAssets[1],
+        landscapeAsset: _landscapeAssets[1],
         lead: l10n.introSlide2Lead,
         highlight: l10n.introSlide2Highlight,
         tail: l10n.introSlide2Tail,
         subtitle: l10n.introSlide2Subtitle,
-        doodleColor: AppColors.navy,
-        showHeart: false,
+        markerColor: AppColors.sky,
+        actionColor: AppColors.sky,
+        actionForeground: AppColors.navyDark,
       ),
       (
-        header: AppColors.crimson,
-        headerDark: AppColors.crimsonDark,
-        text: Colors.white,
-        asset: 'assets/images/gami-coffee.webp',
+        portraitAsset: _portraitAssets[2],
+        landscapeAsset: _landscapeAssets[2],
         lead: l10n.introSlide3Lead,
         highlight: l10n.introSlide3Highlight,
         tail: l10n.introSlide3Tail,
         subtitle: l10n.introSlide3Subtitle,
-        doodleColor: AppColors.crimson,
-        showHeart: false,
+        markerColor: AppColors.amber,
+        actionColor: AppColors.crimson,
+        actionForeground: Colors.white,
       ),
     ];
 
-    final current = slides[_page];
-    // Contrast color for overlay chrome (indicators, close icon) on the
-    // colored header: dark ink on sky, white on navy/crimson.
-    final onHeader = current.text;
-    final isLast = _page == _pages - 1;
-
-    return Scaffold(
-      body: Stack(
-        children: [
-          AnimatedBuilder(
-            animation: _ctrl,
-            builder: (context, _) {
-              final page = _ctrl.hasClients ? (_ctrl.page ?? 0.0) : 0.0;
-              return PageView(
-                controller: _ctrl,
-                onPageChanged: _onPageChanged,
-                children: [
-                  for (final (i, slide) in slides.indexed)
-                    OnboardingSlide(
-                      headerColor: slide.header,
-                      headerDark: slide.headerDark,
-                      textColor: slide.text,
-                      markerColor: slide.text == Colors.white
-                          ? (slide.header == AppColors.navy
-                                ? AppColors.sky
-                                : Colors.white)
-                          : AppColors.navyDark,
-                      asset: slide.asset,
-                      lead: slide.lead,
-                      highlight: slide.highlight,
-                      tail: slide.tail,
-                      subtitle: slide.subtitle,
-                      doodleColor: slide.doodleColor,
-                      showHeart: slide.showHeart,
-                      stepBadge: l10n.introStepOf(i + 1, _pages),
-                      isActive: i == _page,
-                      parallax: (page - i).clamp(-1.0, 1.0),
-                    ),
-                ],
-              );
-            },
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const LanguageToggleButton(),
-                  IconButton(
-                    onPressed: _finish,
-                    tooltip: l10n.introSkip,
-                    icon: Icon(Icons.close_rounded, color: onHeader),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SafeArea(
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 64),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(_pages, (i) {
-                    final active = i == _page;
-                    return AnimatedContainer(
-                      duration: MediaQuery.disableAnimationsOf(context)
-                          ? Duration.zero
-                          : const Duration(milliseconds: 250),
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: 26,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: active
-                            ? onHeader
-                            : onHeader.withValues(alpha: 0.35),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ),
-          ),
-          SafeArea(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 22),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+        systemNavigationBarColor: AppColors.navyDark,
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
+      child: Scaffold(
+        backgroundColor: AppColors.navyDark,
+        body: Stack(
+          children: [
+            AnimatedBuilder(
+              animation: _ctrl,
+              builder: (context, _) {
+                final page = _ctrl.hasClients ? (_ctrl.page ?? 0.0) : 0.0;
+                return PageView(
+                  controller: _ctrl,
+                  onPageChanged: _onPageChanged,
                   children: [
-                    IntroArrowButton(
-                      color: current.header,
-                      iconColor: current.text,
-                      onPressed: _next,
-                      semanticLabel: isLast
-                          ? l10n.introStartBtn
-                          : l10n.introNext,
-                      pulse: isLast,
+                    for (final (i, slide) in slides.indexed)
+                      OnboardingSlide(
+                        portraitAsset: slide.portraitAsset,
+                        landscapeAsset: slide.landscapeAsset,
+                        markerColor: slide.markerColor,
+                        lead: slide.lead,
+                        highlight: slide.highlight,
+                        tail: slide.tail,
+                        subtitle: slide.subtitle,
+                        isActive: i == _page,
+                        parallax: (page - i).clamp(-1.0, 1.0),
+                        action: IntroArrowButton(
+                          color: slide.actionColor,
+                          iconColor: slide.actionForeground,
+                          onPressed: _next,
+                          semanticLabel: i == _pages - 1
+                              ? l10n.introStartBtn
+                              : l10n.introNext,
+                          label: i == _pages - 1 ? l10n.introStartBtn : null,
+                          pulse: i == _page && i == _pages - 1,
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(minHeight: 48),
+                      child: const LanguageToggleButton(),
                     ),
-                    if (isLast) ...[
-                      const SizedBox(height: 10),
-                      Text(
-                        l10n.introStartBtn,
-                        style: const TextStyle(
-                          color: AppColors.mutedForeground,
+                    TextButton(
+                      onPressed: _finish,
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.navyDark.withValues(
+                          alpha: 0.56,
+                        ),
+                        overlayColor: Colors.white,
+                        minimumSize: const Size(72, 48),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        side: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.24),
+                        ),
+                        shape: const StadiumBorder(),
+                        textStyle: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                    ],
+                      child: Text(l10n.introSkip),
+                    ),
                   ],
                 ),
               ),
             ),
-          ),
-        ],
+            SafeArea(
+              child: IgnorePointer(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 68),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(_pages, (i) {
+                        final active = i == _page;
+                        return AnimatedContainer(
+                          duration: MediaQuery.disableAnimationsOf(context)
+                              ? Duration.zero
+                              : const Duration(milliseconds: 250),
+                          curve: Curves.easeOutCubic,
+                          margin: const EdgeInsets.symmetric(horizontal: 3.5),
+                          width: active ? 28 : 8,
+                          height: 4.5,
+                          decoration: BoxDecoration(
+                            color: active
+                                ? Colors.white
+                                : Colors.white.withValues(alpha: 0.35),
+                            borderRadius: BorderRadius.circular(999),
+                            boxShadow: active
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.24,
+                                      ),
+                                      blurRadius: 8,
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -15,14 +15,20 @@ class AccountabilitySkeleton extends StatelessWidget {
       children: [
         SkeletonBox(
           width: double.infinity,
-          height: 140,
-          borderRadius: BorderRadius.circular(AppRadius.md),
+          height: 126,
+          borderRadius: BorderRadius.circular(AppRadius.banner),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 12),
+        SkeletonBox(
+          width: double.infinity,
+          height: 132,
+          borderRadius: BorderRadius.circular(AppRadius.banner),
+        ),
+        const SizedBox(height: 20),
         for (var i = 0; i < 3; i++) ...[
           SkeletonBox(
             width: double.infinity,
-            height: 64,
+            height: 68,
             borderRadius: rowRadius,
           ),
           if (i < 2) const SizedBox(height: 10),

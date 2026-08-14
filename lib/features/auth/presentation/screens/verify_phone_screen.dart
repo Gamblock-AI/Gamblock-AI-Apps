@@ -16,17 +16,21 @@ import '../widgets/auth_screen_header.dart';
 import '../widgets/auth_submit_button.dart';
 
 /// WhatsApp OTP verification shown after registration or when an unverified
-/// account signs in. Uses the short-lived verification token from the backend;
-/// a successful code routes the student to the login screen.
+/// account signs in. Uses the short-lived verification token from the backend.
+/// A login-origin flow (`origin == 'login'`) continues straight to the
+/// dashboard with the session issued by the verify call; a register-origin
+/// flow still routes to the login screen.
 class VerifyPhoneScreen extends ConsumerStatefulWidget {
   const VerifyPhoneScreen({
     super.key,
     this.verificationToken,
     this.phone,
+    this.origin = 'register',
   });
 
   final String? verificationToken;
   final String? phone;
+  final String origin;
 
   @override
   ConsumerState<VerifyPhoneScreen> createState() => _VerifyPhoneScreenState();
@@ -68,15 +72,23 @@ class _VerifyPhoneScreenState extends ConsumerState<VerifyPhoneScreen> {
       _error = null;
     });
     try {
-      final ok = await ref
+      final data = await ref
           .read(authProvider.notifier)
           .verifyPhone(token, _codeCtrl.text.trim());
       if (!mounted) return;
-      if (ok) {
-        context.go('/login');
-      } else {
-        setState(() => _error = l10n.authVerifyError);
+      if (data != null &&
+          widget.origin == 'login' &&
+          data['access_token'] != null &&
+          data['refresh_token'] != null) {
+        await ref.read(authProvider.notifier).completeSession(data);
+        if (mounted) context.go('/dashboard');
+        return;
       }
+      if (data == null) {
+        setState(() => _error = l10n.authVerifyError);
+        return;
+      }
+      context.go('/login');
     } catch (e) {
       if (mounted) {
         setState(() => _error = AppMessages.friendlyMessage(context, e));

@@ -72,6 +72,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             'phone': user is Map
                 ? user['phone_e164']?.toString() ?? ''
                 : '',
+            'origin': 'register',
           },
         );
       } else if (data?['access_token'] != null) {

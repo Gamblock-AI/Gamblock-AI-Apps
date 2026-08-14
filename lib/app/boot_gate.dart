@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/auth/auth_state.dart';
 import '../core/settings/app_settings.dart';
+import '../core/widgets/app_busy_indicator.dart';
+import '../core/widgets/mesh_background.dart';
 import '../features/intro/data/onboarding_state.dart';
 
 /// Splash stand-in shown on the root route while the boot providers load.
@@ -18,10 +20,17 @@ class BootGate extends ConsumerWidget {
     final onboardingLoading = ref.watch(onboardingProvider).isLoading;
 
     if (authLoading || settingsLoading || onboardingLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return const MeshBackground(
+        intensity: MeshBackgroundIntensity.strong,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Center(child: AppBusyIndicator(size: 32)),
+        ),
       );
     }
-    return const Scaffold(body: SizedBox.shrink());
+    return const Scaffold(
+      backgroundColor: Colors.transparent,
+      body: SizedBox.shrink(),
+    );
   }
 }

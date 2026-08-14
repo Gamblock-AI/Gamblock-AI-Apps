@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
@@ -6,14 +9,15 @@ import '../core/feedback/haptics.dart';
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_dimens.dart';
 import '../core/widgets/brand_widgets.dart';
+import '../features/mini_games/presentation/mini_game_exit.dart';
 
-class AppShell extends StatelessWidget {
+class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.child});
 
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final location = GoRouterState.of(context).uri.path;
     final l10n = AppLocalizations.of(context)!;
     final destinations = [
@@ -43,33 +47,18 @@ class AppShell extends StatelessWidget {
       ),
     ];
     final selectedIndex = _index(location);
-    void select(int index) {
+    Future<void> navigateTo(String path) async {
+      if (location == path) return;
       Haptics.selection();
-      context.go(destinations[index].path);
+      await exitMiniGameTo(context, ref, path);
     }
 
-    void openQuickActions() {
-      Haptics.selection();
-      showQuickActionsSheet(
-        context,
-        title: l10n.quickActionsTitle,
-        actions: [
-          QuickAction(
-            icon: Icons.self_improvement_rounded,
-            label: l10n.quickActionBreathe,
-            subtitle: l10n.quickActionBreatheSubtitle,
-            color: AppColors.navy,
-            onTap: () => context.go('/pattern-interrupt'),
-          ),
-          QuickAction(
-            icon: Icons.support_agent_rounded,
-            label: l10n.quickActionRecovery,
-            subtitle: l10n.quickActionRecoverySubtitle,
-            color: AppColors.blueAccent,
-            onTap: () => context.go('/recovery'),
-          ),
-        ],
-      );
+    void select(int index) {
+      unawaited(navigateTo(destinations[index].path));
+    }
+
+    void openMiniGames() {
+      unawaited(navigateTo('/mini-games'));
     }
 
     return LayoutBuilder(
@@ -83,59 +72,98 @@ class AppShell extends StatelessWidget {
           ),
         );
         if (useRail) {
-          return Scaffold(
-            body: SafeArea(
-              child: Row(
-                children: [
-                  NavigationRail(
-                    selectedIndex: selectedIndex,
-                    onDestinationSelected: select,
-                    labelType: constraints.maxWidth >= 1000
-                        ? NavigationRailLabelType.none
-                        : NavigationRailLabelType.all,
-                    extended: constraints.maxWidth >= 1000,
-                    leading: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 18),
-                      child: CircleAvatar(
-                        radius: 22,
-                        backgroundColor: AppColors.navy,
-                        child: Icon(Icons.shield_rounded, color: Colors.white),
-                      ),
-                    ),
-                    destinations: [
-                      for (final destination in destinations)
-                        NavigationRailDestination(
-                          icon: Icon(destination.icon),
-                          selectedIcon: Icon(destination.selectedIcon),
-                          label: Text(destination.label),
+          return MeshBackground(
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              body: SafeArea(
+                child: Row(
+                  children: [
+                    NavigationRail(
+                      backgroundColor: Colors.white.withValues(alpha: 0.74),
+                      selectedIndex: selectedIndex,
+                      onDestinationSelected: select,
+                      labelType: constraints.maxWidth >= 1000
+                          ? NavigationRailLabelType.none
+                          : NavigationRailLabelType.all,
+                      extended: constraints.maxWidth >= 1000,
+                      leading: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 18,
+                          horizontal: 12,
                         ),
-                    ],
-                  ),
-                  VerticalDivider(
-                    width: 1,
-                    color: AppColors.navy.withValues(alpha: .08),
-                  ),
-                  Expanded(child: content),
-                ],
+                        child: constraints.maxWidth >= 1000
+                            ? Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/gamblock-1.png',
+                                    key: const ValueKey('sidebar-brand-logo'),
+                                    width: 32,
+                                    height: 32,
+                                    fit: BoxFit.contain,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  const Text(
+                                    'Gamblock AI',
+                                    key: ValueKey('sidebar-brand-title'),
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.navy,
+                                      letterSpacing: -0.3,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Image.asset(
+                                'assets/images/gamblock-1.png',
+                                key: const ValueKey('sidebar-brand-logo'),
+                                width: 32,
+                                height: 32,
+                                fit: BoxFit.contain,
+                              ),
+                      ),
+                      destinations: [
+                        for (final destination in destinations)
+                          NavigationRailDestination(
+                            icon: Icon(destination.icon),
+                            selectedIcon: Icon(destination.selectedIcon),
+                            label: Text(destination.label),
+                          ),
+                      ],
+                    ),
+                    VerticalDivider(
+                      width: 1,
+                      color: AppColors.navy.withValues(alpha: .08),
+                    ),
+                    Expanded(child: content),
+                  ],
+                ),
               ),
             ),
           );
         }
-        return Scaffold(
-          extendBody: true,
-          body: content,
-          bottomNavigationBar: _GlassBottomNav(
-            selectedIndex: selectedIndex,
-            destinations: destinations,
-            onSelect: select,
-            onFab: openQuickActions,
+        return MeshBackground(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            extendBody: true,
+            body: content,
+            bottomNavigationBar: _GlassBottomNav(
+              selectedIndex: selectedIndex,
+              destinations: destinations,
+              onSelect: select,
+              onMiniGames: openMiniGames,
+              miniGamesActive: location.startsWith('/mini-games'),
+              miniGamesLabel: l10n.miniGamesTitle,
+            ),
           ),
         );
       },
     );
   }
 
-  int _index(String path) {
+  int? _index(String path) {
+    if (path.startsWith('/mini-games')) return null;
     if (path.startsWith('/analytics')) return 1;
     if (path.startsWith('/accountability')) return 2;
     if (path.startsWith('/settings')) return 3;
@@ -154,16 +182,20 @@ class _Destination {
 /// Floating glass bottom bar with four destinations and a raised center FAB —
 /// mirrors the wireframe bottom navigation (blur, hairline border, active dot).
 class _GlassBottomNav extends StatelessWidget {
-  final int selectedIndex;
+  final int? selectedIndex;
   final List<_Destination> destinations;
   final ValueChanged<int> onSelect;
-  final VoidCallback onFab;
+  final VoidCallback onMiniGames;
+  final bool miniGamesActive;
+  final String miniGamesLabel;
 
   const _GlassBottomNav({
     required this.selectedIndex,
     required this.destinations,
     required this.onSelect,
-    required this.onFab,
+    required this.onMiniGames,
+    required this.miniGamesActive,
+    required this.miniGamesLabel,
   });
 
   @override
@@ -171,11 +203,16 @@ class _GlassBottomNav extends StatelessWidget {
     return SafeArea(
       top: false,
       child: SizedBox(
-        height: 76,
+        height: 104,
         child: Stack(
+          alignment: Alignment.bottomCenter,
           clipBehavior: Clip.none,
           children: [
-            Positioned.fill(
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 76,
               child: Container(
                 decoration: BoxDecoration(
                   color: AppColors.glassFill,
@@ -215,10 +252,16 @@ class _GlassBottomNav extends StatelessWidget {
               ),
             ),
             Positioned(
-              top: -30,
+              top: 0,
               left: 0,
               right: 0,
-              child: Center(child: _CenterFab(onTap: onFab)),
+              child: Center(
+                child: _CenterFab(
+                  onTap: onMiniGames,
+                  active: miniGamesActive,
+                  label: miniGamesLabel,
+                ),
+              ),
             ),
           ],
         ),
@@ -249,26 +292,25 @@ class _NavItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 8),
             Icon(
               selected ? destination.selectedIcon : destination.icon,
-              size: AppIconSize.lg,
+              size: 22,
               color: selected ? AppColors.navy : AppColors.inkMuted,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 3),
             Text(
               destination.label,
               style: TextStyle(
-                fontSize: 11,
+                fontSize: 10.5,
+                height: 1.1,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                 color: selected ? AppColors.navy : AppColors.inkMuted,
               ),
             ),
-            const Spacer(),
+            const SizedBox(height: 4),
             Container(
               width: 4,
               height: 4,
-              margin: const EdgeInsets.only(bottom: 6),
               decoration: BoxDecoration(
                 color: selected ? AppColors.blueAccent : Colors.transparent,
                 shape: BoxShape.circle,
@@ -283,23 +325,49 @@ class _NavItem extends StatelessWidget {
 
 class _CenterFab extends StatelessWidget {
   final VoidCallback onTap;
-  const _CenterFab({required this.onTap});
+  final bool active;
+  final String label;
+
+  const _CenterFab({
+    required this.onTap,
+    required this.active,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      customBorder: const CircleBorder(),
-      child: Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          gradient: AppColors.blueAccentGradient,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 4),
-          boxShadow: AppColors.fabGlow,
+    return Semantics(
+      button: true,
+      selected: active,
+      label: label,
+      child: Tooltip(
+        message: label,
+        child: Material(
+          color: Colors.transparent,
+          shape: const CircleBorder(),
+          child: InkWell(
+            onTap: onTap,
+            customBorder: const CircleBorder(),
+            child: Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                gradient: AppColors.blueAccentGradient,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: active ? AppColors.navy : Colors.white,
+                  width: active ? 3 : 4,
+                ),
+                boxShadow: AppColors.fabGlow,
+              ),
+              child: const Icon(
+                Icons.sports_esports_rounded,
+                color: Colors.white,
+                size: 28,
+              ),
+            ),
+          ),
         ),
-        child: const Icon(Icons.add_rounded, color: Colors.white, size: 30),
       ),
     );
   }

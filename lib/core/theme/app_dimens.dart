@@ -12,9 +12,9 @@ class AppSpacing {
   static const double xxl = 32;
 
   /// Unified scrollable-tab padding (protection/analytics/accountability/
-  /// settings all share this). Bottom inset (104) ensures the lowest card
+  /// settings all share this). Bottom inset (136) ensures the lowest card
   /// scrolls fully clear of the floating glass bottom navigation bar and center FAB.
-  static const EdgeInsets screenPadding = EdgeInsets.fromLTRB(lg, md, lg, 104);
+  static const EdgeInsets screenPadding = EdgeInsets.fromLTRB(lg, md, lg, 136);
 }
 
 /// Shared corner-radius scale. Cards use [md] (16, web `rounded-2xl`),

@@ -3,6 +3,7 @@ import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/messaging/app_messages.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_busy_indicator.dart';
 
 class PasswordChange {
   const PasswordChange({
@@ -105,9 +106,7 @@ class _PasswordChangeDialogState extends State<_PasswordChangeDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 380),
         padding: const EdgeInsets.all(18),
@@ -147,10 +146,10 @@ class _PasswordChangeDialogState extends State<_PasswordChangeDialog> {
                     child: Text(
                       l10n.settingsChangePassword,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.navy,
-                            letterSpacing: -0.3,
-                          ),
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.navy,
+                        letterSpacing: -0.3,
+                      ),
                     ),
                   ),
                 ],
@@ -182,7 +181,8 @@ class _PasswordChangeDialogState extends State<_PasswordChangeDialog> {
                       show: _showCurrent,
                       serverError: _currentServerError,
                       autofillHints: const [AutofillHints.password],
-                      onToggle: () => setState(() => _showCurrent = !_showCurrent),
+                      onToggle: () =>
+                          setState(() => _showCurrent = !_showCurrent),
                       validator: (value) => value == null || value.isEmpty
                           ? l10n.msgErrPasswordValidation
                           : null,
@@ -212,10 +212,12 @@ class _PasswordChangeDialogState extends State<_PasswordChangeDialog> {
                       label: l10n.settingsConfirmPassword,
                       show: _showConfirmation,
                       autofillHints: const [AutofillHints.newPassword],
-                      onToggle: () =>
-                          setState(() => _showConfirmation = !_showConfirmation),
-                      validator: (value) =>
-                          value != _next.text ? l10n.settingsPasswordMismatch : null,
+                      onToggle: () => setState(
+                        () => _showConfirmation = !_showConfirmation,
+                      ),
+                      validator: (value) => value != _next.text
+                          ? l10n.settingsPasswordMismatch
+                          : null,
                     ),
                   ],
                 ),
@@ -242,7 +244,9 @@ class _PasswordChangeDialogState extends State<_PasswordChangeDialog> {
                         child: Text(
                           l10n.cancel,
                           style: const TextStyle(
-                              fontWeight: FontWeight.w700, fontSize: 13),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ),
@@ -262,17 +266,18 @@ class _PasswordChangeDialogState extends State<_PasswordChangeDialog> {
                         ),
                         onPressed: _submitting ? null : _submit,
                         child: _submitting
-                            ? const SizedBox.square(
-                                dimension: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
+                            ? const AppBusyIndicator(
+                                size: 16,
+                                strokeWidth: 2,
+                                color: Colors.white,
+                                trackColor: Color(0x55FFFFFF),
                               )
                             : Text(
                                 l10n.save,
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.w700, fontSize: 13),
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                ),
                               ),
                       ),
                     ),
@@ -317,8 +322,10 @@ class _PasswordChangeDialogState extends State<_PasswordChangeDialog> {
         isDense: true,
         filled: true,
         fillColor: AppColors.background,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.border),
@@ -330,8 +337,11 @@ class _PasswordChangeDialogState extends State<_PasswordChangeDialog> {
         suffixIcon: IconButton(
           tooltip: show ? l10n.settingsHidePassword : l10n.settingsShowPassword,
           onPressed: onToggle,
-          icon: Icon(show ? Icons.visibility_off : Icons.visibility,
-              size: 20, color: AppColors.mutedForeground),
+          icon: Icon(
+            show ? Icons.visibility_off : Icons.visibility,
+            size: 20,
+            color: AppColors.mutedForeground,
+          ),
         ),
       ),
     );

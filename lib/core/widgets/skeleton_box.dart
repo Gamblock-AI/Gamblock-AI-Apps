@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
-/// Shimmering placeholder for loading states. Uses a subtle pulse animation;
-/// disabled (static) when the platform requests reduced motion.
+/// Blue-tinted shimmer placeholder for branded loading states.
 class SkeletonBox extends StatefulWidget {
   final double width;
   final double height;
@@ -29,7 +28,7 @@ class _SkeletonBoxState extends State<SkeletonBox>
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1100),
       vsync: this,
-    )..repeat(reverse: true);
+    )..repeat();
   }
 
   @override
@@ -39,7 +38,7 @@ class _SkeletonBoxState extends State<SkeletonBox>
       _controller.stop();
       _controller.value = 0.5;
     } else if (!_controller.isAnimating) {
-      _controller.repeat(reverse: true);
+      _controller.repeat();
     }
   }
 
@@ -54,14 +53,22 @@ class _SkeletonBoxState extends State<SkeletonBox>
     return AnimatedBuilder(
       animation: _controller,
       builder: (_, __) {
+        final phase = (_controller.value * 2) - 1;
         return Container(
           width: widget.width,
           height: widget.height,
           decoration: BoxDecoration(
-            color: AppColors.navy.withValues(
-              alpha: 0.04 + 0.06 * _controller.value,
+            gradient: LinearGradient(
+              begin: Alignment(-1.8 + phase, -0.25),
+              end: Alignment(0.2 + phase, 0.25),
+              colors: [
+                AppColors.azure.withValues(alpha: 0.72),
+                Colors.white.withValues(alpha: 0.9),
+                AppColors.skyLight.withValues(alpha: 0.58),
+              ],
             ),
             borderRadius: widget.borderRadius,
+            border: Border.all(color: Colors.white.withValues(alpha: 0.78)),
           ),
         );
       },

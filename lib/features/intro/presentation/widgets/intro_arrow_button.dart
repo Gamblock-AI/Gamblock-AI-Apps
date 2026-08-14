@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/widgets/pressable.dart';
+import '../../../../core/feedback/haptics.dart';
 
-/// Circular accent button that advances the intro flow (or finishes it on the
-/// last slide). Color matches the active slide header. When [pulse] is on, an
-/// expanding ring loops behind the button to signal the final step.
+/// Accessible circular or pill-shaped CTA for advancing the intro flow.
 class IntroArrowButton extends StatefulWidget {
   final Color color;
   final Color iconColor;
   final VoidCallback onPressed;
   final String semanticLabel;
+  final String? label;
   final bool pulse;
 
   const IntroArrowButton({
@@ -18,6 +17,7 @@ class IntroArrowButton extends StatefulWidget {
     required this.iconColor,
     required this.onPressed,
     required this.semanticLabel,
+    this.label,
     this.pulse = false,
   });
 
@@ -51,14 +51,18 @@ class _IntroArrowButtonState extends State<IntroArrowButton>
   }
 
   void _syncPulse() {
-    final enabled =
-        widget.pulse && !MediaQuery.disableAnimationsOf(context);
+    final enabled = widget.pulse && !MediaQuery.disableAnimationsOf(context);
     if (enabled && !_pulseCtrl.isAnimating) {
       _pulseCtrl.repeat();
-    } else if (!enabled && _pulseCtrl.isAnimating) {
+    } else if (!enabled) {
       _pulseCtrl.stop();
       _pulseCtrl.value = 0;
     }
+  }
+
+  void _handlePressed() {
+    Haptics.light();
+    widget.onPressed();
   }
 
   @override
@@ -70,6 +74,56 @@ class _IntroArrowButtonState extends State<IntroArrowButton>
   @override
   Widget build(BuildContext context) {
     final disableAnimations = MediaQuery.disableAnimationsOf(context);
+    final hasLabel = widget.label != null && widget.label!.trim().isNotEmpty;
+    final width = hasLabel ? 192.0 : 56.0;
+    final borderRadius = BorderRadius.circular(28);
+
+    final button = DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: borderRadius,
+        boxShadow: [
+          BoxShadow(
+            color: widget.color.withValues(alpha: 0.42),
+            blurRadius: 20,
+            offset: const Offset(0, 7),
+            spreadRadius: -3,
+          ),
+        ],
+      ),
+      child: SizedBox(
+        width: width,
+        height: 56,
+        child: FilledButton(
+          onPressed: _handlePressed,
+          style: FilledButton.styleFrom(
+            backgroundColor: widget.color,
+            foregroundColor: widget.iconColor,
+            disabledBackgroundColor: widget.color,
+            disabledForegroundColor: widget.iconColor,
+            elevation: 0,
+            padding: EdgeInsets.symmetric(horizontal: hasLabel ? 20 : 0),
+            side: BorderSide(color: Colors.white.withValues(alpha: 0.22)),
+            shape: RoundedRectangleBorder(borderRadius: borderRadius),
+            textStyle: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.2,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (hasLabel) ...[
+                Flexible(child: Text(widget.label!)),
+                const SizedBox(width: 10),
+              ],
+              Icon(Icons.arrow_forward_rounded, size: hasLabel ? 22 : 24),
+            ],
+          ),
+        ),
+      ),
+    );
 
     return Stack(
       alignment: Alignment.center,
@@ -80,50 +134,26 @@ class _IntroArrowButtonState extends State<IntroArrowButton>
             animation: _pulseCtrl,
             builder: (context, child) {
               return Transform.scale(
-                scale: 1 + 0.55 * _pulseCtrl.value,
+                scale: 1 + 0.34 * _pulseCtrl.value,
                 child: Opacity(
-                  opacity: (1 - _pulseCtrl.value) * 0.55,
+                  opacity: (1 - _pulseCtrl.value) * 0.48,
                   child: child,
                 ),
               );
             },
             child: Container(
-              width: 56,
+              width: width,
               height: 56,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
+                borderRadius: borderRadius,
                 border: Border.all(color: widget.color, width: 2),
               ),
             ),
           ),
-        Pressable(
-          onTap: widget.onPressed,
-          semanticLabel: widget.semanticLabel,
-          child: AnimatedContainer(
-            width: 56,
-            height: 56,
-            duration: disableAnimations
-                ? Duration.zero
-                : const Duration(milliseconds: 250),
-            curve: Curves.easeOutCubic,
-            decoration: BoxDecoration(
-              color: widget.color,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: widget.color.withValues(alpha: 0.4),
-                  blurRadius: 15,
-                  offset: const Offset(0, 4),
-                  spreadRadius: -3,
-                ),
-              ],
-            ),
-            child: Icon(
-              Icons.arrow_forward_rounded,
-              color: widget.iconColor,
-              size: 24,
-            ),
-          ),
+        Semantics(
+          button: true,
+          label: widget.semanticLabel,
+          child: Tooltip(message: widget.semanticLabel, child: button),
         ),
       ],
     );

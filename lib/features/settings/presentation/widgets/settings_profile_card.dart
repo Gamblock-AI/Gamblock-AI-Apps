@@ -10,6 +10,8 @@ import '../../../../core/messaging/app_messages.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/widgets/brand_widgets.dart';
+import 'avatar_photo_action_dialog.dart';
+import 'avatar_photo_cropper_dialog.dart';
 
 /// Identifies the authenticated user at the top of the Settings screen.
 /// Light glass card with a monogram avatar and soft blob decor, plus camera
@@ -20,7 +22,8 @@ class SettingsProfileCard extends ConsumerStatefulWidget {
   final AuthState auth;
 
   @override
-  ConsumerState<SettingsProfileCard> createState() => _SettingsProfileCardState();
+  ConsumerState<SettingsProfileCard> createState() =>
+      _SettingsProfileCardState();
 }
 
 class _SettingsProfileCardState extends ConsumerState<SettingsProfileCard> {
@@ -29,19 +32,55 @@ class _SettingsProfileCardState extends ConsumerState<SettingsProfileCard> {
 
   AuthState get auth => widget.auth;
 
-  Future<void> _pickAndUpload() async {
-    if (_busy) return;
-    setState(() => _busy = true);
+  Future<void> _onAvatarTap() async {
+    if (_busy || !mounted) return;
+    final displayName = auth.displayName?.trim();
+    final name = displayName?.isNotEmpty == true ? displayName! : 'G';
+    final action = await showAvatarPhotoActionDialog(
+      context,
+      name: name,
+      avatarUrl: auth.avatarUrl,
+      avatarVersion: auth.avatarVersion,
+      canUseCamera: _picker.supportsImageSource(ImageSource.camera),
+    );
+    if (!mounted || action == null) return;
+    if (action == AvatarPhotoAction.delete) {
+      await _deleteAvatar();
+      return;
+    }
+    await _pickCropAndUpload(
+      action == AvatarPhotoAction.camera
+          ? ImageSource.camera
+          : ImageSource.gallery,
+    );
+  }
+
+  Future<void> _pickCropAndUpload(ImageSource source) async {
     try {
       final XFile? picked = await _picker.pickImage(
-        source: ImageSource.gallery,
+        source: source,
         imageQuality: 90,
-        maxWidth: 1024,
-        maxHeight: 1024,
+        maxWidth: 2048,
+        maxHeight: 2048,
       );
       if (picked == null) return;
       final bytes = await picked.readAsBytes();
-      final webp = encodeAvatarWebP(bytes);
+      if (bytes.lengthInBytes > maxAvatarSourceBytes) {
+        if (mounted) {
+          AppFeedback.error(
+            context,
+            AppLocalizations.of(context)!.settingsAvatarSourceTooLarge,
+          );
+        }
+        return;
+      }
+      if (!mounted) return;
+      final cropped = await showAvatarPhotoCropperDialog(
+        context,
+        sourceBytes: bytes,
+      );
+      if (cropped == null) return;
+      final webp = encodeAvatarWebP(cropped);
       if (webp == null) {
         if (mounted) {
           AppFeedback.error(
@@ -51,6 +90,8 @@ class _SettingsProfileCardState extends ConsumerState<SettingsProfileCard> {
         }
         return;
       }
+      if (!mounted) return;
+      setState(() => _busy = true);
       await ref.read(authProvider.notifier).uploadAvatar(webp);
       if (mounted) {
         AppFeedback.success(
@@ -60,13 +101,10 @@ class _SettingsProfileCardState extends ConsumerState<SettingsProfileCard> {
       }
     } catch (error) {
       if (mounted) {
-        AppFeedback.error(
-          context,
-          AppMessages.friendlyMessage(context, error),
-        );
+        AppFeedback.error(context, AppMessages.friendlyMessage(context, error));
       }
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (mounted && _busy) setState(() => _busy = false);
     }
   }
 
@@ -83,10 +121,7 @@ class _SettingsProfileCardState extends ConsumerState<SettingsProfileCard> {
       }
     } catch (error) {
       if (mounted) {
-        AppFeedback.error(
-          context,
-          AppMessages.friendlyMessage(context, error),
-        );
+        AppFeedback.error(context, AppMessages.friendlyMessage(context, error));
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -112,20 +147,34 @@ class _SettingsProfileCardState extends ConsumerState<SettingsProfileCard> {
           const Positioned(
             right: -40,
             top: -40,
-            child: RadialBlob(color: AppColors.blueAccent, size: 170, alpha: 0.14),
+            child: RadialBlob(
+              color: AppColors.blueAccent,
+              size: 170,
+              alpha: 0.14,
+            ),
           ),
           const Positioned(
             bottom: -50,
             left: -40,
-            child: RadialBlob(color: AppColors.violetAccent, size: 160, alpha: 0.10),
+            child: RadialBlob(
+              color: AppColors.violetAccent,
+              size: 160,
+              alpha: 0.10,
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: Row(
               children: [
-                Stack(
-                  children: [
-                    UserAvatar(
+                Semantics(
+                  button: true,
+                  label: auth.avatarUrl == null
+                      ? l10n.settingsAvatarUpload
+                      : l10n.settingsAvatarChange,
+                  child: InkWell(
+                    onTap: _busy ? null : _onAvatarTap,
+                    customBorder: const CircleBorder(),
+                    child: UserAvatar(
                       name: name,
                       avatarUrl: auth.avatarUrl,
                       avatarVersion: auth.avatarVersion,
@@ -133,19 +182,7 @@ class _SettingsProfileCardState extends ConsumerState<SettingsProfileCard> {
                       size: 52,
                       boxShadow: AppColors.cardSoftShadow,
                     ),
-                    Positioned(
-                      right: 0,
-                      bottom: 0,
-                      child: _AvatarActionButton(
-                        tooltip: auth.avatarUrl == null
-                            ? l10n.settingsAvatarUpload
-                            : l10n.settingsAvatarChange,
-                        icon: Icons.photo_camera_rounded,
-                        busy: _busy,
-                        onPressed: _pickAndUpload,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -187,45 +224,6 @@ class _SettingsProfileCardState extends ConsumerState<SettingsProfileCard> {
                                 : l10n.settingsWhatsappUnverified,
                             active: auth.phoneVerified,
                           ),
-                          if (auth.avatarUrl != null)
-                            InkWell(
-                              onTap: _busy ? null : _deleteAvatar,
-                              borderRadius: BorderRadius.circular(16),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 3,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.crimson.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: AppColors.crimson.withValues(
-                                      alpha: 0.25,
-                                    ),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(
-                                      Icons.delete_outline_rounded,
-                                      size: 12,
-                                      color: AppColors.crimson,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      l10n.settingsAvatarRemove,
-                                      style: const TextStyle(
-                                        color: AppColors.crimson,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
                         ],
                       ),
                     ],
@@ -235,45 +233,6 @@ class _SettingsProfileCardState extends ConsumerState<SettingsProfileCard> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _AvatarActionButton extends StatelessWidget {
-  const _AvatarActionButton({
-    required this.tooltip,
-    required this.icon,
-    required this.busy,
-    required this.onPressed,
-  });
-
-  final String tooltip;
-  final IconData icon;
-  final bool busy;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: InkWell(
-        onTap: busy ? null : onPressed,
-        customBorder: const CircleBorder(),
-        child: Container(
-          padding: const EdgeInsets.all(2),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            shape: BoxShape.circle,
-            border: Border.all(color: AppColors.glassBorder),
-          ),
-          child: busy
-              ? const SizedBox.square(
-                  dimension: 14,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : Icon(icon, size: 14, color: AppColors.navy),
-        ),
       ),
     );
   }

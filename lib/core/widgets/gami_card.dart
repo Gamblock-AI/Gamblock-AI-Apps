@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_dimens.dart';
+import 'gami_image.dart';
 
 /// Supportive mascot card for encouragement moments (mission completion,
 /// analytics appreciation). Mirrors the website's GamiCard: Gami is a
@@ -13,12 +14,14 @@ class GamiCard extends StatelessWidget {
     required this.message,
     this.asset = 'assets/images/gami-thumbsup.webp',
     this.action,
+    this.radius = AppRadius.lg,
   });
 
   final String? title;
   final String message;
   final String asset;
   final Widget? action;
+  final double radius;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +30,7 @@ class GamiCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: AppColors.azure.withValues(alpha: 0.35),
-        borderRadius: BorderRadius.circular(AppRadius.lg),
+        borderRadius: BorderRadius.circular(radius),
         border: Border.all(color: AppColors.navy.withValues(alpha: 0.15)),
       ),
       child: Stack(
@@ -57,10 +60,10 @@ class GamiCard extends StatelessWidget {
                     shape: BoxShape.circle,
                     color: AppColors.skyLight.withValues(alpha: 0.45),
                   ),
-                  child: Image.asset(
-                    asset,
+                  child: GamiImage(
+                    asset: asset,
                     fit: BoxFit.contain,
-                    excludeFromSemantics: true,
+                    cacheWidth: 180,
                   ),
                 ),
                 const SizedBox(width: 12),

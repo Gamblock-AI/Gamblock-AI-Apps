@@ -2,25 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gamblock_ai_apps/features/intro/presentation/widgets/onboarding_slide.dart';
 
-Widget _wrap({required double width, required double height}) {
+const _portraitAsset = 'assets/images/onboarding-protect-portrait.webp';
+const _landscapeAsset = 'assets/images/onboarding-protect-landscape.webp';
+
+Widget _wrap({
+  required double width,
+  required double height,
+  bool disableAnimations = false,
+  String tail = 'YOURSELF',
+}) {
   return MaterialApp(
-    home: Scaffold(
-      body: Center(
-        child: SizedBox(
-          width: width,
-          height: height,
-          child: const OnboardingSlide(
-            headerColor: Color(0xFF3DD6F5),
-            headerDark: Color(0xFF2BB4D4),
-            textColor: Color(0xFF0D1B35),
-            markerColor: Color(0xFF0D1B35),
-            asset: 'assets/images/gami-hug-heart.webp',
-            lead: "DON'T FORGET TO",
-            highlight: 'PROTECT',
-            tail: 'YOURSELF',
-            subtitle: 'On-device AI protection watches over every step.',
-            stepBadge: 'STEP 1 OF 3',
-            showHeart: true,
+    home: MediaQuery(
+      data: MediaQueryData(disableAnimations: disableAnimations),
+      child: Scaffold(
+        body: Center(
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: OnboardingSlide(
+              portraitAsset: _portraitAsset,
+              landscapeAsset: _landscapeAsset,
+              markerColor: const Color(0xFF3DD6F5),
+              lead: "DON'T FORGET TO",
+              highlight: 'PROTECT',
+              tail: tail,
+              subtitle: 'On-device AI protection watches over every step.',
+              action: const SizedBox(
+                key: ValueKey('test-action'),
+                width: 56,
+                height: 56,
+              ),
+            ),
           ),
         ),
       ),
@@ -28,75 +40,60 @@ Widget _wrap({required double width, required double height}) {
   );
 }
 
+String _backgroundAsset(WidgetTester tester) {
+  final image = tester.widget<Image>(
+    find.byKey(const ValueKey('onboarding-background')),
+  );
+  return (image.image as AssetImage).assetName;
+}
+
 void main() {
-  testWidgets('slide shows headline and mascot in a wide layout', (
-    tester,
-  ) async {
+  testWidgets('wide layout selects the landscape background', (tester) async {
     await tester.pumpWidget(_wrap(width: 760, height: 480));
     await tester.pump();
 
+    expect(_backgroundAsset(tester), _landscapeAsset);
     expect(find.text("DON'T FORGET TO"), findsOneWidget);
     expect(find.text('PROTECT'), findsOneWidget);
     expect(find.text('YOURSELF'), findsOneWidget);
-    expect(find.byType(Image), findsOneWidget);
+    expect(find.byKey(const ValueKey('test-action')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('slide shows badge, headline, subtitle, and mascot when compact', (
+  testWidgets('compact layout selects portrait art without overflowing', (
     tester,
   ) async {
     await tester.pumpWidget(_wrap(width: 360, height: 560));
     await tester.pump();
 
-    expect(find.text('STEP 1 OF 3'), findsOneWidget);
-    expect(find.text("DON'T FORGET TO"), findsOneWidget);
-    expect(find.text('PROTECT'), findsOneWidget);
-    expect(find.text('YOURSELF'), findsOneWidget);
+    expect(_backgroundAsset(tester), _portraitAsset);
     expect(
       find.text('On-device AI protection watches over every step.'),
       findsOneWidget,
     );
-    expect(find.byType(Image), findsOneWidget);
+    expect(find.byKey(const ValueKey('test-action')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('slide skips empty headline parts and the badge when omitted', (
+  testWidgets('portrait tablet keeps the portrait composition', (tester) async {
+    await tester.pumpWidget(_wrap(width: 800, height: 1000));
+    await tester.pump();
+
+    expect(_backgroundAsset(tester), _portraitAsset);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('empty headline parts and reduced motion remain valid', (
     tester,
   ) async {
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: OnboardingSlide(
-            headerColor: Color(0xFF16294C),
-            headerDark: Color(0xFF0D1B35),
-            textColor: Colors.white,
-            markerColor: Color(0xFF3DD6F5),
-            asset: 'assets/images/gami-relax.webp',
-            lead: "IT'S OKAY TO",
-            highlight: 'TAKE A PAUSE',
-            tail: '',
-            subtitle: 'Pattern Interrupt gives you breathing room.',
-          ),
-        ),
-      ),
+      _wrap(width: 390, height: 844, disableAnimations: true, tail: ''),
     );
     await tester.pump();
 
-    expect(find.text("IT'S OKAY TO"), findsOneWidget);
-    expect(find.text('TAKE A PAUSE'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('tapping the mascot plays a bounce without errors', (
-    tester,
-  ) async {
-    await tester.pumpWidget(_wrap(width: 360, height: 560));
-    await tester.pump();
-
-    await tester.tap(find.byType(Image));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
-
+    expect(find.text("DON'T FORGET TO"), findsOneWidget);
+    expect(find.text('PROTECT'), findsOneWidget);
+    expect(find.text('YOURSELF'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }

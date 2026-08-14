@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/widgets/app_busy_indicator.dart';
+
 /// A fixed-height primary action with a consistent busy state for auth forms.
 class AuthSubmitButton extends StatelessWidget {
   const AuthSubmitButton({
@@ -22,13 +24,10 @@ class AuthSubmitButton extends StatelessWidget {
       ),
       onPressed: isLoading ? null : onPressed,
       child: isLoading
-          ? const SizedBox(
-              height: 22,
-              width: 22,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.5,
-                color: Colors.white,
-              ),
+          ? const AppBusyIndicator(
+              size: 22,
+              color: Colors.white,
+              trackColor: Color(0x55FFFFFF),
             )
           : Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
     );

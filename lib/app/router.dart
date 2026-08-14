@@ -11,9 +11,13 @@ import '../features/auth/presentation/screens/verify_phone_screen.dart';
 import '../features/intro/presentation/screens/intro_screen.dart';
 import '../features/intro/data/onboarding_state.dart';
 import '../features/auth/presentation/screens/forgot_password_screen.dart';
+import '../features/mini_games/presentation/screens/brain_summit_screen.dart';
+import '../features/mini_games/presentation/screens/mini_games_hub_screen.dart';
+import '../features/mini_games/presentation/screens/picture_forge_screen.dart';
+import '../features/mini_games/presentation/screens/spectrum_sprint_screen.dart';
+import '../features/mini_games/presentation/screens/twin_trace_screen.dart';
 import '../features/pattern_interrupt/presentation/screens/pattern_interrupt_screen.dart';
 import '../features/protection/presentation/screens/protection_screen.dart';
-import '../features/recovery/presentation/screens/recovery_handoff_screen.dart';
 import '../features/settings/presentation/screens/settings_help_screen.dart';
 import '../features/settings/presentation/screens/settings_privacy_screen.dart';
 import '../features/settings/settings_screen.dart';
@@ -47,24 +51,18 @@ Page<void> _page({required LocalKey key, required Widget child}) {
 
 class RouterNotifier extends ChangeNotifier {
   RouterNotifier(this._ref) {
-    _ref.listen<AuthState>(
-      authProvider,
-      (previous, next) {
-        if (previous?.isAuthenticated != next.isAuthenticated ||
-            previous?.isLoading != next.isLoading) {
-          notifyListeners();
-        }
-      },
-    );
-    _ref.listen<OnboardingState>(
-      onboardingProvider,
-      (previous, next) {
-        if (previous?.isCompleted != next.isCompleted ||
-            previous?.isLoading != next.isLoading) {
-          notifyListeners();
-        }
-      },
-    );
+    _ref.listen<AuthState>(authProvider, (previous, next) {
+      if (previous?.isAuthenticated != next.isAuthenticated ||
+          previous?.isLoading != next.isLoading) {
+        notifyListeners();
+      }
+    });
+    _ref.listen<OnboardingState>(onboardingProvider, (previous, next) {
+      if (previous?.isCompleted != next.isCompleted ||
+          previous?.isLoading != next.isLoading) {
+        notifyListeners();
+      }
+    });
   }
 
   final Ref _ref;
@@ -100,17 +98,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (path == '/onboarding' || path == '/onboarding/create-group') {
         return '/intro';
       }
-      final authEntry = path == '/login' ||
+      final authEntry =
+          path == '/login' ||
           path == '/register' ||
           path == '/forgot-password' ||
           path == '/verify-phone';
       if (authState.isAuthenticated && authEntry) {
         return '/dashboard';
       }
-      final publicPath =
-          authEntry ||
-          path == '/pattern-interrupt' ||
-          path == '/recovery';
+      final publicPath = authEntry || path == '/pattern-interrupt';
       if (!authState.isAuthenticated && !publicPath) {
         return '/login';
       }
@@ -149,9 +145,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           return _page(
             key: state.pageKey,
             child: VerifyPhoneScreen(
-              verificationToken:
-                  extra is Map ? extra['verification_token']?.toString() : null,
+              verificationToken: extra is Map
+                  ? extra['verification_token']?.toString()
+                  : null,
               phone: extra is Map ? extra['phone']?.toString() ?? '' : '',
+              origin: extra is Map
+                  ? extra['origin']?.toString() ?? 'register'
+                  : 'register',
             ),
           );
         },
@@ -166,21 +166,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, state) =>
             _page(key: state.pageKey, child: const PatternInterruptScreen()),
       ),
-      GoRoute(
-        path: '/recovery',
-        pageBuilder: (_, state) =>
-            _page(key: state.pageKey, child: const RecoveryHandoffScreen()),
-      ),
-      GoRoute(
-        path: '/settings/privacy',
-        pageBuilder: (_, state) =>
-            _page(key: state.pageKey, child: const SettingsPrivacyScreen()),
-      ),
-      GoRoute(
-        path: '/settings/help',
-        pageBuilder: (_, state) =>
-            _page(key: state.pageKey, child: const SettingsHelpScreen()),
-      ),
       ShellRoute(
         builder: (_, __, child) => AppShell(child: child),
         routes: [
@@ -188,6 +173,37 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/dashboard',
             pageBuilder: (_, state) =>
                 _page(key: state.pageKey, child: const ProtectionScreen()),
+          ),
+          GoRoute(
+            path: '/mini-games',
+            pageBuilder: (_, state) =>
+                _page(key: state.pageKey, child: const MiniGamesHubScreen()),
+            routes: [
+              GoRoute(
+                path: 'spectrum-sprint',
+                pageBuilder: (_, state) => _page(
+                  key: state.pageKey,
+                  child: const SpectrumSprintScreen(),
+                ),
+              ),
+              GoRoute(
+                path: 'picture-forge',
+                pageBuilder: (_, state) => _page(
+                  key: state.pageKey,
+                  child: const PictureForgeScreen(),
+                ),
+              ),
+              GoRoute(
+                path: 'twin-trace',
+                pageBuilder: (_, state) =>
+                    _page(key: state.pageKey, child: const TwinTraceScreen()),
+              ),
+              GoRoute(
+                path: 'brain-summit',
+                pageBuilder: (_, state) =>
+                    _page(key: state.pageKey, child: const BrainSummitScreen()),
+              ),
+            ],
           ),
           GoRoute(
             path: '/analytics',
@@ -203,6 +219,16 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/settings',
             pageBuilder: (_, state) =>
                 _page(key: state.pageKey, child: const SettingsScreen()),
+          ),
+          GoRoute(
+            path: '/settings/privacy',
+            pageBuilder: (_, state) =>
+                _page(key: state.pageKey, child: const SettingsPrivacyScreen()),
+          ),
+          GoRoute(
+            path: '/settings/help',
+            pageBuilder: (_, state) =>
+                _page(key: state.pageKey, child: const SettingsHelpScreen()),
           ),
         ],
       ),

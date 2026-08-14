@@ -1,10 +1,5 @@
 {
   "@@locale": "id",
-  "quickActionsTitle": "Tindakan Cepat",
-  "quickActionBreathe": "Jeda & Tarik Napas",
-  "quickActionBreatheSubtitle": "Latihan napas singkat sebelum melanjutkan",
-  "quickActionRecovery": "Pemulihan & Dukungan",
-  "quickActionRecoverySubtitle": "Buka panduan dan dukungan pemulihan",
   "reminderChannelName": "Pengingat harian",
   "reminderChannelDesc": "Pengingat check-in sekali sehari",
   "reminderNotificationTitle": "Waktu untuk dirimu",

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/auth/auth_state.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimens.dart';
+import '../../../../core/widgets/app_section_header.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../accountability/domain/entities/accountability_models.dart';
 import 'protection_accountability_card.dart';
@@ -44,30 +45,29 @@ class ProtectionAccountabilitySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          l10n.protectionAccountabilityTitle,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: AppColors.ink,
-            fontWeight: FontWeight.w700,
-            fontSize: 16,
-          ),
-        ),
-        const SizedBox(height: 10),
+        AppSectionHeader(title: l10n.protectionAccountabilityTitle),
+        const SizedBox(height: 14),
         if (!auth.isAuthenticated)
           EmptyState(
             icon: Icons.lock_outline,
             title: l10n.protectionSignInTitle,
             hint: l10n.protectionSignInBody,
+            tone: AppStateTone.protected,
             actionLabel: l10n.authLoginBtn,
             onAction: onLogin,
+            radius: AppRadius.banner,
           )
         else if (auth.deviceId == null)
           EmptyState(
             icon: Icons.phonelink_erase,
             title: l10n.deviceRegistrationMissing,
             hint: l10n.deviceRegistrationMissingBody,
+            tone: AppStateTone.warning,
+            mascotAsset: 'assets/images/gami-device-register.webp',
+            compact: true,
             actionLabel: l10n.setupTitle,
             onAction: onOpenSetup,
+            radius: AppRadius.banner,
           )
         else
           ProtectionAccountabilityCard(
