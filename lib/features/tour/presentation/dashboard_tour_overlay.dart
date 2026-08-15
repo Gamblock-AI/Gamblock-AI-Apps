@@ -60,9 +60,7 @@ class _SpotlightDimPainter extends CustomPainter {
     final path = Path()
       ..fillType = PathFillType.evenOdd
       ..addRect(Offset.zero & size)
-      ..addRRect(
-        RRect.fromRectAndRadius(spotlight, const Radius.circular(20)),
-      );
+      ..addRRect(RRect.fromRectAndRadius(spotlight, const Radius.circular(20)));
     canvas.drawPath(path, Paint()..color = const Color(0x8C0A1428));
     canvas.drawRRect(
       RRect.fromRectAndRadius(spotlight, const Radius.circular(20)),
@@ -130,6 +128,12 @@ class _DashboardTourOverlayState extends ConsumerState<DashboardTourOverlay> {
   @override
   Widget build(BuildContext context) {
     final tour = ref.watch(dashboardTourProvider);
+    ref.listen(dashboardTourProvider, (previous, next) {
+      if (previous?.index != next.index) {
+        _skipAttempted = false;
+        _measure();
+      }
+    });
     final step = kDashboardTourSteps[tour.index];
     final l10n = AppLocalizations.of(context)!;
     final screen = MediaQuery.sizeOf(context);
@@ -203,8 +207,10 @@ class _TourBubble extends StatelessWidget {
     final bubbleHeight = 190.0;
     final below = targetRect.bottom + _spotlightGap;
     final top = below + bubbleHeight > screenSize.height - _margin
-        ? (targetRect.top - _spotlightGap - bubbleHeight)
-            .clamp(_margin, screenSize.height - bubbleHeight - _margin)
+        ? (targetRect.top - _spotlightGap - bubbleHeight).clamp(
+            _margin,
+            screenSize.height - bubbleHeight - _margin,
+          )
         : below;
     final left = (targetRect.center.dx - bubbleWidth / 2)
         .clamp(_margin, screenSize.width - bubbleWidth - _margin)
@@ -214,105 +220,122 @@ class _TourBubble extends StatelessWidget {
       left: left,
       top: top.toDouble(),
       width: bubbleWidth,
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          border: Border.all(color: AppColors.border),
-          boxShadow: AppColors.cardSoftShadow,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.navy,
-                      height: 1.25,
+      child: Material(
+        type: MaterialType.transparency,
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            border: Border.all(color: AppColors.border),
+            boxShadow: AppColors.cardSoftShadow,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.navy,
+                        height: 1.25,
+                        decoration: TextDecoration.none,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                InkWell(
-                  onTap: onSkip,
-                  borderRadius: BorderRadius.circular(8),
-                  child: const Padding(
-                    padding: EdgeInsets.all(4),
-                    child: Icon(
-                      Icons.close_rounded,
-                      size: 18,
-                      color: AppColors.mutedForeground,
+                  const SizedBox(width: 8),
+                  InkWell(
+                    onTap: onSkip,
+                    borderRadius: BorderRadius.circular(8),
+                    child: const Padding(
+                      padding: EdgeInsets.all(4),
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 18,
+                        color: AppColors.mutedForeground,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              body,
-              style: const TextStyle(
-                fontSize: 13,
-                height: 1.5,
-                color: AppColors.mutedForeground,
+                ],
               ),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                Text(
-                  l10n.tourStepOf(index + 1, total),
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.mutedForeground,
-                  ),
+              const SizedBox(height: 8),
+              Text(
+                body,
+                style: const TextStyle(
+                  fontSize: 13,
+                  height: 1.5,
+                  color: AppColors.mutedForeground,
+                  decoration: TextDecoration.none,
                 ),
-                TextButton(
-                  onPressed: onSkip,
-                  style: TextButton.styleFrom(
-                    foregroundColor: AppColors.mutedForeground,
-                    minimumSize: const Size(0, 36),
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Text(
+                    l10n.tourStepOf(index + 1, total),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.mutedForeground,
+                      decoration: TextDecoration.none,
+                    ),
                   ),
-                  child: Text(l10n.tourSkip),
-                ),
-                if (index > 0)
                   TextButton(
-                    onPressed: onBack,
+                    onPressed: onSkip,
                     style: TextButton.styleFrom(
-                      foregroundColor: AppColors.navy,
+                      foregroundColor: AppColors.mutedForeground,
                       minimumSize: const Size(0, 36),
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      textStyle: const TextStyle(
+                        decoration: TextDecoration.none,
+                      ),
                     ),
-                    child: Text(l10n.tourBack),
+                    child: Text(l10n.tourSkip),
                   ),
-                FilledButton(
-                  onPressed: onNext,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.navy,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(0, 36),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  if (index > 0)
+                    TextButton(
+                      onPressed: onBack,
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.navy,
+                        minimumSize: const Size(0, 36),
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        textStyle: const TextStyle(
+                          decoration: TextDecoration.none,
+                        ),
+                      ),
+                      child: Text(l10n.tourBack),
+                    ),
+                  FilledButton(
+                    onPressed: onNext,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.navy,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(0, 36),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      textStyle: const TextStyle(
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                    child: Text(
+                      index >= total - 1 ? l10n.tourDone : l10n.tourNext,
+                    ),
                   ),
-                  child: Text(index >= total - 1 ? l10n.tourDone : l10n.tourNext),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

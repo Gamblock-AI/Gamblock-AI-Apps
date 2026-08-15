@@ -1096,7 +1096,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get analyticsDataLocalOnly =>
-      'The backend is unavailable or data is insufficient; this view uses available local counts.';
+      'Protection summary is computed and stored securely on your device.';
 
   @override
   String get analyticsBlocked => 'Content blocked';

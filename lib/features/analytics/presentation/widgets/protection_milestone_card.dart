@@ -22,7 +22,7 @@ class ProtectionMilestoneCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     // Owns its trailing gap so callers never duplicate the visibility rule.
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.only(bottom: 12),
       child: GamiCard(
         title: l10n.analyticsMilestoneTitle,
         message: l10n.analyticsMilestoneBody(helpedCount, data.periodDays),

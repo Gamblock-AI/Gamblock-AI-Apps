@@ -2087,7 +2087,7 @@ abstract class AppLocalizations {
   /// No description provided for @analyticsDataLocalOnly.
   ///
   /// In id, this message translates to:
-  /// **'Backend tidak tersedia atau data belum cukup; tampilan ini memakai hitungan lokal yang tersedia.'**
+  /// **'Ringkasan proteksi dihitung dan tersimpan aman di perangkat Anda.'**
   String get analyticsDataLocalOnly;
 
   /// No description provided for @analyticsBlocked.

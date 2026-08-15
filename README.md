@@ -104,7 +104,10 @@ Android has compile-time-separated `play` and `research` flavors. Both declare
 an Accessibility Service that supports:
 
 - Chrome (`com.android.chrome`) and Edge
-  (`com.microsoft.emmx`) URL/title/headings/anchor extraction;
+  (`com.microsoft.emmx`) URL/title/headings/anchor extraction; the Research
+  flavor additionally observes Opera (`com.opera.browser`), Opera Mini
+  (`com.opera.mini.native`), UC Browser (`com.uc.browser`), and Firefox
+  (`org.mozilla.firefox`);
 - bounded, debounced, single-threaded local classification;
 - local Back navigation plus an accessibility overlay Pattern Interrupt;
 - versioned prominent disclosure before the user is sent to Accessibility
@@ -116,9 +119,11 @@ an Accessibility Service that supports:
 
 The Play flavor observes Chrome and Edge only; Settings/package-installer
 monitoring is absent from its source set and accessibility configuration. The
-Research flavor additionally contains transparent settings/uninstall friction
-tied to bounded approval or emergency grants. Other browsers and arbitrary
-Android WebViews are not claimed as covered. A sideloaded app cannot make
+Research flavor additionally observes Opera, Opera Mini, UC Browser, and
+Firefox (best-effort via the editable-URL fallback; per-browser URL-bar
+resource IDs are not hardcoded), and contains transparent settings/uninstall
+friction tied to bounded approval or emergency grants. Other browsers and
+arbitrary Android WebViews are not claimed as covered. A sideloaded app cannot make
 itself impossible to uninstall; the research prototype adds OS-supported
 friction and transparent recovery rather than unsafe device-owner behavior.
 

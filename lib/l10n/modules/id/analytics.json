@@ -8,7 +8,7 @@
   "analyticsErrorTitle": "Analitik belum dapat dimuat",
   "analyticsPrivacyNote": "Hanya hitungan harian yang ditampilkan. URL, domain, judul halaman, dan teks DOM tidak disimpan atau dikirim.",
   "analyticsDataSynced": "Hitungan hari yang selesai sudah disinkronkan ke akun Anda.",
-  "analyticsDataLocalOnly": "Backend tidak tersedia atau data belum cukup; tampilan ini memakai hitungan lokal yang tersedia.",
+  "analyticsDataLocalOnly": "Ringkasan proteksi dihitung dan tersimpan aman di perangkat Anda.",
   "analyticsBlocked": "Konten diblokir",
   "analyticsInterventions": "Intervensi",
   "analyticsTamper": "Upaya perubahan",

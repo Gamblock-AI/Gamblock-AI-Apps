@@ -8,7 +8,7 @@
   "analyticsErrorTitle": "Analytics could not be loaded",
   "analyticsPrivacyNote": "Only daily counts are shown. URLs, domains, page titles, and DOM text are never stored or uploaded.",
   "analyticsDataSynced": "Completed-day counts are synchronized to your account.",
-  "analyticsDataLocalOnly": "The backend is unavailable or data is insufficient; this view uses available local counts.",
+  "analyticsDataLocalOnly": "Protection summary is computed and stored securely on your device.",
   "analyticsBlocked": "Content blocked",
   "analyticsInterventions": "Interventions",
   "analyticsTamper": "Change attempts",

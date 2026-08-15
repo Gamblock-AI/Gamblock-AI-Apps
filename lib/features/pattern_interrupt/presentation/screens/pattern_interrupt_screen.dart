@@ -8,10 +8,10 @@ import '../../../../core/feedback/feedback.dart';
 import '../../../../core/feedback/haptics.dart';
 
 import '../../../../core/config/app_config.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimens.dart';
 import '../widgets/pattern_grounding_panel.dart';
 import '../widgets/pattern_interrupt_panel.dart';
+import '../widgets/pattern_video_background.dart';
 
 class PatternInterruptScreen extends StatefulWidget {
   const PatternInterruptScreen({super.key});
@@ -124,8 +124,7 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
         if (!didPop && !_showWaitHint) setState(() => _showWaitHint = true);
       },
       child: Scaffold(
-        body: Container(
-          decoration: const BoxDecoration(gradient: AppColors.calmDarkGradient),
+        body: PatternVideoBackground(
           child: SafeArea(
             child: Center(
               child: SingleChildScrollView(

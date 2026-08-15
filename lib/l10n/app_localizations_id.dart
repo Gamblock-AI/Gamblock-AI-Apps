@@ -1093,7 +1093,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get analyticsDataLocalOnly =>
-      'Backend tidak tersedia atau data belum cukup; tampilan ini memakai hitungan lokal yang tersedia.';
+      'Ringkasan proteksi dihitung dan tersimpan aman di perangkat Anda.';
 
   @override
   String get analyticsBlocked => 'Konten diblokir';

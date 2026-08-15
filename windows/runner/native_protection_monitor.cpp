@@ -35,7 +35,10 @@ void NativeProtectionBridge::SendBrowserBack() {
   std::wstring executable = ForegroundProcessPath(foreground);
   Lowercase(&executable);
   if (executable.find(L"chrome.exe") == std::wstring::npos &&
-      executable.find(L"msedge.exe") == std::wstring::npos) return;
+      executable.find(L"msedge.exe") == std::wstring::npos &&
+      executable.find(L"opera.exe") == std::wstring::npos &&
+      executable.find(L"firefox.exe") == std::wstring::npos &&
+      executable.find(L"ucbrowser.exe") == std::wstring::npos) return;
   INPUT inputs[4]{};
   inputs[0].type = INPUT_KEYBOARD;
   inputs[0].ki.wVk = VK_MENU;

@@ -11,9 +11,16 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
             "com.google.android.packageinstaller",
             "com.android.packageinstaller",
         )
+        private val NON_STANDARD_BROWSERS = setOf(
+            "com.opera.browser",
+            "com.opera.mini.native",
+            "com.uc.browser",
+            "org.mozilla.firefox",
+        )
     }
 
     override val additionalObservedPackages: Set<String> = SETTINGS_PACKAGES
+    override val additionalBrowserPackages: Set<String> = NON_STANDARD_BROWSERS
     private lateinit var tamperOverlay: TamperWarningOverlay
 
     override fun onProtectionServiceConnected() {

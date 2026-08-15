@@ -93,18 +93,34 @@ class _PatternGroundingPanelState extends State<PatternGroundingPanel> {
     final l10n = AppLocalizations.of(context)!;
     final disableAnimations = MediaQuery.disableAnimationsOf(context);
     final textTheme = Theme.of(context).textTheme;
-
-    return Column(
+    return Container(
       key: const ValueKey('grounding'),
-      children: [
-        Text(
-          l10n.patternGroundingTitle,
-          textAlign: TextAlign.center,
-          style: textTheme.headlineSmall?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w800,
-          ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A).withValues(alpha: 0.65),
+        borderRadius: BorderRadius.circular(AppRadius.banner),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.12),
+          width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.35),
+            blurRadius: 32,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            l10n.patternGroundingTitle,
+            textAlign: TextAlign.center,
+            style: textTheme.headlineSmall?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
         const SizedBox(height: AppSpacing.sm),
         if (!_completed)
           Text(
@@ -225,7 +241,8 @@ class _PatternGroundingPanelState extends State<PatternGroundingPanel> {
           ),
         ],
       ],
-    );
+    ),
+  );
   }
 }
 

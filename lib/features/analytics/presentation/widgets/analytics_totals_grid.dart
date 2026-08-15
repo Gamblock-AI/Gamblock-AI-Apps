@@ -14,39 +14,51 @@ class AnalyticsTotalsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return GridView(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        mainAxisExtent: 68,
-      ),
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        _CompactStatTile(
-          label: l10n.analyticsBlocked,
-          value: '${totals.blocked}',
-          icon: Icons.block_rounded,
-          color: AppColors.crimson,
+        Row(
+          children: [
+            Expanded(
+              child: _CompactStatTile(
+                label: l10n.analyticsBlocked,
+                value: '${totals.blocked}',
+                icon: Icons.block_rounded,
+                color: AppColors.crimson,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _CompactStatTile(
+                label: l10n.analyticsInterventions,
+                value: '${totals.interventions}',
+                icon: Icons.psychology_outlined,
+                color: AppColors.navy,
+              ),
+            ),
+          ],
         ),
-        _CompactStatTile(
-          label: l10n.analyticsInterventions,
-          value: '${totals.interventions}',
-          icon: Icons.psychology_outlined,
-          color: AppColors.navy,
-        ),
-        _CompactStatTile(
-          label: l10n.analyticsTamper,
-          value: '${totals.tamperEvents}',
-          icon: Icons.shield_outlined,
-          color: AppColors.amber,
-        ),
-        _CompactStatTile(
-          label: l10n.analyticsPermission,
-          value: '${totals.permissionRevoked}',
-          icon: Icons.warning_amber_rounded,
-          color: AppColors.sage,
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: _CompactStatTile(
+                label: l10n.analyticsTamper,
+                value: '${totals.tamperEvents}',
+                icon: Icons.shield_outlined,
+                color: AppColors.amber,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _CompactStatTile(
+                label: l10n.analyticsPermission,
+                value: '${totals.permissionRevoked}',
+                icon: Icons.warning_amber_rounded,
+                color: AppColors.sage,
+              ),
+            ),
+          ],
         ),
       ],
     );

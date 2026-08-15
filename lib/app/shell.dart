@@ -218,74 +218,65 @@ class _GlassBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
-      child: SizedBox(
-        height: 104,
-        child: Stack(
-          alignment: Alignment.bottomCenter,
-          clipBehavior: Clip.none,
-          children: [
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              height: 76,
-              child: TourTarget(
-                id: 'tour-nav',
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.glassFill,
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(AppRadius.banner),
-                    ),
-                    border: const Border(
-                      top: BorderSide(color: AppColors.glassBorder),
-                    ),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x0A000000),
-                        blurRadius: 40,
-                        offset: Offset(0, -10),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      for (var i = 0; i < destinations.length; i++)
-                        Expanded(
-                          child: _NavItem(
-                            destination: destinations[i],
-                            selected: i == selectedIndex,
-                            onTap: () => onSelect(i),
-                            // Keep the two items beside the center FAB clear of
-                            // the 60px raised button (16px symmetric inset).
-                            padding: i == 1
-                                ? const EdgeInsets.only(right: AppSpacing.lg)
-                                : i == 2
-                                ? const EdgeInsets.only(left: AppSpacing.lg)
-                                : EdgeInsets.zero,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Center(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+        child: SizedBox(
+          height: 80,
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            clipBehavior: Clip.none,
+            children: [
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: 64,
                 child: TourTarget(
-                  id: 'tour-fab',
-                  child: _CenterFab(
-                    onTap: onMiniGames,
-                    active: miniGamesActive,
-                    label: miniGamesLabel,
+                  id: 'tour-nav',
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(AppRadius.banner),
+                      border: Border.all(color: AppColors.border),
+                      boxShadow: AppColors.cardSoftShadow,
+                    ),
+                    child: Row(
+                      children: [
+                        for (var i = 0; i < destinations.length; i++)
+                          Expanded(
+                            child: _NavItem(
+                              destination: destinations[i],
+                              selected: i == selectedIndex,
+                              onTap: () => onSelect(i),
+                              padding: i == 1
+                                  ? const EdgeInsets.only(right: AppSpacing.lg)
+                                  : i == 2
+                                  ? const EdgeInsets.only(left: AppSpacing.lg)
+                                  : EdgeInsets.zero,
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: TourTarget(
+                    id: 'tour-fab',
+                    child: _CenterFab(
+                      onTap: onMiniGames,
+                      active: miniGamesActive,
+                      label: miniGamesLabel,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -309,6 +300,7 @@ class _NavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.banner),
       child: Padding(
         padding: padding,
         child: Column(
@@ -316,20 +308,20 @@ class _NavItem extends StatelessWidget {
           children: [
             Icon(
               selected ? destination.selectedIcon : destination.icon,
-              size: 22,
+              size: 21,
               color: selected ? AppColors.navy : AppColors.inkMuted,
             ),
-            const SizedBox(height: 3),
+            const SizedBox(height: 2),
             Text(
               destination.label,
               style: TextStyle(
-                fontSize: 10.5,
+                fontSize: 10,
                 height: 1.1,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                 color: selected ? AppColors.navy : AppColors.inkMuted,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 3),
             Container(
               width: 4,
               height: 4,

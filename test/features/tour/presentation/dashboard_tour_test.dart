@@ -96,6 +96,16 @@ Widget _harness({
   );
 }
 
+Rect _spotlightRect(WidgetTester tester) {
+  final paint = find.byWidgetPredicate(
+    (widget) =>
+        widget is CustomPaint &&
+        widget.painter?.runtimeType.toString() == '_SpotlightDimPainter',
+  );
+  final customPaint = tester.widget<CustomPaint>(paint);
+  return (customPaint.painter! as dynamic).spotlight as Rect;
+}
+
 void main() {
   testWidgets('does not start when the tour is not eligible', (tester) async {
     final store = _FakeTourSeenStore();
@@ -183,5 +193,39 @@ void main() {
     await tester.tap(doneButton);
     await tester.pump();
     expect(find.text('Dashboard kamu'), findsNothing);
+  });
+
+  testWidgets('spotlight moves to the next target when advancing', (
+    tester,
+  ) async {
+    final store = _FakeTourSeenStore();
+    await tester.pumpWidget(
+      _harness(
+        host: const DashboardTourHost(currentPath: '/dashboard'),
+        eligible: true,
+        store: store,
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+    await tester.pump();
+
+    // Step 0 spotlights `tour-welcome` (40,80,240x56) inflated by 14.
+    expect(
+      _spotlightRect(tester),
+      Rect.fromLTRB(26, 66, 294, 150),
+      reason: 'spotlight starts over the first target',
+    );
+
+    await tester.tap(find.text('Lanjut'));
+    await tester.pump();
+    await tester.pump();
+
+    // Step 1 spotlights `tour-hero` (40,160,240x120) inflated by 14.
+    expect(
+      _spotlightRect(tester),
+      Rect.fromLTRB(26, 146, 294, 294),
+      reason: 'spotlight follows the next target on Next',
+    );
   });
 }

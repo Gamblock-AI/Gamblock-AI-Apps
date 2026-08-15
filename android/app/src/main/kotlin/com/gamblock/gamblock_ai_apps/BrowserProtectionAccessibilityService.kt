@@ -31,9 +31,41 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             "com.microsoft.emmx:id/url_bar",
             "com.microsoft.emmx:id/location_bar_edit_text",
         )
+
+        fun isNavigationContentChange(changeTypes: Int): Boolean {
+            return (changeTypes and (
+                AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE or
+                    AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_APPEARED or
+                    AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED
+                )) != 0
+        }
+
+        fun looksLikeUrl(value: String): Boolean {
+            return value.startsWith("http://") ||
+                value.startsWith("https://") ||
+                (value.contains('.') && !value.contains(' '))
+        }
+
+        fun isBetterUrlCandidate(candidate: String, current: String): Boolean {
+            if (current.isEmpty()) return true
+            val candidateIsUrl = looksLikeUrl(candidate)
+            val currentIsUrl = looksLikeUrl(current)
+            if (candidateIsUrl != currentIsUrl) return candidateIsUrl
+            val candidateHasScheme =
+                candidate.startsWith("http://") || candidate.startsWith("https://")
+            val currentHasScheme =
+                current.startsWith("http://") || current.startsWith("https://")
+            if (candidateHasScheme != currentHasScheme) return candidateHasScheme
+            return candidate.length > current.length
+        }
     }
 
     protected open val additionalObservedPackages: Set<String> = emptySet()
+
+    protected open val additionalBrowserPackages: Set<String> = emptySet()
+
+    private val observedBrowsers: Set<String>
+        get() = SUPPORTED_BROWSERS + additionalBrowserPackages
 
     private val worker = Executors.newSingleThreadExecutor()
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -56,7 +88,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             notificationTimeout = 250
             flags = AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or
                 AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
-            packageNames = (SUPPORTED_BROWSERS + additionalObservedPackages).toTypedArray()
+            packageNames = (observedBrowsers + additionalObservedPackages).toTypedArray()
         }
         classifier = HybridClassifier(applicationContext)
         aggregateStore = DailyAggregateStore(applicationContext)
@@ -85,7 +117,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null) return
         val sourcePackage = event.packageName?.toString() ?: return
-        if (sourcePackage in SUPPORTED_BROWSERS) {
+        if (sourcePackage in observedBrowsers) {
             // AI activates only on committed navigation (Enter/submit/link
             // click/page change), never on keystrokes or plain text edits.
             if (!isNavigationLike(event)) return
@@ -101,12 +133,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             AccessibilityEvent.TYPE_VIEW_CLICKED -> true
 
             AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {
-                val changeTypes = event.contentChangeTypes
-                (changeTypes and (
-                    AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE or
-                        AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_APPEARED or
-                        AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED
-                    )) != 0
+                isNavigationContentChange(event.contentChangeTypes)
             }
 
             else -> false
@@ -141,7 +168,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                 val classificationFinishedNanos = SystemClock.elapsedRealtimeNanos()
                 val signature = listOf(input.url, input.title, input.headings, input.anchorTexts).hashCode()
                 val now = System.currentTimeMillis()
-                if (signature == lastSignature && now - lastDecisionAt < 2500) {
+                if (signature == lastSignature && now - lastDecisionAt < 800) {
                     return@execute
                 }
                 lastSignature = signature
@@ -152,29 +179,32 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                     aggregateStore.increment("block_count_sync")
                     aggregateStore.increment("intervention_shown")
                     mainHandler.post {
-                        performGlobalAction(GLOBAL_ACTION_BACK)
-                        overlay.showIntervention {
-                            phase4Evidence.recordLatency(
-                                Phase4LatencySample(
-                                    scanStartedNanos = scanStartedNanos,
-                                    inputReadyNanos = inputReadyNanos,
-                                    classificationStartedNanos = classificationStartedNanos,
-                                    classificationFinishedNanos = classificationFinishedNanos,
-                                    visibleNanos = SystemClock.elapsedRealtimeNanos(),
-                                    modelVersion = result.modelVersion,
-                                    rulesetVersion = result.rulesetVersion,
+                        try {
+                            performGlobalAction(GLOBAL_ACTION_BACK)
+                            overlay.showIntervention {
+                                phase4Evidence.recordLatency(
+                                    Phase4LatencySample(
+                                        scanStartedNanos = scanStartedNanos,
+                                        inputReadyNanos = inputReadyNanos,
+                                        classificationStartedNanos = classificationStartedNanos,
+                                        classificationFinishedNanos = classificationFinishedNanos,
+                                        visibleNanos = SystemClock.elapsedRealtimeNanos(),
+                                        modelVersion = result.modelVersion,
+                                        rulesetVersion = result.rulesetVersion,
+                                    ),
+                                )
+                            }
+                            NativeEventBus.emit(
+                                mapOf(
+                                    "type" to "intervention_shown",
+                                    "reason_code" to result.reasonCode,
+                                    "model_version" to result.modelVersion,
+                                    "ruleset_version" to result.rulesetVersion,
+                                    "native_overlay" to true,
                                 ),
                             )
+                        } catch (_: Exception) {
                         }
-                        NativeEventBus.emit(
-                            mapOf(
-                                "type" to "intervention_shown",
-                                "reason_code" to result.reasonCode,
-                                "model_version" to result.modelVersion,
-                                "ruleset_version" to result.rulesetVersion,
-                                "native_overlay" to true,
-                            ),
-                        )
                     }
                 } else {
                     NativeEventBus.emit(snapshotEvent())
@@ -211,7 +241,9 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             val text = (node.text?.toString() ?: node.contentDescription?.toString() ?: "")
                 .trim()
                 .take(256)
-            if (fallbackEditable.isEmpty() && node.isEditable && text.length <= 2048) {
+            if (node.isEditable && text.length <= 2048 &&
+                isBetterUrlCandidate(text, fallbackEditable)
+            ) {
                 fallbackEditable = text
             }
             if (text.isNotEmpty()) {
@@ -257,12 +289,6 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             "degraded_reason_code" to stateStore.degradedReason(),
             "last_event_at" to stateStore.lastEventAt(),
         )
-    }
-
-    private fun looksLikeUrl(value: String): Boolean {
-        return value.startsWith("http://") ||
-            value.startsWith("https://") ||
-            (value.contains('.') && !value.contains(' '))
     }
 
     override fun onInterrupt() {

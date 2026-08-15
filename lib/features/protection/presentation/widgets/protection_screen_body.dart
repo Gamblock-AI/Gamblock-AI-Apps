@@ -87,7 +87,7 @@ class ProtectionScreenBody extends StatelessWidget {
               horizontalPadding,
               20,
               horizontalPadding,
-              112,
+              148,
             ),
             children: [
               TourTarget(

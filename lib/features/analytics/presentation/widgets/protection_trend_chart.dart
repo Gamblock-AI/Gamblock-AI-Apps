@@ -103,15 +103,16 @@ class ProtectionTrendChart extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(6),
+                              width: 44,
+                              height: 44,
                               decoration: BoxDecoration(
-                                color: AppColors.navy.withValues(alpha: 0.06),
+                                color: AppColors.azure.withValues(alpha: 0.7),
                                 shape: BoxShape.circle,
                               ),
-                              child: Image.asset(
-                                'assets/images/gami-peek.webp',
-                                height: 48,
-                                excludeFromSemantics: true,
+                              child: const Icon(
+                                Icons.bar_chart_rounded,
+                                size: 24,
+                                color: AppColors.navy,
                               ),
                             ),
                             const SizedBox(height: 8),
