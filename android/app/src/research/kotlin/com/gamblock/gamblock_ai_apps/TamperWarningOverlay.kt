@@ -18,6 +18,9 @@ class TamperWarningOverlay(private val service: AccessibilityService) {
     private val windowManager = service.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private var root: View? = null
 
+    val isShowing: Boolean
+        get() = root != null
+
     fun show() {
         if (root != null) return
         val isEnglish = Locale.getDefault().language == "en"
