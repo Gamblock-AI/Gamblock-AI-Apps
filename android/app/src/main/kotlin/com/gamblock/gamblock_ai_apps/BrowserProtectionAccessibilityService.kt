@@ -2,6 +2,7 @@ package com.gamblock.gamblock_ai_apps
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
