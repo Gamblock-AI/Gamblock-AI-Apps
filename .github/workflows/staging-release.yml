@@ -1,0 +1,73 @@
+name: Research Staging Release
+
+# Publishes the Research staging debug APK (pointing at the staging backend)
+# as a GitHub Release for QA/test distribution. This is a diagnostic-quality
+# artifact, not a signed store/pilot candidate. Trigger manually.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. 0.0.1)'
+        required: false
+        default: '0.0.1'
+
+permissions:
+  contents: write
+
+env:
+  FLUTTER_VERSION: '3.41.9'
+
+jobs:
+  staging_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Require staging backend variables
+        env:
+          API_BASE_URL: ${{ vars.STAGING_API_BASE_URL }}
+          WEB_BASE_URL: ${{ vars.STAGING_WEB_BASE_URL }}
+        run: |
+          test -n "$API_BASE_URL"
+          test -n "$WEB_BASE_URL"
+          printf '%s\n' \
+            'APP_ENV=staging' \
+            "API_BASE_URL=$API_BASE_URL" \
+            "WEB_BASE_URL=$WEB_BASE_URL" > .env
+
+      - run: flutter pub get
+
+      - name: Build Research staging APK
+        run: |
+          flutter build apk --debug --flavor research \
+            --build-name "${{ github.event.inputs.version }}" \
+            --build-number "$GITHUB_RUN_NUMBER"
+
+      - name: Name and hash artifact
+        run: |
+          version="${{ github.event.inputs.version }}"
+          cp build/app/outputs/flutter-apk/app-research-debug.apk \
+            "gamblock-ai-research-staging-${version}+${GITHUB_RUN_NUMBER}.apk"
+          sha256sum gamblock-ai-research-staging-*.apk > android-SHA256SUMS.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Research Staging v${{ github.event.inputs.version }}"
+          tag_name: "research-staging-v${{ github.event.inputs.version }}"
+          body: |
+            Research flavor debug APK pointing at the staging backend
+            (`api-staging.gamblock-ai.com`). Test data lands in the
+            `gamblock_staging` database and never mixes with production.
+
+            - Signed: no (diagnostic debug key)
+            - Backend: staging
+            - Verified: CI build only; no real-device evidence claimed
+          files: |
+            gamblock-ai-research-staging-*.apk
+            android-SHA256SUMS.txt

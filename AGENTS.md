@@ -139,7 +139,12 @@ repository tests and `flutter_test` for widgets. Never call real backend or
 external services.
 
 CI builds the `play` and `research` Android flavors, the Windows debug bundle,
-and a diagnostic MSI without production keys. Signed release builds are
+and a diagnostic MSI without production keys. The CI diagnostic lane also
+produces a `research`-flavor staging APK pointed at `api-staging.gamblock-ai.com`
+(`STAGING_API_BASE_URL`/`STAGING_WEB_BASE_URL`), so test data stays in the
+`gamblock_staging` database; a manual Research Staging GitHub Release
+(`staging-release.yml`, `workflow_dispatch`) publishes that debug APK for QA.
+Signed release builds are
 restricted to immutable semantic-version tags and protected environments. See
 `docs/ai/distribution-matrix.md` for the exact artifact and key contract.
 
@@ -148,7 +153,10 @@ restricted to immutable semantic-version tags and protected environments. See
 - Do not edit `.env`, credentials, keystores, generated build output, or
   platform dependency caches.
 - CI debug artifacts are clearly labelled and short-retention; CI must not
-  create or mutate a public `latest` release. Tag-triggered candidates remain
+  create or mutate a public `latest` release. The Research Staging release is a
+  debug APK for QA/test only, is clearly labelled unsigned and staging-backed,
+  and must never be presented as signed, store-ready, or production-ready.
+  Tag-triggered candidates remain
   gated workflow artifacts: Play receives a signed AAB, the Research pilot a
   separately signed APK, and the Windows pilot a signed MSI only after the
   protected signing environments succeed. Never present a debug/unsigned

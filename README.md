@@ -16,7 +16,10 @@ remain required.
 The Android `play` and `research` flavors and the Windows pilot have separate
 capability and signing boundaries. Pull requests and `main` build diagnostic
 artifacts without production keys; those artifacts remain short-retention CI
-outputs and are not user-facing releases. Signed Play/Research/Windows
+outputs and are not user-facing releases. A Research staging APK is also built
+against `api-staging.gamblock-ai.com` so test data never mixes with the
+production backend, and can be published on demand as a "Research Staging"
+GitHub Release for QA. Signed Play/Research/Windows
 candidates are built only from immutable version tags in protected GitHub
 Environments. The complete matrix, key names, and artifact contract are in
 [`docs/ai/distribution-matrix.md`](docs/ai/distribution-matrix.md).

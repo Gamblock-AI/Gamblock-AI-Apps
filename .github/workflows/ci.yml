@@ -73,6 +73,22 @@ jobs:
             --build-name 0.0.0-ci --build-number "$GITHUB_RUN_NUMBER"
           cp build/app/outputs/flutter-apk/app-research-debug.apk \
             "ci-artifacts/android/gamblock-ai-research-debug-${GITHUB_SHA::7}.apk"
+      - name: Build Research staging APK
+        if: vars.STAGING_API_BASE_URL != '' && vars.STAGING_WEB_BASE_URL != ''
+        env:
+          API_BASE_URL: ${{ vars.STAGING_API_BASE_URL }}
+          WEB_BASE_URL: ${{ vars.STAGING_WEB_BASE_URL }}
+        run: |
+          test -n "$API_BASE_URL"
+          test -n "$WEB_BASE_URL"
+          printf '%s\n' \
+            'APP_ENV=staging' \
+            "API_BASE_URL=$API_BASE_URL" \
+            "WEB_BASE_URL=$WEB_BASE_URL" > .env
+          flutter build apk --debug --flavor research \
+            --build-name 0.0.0-staging --build-number "$GITHUB_RUN_NUMBER"
+          cp build/app/outputs/flutter-apk/app-research-debug.apk \
+            "ci-artifacts/android/gamblock-ai-research-staging-${GITHUB_SHA::7}.apk"
       - name: Record Android diagnostic metadata
         run: |
           sha256sum ci-artifacts/android/* > ci-artifacts/android/SHA256SUMS.txt
@@ -83,7 +99,7 @@ jobs:
             "commit": "${GITHUB_SHA}",
             "run_id": "${GITHUB_RUN_ID}",
             "flutter_version": "${FLUTTER_VERSION}",
-            "variants": ["play-debug-ci", "research-debug-ci"]
+            "variants": ["play-debug-ci", "research-debug-ci", "research-staging-ci"]
           }
           EOF
       - uses: actions/upload-artifact@v4
