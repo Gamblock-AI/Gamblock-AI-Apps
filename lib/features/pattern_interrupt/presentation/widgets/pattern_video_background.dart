@@ -68,7 +68,7 @@ class _PatternVideoBackgroundState extends State<PatternVideoBackground>
         : 'assets/videos/intervention-android.mp4';
 
     if (_loadedAsset == targetAsset && _controller != null) {
-      if (!_controller!.value.isPlaying) {
+      if (_isInitialized && !_controller!.value.isPlaying) {
         _controller!.play();
       }
       return;
@@ -98,7 +98,6 @@ class _PatternVideoBackgroundState extends State<PatternVideoBackground>
           });
         })
         .catchError((_) {
-          // Gracefully fallback to dark calm gradient on error/test environment
           if (!mounted) return;
           setState(() {
             _isInitialized = false;
@@ -126,29 +125,37 @@ class _PatternVideoBackgroundState extends State<PatternVideoBackground>
           decoration: const BoxDecoration(gradient: AppColors.calmDarkGradient),
         ),
 
-        // Video Layer
-        if (showVideo)
-          SizedBox.expand(
-            child: FittedBox(
-              fit: BoxFit.cover,
-              child: SizedBox(
-                width: _controller!.value.size.width,
-                height: _controller!.value.size.height,
-                child: VideoPlayer(_controller!),
+        // Video Layer with gentle fade-in
+        if (_controller != null && _isInitialized)
+          AnimatedOpacity(
+            opacity: showVideo ? 1.0 : 0.0,
+            duration: disableAnimations
+                ? Duration.zero
+                : const Duration(milliseconds: 500),
+            child: SizedBox.expand(
+              child: FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: _controller!.value.size.width,
+                  height: _controller!.value.size.height,
+                  child: VideoPlayer(_controller!),
+                ),
               ),
             ),
           ),
 
-        // Scrim overlay for crisp foreground text legibility and calm atmosphere
+        // Ambient vignette scrim overlay: protects text legibility without obscuring video
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                const Color(0xFF0F172A).withValues(alpha: showVideo ? 0.72 : 0.4),
-                const Color(0xFF09090B).withValues(alpha: showVideo ? 0.85 : 0.6),
+                Colors.black.withValues(alpha: showVideo ? 0.30 : 0.45),
+                Colors.black.withValues(alpha: showVideo ? 0.15 : 0.40),
+                const Color(0xFF09090B).withValues(alpha: showVideo ? 0.55 : 0.65),
               ],
+              stops: const [0.0, 0.45, 1.0],
             ),
           ),
         ),

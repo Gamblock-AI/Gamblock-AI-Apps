@@ -24,12 +24,44 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
 
         private val SUPPORTED_BROWSERS = setOf(
             "com.android.chrome",
+            "com.chrome.beta",
+            "com.chrome.dev",
+            "com.chrome.canary",
+            "com.google.android.apps.chrome",
             "com.microsoft.emmx",
+            "com.sec.android.app.sbrowser",
+            "com.sec.android.app.sbrowser.beta",
+            "com.brave.browser",
+            "com.opera.browser",
+            "com.opera.mini.native",
+            "com.opera.touch",
+            "org.mozilla.firefox",
+            "org.mozilla.firefox_beta",
+            "org.mozilla.focus",
+            "com.mi.globalbrowser",
+            "com.vivo.browser",
+            "com.heytap.browser",
+            "com.coloros.browser",
+            "com.oppo.browser",
+            "com.duckduckgo.mobile.android",
+            "com.uc.browser.en",
+            "com.UCMobile.intl",
         )
         private val URL_RESOURCE_IDS = listOf(
             "com.android.chrome:id/url_bar",
+            "com.android.chrome:id/search_box_text",
+            "com.android.chrome:id/location_bar_edit_text",
+            "com.android.chrome:id/line_1",
+            "com.android.chrome:id/omnibox_title_view",
             "com.microsoft.emmx:id/url_bar",
             "com.microsoft.emmx:id/location_bar_edit_text",
+            "com.microsoft.emmx:id/search_box_text",
+            "com.sec.android.app.sbrowser:id/location_bar_edit_text",
+            "com.sec.android.app.sbrowser:id/url_bar",
+            "org.mozilla.firefox:id/toolbar_url",
+            "org.mozilla.firefox:id/mozac_browser_toolbar_url_view",
+            "com.brave.browser:id/url_bar",
+            "com.opera.browser:id/url_field",
         )
 
         fun isNavigationContentChange(changeTypes: Int): Boolean {
@@ -41,9 +73,10 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         }
 
         fun looksLikeUrl(value: String): Boolean {
-            return value.startsWith("http://") ||
-                value.startsWith("https://") ||
-                (value.contains('.') && !value.contains(' '))
+            val trimmed = value.trim()
+            return trimmed.startsWith("http://") ||
+                trimmed.startsWith("https://") ||
+                (trimmed.contains('.') && !trimmed.contains(' ') && trimmed.length >= 4)
         }
 
         fun isBetterUrlCandidate(candidate: String, current: String): Boolean {
@@ -85,7 +118,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                 AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED or
                 AccessibilityEvent.TYPE_VIEW_CLICKED
             feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC
-            notificationTimeout = 250
+            notificationTimeout = 150
             flags = AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or
                 AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
             packageNames = (observedBrowsers + additionalObservedPackages).toTypedArray()
@@ -98,9 +131,6 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         HealthNotificationPreferences.show(this)
         NativeEventBus.emit(snapshotEvent())
         onProtectionServiceConnected()
-        // Model parsing + SHA-256 integrity verification are heavy; keep them
-        // off the accessibility main thread. The single worker guarantees the
-        // load finishes before the first classification.
         worker.execute {
             val loaded = classifier.load()
             mainHandler.post {
@@ -118,8 +148,6 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         if (event == null) return
         val sourcePackage = event.packageName?.toString() ?: return
         if (sourcePackage in observedBrowsers) {
-            // AI activates only on committed navigation (Enter/submit/link
-            // click/page change), never on keystrokes or plain text edits.
             if (!isNavigationLike(event)) return
             scheduleBrowserScan(event)
             return
@@ -154,21 +182,16 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         }
         pendingScan?.let(mainHandler::removeCallbacks)
         val runnable = Runnable {
-            val scanStartedNanos = SystemClock.elapsedRealtimeNanos()
-            val input = extractSignals(event, rootInActiveWindow)
-            if (input == null) {
-                stateStore.setStatus("degraded", "signal_unavailable")
-                NativeEventBus.emit(snapshotEvent())
-                return@Runnable
-            }
-            val inputReadyNanos = SystemClock.elapsedRealtimeNanos()
+            val root = rootInActiveWindow ?: event.source
+            val input = extractSignals(event, root)
+            // Transient intermediate frames during navigation are normal; ignore without degrading
+            if (input == null) return@Runnable
+
             worker.execute {
-                val classificationStartedNanos = SystemClock.elapsedRealtimeNanos()
                 val result = classifier.classify(input)
-                val classificationFinishedNanos = SystemClock.elapsedRealtimeNanos()
                 val signature = listOf(input.url, input.title, input.headings, input.anchorTexts).hashCode()
                 val now = System.currentTimeMillis()
-                if (signature == lastSignature && now - lastDecisionAt < 800) {
+                if (signature == lastSignature && now - lastDecisionAt < 500 && result.decision != "block") {
                     return@execute
                 }
                 lastSignature = signature
@@ -181,29 +204,22 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                     mainHandler.post {
                         try {
                             performGlobalAction(GLOBAL_ACTION_BACK)
-                            overlay.showIntervention {
-                                phase4Evidence.recordLatency(
-                                    Phase4LatencySample(
-                                        scanStartedNanos = scanStartedNanos,
-                                        inputReadyNanos = inputReadyNanos,
-                                        classificationStartedNanos = classificationStartedNanos,
-                                        classificationFinishedNanos = classificationFinishedNanos,
-                                        visibleNanos = SystemClock.elapsedRealtimeNanos(),
-                                        modelVersion = result.modelVersion,
-                                        rulesetVersion = result.rulesetVersion,
-                                    ),
-                                )
-                            }
+                            startActivity(
+                                Intent(this@BrowserProtectionAccessibilityService, MainActivity::class.java).apply {
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                                    putExtra("open_intervention", true)
+                                },
+                            )
                             NativeEventBus.emit(
                                 mapOf(
                                     "type" to "intervention_shown",
                                     "reason_code" to result.reasonCode,
                                     "model_version" to result.modelVersion,
                                     "ruleset_version" to result.rulesetVersion,
-                                    "native_overlay" to true,
                                 ),
                             )
                         } catch (_: Exception) {
+                            overlay.showIntervention()
                         }
                     }
                 } else {
@@ -212,7 +228,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             }
         }
         pendingScan = runnable
-        mainHandler.postDelayed(runnable, 500)
+        mainHandler.postDelayed(runnable, 300)
     }
 
     private fun extractSignals(
@@ -231,48 +247,67 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         }
         val headings = mutableListOf<String>()
         val anchors = mutableListOf<String>()
-        var fallbackEditable = ""
+        val bodyTexts = mutableListOf<String>()
+        var fallbackUrlCandidate = ""
         val queue = ArrayDeque<AccessibilityNodeInfo>()
         queue.add(root)
         var visited = 0
         while (queue.isNotEmpty() && visited < 500) {
             val node = queue.removeFirst()
             visited++
-            val text = (node.text?.toString() ?: node.contentDescription?.toString() ?: "")
-                .trim()
-                .take(256)
-            if (node.isEditable && text.length <= 2048 &&
-                isBetterUrlCandidate(text, fallbackEditable)
-            ) {
-                fallbackEditable = text
-            }
-            if (text.isNotEmpty()) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && node.isHeading && headings.size < 32) {
-                    headings.add(text)
+            val rawText = (node.text?.toString() ?: node.contentDescription?.toString() ?: "").trim()
+            val text = rawText.take(256)
+
+            val viewId = node.viewIdResourceName?.lowercase().orEmpty()
+            if (viewId.contains("url") || viewId.contains("location") || viewId.contains("search_box") || viewId.contains("address")) {
+                if (rawText.isNotEmpty() && isBetterUrlCandidate(rawText, fallbackUrlCandidate)) {
+                    fallbackUrlCandidate = rawText
                 }
-                if ((node.isClickable || node.isFocusable) && anchors.size < 64) {
+            } else if (rawText.isNotEmpty() && looksLikeUrl(rawText) && isBetterUrlCandidate(rawText, fallbackUrlCandidate)) {
+                fallbackUrlCandidate = rawText
+            }
+
+            if (text.isNotEmpty()) {
+                val isHeadingNode = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && node.isHeading) ||
+                    (text.length in 4..80 && (node.className == "android.widget.TextView" || node.className == "android.view.View"))
+                if (isHeadingNode && headings.size < 32) {
+                    headings.add(text)
+                } else if ((node.isClickable || node.isFocusable) && anchors.size < 64) {
                     anchors.add(text)
+                } else if (bodyTexts.size < 64) {
+                    bodyTexts.add(text)
                 }
             }
             for (index in 0 until node.childCount) {
                 node.getChild(index)?.let(queue::add)
             }
         }
-        if (url.isEmpty() && looksLikeUrl(fallbackEditable)) url = fallbackEditable
+
+        val resolvedUrl = when {
+            url.isNotEmpty() -> url
+            looksLikeUrl(fallbackUrlCandidate) -> fallbackUrlCandidate
+            fallbackUrlCandidate.isNotEmpty() -> fallbackUrlCandidate
+            else -> ""
+        }
+
         val title = (
             event.contentDescription?.toString()
                 ?: event.text.firstOrNull()?.toString()
                 ?: (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) root.paneTitle?.toString() else null)
+                ?: headings.firstOrNull()
                 ?: ""
-            ).take(512)
-        if (url.isEmpty() && title.isEmpty() && headings.isEmpty() && anchors.isEmpty()) {
+        ).take(512)
+
+        // Combine collected body text into anchors list to feed the classifier unigrams/bigrams
+        val allSignals = anchors + bodyTexts
+        if (resolvedUrl.isEmpty() && title.isEmpty() && headings.isEmpty() && allSignals.isEmpty()) {
             return null
         }
         return ClassificationInput(
-            url = url,
+            url = resolvedUrl,
             title = title,
             headings = headings,
-            anchorTexts = anchors,
+            anchorTexts = allSignals.take(64),
         )
     }
 
@@ -291,10 +326,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         )
     }
 
-    override fun onInterrupt() {
-        stateStore.setStatus("degraded", "accessibility_interrupted")
-        NativeEventBus.emit(snapshotEvent())
-    }
+    override fun onInterrupt() = Unit
 
     override fun onDestroy() {
         onProtectionServiceDestroyed()

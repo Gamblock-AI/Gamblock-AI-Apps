@@ -83,6 +83,7 @@ class ProtectionScreenBody extends StatelessWidget {
           onRefresh: onRefresh,
           child: ListView(
             key: const ValueKey('protection-dashboard-scroll'),
+            cacheExtent: 3000,
             padding: EdgeInsets.fromLTRB(
               horizontalPadding,
               20,

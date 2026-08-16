@@ -120,6 +120,10 @@ class MainActivity : FlutterActivity() {
         if (intent.getBooleanExtra("open_approval", false)) {
             NativeEventBus.emit(mapOf("type" to "approval_required"))
         }
+        if (intent.getBooleanExtra("open_intervention", false)) {
+            NativeEventBus.emit(mapOf("type" to "intervention_shown"))
+            intent.removeExtra("open_intervention")
+        }
     }
 
     override fun onResume() {
@@ -127,6 +131,10 @@ class MainActivity : FlutterActivity() {
         if (intent.getBooleanExtra("open_approval", false)) {
             NativeEventBus.emit(mapOf("type" to "approval_required"))
             intent.removeExtra("open_approval")
+        }
+        if (intent.getBooleanExtra("open_intervention", false)) {
+            NativeEventBus.emit(mapOf("type" to "intervention_shown"))
+            intent.removeExtra("open_intervention")
         }
     }
 
@@ -138,20 +146,23 @@ class MainActivity : FlutterActivity() {
 
     private fun snapshot(): Map<String, Any?> {
         val enabled = isAccessibilityEnabled()
+        val storedStatus = stateStore.status()
         val status = when {
             !enabled -> "inactive"
             stateStore.activeGrantAllowsProtectionPause() -> "paused"
-            else -> stateStore.status()
+            storedStatus == "degraded" && stateStore.degradedReason() == "artifact_invalid" -> "degraded"
+            else -> "active"
         }
+        val isHealthy = enabled && status != "degraded"
         return mapOf(
             "platform" to "android",
             "status" to status,
             "service_running" to enabled,
-            "sensor_status" to if (enabled) "connected" else "disconnected",
+            "sensor_status" to if (isHealthy) "connected" else if (enabled) "degraded" else "disconnected",
             "permission_status" to if (enabled) "granted" else "revoked",
             "model_version" to classifier.modelVersion,
             "ruleset_version" to classifier.rulesetVersion,
-            "degraded_reason_code" to if (enabled) stateStore.degradedReason() else "accessibility_disabled",
+            "degraded_reason_code" to if (enabled) (if (status == "degraded") stateStore.degradedReason() else null) else "accessibility_disabled",
             "last_event_at" to stateStore.lastEventAt(),
         )
     }
@@ -162,7 +173,8 @@ class MainActivity : FlutterActivity() {
             AccessibilityServiceInfo.FEEDBACK_ALL_MASK,
         ).any {
             it.resolveInfo.serviceInfo.packageName == packageName &&
-                it.resolveInfo.serviceInfo.name.contains("GamblockAccessibilityService")
+                (it.resolveInfo.serviceInfo.name.contains("AccessibilityService") ||
+                 it.resolveInfo.serviceInfo.name.contains("Gamblock"))
         }
     }
 

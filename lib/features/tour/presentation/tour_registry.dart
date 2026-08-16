@@ -15,6 +15,12 @@ class TourRegistry {
     if (_keys[id] == key) _keys.remove(id);
   }
 
+  /// BuildContext of the target widget, or null when it is not mounted yet.
+  BuildContext? contextOf(String id) => _keys[id]?.currentContext;
+
+  /// GlobalKey of the target widget, or null when it is not registered.
+  GlobalKey? keyOf(String id) => _keys[id];
+
   /// Global rect of the target widget, or null when it is not mounted yet.
   Rect? rectOf(String id) {
     final context = _keys[id]?.currentContext;

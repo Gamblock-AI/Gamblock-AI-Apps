@@ -94,9 +94,10 @@ class PatternInterruptOverlay(
                 container.addView(
                     view,
                     LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        if (view == breathing) dp(180) else LinearLayout.LayoutParams.WRAP_CONTENT,
+                        if (view == breathing) dp(160) else LinearLayout.LayoutParams.MATCH_PARENT,
+                        if (view == breathing) dp(160) else LinearLayout.LayoutParams.WRAP_CONTENT,
                     ).apply {
+                        gravity = Gravity.CENTER_HORIZONTAL
                         topMargin = if (view == breathing) 0 else dp(12)
                     },
                 )

@@ -30,73 +30,84 @@ class PatternBreathingOrb extends StatelessWidget {
           animation: animation,
           builder: (context, child) {
             final t = disableAnimations ? 0.5 : animation.value;
-            final scale = disableAnimations ? 1.0 : 0.88 + (t * 0.12);
-            return CustomPaint(
-              foregroundPainter: _ProgressRingPainter(progress),
+            final scale = disableAnimations ? 1.0 : 0.90 + (t * 0.10);
+            return Center(
               child: SizedBox(
-                width: 210,
-                height: 210,
-                child: Center(
-                  child: Transform.scale(
-                    scale: scale,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Outer ambient glowing halo
-                        Container(
-                          width: 180,
-                          height: 180,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.sky.withValues(
-                              alpha: 0.08 + (t * 0.08),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
+                width: 180,
+                height: 180,
+                child: AspectRatio(
+                  aspectRatio: 1.0,
+                  child: CustomPaint(
+                    foregroundPainter: _ProgressRingPainter(progress),
+                    child: Center(
+                      child: Transform.scale(
+                        scale: scale,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Outer ambient glowing halo
+                            Container(
+                              width: 150,
+                              height: 150,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
                                 color: AppColors.sky.withValues(
-                                  alpha: 0.25 * t + 0.1,
+                                  alpha: 0.10 + (t * 0.10),
                                 ),
-                                blurRadius: 40 + (25 * t),
-                                spreadRadius: 8 + (12 * t),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.sky.withValues(
+                                      alpha: 0.28 * t + 0.12,
+                                    ),
+                                    blurRadius: 36 + (20 * t),
+                                    spreadRadius: 6 + (10 * t),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                        // Inner frosted glass core
-                        Container(
-                          width: 140,
-                          height: 140,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: RadialGradient(
-                              colors: [
-                                Colors.white.withValues(alpha: 0.25),
-                                AppColors.skyDark.withValues(alpha: 0.40),
-                                const Color(0xFF0F172A).withValues(alpha: 0.70),
-                              ],
-                              stops: const [0.0, 0.65, 1.0],
                             ),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.45 + (t * 0.2)),
-                              width: 1.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.white.withValues(alpha: 0.15),
-                                blurRadius: 16,
-                                spreadRadius: -2,
+                            // Inner frosted glass core
+                            Container(
+                              width: 110,
+                              height: 110,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: RadialGradient(
+                                  colors: [
+                                    Colors.white.withValues(alpha: 0.28),
+                                    AppColors.skyDark.withValues(alpha: 0.35),
+                                    const Color(0xFF0F172A).withValues(alpha: 0.65),
+                                  ],
+                                  stops: const [0.0, 0.65, 1.0],
+                                ),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.45 + (t * 0.25)),
+                                  width: 1.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.white.withValues(alpha: 0.15),
+                                    blurRadius: 14,
+                                    spreadRadius: -2,
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Icon(
-                              Icons.self_improvement_rounded,
-                              size: 58,
-                              color: Colors.white.withValues(alpha: 0.95),
+                              child: Center(
+                                child: Image.asset(
+                                  'assets/images/gami-meditate.webp',
+                                  width: 68,
+                                  height: 68,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) => Icon(
+                                    Icons.self_improvement_rounded,
+                                    size: 52,
+                                    color: Colors.white.withValues(alpha: 0.95),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),

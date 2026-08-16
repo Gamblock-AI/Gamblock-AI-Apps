@@ -89,39 +89,87 @@ class DashboardTourOverlay extends ConsumerStatefulWidget {
 
 class _DashboardTourOverlayState extends ConsumerState<DashboardTourOverlay> {
   Rect? _rect;
+  Rect? _previousRect;
   bool _skipAttempted = false;
 
   @override
   void initState() {
     super.initState();
-    _measure();
+    _revealAndMeasure();
   }
 
   @override
   void didUpdateWidget(covariant DashboardTourOverlay oldWidget) {
     super.didUpdateWidget(oldWidget);
     _skipAttempted = false;
-    _measure();
+    _revealAndMeasure();
   }
 
-  void _measure() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+  void _revealAndMeasure() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       final tour = ref.read(dashboardTourProvider);
       if (!tour.open) return;
       final step = kDashboardTourSteps[tour.index];
-      final rect = ref.read(tourRegistryProvider).rectOf(step.targetKey);
+      final registry = ref.read(tourRegistryProvider);
+      final isTopTarget =
+          step.targetKey == 'tour-welcome' || step.targetKey == 'tour-profile';
+
+      // Auto-scroll the target into comfortable view if inside a scrollable
+      final targetContext = registry.contextOf(step.targetKey) ??
+          (isTopTarget
+              ? (registry.contextOf('tour-welcome') ??
+                  registry.contextOf('tour-hero'))
+              : null);
+
+      if (targetContext != null && targetContext.mounted) {
+        final scrollable = Scrollable.maybeOf(targetContext);
+        if (scrollable != null) {
+          final disableAnimations =
+              MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+          await Scrollable.ensureVisible(
+            targetContext,
+            duration: disableAnimations
+                ? Duration.zero
+                : const Duration(milliseconds: 320),
+            curve: Curves.easeInOutCubic,
+            alignment: isTopTarget ? 0.0 : 0.35,
+          );
+        }
+      }
+
+      if (!mounted) return;
+      // Allow layout and transform matrices to settle after scroll
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      if (!mounted) return;
+
+      final rect = registry.rectOf(step.targetKey);
       if (rect == null) {
         final canSkip = tour.index < kDashboardTourSteps.length - 1;
         if (canSkip && !_skipAttempted) {
           _skipAttempted = true;
           ref.read(dashboardTourProvider.notifier).next();
-        } else {
-          setState(() => _rect = null);
+          return;
         }
+        // Fallback for last step so user is never trapped in a blank backdrop
+        final screen = MediaQuery.sizeOf(context);
+        final fallbackRect = isTopTarget
+            ? Rect.fromLTWH(screen.width * 0.06, 32.0, 56.0, 56.0)
+            : Rect.fromCenter(
+                center: Offset(screen.width / 2, screen.height * 0.4),
+                width: 160,
+                height: 60,
+              );
+        setState(() {
+          _previousRect = _rect;
+          _rect = fallbackRect;
+        });
         return;
       }
-      setState(() => _rect = rect);
+      setState(() {
+        _previousRect = _rect;
+        _rect = rect;
+      });
     });
   }
 
@@ -131,27 +179,47 @@ class _DashboardTourOverlayState extends ConsumerState<DashboardTourOverlay> {
     ref.listen(dashboardTourProvider, (previous, next) {
       if (previous?.index != next.index) {
         _skipAttempted = false;
-        _measure();
+        _revealAndMeasure();
       }
     });
     final step = kDashboardTourSteps[tour.index];
     final l10n = AppLocalizations.of(context)!;
     final screen = MediaQuery.sizeOf(context);
+    final disableAnimations =
+        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     final rect = _rect;
-    final spotlightRect = rect != null
-        ? rect.inflate(_spotlightRadius)
-        : const Rect.fromLTWH(0, 0, 1, 1);
 
     return Semantics(
       label: l10n.tourLabel,
       child: Stack(
         children: [
-          // Interaction blocker: absorbs taps and dims the background.
+          // Interaction blocker: absorbs taps and dims the background with animated spotlight.
           Positioned.fill(
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {},
-              child: CustomPaint(painter: _SpotlightDimPainter(spotlightRect)),
+              child: rect != null
+                  ? TweenAnimationBuilder<Rect?>(
+                      tween: RectTween(
+                        begin: _previousRect ?? rect,
+                        end: rect,
+                      ),
+                      duration: disableAnimations
+                          ? Duration.zero
+                          : const Duration(milliseconds: 260),
+                      curve: Curves.easeInOutCubic,
+                      builder: (context, animatedRect, child) {
+                        final target = animatedRect ?? rect;
+                        return CustomPaint(
+                          painter: _SpotlightDimPainter(
+                            target.inflate(_spotlightRadius),
+                          ),
+                        );
+                      },
+                    )
+                  : const CustomPaint(
+                      painter: _SpotlightDimPainter(Rect.zero),
+                    ),
             ),
           ),
           if (rect != null)
@@ -203,17 +271,30 @@ class _TourBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final bubbleWidth = (screenSize.width - _margin * 2).clamp(0.0, 360.0);
-    final bubbleHeight = 190.0;
-    final below = targetRect.bottom + _spotlightGap;
-    final top = below + bubbleHeight > screenSize.height - _margin
-        ? (targetRect.top - _spotlightGap - bubbleHeight).clamp(
+    final screenWidth = screenSize.width;
+    final screenHeight = screenSize.height;
+    final bubbleWidth = (screenWidth - _margin * 2).clamp(0.0, 360.0);
+    const estimatedBubbleHeight = 180.0;
+
+    final spaceBelow =
+        screenHeight - targetRect.bottom - _spotlightGap - _margin;
+    final spaceAbove = targetRect.top - _spotlightGap - _margin;
+
+    final placeBelow =
+        spaceBelow >= estimatedBubbleHeight || spaceBelow >= spaceAbove;
+
+    final maxTop = (screenHeight - estimatedBubbleHeight - _margin).clamp(
+      _margin,
+      screenHeight,
+    );
+    final top = placeBelow
+        ? (targetRect.bottom + _spotlightGap).clamp(_margin, maxTop)
+        : (targetRect.top - _spotlightGap - estimatedBubbleHeight).clamp(
             _margin,
-            screenSize.height - bubbleHeight - _margin,
-          )
-        : below;
+            maxTop,
+          );
     final left = (targetRect.center.dx - bubbleWidth / 2)
-        .clamp(_margin, screenSize.width - bubbleWidth - _margin)
+        .clamp(_margin, screenWidth - bubbleWidth - _margin)
         .toDouble();
 
     return Positioned(
@@ -223,90 +304,81 @@ class _TourBubble extends StatelessWidget {
       child: Material(
         type: MaterialType.transparency,
         child: Container(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(16),
+          constraints: BoxConstraints(
+            maxHeight: (screenHeight * 0.45).clamp(160.0, 320.0),
+          ),
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppRadius.lg),
             border: Border.all(color: AppColors.border),
             boxShadow: AppColors.cardSoftShadow,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.navy,
-                        height: 1.25,
-                        decoration: TextDecoration.none,
+          child: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.navy,
+                          height: 1.25,
+                          decoration: TextDecoration.none,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  InkWell(
-                    onTap: onSkip,
-                    borderRadius: BorderRadius.circular(8),
-                    child: const Padding(
-                      padding: EdgeInsets.all(4),
-                      child: Icon(
-                        Icons.close_rounded,
-                        size: 18,
-                        color: AppColors.mutedForeground,
+                    const SizedBox(width: 8),
+                    InkWell(
+                      onTap: onSkip,
+                      borderRadius: BorderRadius.circular(8),
+                      child: const Padding(
+                        padding: EdgeInsets.all(4),
+                        child: Icon(
+                          Icons.close_rounded,
+                          size: 18,
+                          color: AppColors.mutedForeground,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                body,
-                style: const TextStyle(
-                  fontSize: 13,
-                  height: 1.5,
-                  color: AppColors.mutedForeground,
-                  decoration: TextDecoration.none,
+                  ],
                 ),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Text(
-                    l10n.tourStepOf(index + 1, total),
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.mutedForeground,
-                      decoration: TextDecoration.none,
-                    ),
+                const SizedBox(height: 8),
+                Text(
+                  body,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    height: 1.45,
+                    color: AppColors.mutedForeground,
+                    decoration: TextDecoration.none,
                   ),
-                  TextButton(
-                    onPressed: onSkip,
-                    style: TextButton.styleFrom(
-                      foregroundColor: AppColors.mutedForeground,
-                      minimumSize: const Size(0, 36),
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      textStyle: const TextStyle(
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      l10n.tourStepOf(index + 1, total),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.mutedForeground,
                         decoration: TextDecoration.none,
                       ),
                     ),
-                    child: Text(l10n.tourSkip),
-                  ),
-                  if (index > 0)
                     TextButton(
-                      onPressed: onBack,
+                      onPressed: onSkip,
                       style: TextButton.styleFrom(
-                        foregroundColor: AppColors.navy,
+                        foregroundColor: AppColors.mutedForeground,
                         minimumSize: const Size(0, 36),
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -314,27 +386,42 @@ class _TourBubble extends StatelessWidget {
                           decoration: TextDecoration.none,
                         ),
                       ),
-                      child: Text(l10n.tourBack),
+                      child: Text(l10n.tourSkip),
                     ),
-                  FilledButton(
-                    onPressed: onNext,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.navy,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(0, 36),
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      textStyle: const TextStyle(
-                        decoration: TextDecoration.none,
+                    if (index > 0)
+                      TextButton(
+                        onPressed: onBack,
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.navy,
+                          minimumSize: const Size(0, 36),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          textStyle: const TextStyle(
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                        child: Text(l10n.tourBack),
+                      ),
+                    FilledButton(
+                      onPressed: onNext,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.navy,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(0, 36),
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        textStyle: const TextStyle(
+                          decoration: TextDecoration.none,
+                        ),
+                      ),
+                      child: Text(
+                        index >= total - 1 ? l10n.tourDone : l10n.tourNext,
                       ),
                     ),
-                    child: Text(
-                      index >= total - 1 ? l10n.tourDone : l10n.tourNext,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
