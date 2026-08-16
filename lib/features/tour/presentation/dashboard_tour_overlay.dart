@@ -89,7 +89,6 @@ class DashboardTourOverlay extends ConsumerStatefulWidget {
 
 class _DashboardTourOverlayState extends ConsumerState<DashboardTourOverlay> {
   Rect? _rect;
-  Rect? _previousRect;
   bool _skipAttempted = false;
 
   @override
@@ -139,9 +138,6 @@ class _DashboardTourOverlayState extends ConsumerState<DashboardTourOverlay> {
       }
 
       if (!mounted) return;
-      // Allow layout and transform matrices to settle after scroll
-      await Future<void>.delayed(const Duration(milliseconds: 40));
-      if (!mounted) return;
 
       final rect = registry.rectOf(step.targetKey);
       if (rect == null) {
@@ -161,13 +157,11 @@ class _DashboardTourOverlayState extends ConsumerState<DashboardTourOverlay> {
                 height: 60,
               );
         setState(() {
-          _previousRect = _rect;
           _rect = fallbackRect;
         });
         return;
       }
       setState(() {
-        _previousRect = _rect;
         _rect = rect;
       });
     });
@@ -185,41 +179,24 @@ class _DashboardTourOverlayState extends ConsumerState<DashboardTourOverlay> {
     final step = kDashboardTourSteps[tour.index];
     final l10n = AppLocalizations.of(context)!;
     final screen = MediaQuery.sizeOf(context);
-    final disableAnimations =
-        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     final rect = _rect;
 
     return Semantics(
       label: l10n.tourLabel,
       child: Stack(
         children: [
-          // Interaction blocker: absorbs taps and dims the background with animated spotlight.
+          // Interaction blocker: absorbs taps and dims the background with spotlight.
           Positioned.fill(
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {},
-              child: rect != null
-                  ? TweenAnimationBuilder<Rect?>(
-                      tween: RectTween(
-                        begin: _previousRect ?? rect,
-                        end: rect,
-                      ),
-                      duration: disableAnimations
-                          ? Duration.zero
-                          : const Duration(milliseconds: 260),
-                      curve: Curves.easeInOutCubic,
-                      builder: (context, animatedRect, child) {
-                        final target = animatedRect ?? rect;
-                        return CustomPaint(
-                          painter: _SpotlightDimPainter(
-                            target.inflate(_spotlightRadius),
-                          ),
-                        );
-                      },
-                    )
-                  : const CustomPaint(
-                      painter: _SpotlightDimPainter(Rect.zero),
-                    ),
+              child: CustomPaint(
+                painter: _SpotlightDimPainter(
+                  rect != null
+                      ? rect.inflate(_spotlightRadius)
+                      : const Rect.fromLTWH(0, 0, 1, 1),
+                ),
+              ),
             ),
           ),
           if (rect != null)
