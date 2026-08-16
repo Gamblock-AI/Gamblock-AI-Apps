@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version without the v prefix (e.g. 1.2.0)'
+        required: true
+        type: string
 
 concurrency:
   group: flutter-release-${{ github.ref }}
@@ -18,11 +24,25 @@ env:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
-      - name: Require an immutable semantic-version tag
+      - name: Resolve release version
+        id: version
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.version }}
         run: |
-          [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          set -euo pipefail
+          if [[ -n "$GITHUB_REF_NAME" && "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          elif [[ -n "$INPUT_VERSION" && "$INPUT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            VERSION="$INPUT_VERSION"
+          else
+            echo "No immutable semantic version: set the vX.Y.Z tag or pass the version input." >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
@@ -109,7 +129,7 @@ jobs:
           PROTECTION_GRANT_TRUST_STORE_BASE64: ${{ vars.PROTECTION_GRANT_TRUST_STORE_BASE64 }}
         run: |
           set -euo pipefail
-          version_name="${GITHUB_REF_NAME#v}"
+          version_name="${{ needs.verify.outputs.version }}"
           flutter build appbundle --release --flavor play \
             --build-name "$version_name" --build-number "$GITHUB_RUN_NUMBER"
           flutter build apk --release --flavor research \
@@ -117,7 +137,7 @@ jobs:
       - name: Verify and name Android artifacts
         run: |
           set -euo pipefail
-          version_name="${GITHUB_REF_NAME#v}"
+          version_name="${{ needs.verify.outputs.version }}"
           play_aab="build/app/outputs/bundle/playRelease/app-play-release.aab"
           research_apk="build/app/outputs/flutter-apk/app-research-release.apk"
           test -f "$play_aab"
@@ -207,7 +227,7 @@ jobs:
           SIGNING_PFX_PASSWORD: ${{ secrets.WINDOWS_PILOT_SIGNING_PFX_PASSWORD }}
           TIMESTAMP_URL: ${{ vars.WINDOWS_TIMESTAMP_URL }}
         run: |
-          $version = $env:GITHUB_REF_NAME.Substring(1)
+          $version = "${{ needs.verify.outputs.version }}"
           $bundle = (Resolve-Path "build\windows\x64\runner\Release").Path
           $pfx = "$env:RUNNER_TEMP\gamblock-pilot-signing.pfx"
 
