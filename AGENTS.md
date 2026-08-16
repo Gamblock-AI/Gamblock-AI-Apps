@@ -142,13 +142,11 @@ CI builds the `play` and `research` Android flavors, the Windows debug bundle,
 and a diagnostic MSI without production keys. The CI diagnostic lane also
 produces a `research`-flavor staging APK pointed at `api-staging.gamblock-ai.com`
 (`STAGING_API_BASE_URL`/`STAGING_WEB_BASE_URL`), so test data stays in the
-`gamblock_staging` database; a manual Research Staging GitHub Release
-(`staging-release.yml`, `workflow_dispatch`) publishes that staging APK plus a
-Windows staging pilot MSI for QA. Signed release builds (`release.yml`) run from
+`gamblock_staging` database. When executing a user release request (e.g. "buat release baru <version>"), follow `docs/ai/release-workflow.md`: trigger both `release.yml` (via tag) and `staging-release.yml` (via workflow_dispatch), monitor them to completion, and consolidate all 5+ build artifacts (Production + Staging) into the single canonical release `https://github.com/Gamblock-AI/Gamblock-AI-Apps/releases/tag/v<version>`. Signed release builds (`release.yml`) run from
 an immutable semantic-version tag or a manual `workflow_dispatch` with the same
 semver input, in protected environments, and produce the signed Play AAB,
 Research APK, and Windows pilot MSI. See
-`docs/ai/distribution-matrix.md` for the exact artifact and key contract.
+`docs/ai/distribution-matrix.md` and `docs/ai/release-workflow.md` for the exact artifact and execution contract.
 
 ## Protected and external actions
 

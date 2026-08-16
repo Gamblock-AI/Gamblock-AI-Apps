@@ -19,4 +19,5 @@ required_context:
   - docs/ai/README.md
   - docs/ai/distribution-matrix.md
   - docs/ai/manifest.yaml
+  - docs/ai/release-workflow.md
   - docs/release/README.md
