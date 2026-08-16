@@ -46,6 +46,25 @@ public key before changing the backend signing `kid`; remove the old key only
 after every supported client has moved beyond it. Empty, malformed, or unknown
 trust data fails closed.
 
+### Secret storage locations
+
+All signing material is stored in three places: the protected GitHub
+Environment, the owner's local backup directory, and the owner's password
+manager. Never commit these values to Git.
+
+| Material | GitHub (Actions) | Local backup (mode 0600) | Password manager entry |
+|---|---|---|---|
+| Play keystore | env `release-signing` → `ANDROID_PLAY_KEYSTORE_BASE64` + passwords | `~/.gamblock/secrets/gamblock-play-upload.jks` | `Gamblock-AI / Play Signing Keystore` |
+| Research keystore | env `release-signing` → `ANDROID_RESEARCH_KEYSTORE_BASE64` + passwords | `~/.gamblock/secrets/gamblock-research.jks` | `Gamblock-AI / Research Signing Keystore` |
+| Windows pilot PFX (self-signed) | env `pilot-signing` → `WINDOWS_PILOT_SIGNING_PFX_BASE64` + `WINDOWS_PILOT_SIGNING_PFX_PASSWORD` | `~/.gamblock/secrets/gamblock-pilot-signing.pfx` (key `.key`, cert `.crt`, password `.pfx_password`) | `Gamblock-AI / Windows Pilot Signing PFX` |
+| Backend protection-grant ES256 key | vault only (never copied to Flutter) | encrypted Ansible vault | via infra vault credentials |
+
+The owner's current Windows pilot PFX was generated as a **self-signed**
+Authenticode certificate. It is suitable for CI/staging QA builds; the signed
+MSIs still trigger SmartScreen/Defender warnings. Replace it with a CA-issued
+code-signing certificate before public pilot distribution, then rotate the
+`pilot-signing` secrets.
+
 The tag-only signed release workflow expects protected environments and these
 inputs:
 
