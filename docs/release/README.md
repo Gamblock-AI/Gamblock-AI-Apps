@@ -12,9 +12,12 @@ real-device correctness.
 | Play AAB | `com.gamblock.gamblock_ai_apps` / Gamblock-AI | Public Android | Browser-only Accessibility, local classification/block/Pattern Interrupt; no Settings or uninstall interception |
 | Research APK | `com.gamblock.gamblock_ai_apps.research` / Gamblock-AI Research | Approved PKM cohort | Full research prototype, including transparent best-effort settings/removal friction |
 | Pilot MSI | Gamblock-AI Pilot | Approved Windows cohort | Per-machine LocalSystem service, partner-approved normal maintenance, administrator break-glass |
+| Research staging APK + MSI | Research flavor + Gamblock-AI Pilot identity, staging backend | QA/test | Same protection behavior as the research/pilot variants but pointed at `api-staging.gamblock-ai.com`; published from the manual `staging-release.yml` lane |
 
 Debug APKs, Windows ZIPs, and the diagnostic unsigned MSI are CI diagnostics
-only. They must not be linked from a download page or handed to participants.
+only. The Research staging release is a separate QA lane: its APK is debug
+signed and its MSI uses the owner self-signed Authenticode PFX, so it must be
+labelled staging-backed and not be presented as signed or production-ready.
 
 ## Signing boundaries
 

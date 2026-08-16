@@ -143,9 +143,11 @@ and a diagnostic MSI without production keys. The CI diagnostic lane also
 produces a `research`-flavor staging APK pointed at `api-staging.gamblock-ai.com`
 (`STAGING_API_BASE_URL`/`STAGING_WEB_BASE_URL`), so test data stays in the
 `gamblock_staging` database; a manual Research Staging GitHub Release
-(`staging-release.yml`, `workflow_dispatch`) publishes that debug APK for QA.
-Signed release builds are
-restricted to immutable semantic-version tags and protected environments. See
+(`staging-release.yml`, `workflow_dispatch`) publishes that staging APK plus a
+Windows staging pilot MSI for QA. Signed release builds (`release.yml`) run from
+an immutable semantic-version tag or a manual `workflow_dispatch` with the same
+semver input, in protected environments, and produce the signed Play AAB,
+Research APK, and Windows pilot MSI. See
 `docs/ai/distribution-matrix.md` for the exact artifact and key contract.
 
 ## Protected and external actions
@@ -154,8 +156,9 @@ restricted to immutable semantic-version tags and protected environments. See
   platform dependency caches.
 - CI debug artifacts are clearly labelled and short-retention; CI must not
   create or mutate a public `latest` release. The Research Staging release is a
-  debug APK for QA/test only, is clearly labelled unsigned and staging-backed,
-  and must never be presented as signed, store-ready, or production-ready.
+  debug APK plus a self-signed-pilot MSI for QA/test only, is clearly labelled
+  unsigned-or-self-signed and staging-backed, and must never be presented as
+  signed, store-ready, or production-ready.
   Tag-triggered candidates remain
   gated workflow artifacts: Play receives a signed AAB, the Research pilot a
   separately signed APK, and the Windows pilot a signed MSI only after the

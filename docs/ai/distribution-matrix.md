@@ -16,6 +16,7 @@ under each platform's distribution boundary.
 | `windows-msi-ci` | `GamblockAI-diagnostic-<sha>.msi` | Gamblock-AI per-machine package | WiX packaging, Program Files/ProgramData layout, and SCM registration validation | CI diagnostic artifact only | MSI is unsigned; binaries are not a pilot release |
 | `play-release` | `app-play-release.aab` | `com.gamblock.gamblock_ai_apps` | Play-safe browser-only source set | Play submission candidate | Protected Play upload/signing key |
 | `research-release` | `app-research-release.apk` | `com.gamblock.gamblock_ai_apps.research` | Full research prototype with documented best-effort resistance and non-standard browser sensing | Approved research pilot | Protected Research signing key |
+| `research-staging-release` | `gamblock-ai-research-staging-<ver>.apk` + `GamblockAI-Pilot-Staging-<ver>-x64.msi` | Research flavor + Gamblock-AI Pilot identity | Research staging variants pointing at `api-staging.gamblock-ai.com` so test data stays in `gamblock_staging` | QA/test GitHub Release (manual `workflow_dispatch`) | APK: debug key; MSI: owner self-signed Authenticode PFX |
 | `windows-pilot-release` | `GamblockAI-Pilot-<version>-x64.msi` | Gamblock-AI Pilot | Per-machine MSI, LocalSystem service, SCM recovery, and administrator break-glass | Approved Windows pilot | Protected Authenticode PFX |
 
 Diagnostic artifacts are never presented as signed, store-ready, or
@@ -44,9 +45,15 @@ Signed builds require the following protected inputs:
 | `PLAY_KEYSTORE_PATH`, `PLAY_KEYSTORE_PASSWORD`, `PLAY_KEY_PASSWORD` | Play AAB | Yes |
 | `RESEARCH_KEYSTORE_PATH`, `RESEARCH_KEYSTORE_PASSWORD`, `RESEARCH_KEY_PASSWORD` | Research APK | Yes |
 | `ANDROID_PLAY_KEY_ALIAS`, `ANDROID_RESEARCH_KEY_ALIAS` | Android key aliases | No; GitHub Variables |
-| `WINDOWS_PILOT_SIGNING_PFX_BASE64`, `WINDOWS_PILOT_SIGNING_PFX_PASSWORD` | Windows pilot MSI | Yes |
+| `WINDOWS_PILOT_SIGNING_PFX_BASE64`, `WINDOWS_PILOT_SIGNING_PFX_PASSWORD` | Windows pilot MSI (production + staging) | Yes |
+| `WINDOWS_TIMESTAMP_URL` | Windows pilot timestamp endpoint | No; optional GitHub Variable |
 | `PROTECTION_GRANT_TRUST_STORE_BASE64` | Android/Windows native verifier | No; public key map |
 | backend `PROTECTION_GRANT_SIGNING_PRIVATE_KEY` | Backend only | Yes; never copied to Flutter |
+
+The Windows `pilot-signing` environment holds the Authenticode PFX. For the
+staging release lane the PFX is the owner-generated self-signed certificate, so
+staging MSIs still trigger SmartScreen/Defender warnings; a production CA-issued
+code-signing certificate is required before public pilot distribution.
 
 Signing identities are independent. A Play key, Research key, Windows
 certificate, and backend ES256 key must never be reused for another purpose.
@@ -68,8 +75,14 @@ time:
   production secrets.
 - Diagnostic output is uploaded only through `actions/upload-artifact` with a
   short retention period.
-- Signed output runs only from an immutable semantic-version tag in a protected
-  environment and fails closed when any required key or trust value is absent.
+- The `Signed Release Candidates` workflow (`release.yml`) runs from an
+  immutable `vMAJOR.MINOR.PATCH` tag or a manual `workflow_dispatch` with the
+  same semver input; it builds the signed Play AAB, Research APK, and Windows
+  pilot MSI and fails closed when any required key or trust value is absent.
+- The `Research Staging Release` workflow (`staging-release.yml`) is a manual
+  `workflow_dispatch` that publishes the research staging APK and the Windows
+  staging pilot MSI (staging backend, self-signed PFX) to a GitHub Release for
+  QA/test; it never touches the signed release lane.
 - Store publication, pilot handoff, and device/VM evidence remain external
   approval gates.
 
