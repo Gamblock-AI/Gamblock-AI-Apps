@@ -80,6 +80,11 @@
                          Value="[GAMBLOCKDATADIR]"
                          Type="string"
                          KeyPath="yes" />
+          <RegistryValue Root="HKLM"
+                         Key="Software\GamblockAI"
+                         Name="ProductCode"
+                         Value="[ProductCode]"
+                         Type="string" />
         </Component>
       </Directory>
     </StandardDirectory>

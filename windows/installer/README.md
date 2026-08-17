@@ -51,7 +51,15 @@ is public material; never put a private signing key in this variable. A CMake
 caller may alternatively pass the same value as
 `-DPROTECTION_GRANT_TRUST_STORE_BASE64=...`.
 
-Standard app maintenance uses a signed, device-bound grant. The installed MSI
-remains the explicit administrator break-glass path: Windows Installer can stop
-and remove the service through SCM after elevation, without hidden navigation or
-keystroke interception.
+Standard in-app removal uses a signed, device-bound `uninstall_detected` or
+`emergency_access` grant. The LocalSystem service consumes that grant, reads the
+installed ProductCode from its protected HKLM registration, and starts a normal
+silent Windows Installer removal. A `pause_protection` grant cannot remove the
+product. Direct elevated MSI removal remains the explicit administrator
+break-glass path: Windows Installer can stop and remove the service through SCM
+without hidden navigation or keystroke interception.
+
+The scripts under `windows/scripts/` are developer/evidence helpers and are not
+packaged. In particular, `uninstall-service.ps1` invokes the explicit
+administrator service-removal command; it is not the participant-facing
+grant-approved MSI path.

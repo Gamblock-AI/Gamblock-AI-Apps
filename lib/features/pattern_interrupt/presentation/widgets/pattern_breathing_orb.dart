@@ -14,12 +14,14 @@ class PatternBreathingOrb extends StatelessWidget {
     required this.progress,
     required this.disableAnimations,
     required this.semanticsLabel,
+    this.size = 140,
   });
 
   final Animation<double> animation;
   final Animation<double> progress;
   final bool disableAnimations;
   final String semanticsLabel;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +32,15 @@ class PatternBreathingOrb extends StatelessWidget {
           animation: animation,
           builder: (context, child) {
             final t = disableAnimations ? 0.5 : animation.value;
-            final scale = disableAnimations ? 1.0 : 0.90 + (t * 0.10);
+            final scale = disableAnimations ? 1.0 : 0.92 + (t * 0.08);
+            final haloSize = size * 0.84;
+            final coreSize = size * 0.64;
+            final imageSize = size * 0.40;
+
             return Center(
               child: SizedBox(
-                width: 180,
-                height: 180,
+                width: size,
+                height: size,
                 child: AspectRatio(
                   aspectRatio: 1.0,
                   child: CustomPaint(
@@ -47,46 +53,46 @@ class PatternBreathingOrb extends StatelessWidget {
                           children: [
                             // Outer ambient glowing halo
                             Container(
-                              width: 150,
-                              height: 150,
+                              width: haloSize,
+                              height: haloSize,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: AppColors.sky.withValues(
-                                  alpha: 0.10 + (t * 0.10),
+                                  alpha: 0.12 + (t * 0.12),
                                 ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: AppColors.sky.withValues(
-                                      alpha: 0.28 * t + 0.12,
+                                      alpha: 0.28 * t + 0.15,
                                     ),
-                                    blurRadius: 36 + (20 * t),
-                                    spreadRadius: 6 + (10 * t),
+                                    blurRadius: 28 + (18 * t),
+                                    spreadRadius: 4 + (8 * t),
                                   ),
                                 ],
                               ),
                             ),
                             // Inner frosted glass core
                             Container(
-                              width: 110,
-                              height: 110,
+                              width: coreSize,
+                              height: coreSize,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 gradient: RadialGradient(
                                   colors: [
-                                    Colors.white.withValues(alpha: 0.28),
-                                    AppColors.skyDark.withValues(alpha: 0.35),
-                                    const Color(0xFF0F172A).withValues(alpha: 0.65),
+                                    Colors.white.withValues(alpha: 0.32),
+                                    AppColors.skyDark.withValues(alpha: 0.40),
+                                    const Color(0xFF0F172A).withValues(alpha: 0.70),
                                   ],
                                   stops: const [0.0, 0.65, 1.0],
                                 ),
                                 border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.45 + (t * 0.25)),
-                                  width: 1.5,
+                                  color: Colors.white.withValues(alpha: 0.50 + (t * 0.25)),
+                                  width: 1.4,
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.white.withValues(alpha: 0.15),
-                                    blurRadius: 14,
+                                    color: Colors.white.withValues(alpha: 0.18),
+                                    blurRadius: 12,
                                     spreadRadius: -2,
                                   ),
                                 ],
@@ -94,12 +100,12 @@ class PatternBreathingOrb extends StatelessWidget {
                               child: Center(
                                 child: Image.asset(
                                   'assets/images/gami-meditate.webp',
-                                  width: 68,
-                                  height: 68,
+                                  width: imageSize,
+                                  height: imageSize,
                                   fit: BoxFit.contain,
                                   errorBuilder: (_, __, ___) => Icon(
                                     Icons.self_improvement_rounded,
-                                    size: 52,
+                                    size: imageSize * 0.8,
                                     color: Colors.white.withValues(alpha: 0.95),
                                   ),
                                 ),

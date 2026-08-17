@@ -27,7 +27,8 @@ bool FlutterWindow::OnCreate() {
   }
   RegisterPlugins(flutter_controller_->engine());
   protection_bridge_ = std::make_unique<NativeProtectionBridge>(
-      flutter_controller_->engine(), GetHandle());
+      flutter_controller_->engine(), GetHandle(),
+      [this](bool locked) { intervention_locked_.store(locked); });
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
@@ -57,6 +58,26 @@ LRESULT
 FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
                               WPARAM const wparam,
                               LPARAM const lparam) noexcept {
+  const bool close_request =
+      message == WM_CLOSE ||
+      (message == WM_SYSCOMMAND && (wparam & 0xfff0) == SC_CLOSE);
+  if (close_request) {
+    if (intervention_locked_.load()) return 0;
+    if (protection_bridge_) protection_bridge_->PrepareForWindowClose();
+  }
+  if (message == WM_TIMER &&
+      wparam == NativeProtectionBridge::kInterventionCloseGateTimer) {
+    KillTimer(hwnd, NativeProtectionBridge::kInterventionCloseGateTimer);
+    intervention_locked_.store(false);
+    return 0;
+  }
+  if (message == WM_TIMER &&
+      wparam == NativeProtectionBridge::kInterventionExpiryTimer &&
+      protection_bridge_) {
+    protection_bridge_->HandleInterventionTimeout();
+    return 0;
+  }
+
   // Give Flutter, including plugins, an opportunity to handle window messages.
   if (flutter_controller_) {
     std::optional<LRESULT> result =

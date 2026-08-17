@@ -6,6 +6,7 @@ import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/feedback/feedback.dart';
 import '../../../../core/feedback/haptics.dart';
+import '../../../../core/platform/platform_bridge.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../../../core/theme/app_dimens.dart';
@@ -14,7 +15,9 @@ import '../widgets/pattern_interrupt_panel.dart';
 import '../widgets/pattern_video_background.dart';
 
 class PatternInterruptScreen extends StatefulWidget {
-  const PatternInterruptScreen({super.key});
+  const PatternInterruptScreen({super.key, this.interventionId = ''});
+
+  final String interventionId;
 
   @override
   State<PatternInterruptScreen> createState() => _PatternInterruptScreenState();
@@ -31,6 +34,8 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
   bool _groundingOpen = false;
   bool _showWaitHint = false;
   bool _inhaling = true;
+  bool _visibleAcknowledged = false;
+  bool _completed = false;
 
   @override
   void initState() {
@@ -53,6 +58,9 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
       vsync: this,
       duration: const Duration(seconds: _durationSeconds),
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_ackVisible());
+    });
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
       setState(() => _remaining = (_remaining - 1).clamp(0, _durationSeconds));
@@ -61,6 +69,45 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
         Haptics.success();
       }
     });
+  }
+
+  Future<void> _ackVisible() async {
+    if (_visibleAcknowledged || widget.interventionId.isEmpty) return;
+    _visibleAcknowledged = true;
+    final accepted = await _retryNativeConfirmation(
+      () => PlatformBridge.ackInterventionVisible(widget.interventionId),
+    );
+    if (!accepted && mounted) context.go('/dashboard');
+  }
+
+  Future<void> _completeIntervention() async {
+    if (_completed || widget.interventionId.isEmpty) return;
+    _completed = true;
+    await _retryNativeConfirmation(
+      () => PlatformBridge.completeIntervention(widget.interventionId),
+    );
+  }
+
+  Future<bool> _retryNativeConfirmation(
+    Future<bool> Function() operation,
+  ) async {
+    for (var attempt = 0; attempt < 4; attempt++) {
+      if (await operation()) return true;
+      if (attempt < 3) {
+        await Future<void>.delayed(Duration(milliseconds: 200 * (attempt + 1)));
+      }
+    }
+    return false;
+  }
+
+  Future<void> _completeAndGo(String location) async {
+    await _completeIntervention();
+    if (mounted) context.go(location);
+  }
+
+  Future<void> _completeAndOpenWeb(String path) async {
+    await _completeIntervention();
+    if (mounted) await _openWeb(path);
   }
 
   @override
@@ -121,57 +168,85 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
     return PopScope(
       canPop: ready,
       onPopInvokedWithResult: (didPop, _) {
+        if (didPop) {
+          unawaited(_completeIntervention());
+          return;
+        }
         if (!didPop && !_showWaitHint) setState(() => _showWaitHint = true);
       },
       child: Scaffold(
         body: PatternVideoBackground(
           child: SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xl,
-                  vertical: 28,
-                ),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 520),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      disableAnimations
-                          ? _interruptContent(disableAnimations)
-                          : AnimatedSize(
-                              duration: const Duration(milliseconds: 220),
-                              curve: Curves.easeOutCubic,
-                              alignment: Alignment.topCenter,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                const horizontalPadding = AppSpacing.lg;
+                const verticalPadding = 16.0;
+                final availableHeight =
+                    constraints.maxHeight - (verticalPadding * 2);
+
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: horizontalPadding,
+                    vertical: verticalPadding,
+                  ),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: availableHeight > 0 ? availableHeight : 0,
+                        maxWidth: 480,
+                      ),
+                      child: IntrinsicHeight(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
                               child: _interruptContent(disableAnimations),
                             ),
-                      // Fixed-height slot: the back-press hint fades in without
-                      // shifting the panel above it.
-                      SizedBox(
-                        height: 36,
-                        child: Center(
-                          child: AnimatedOpacity(
-                            opacity: _showWaitHint && !ready && !_groundingOpen
-                                ? 1.0
-                                : 0.0,
-                            duration: disableAnimations
-                                ? Duration.zero
-                                : const Duration(milliseconds: 250),
-                            child: Text(
-                              AppLocalizations.of(context)!.patternWaitHint,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.75),
-                                fontSize: 13,
+                            // Fixed-height slot: the back-press hint fades in without
+                            // shifting the panel above it.
+                            SizedBox(
+                              height: 32,
+                              child: Center(
+                                child: AnimatedOpacity(
+                                  opacity:
+                                      _showWaitHint && !ready && !_groundingOpen
+                                      ? 1.0
+                                      : 0.0,
+                                  duration: disableAnimations
+                                      ? Duration.zero
+                                      : const Duration(milliseconds: 250),
+                                  child: Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.patternWaitHint,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.85,
+                                      ),
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w500,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.black.withValues(
+                                            alpha: 0.65,
+                                          ),
+                                          blurRadius: 8,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ),
         ),
@@ -185,7 +260,9 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
         : const Duration(milliseconds: 220),
     child: _groundingOpen
         ? PatternGroundingPanel(
-            onReturnToProtection: () => context.go('/dashboard'),
+            onReturnToProtection: () {
+              unawaited(_completeAndGo('/dashboard'));
+            },
           )
         : PatternInterruptPanel(
             breathingAnimation: _breathingController,
@@ -193,10 +270,14 @@ class _PatternInterruptScreenState extends State<PatternInterruptScreen>
             inhaling: _inhaling,
             disableAnimations: disableAnimations,
             secondsRemaining: _remaining,
-            onContinue: () => _openWeb('post-intervention'),
+            onContinue: () {
+              unawaited(_completeAndOpenWeb('post-intervention'));
+            },
             onOpenGrounding: () => setState(() => _groundingOpen = true),
             onOpenHelp: () => _openWeb('help'),
-            onLater: () => context.go('/dashboard'),
+            onLater: () {
+              unawaited(_completeAndGo('/dashboard'));
+            },
           ),
   );
 }

@@ -35,6 +35,8 @@ std::optional<std::string> JsonString(const std::string& json,
                                       const std::string& key);
 std::optional<double> JsonNumber(const std::string& json,
                                  const std::string& key);
+std::optional<bool> JsonBool(const std::string& json,
+                             const std::string& key);
 std::vector<std::string> JsonStringArray(const std::string& json,
                                          const std::string& key,
                                          size_t maximum_items,
@@ -62,7 +64,8 @@ std::string WebSocketAccept(const std::string& key);
 std::optional<std::string> HttpHeader(const std::string& request,
                                       const std::string& name);
 
-bool BuildPipeSecurity(SECURITY_ATTRIBUTES* attributes,
+bool BuildPipeSecurity(DWORD session_id,
+                       SECURITY_ATTRIBUTES* attributes,
                        PSECURITY_DESCRIPTOR* descriptor,
                        PACL* acl);
 

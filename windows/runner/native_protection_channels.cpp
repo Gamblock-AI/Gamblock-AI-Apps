@@ -111,6 +111,38 @@ void NativeProtectionBridge::ConfigureMethodChannel(
               EscapeJson(evidence_id == nullptr ? "" : *evidence_id) + "\"";
           result->Success(flutter::EncodableValue(JsonBool(
               CallService("intervention_committed", fields), "ok")));
+        } else if (call.method_name() == "ackInterventionVisible") {
+          FlushPendingBlockAction(750);
+          const auto* value = FindArgument(arguments, "intervention_id");
+          const auto* intervention_id =
+              value ? std::get_if<std::string>(value) : nullptr;
+          const std::string fields = ",\"intervention_id\":\"" +
+              EscapeJson(intervention_id == nullptr ? "" : *intervention_id) +
+              "\"";
+          result->Success(flutter::EncodableValue(JsonBool(
+              CallService("ack_intervention_visible", fields, 1000), "ok")));
+        } else if (call.method_name() == "completeIntervention") {
+          FlushPendingBlockAction(750);
+          const auto* value = FindArgument(arguments, "intervention_id");
+          const auto* intervention_id =
+              value ? std::get_if<std::string>(value) : nullptr;
+          const std::string id =
+              intervention_id == nullptr ? "" : *intervention_id;
+          const std::string fields = ",\"intervention_id\":\"" +
+              EscapeJson(id) + "\"";
+          const bool completed = JsonBool(
+              CallService("complete_intervention", fields, 1000), "ok");
+          if (completed && id == active_intervention_id_) {
+            KillTimer(window_, kInterventionExpiryTimer);
+            KillTimer(window_, kInterventionCloseGateTimer);
+            active_intervention_id_.clear();
+            pending_block_action_result_.reset();
+            if (intervention_lock_changed_) intervention_lock_changed_(false);
+          }
+          result->Success(flutter::EncodableValue(completed));
+        } else if (call.method_name() == "beginApprovedRemoval") {
+          result->Success(flutter::EncodableValue(JsonBool(
+              CallService("begin_approved_removal", "", 10000), "ok")));
         } else {
           result->NotImplemented();
         }

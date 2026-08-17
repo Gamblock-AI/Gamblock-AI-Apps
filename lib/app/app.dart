@@ -21,6 +21,7 @@ class GamblockApp extends ConsumerStatefulWidget {
 class _GamblockAppState extends ConsumerState<GamblockApp>
     with WidgetsBindingObserver {
   StreamSubscription? _interventionSub;
+  String? _pendingApprovalLocation;
 
   @override
   void initState() {
@@ -32,37 +33,54 @@ class _GamblockAppState extends ConsumerState<GamblockApp>
     };
     _interventionSub = PlatformBridge.events().listen((event) {
       final router = ref.read(routerProvider);
-      if (event.type == 'intervention_shown') {
-        router.go('/pattern-interrupt');
-        final evidenceId = event.payload['evidence_id']?.toString() ?? '';
-        if (evidenceId.isNotEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            unawaited(PlatformBridge.recordInterventionCommitted(evidenceId));
-          });
-        }
+      if (event.type == 'intervention_required' ||
+          event.type == 'intervention_shown') {
+        final nativeId =
+            event.payload['intervention_id']?.toString().trim() ?? '';
+        final interventionId = nativeId.isNotEmpty
+            ? nativeId
+            : 'legacy-${DateTime.now().microsecondsSinceEpoch}';
+        router.go(
+          Uri(
+            path: '/pattern-interrupt',
+            queryParameters: {'intervention_id': interventionId},
+          ).toString(),
+        );
       } else if (event.type == 'approval_required') {
-        router.go('/dashboard');
+        final action = event.payload['tamper_action']?.toString().trim() ?? '';
+        final nativeId = event.payload['action_id']?.toString().trim() ?? '';
+        final location = Uri(
+          path: '/dashboard',
+          queryParameters: {
+            if (action.isNotEmpty) 'approval_action': action,
+            if (nativeId.isNotEmpty) 'approval_id': nativeId,
+          },
+        ).toString();
+        if (ref.read(authProvider).isAuthenticated) {
+          router.go(location);
+        } else {
+          _pendingApprovalLocation = location;
+          router.go('/login');
+        }
       }
     });
   }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _interventionSub?.cancel();
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed &&
-        ref.read(authProvider).isAuthenticated) {
-      ref.read(authProvider.notifier).refreshProfile().catchError((_) {});
-    }
+  void _resumePendingApproval(AuthState auth) {
+    final location = _pendingApprovalLocation;
+    if (!auth.isAuthenticated || location == null) return;
+    _pendingApprovalLocation = null;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(routerProvider).go(location);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AuthState>(authProvider, (_, next) {
+      _resumePendingApproval(next);
+    });
     final router = ref.watch(routerProvider);
     final settings = ref.watch(appSettingsProvider);
 
@@ -91,5 +109,20 @@ class _GamblockAppState extends ConsumerState<GamblockApp>
       locale: settings.locale,
       routerConfig: router,
     );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _interventionSub?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed &&
+        ref.read(authProvider).isAuthenticated) {
+      ref.read(authProvider.notifier).refreshProfile().catchError((_) {});
+    }
   }
 }

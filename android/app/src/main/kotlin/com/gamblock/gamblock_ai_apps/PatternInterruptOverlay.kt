@@ -29,9 +29,18 @@ class PatternInterruptOverlay(
     private val handler = Handler(Looper.getMainLooper())
     private var root: View? = null
     private var animator: ValueAnimator? = null
+    private var activeInterventionId: String? = null
+    private var completion: (() -> Unit)? = null
 
-    fun showIntervention(onCommitted: (() -> Unit)? = null) {
-        if (root != null) return
+    fun showIntervention(
+        interventionId: String,
+        onCommitted: (() -> Unit)? = null,
+        onCompleted: (() -> Unit)? = null,
+    ) {
+        if (root != null && activeInterventionId == interventionId) return
+        if (root != null) dismiss()
+        activeInterventionId = interventionId
+        completion = onCompleted
         val locale = if (Locale.getDefault().language == "en") "en" else "id"
         val isEnglish = locale == "en"
         val container = LinearLayout(service).apply {
@@ -66,8 +75,8 @@ class PatternInterruptOverlay(
         val continueButton = button(
             if (isEnglish) "Continue to recovery" else "Lanjut ke pemulihan",
         ) {
-            openWeb("$locale/post-intervention?source=pattern_interrupt")
-            dismiss()
+            runCatching { openWeb("$locale/post-intervention?source=pattern_interrupt") }
+            completeAndDismiss()
         }.apply { isEnabled = false }
         val groundingButton = button(
             if (isEnglish) "Offline grounding" else "Grounding offline",
@@ -80,13 +89,13 @@ class PatternInterruptOverlay(
             }
             breathing.visibility = View.GONE
             continueButton.text = if (isEnglish) "Finish" else "Selesai"
-            continueButton.setOnClickListener { dismiss() }
+            continueButton.setOnClickListener { completeAndDismiss() }
         }.apply { isEnabled = false }
         val helpButton = button(if (isEnglish) "I need help" else "Butuh bantuan") {
-            openWeb("$locale/help")
+            runCatching { openWeb("$locale/help") }
         }
         val laterButton = button(if (isEnglish) "Return to protection" else "Kembali ke proteksi") {
-            dismiss()
+            completeAndDismiss()
         }.apply { isEnabled = false }
 
         listOf(breathing, title, body, countdown, continueButton, groundingButton, helpButton, laterButton)
@@ -163,10 +172,21 @@ class PatternInterruptOverlay(
             }
         }
         root = null
+        activeInterventionId = null
+        completion = null
+    }
+
+    fun dismissIntervention(interventionId: String) {
+        if (activeInterventionId == interventionId) dismiss()
+    }
+
+    private fun completeAndDismiss() {
+        val callback = completion
+        dismiss()
+        callback?.invoke()
     }
 
     private fun attach(view: View) {
-        root = view
         windowManager.addView(
             view,
             WindowManager.LayoutParams(
@@ -177,6 +197,7 @@ class PatternInterruptOverlay(
                 PixelFormat.TRANSLUCENT,
             ),
         )
+        root = view
     }
 
     private fun text(value: String, size: Float, color: Int): TextView {

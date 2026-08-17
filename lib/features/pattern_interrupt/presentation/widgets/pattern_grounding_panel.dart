@@ -94,29 +94,30 @@ class _PatternGroundingPanelState extends State<PatternGroundingPanel> {
     final l10n = AppLocalizations.of(context)!;
     final disableAnimations = MediaQuery.disableAnimationsOf(context);
     final textTheme = Theme.of(context).textTheme;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(AppRadius.banner),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          key: const ValueKey('grounding'),
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 26),
-          decoration: BoxDecoration(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.32),
-            borderRadius: BorderRadius.circular(AppRadius.banner),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.18),
-              width: 1.2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.25),
-                blurRadius: 36,
-                offset: const Offset(0, 12),
+    return Center(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppRadius.banner),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: Container(
+            key: const ValueKey('grounding'),
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0F172A).withValues(alpha: 0.45),
+              borderRadius: BorderRadius.circular(AppRadius.banner),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.20),
+                width: 1.2,
               ),
-            ],
-          ),
-          child: Column(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.35),
+                  blurRadius: 36,
+                  offset: const Offset(0, 12),
+                ),
+              ],
+            ),
+            child: Column(
             children: [
           Text(
             l10n.patternGroundingTitle,
@@ -248,6 +249,7 @@ class _PatternGroundingPanelState extends State<PatternGroundingPanel> {
       ],
     ),
   ),
+),
 ),
 );
 }

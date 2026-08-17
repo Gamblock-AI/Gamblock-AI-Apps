@@ -62,6 +62,10 @@ class ProtectionCoordinator {
     return _ref.read(protectionRepositoryProvider).runLocalSelfTest();
   }
 
+  Future<bool> beginApprovedRemoval() {
+    return _ref.read(protectionRepositoryProvider).beginApprovedRemoval();
+  }
+
   Future<void> requestApproval({
     required String deviceId,
     required String membershipId,

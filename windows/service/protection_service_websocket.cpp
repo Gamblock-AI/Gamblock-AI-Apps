@@ -202,10 +202,7 @@ void ProtectionService::HandleWebSocketClient(SOCKET client) {
     }
     const auto classification_finished = std::chrono::steady_clock::now();
     if (decision.block) {
-      IncrementAggregate("block_count_sync");
-      IncrementAggregate("intervention_shown");
-      EnsureUserAgentRunning();
-      const std::string evidence_id = BeginPhase4Latency(
+      const auto intervention = BeginIntervention(
           input_ready,
           pre_input_duration_ms,
           extraction_duration_ms,
@@ -214,18 +211,10 @@ void ProtectionService::HandleWebSocketClient(SOCKET client) {
           std::chrono::duration<double, std::milli>(
               classification_finished - classification_started).count(),
           decision);
-      std::ostringstream event;
-      event << "{\"type\":\"intervention_shown\",\"reason_code\":\""
-            << EscapeJson(decision.reason_code)
-            << "\",\"model_version\":\""
-            << EscapeJson(decision.model_version)
-            << "\",\"ruleset_version\":\""
-            << EscapeJson(decision.ruleset_version) << "\"";
-      if (!evidence_id.empty()) {
-        event << ",\"evidence_id\":\"" << EscapeJson(evidence_id) << "\"";
+      if (intervention) {
+        RequestUserAgent(interactive_session_id_.load());
+        SendAgentEvent(*intervention);
       }
-      event << '}';
-      SendAgentEvent(event.str());
     }
   }
   close_client();

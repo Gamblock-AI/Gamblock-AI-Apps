@@ -84,6 +84,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       final path = state.uri.path;
       if (authState.isLoading || onboarding.isLoading) return null;
 
+      // A native intervention is safety-critical and must remain reachable
+      // even if onboarding/auth state is incomplete or being repaired.
+      if (path == '/pattern-interrupt') return null;
+
       // Onboarding gate: until the intro is completed, only `/intro` is
       // reachable. This must take priority over auth routing so an
       // authenticated session cannot bounce `/intro` -> `/dashboard` -> `/intro`.
@@ -163,16 +167,28 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/pattern-interrupt',
-        pageBuilder: (_, state) =>
-            _page(key: state.pageKey, child: const PatternInterruptScreen()),
+        pageBuilder: (_, state) {
+          final interventionId =
+              state.uri.queryParameters['intervention_id'] ?? '';
+          return _page(
+            key: ValueKey('pattern-interrupt-$interventionId'),
+            child: PatternInterruptScreen(interventionId: interventionId),
+          );
+        },
       ),
       ShellRoute(
         builder: (_, __, child) => AppShell(child: child),
         routes: [
           GoRoute(
             path: '/dashboard',
-            pageBuilder: (_, state) =>
-                _page(key: state.pageKey, child: const ProtectionScreen()),
+            pageBuilder: (_, state) => _page(
+              key: state.pageKey,
+              child: ProtectionScreen(
+                requestedApprovalAction:
+                    state.uri.queryParameters['approval_action'],
+                requestedApprovalId: state.uri.queryParameters['approval_id'],
+              ),
+            ),
           ),
           GoRoute(
             path: '/mini-games',

@@ -8,9 +8,9 @@ if (-not (Test-Path $serviceBinary)) {
     throw "gamblock_ai_service.exe was not found next to the installed client bundle."
 }
 
-& $serviceBinary --uninstall
+& $serviceBinary --admin-uninstall
 if ($LASTEXITCODE -ne 0) {
-    throw "Removal requires an active approved uninstall/disable or emergency grant."
+    throw "Administrator service removal failed."
 }
 
-Write-Host "Gamblock AI protection service removed."
+Write-Host "Gamblock AI protection service removed through the administrator break-glass path."

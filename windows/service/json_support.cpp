@@ -60,6 +60,14 @@ std::optional<double> JsonNumber(const std::string& json,
   }
 }
 
+std::optional<bool> JsonBool(const std::string& json,
+                             const std::string& key) {
+  const std::regex pattern("\"" + key + "\"\\s*:\\s*(true|false)");
+  std::smatch match;
+  if (!std::regex_search(json, match, pattern)) return std::nullopt;
+  return match[1].str() == "true";
+}
+
 std::vector<std::string> JsonStringArray(const std::string& json,
                                          const std::string& key,
                                          size_t maximum_items,

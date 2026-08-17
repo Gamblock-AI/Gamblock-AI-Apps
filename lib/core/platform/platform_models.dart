@@ -8,6 +8,7 @@ class ProtectionSnapshot {
     required this.permissionStatus,
     required this.modelVersion,
     required this.rulesetVersion,
+    this.supportsControlledRemoval = false,
     this.degradedReasonCode,
     this.lastEventAt,
   });
@@ -19,6 +20,7 @@ class ProtectionSnapshot {
   final String permissionStatus;
   final String modelVersion;
   final String rulesetVersion;
+  final bool supportsControlledRemoval;
   final String? degradedReasonCode;
   final DateTime? lastEventAt;
 
@@ -39,6 +41,7 @@ class ProtectionSnapshot {
       rulesetVersion:
           map['ruleset_version']?.toString() ??
           'gambling-keywords-b4f2932a7647',
+      supportsControlledRemoval: map['supports_controlled_removal'] == true,
       degradedReasonCode: map['degraded_reason_code']?.toString(),
       lastEventAt: lastEvent == null ? null : DateTime.tryParse(lastEvent),
     );
@@ -52,6 +55,7 @@ class ProtectionSnapshot {
     permissionStatus: 'unknown',
     modelVersion: 'gamblock-lr-bfafb725511a',
     rulesetVersion: 'gambling-keywords-b4f2932a7647',
+    supportsControlledRemoval: false,
     degradedReasonCode: 'native_bridge_unavailable',
   );
 }
@@ -103,17 +107,20 @@ class NativeDailyAggregate {
           : int.tryParse(map['count']?.toString() ?? '') ?? 0,
       hourly: rawHourly is List
           ? rawHourly
-              .whereType<Object?>()
-              .map((value) =>
-                  value is int ? value : int.tryParse(value?.toString() ?? '') ?? 0)
-              .take(24)
-              .toList()
+                .whereType<Object?>()
+                .map(
+                  (value) => value is int
+                      ? value
+                      : int.tryParse(value?.toString() ?? '') ?? 0,
+                )
+                .take(24)
+                .toList()
           : const [],
       blockedEventTimes: rawTimes is List
           ? rawTimes
-              .map((value) => value?.toString() ?? '')
-              .where((value) => value.isNotEmpty)
-              .toList()
+                .map((value) => value?.toString() ?? '')
+                .where((value) => value.isNotEmpty)
+                .toList()
           : const [],
     );
   }

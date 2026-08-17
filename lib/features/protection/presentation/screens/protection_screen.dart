@@ -15,7 +15,14 @@ import '../widgets/protection_screen_body.dart';
 import '../widgets/self_test_result_dialog.dart';
 
 class ProtectionScreen extends ConsumerStatefulWidget {
-  const ProtectionScreen({super.key});
+  const ProtectionScreen({
+    super.key,
+    this.requestedApprovalAction,
+    this.requestedApprovalId,
+  });
+
+  final String? requestedApprovalAction;
+  final String? requestedApprovalId;
 
   @override
   ConsumerState<ProtectionScreen> createState() => _ProtectionScreenState();
@@ -30,6 +37,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
   Object? _error;
   bool _loading = true;
   bool _actionLoading = false;
+  bool _handledRequestedApproval = false;
 
   @override
   void initState() {
@@ -80,6 +88,22 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
       _error = accountability.error;
       _loading = false;
     });
+    _handleRequestedApproval();
+  }
+
+  void _handleRequestedApproval() {
+    if (_handledRequestedApproval || !mounted) return;
+    final requested = widget.requestedApprovalAction?.trim() ?? '';
+    if (requested.isEmpty) return;
+    _handledRequestedApproval = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (requested == 'uninstall' || requested == 'uninstall_detected') {
+        _requestApproval(initialAction: 'uninstall_detected');
+      } else {
+        AppFeedback.error(context, AppLocalizations.of(context)!.emergencyBody);
+      }
+    });
   }
 
   Future<void> _openSetup() async {
@@ -95,13 +119,26 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
     await showSelfTestResultDialog(context, result);
   }
 
-  Future<void> _requestApproval() async {
+  Future<void> _requestApproval({String? initialAction}) async {
     final auth = ref.read(authProvider);
     final membership = _accountability?.activeMembership;
-    if (auth.deviceId == null || membership == null) return;
+    if (auth.deviceId == null) {
+      AppFeedback.error(
+        context,
+        AppLocalizations.of(context)!.deviceRegistrationMissingBody,
+      );
+      return;
+    }
+    if (membership == null) {
+      AppFeedback.error(
+        context,
+        AppLocalizations.of(context)!.protectionPartnerRequired,
+      );
+      return;
+    }
     final draft = await showDialog<ApprovalDraft>(
       context: context,
-      builder: (_) => const ApprovalRequestDialog(),
+      builder: (_) => ApprovalRequestDialog(initialAction: initialAction),
     );
     if (draft == null || !mounted) return;
     await _runAccountabilityAction(
@@ -119,12 +156,44 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
   Future<void> _applyApproval(ApprovalRequest request) async {
     final deviceId = ref.read(authProvider).deviceId;
     if (deviceId == null) return;
-    await _runAccountabilityAction(
+    final controlledRemoval =
+        request.action == 'uninstall_detected' &&
+        _status?.supportsControlledRemoval == true;
+    if (controlledRemoval) {
+      final l10n = AppLocalizations.of(context)!;
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(l10n.protectionUninstallAction),
+          content: Text(l10n.setupLimitations),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text(l10n.protectionUninstallAction),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true || !mounted) return;
+    }
+    final applied = await _runAccountabilityAction(
       () => ProtectionCoordinator(
         ref,
       ).applyApproval(requestId: request.id, deviceId: deviceId),
       AppLocalizations.of(context)!.protectionApprovalApplied,
     );
+    if (!applied || !controlledRemoval || !mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    setState(() => _actionLoading = true);
+    final started = await ProtectionCoordinator(ref).beginApprovedRemoval();
+    if (mounted && !started) {
+      AppFeedback.error(context, l10n.msgErrGeneric);
+    }
+    if (mounted) setState(() => _actionLoading = false);
   }
 
   Future<void> _requestEmergency() async {
@@ -148,7 +217,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
     );
   }
 
-  Future<void> _runAccountabilityAction(
+  Future<bool> _runAccountabilityAction(
     Future<void> Function() action,
     String successMessage,
   ) async {
@@ -157,10 +226,12 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
       await action();
       if (mounted) AppFeedback.success(context, successMessage);
       await _load();
+      return true;
     } catch (error) {
       if (mounted) {
         AppFeedback.error(context, AppMessages.friendlyMessage(context, error));
       }
+      return false;
     } finally {
       if (mounted) setState(() => _actionLoading = false);
     }

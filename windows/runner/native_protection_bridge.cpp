@@ -1,8 +1,13 @@
 #include "native_protection_bridge.h"
 
+#include <utility>
+
 NativeProtectionBridge::NativeProtectionBridge(flutter::FlutterEngine* engine,
-                                               HWND window)
-    : window_(window) {
+                                               HWND window,
+                                               std::function<void(bool)>
+                                                   intervention_lock_changed)
+    : window_(window),
+      intervention_lock_changed_(std::move(intervention_lock_changed)) {
   ConfigureMethodChannel(engine);
   ConfigureEventChannel(engine);
   pipe_thread_ = std::thread(&NativeProtectionBridge::ConnectLoop, this);

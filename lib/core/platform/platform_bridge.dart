@@ -25,8 +25,11 @@ class PlatformBridge {
         .handleError((_) {});
   }
 
-  static Stream<NativeProtectionEvent> interventionEvents() =>
-      events().where((event) => event.type == 'intervention_shown');
+  static Stream<NativeProtectionEvent> interventionEvents() => events().where(
+    (event) =>
+        event.type == 'intervention_required' ||
+        event.type == 'intervention_shown',
+  );
 
   static Future<ProtectionSnapshot> getProtectionSnapshot() async {
     try {
@@ -62,12 +65,26 @@ class PlatformBridge {
   static Future<bool> setHealthNotifications(bool enabled) =>
       _boolMethodWithArguments('setHealthNotifications', {'enabled': enabled});
 
-  static Future<bool> recordInterventionCommitted(String evidenceId) {
-    if (evidenceId.isEmpty) return Future.value(false);
-    return _boolMethodWithArguments('recordInterventionCommitted', {
-      'evidence_id': evidenceId,
+  static Future<bool> ackInterventionVisible(String interventionId) {
+    if (interventionId.isEmpty) return Future.value(false);
+    return _boolMethodWithArguments('ackInterventionVisible', {
+      'intervention_id': interventionId,
     });
   }
+
+  static Future<bool> completeIntervention(String interventionId) {
+    if (interventionId.isEmpty) return Future.value(false);
+    return _boolMethodWithArguments('completeIntervention', {
+      'intervention_id': interventionId,
+    });
+  }
+
+  static Future<bool> beginApprovedRemoval() =>
+      _boolMethod('beginApprovedRemoval');
+
+  /// Compatibility alias for pre-v1.5.1 native evidence callers.
+  static Future<bool> recordInterventionCommitted(String evidenceId) =>
+      ackInterventionVisible(evidenceId);
 
   static Future<bool> setDeviceId(String deviceId) async {
     if (deviceId.isEmpty) return false;
@@ -97,8 +114,7 @@ class PlatformBridge {
           if (entry.key != null) entry.key.toString(): entry.value,
       };
       final publicJwk = normalized['public_jwk']?.toString().trim() ?? '';
-      final thumbprint =
-          normalized['jwk_thumbprint']?.toString().trim() ?? '';
+      final thumbprint = normalized['jwk_thumbprint']?.toString().trim() ?? '';
       final proof = normalized['proof']?.toString().trim() ?? '';
       if (publicJwk.isEmpty || thumbprint.isEmpty || proof.isEmpty) return null;
       return normalized;
@@ -181,5 +197,4 @@ class PlatformBridge {
       return false;
     }
   }
-
 }

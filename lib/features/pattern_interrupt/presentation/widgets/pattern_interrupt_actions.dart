@@ -38,12 +38,13 @@ class PatternInterruptActions extends StatelessWidget {
         : const Duration(milliseconds: 300);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
       children: [
         // Primary recovery CTA (unlocked after 7s pause)
         AnimatedContainer(
           duration: animationDuration,
           curve: Curves.easeOutCubic,
-          height: 52,
+          height: 48,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadius.pill),
             gradient: ready
@@ -66,7 +67,9 @@ class PatternInterruptActions extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
-              foregroundColor: ready ? Colors.white : Colors.white.withValues(alpha: 0.4),
+              foregroundColor: ready
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.4),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppRadius.pill),
               ),
@@ -74,26 +77,32 @@ class PatternInterruptActions extends StatelessWidget {
             onPressed: ready ? _withHaptic(onContinue) : null,
             icon: Icon(
               ready ? Icons.arrow_forward_rounded : Icons.lock_outline_rounded,
-              size: 20,
+              size: 19,
             ),
             label: Text(
               l10n.patternContinuePsychoeducation,
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                fontSize: 15,
-                color: ready ? Colors.white : Colors.white.withValues(alpha: 0.45),
+                fontSize: 14.5,
+                color: ready
+                    ? Colors.white
+                    : Colors.white.withValues(alpha: 0.45),
               ),
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         // Secondary grounding exercise CTA
         SizedBox(
-          height: 50,
+          height: 44,
           child: OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              foregroundColor: ready ? Colors.white : Colors.white.withValues(alpha: 0.4),
-              backgroundColor: ready ? Colors.white.withValues(alpha: 0.08) : Colors.transparent,
+              foregroundColor: ready
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.4),
+              backgroundColor: ready
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : Colors.transparent,
               side: BorderSide(
                 color: ready
                     ? Colors.white.withValues(alpha: 0.35)
@@ -104,58 +113,83 @@ class PatternInterruptActions extends StatelessWidget {
               ),
             ),
             onPressed: ready ? _withHaptic(onOpenGrounding) : null,
-            icon: const Icon(Icons.self_improvement_rounded, size: 20),
+            icon: const Icon(Icons.self_improvement_rounded, size: 19),
             label: Text(
               l10n.patternGroundingAction,
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                fontSize: 14.5,
-                color: ready ? Colors.white : Colors.white.withValues(alpha: 0.4),
+                fontSize: 14,
+                color: ready
+                    ? Colors.white
+                    : Colors.white.withValues(alpha: 0.4),
               ),
             ),
           ),
         ),
-        const SizedBox(height: 10),
-        // Help CTA
-        SizedBox(
-          height: 44,
-          child: TextButton.icon(
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.white.withValues(alpha: 0.8),
-            ),
-            onPressed: _withHaptic(onOpenHelp),
-            icon: const Icon(Icons.support_agent_rounded, size: 19),
-            label: Text(
-              l10n.patternHelpAction,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
-            ),
-          ),
-        ),
-        // Reserved slot: the "later" option fades in at the end of the pause
-        SizedBox(
-          height: 44,
-          child: AnimatedOpacity(
-            opacity: ready ? 1 : 0,
-            duration: disableAnimations
-                ? Duration.zero
-                : const Duration(milliseconds: 250),
-            child: IgnorePointer(
-              ignoring: !ready,
-              child: ExcludeSemantics(
-                excluding: !ready,
-                child: TextButton(
+        const SizedBox(height: 6),
+        // Bottom Action Row: Help on left, Later on right
+        Row(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.white.withValues(alpha: 0.65),
+                    foregroundColor: Colors.white.withValues(alpha: 0.8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    minimumSize: const Size(0, 36),
                   ),
-                  onPressed: _withHaptic(onLater),
-                  child: Text(
-                    l10n.patternLaterAction,
-                    style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+                  onPressed: _withHaptic(onOpenHelp),
+                  icon: const Icon(Icons.support_agent_rounded, size: 17),
+                  label: Text(
+                    l10n.patternHelpAction,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12.5,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: AnimatedOpacity(
+                  opacity: ready ? 1 : 0,
+                  duration: disableAnimations
+                      ? Duration.zero
+                      : const Duration(milliseconds: 250),
+                  child: IgnorePointer(
+                    ignoring: !ready,
+                    child: ExcludeSemantics(
+                      excluding: !ready,
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white.withValues(alpha: 0.65),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          minimumSize: const Size(0, 36),
+                        ),
+                        onPressed: _withHaptic(onLater),
+                        child: Text(
+                          l10n.patternLaterAction,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );

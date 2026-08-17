@@ -14,6 +14,7 @@ class ProtectionRepositoryImpl implements ProtectionRepository {
       permissionStatus: snapshot.permissionStatus,
       rulesetVersion: snapshot.rulesetVersion,
       modelVersion: snapshot.modelVersion,
+      supportsControlledRemoval: snapshot.supportsControlledRemoval,
       degradedReasonCode: snapshot.degradedReasonCode,
       lastEventAt: snapshot.lastEventAt,
     );
@@ -26,4 +27,6 @@ class ProtectionRepositoryImpl implements ProtectionRepository {
   Future<Map<String, dynamic>> runLocalSelfTest() =>
       PlatformBridge.runLocalSelfTest();
 
+  @override
+  Future<bool> beginApprovedRemoval() => PlatformBridge.beginApprovedRemoval();
 }

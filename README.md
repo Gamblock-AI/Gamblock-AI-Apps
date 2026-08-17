@@ -19,8 +19,10 @@ artifacts without production keys; those artifacts remain short-retention CI
 outputs and are not user-facing releases. A Research staging APK and a Windows
 staging pilot MSI are also built against `api-staging.gamblock-ai.com` so test
 data never mixes with the production backend, and are published on demand as a
-"Research Staging" GitHub Release for QA. Signed Play/Research/Windows
-candidates are built only from immutable version tags (or a manual
+"Research Staging" GitHub Release for QA. Both staging builds require the same
+non-empty public protection-grant trust store, so partner-approved removal can
+be exercised without copying a private signing key into the client. Signed
+Play/Research/Windows candidates are built only from immutable version tags (or a manual
 `workflow_dispatch` with the same semver) in protected GitHub
 Environments. The complete matrix, key names, and artifact contract are in
 [`docs/ai/distribution-matrix.md`](docs/ai/distribution-matrix.md).
@@ -59,7 +61,14 @@ fonts at runtime.
 
 The native Pattern Interrupt runs for seven seconds, respects reduced motion,
 works offline with a grounding option, and hands off to the website with only
-locale and `source=pattern_interrupt`. The longer recovery journey remains on
+locale and `source=pattern_interrupt`. Each local intervention has an opaque ID
+and remains pending until the presentation path acknowledges a visible frame or
+completes it. Android prefers the Flutter screen and uses the native
+Accessibility overlay only when Flutter does not acknowledge visibility within
+the bounded handoff; Windows replays the same pending ID after agent reconnect
+instead of dropping or duplicating it. Windows rejects native close requests
+during the same seven-second mandatory pause, then a close completes the local
+intervention normally. The longer recovery journey remains on
 the website and is not duplicated in Flutter. The opt-in daily check-in
 reminder works on Android (repeating daily schedule) and Windows (one-shot
 toast re-scheduled at the next app launch, since the Windows plugin has no
@@ -109,11 +118,13 @@ an Accessibility Service that supports:
 
 - Chrome (`com.android.chrome`) and Edge
   (`com.microsoft.emmx`) URL/title/headings/anchor extraction; the Research
-  flavor additionally observes Opera (`com.opera.browser`), Opera Mini
-  (`com.opera.mini.native`), UC Browser (`com.uc.browser`), and Firefox
-  (`org.mozilla.firefox`);
+  flavor additionally observes audited Samsung Internet, Brave, Opera,
+  Firefox, Xiaomi/Vivo/Oppo browsers, DuckDuckGo, and UC Browser package
+  families;
 - bounded, debounced, single-threaded local classification;
-- local Back navigation plus an accessibility overlay Pattern Interrupt;
+- local Back navigation plus Flutter-first Pattern Interrupt delivery, with a
+  native Accessibility overlay fallback when Flutter does not acknowledge its
+  first visible frame in time;
 - versioned prominent disclosure before the user is sent to Accessibility
   Settings;
 - signed, device-bound ES256 grants verified against pinned backend public
@@ -123,13 +134,19 @@ an Accessibility Service that supports:
 
 The Play flavor observes Chrome and Edge only; Settings/package-installer
 monitoring is absent from its source set and accessibility configuration. The
-Research flavor additionally observes Opera, Opera Mini, UC Browser, and
-Firefox (best-effort via the editable-URL fallback; per-browser URL-bar
-resource IDs are not hardcoded), and contains transparent settings/uninstall
-friction tied to bounded approval or emergency grants. Other browsers and
-arbitrary Android WebViews are not claimed as covered. A sideloaded app cannot make
-itself impossible to uninstall; the research prototype adds OS-supported
-friction and transparent recovery rather than unsafe device-owner behavior.
+Research flavor additionally observes the audited non-Play package families
+listed above. Known Samsung Internet, Brave, Opera, and Firefox URL controls are
+used where available; the remaining packages use a best-effort editable-URL
+fallback. It contains transparent settings/removal friction tied to bounded
+approval or emergency grants. Its detector is
+action-aware: merely opening App Info is not tamper evidence, while an explicit
+uninstall, Accessibility-disable, force-stop, or clear-data action is handled
+according to its own purpose. A valid `uninstall_detected` grant can open the
+normal Android removal UI after explicit user confirmation; a protection pause
+does not authorize uninstall. Other browsers and arbitrary Android WebViews
+are not claimed as covered. A sideloaded app cannot make itself impossible to
+uninstall; the research prototype adds best-effort, OS-supported friction and
+transparent recovery rather than unsafe device-owner behavior.
 
 Release signing is intentionally separate. Play uses
 `PLAY_KEYSTORE_PATH`, `PLAY_KEYSTORE_PASSWORD`, `PLAY_KEY_ALIAS`, and
@@ -137,6 +154,8 @@ Release signing is intentionally separate. Play uses
 verification uses the public `PROTECTION_GRANT_TRUST_STORE_BASE64` build value:
 base64 of a JSON map from `kid` to base64 DER SubjectPublicKeyInfo for each
 current/next P-256 key. Empty or malformed trust configuration rejects grants.
+Research staging builds also require and embed this public trust store; generic
+diagnostic builds may omit it and consequently reject every grant.
 The standard flavor outputs are `app-play-release.aab` and
 `app-research-release.apk`; no release build or signing evidence is claimed
 until those artifacts are independently verified.
@@ -147,18 +166,23 @@ The Windows build contains two native processes:
 
 - `gamblock_ai_service.exe` — LocalSystem SCM service with normal recovery,
   authenticated `127.0.0.1:9090` WebSocket, Hybrid-v2 classification,
-  machine-DPAPI pairing/grants, and aggregate counters;
+  machine-DPAPI pairing/grants, pending-intervention replay, controlled MSI
+  removal, and aggregate counters;
 - `gamblock_ai_apps.exe` — user-session Flutter agent that connects through a
-  logon-SID-restricted named pipe, performs supported `SendInput` navigation,
-  presents Pattern Interrupt, and surfaces native state through Method/Event
-  Channels.
+  logon-SID-restricted named pipe, performs browser-scoped `SendInput` Back or
+  close-tab fallback,
+  acknowledges visible/completed Pattern Interrupt state, and surfaces native
+  state through Method/Event Channels.
 
 The browser extension remains a passive sensor. It never receives a block
 command. The supported pilot installer is the per-machine MSI under
 `windows/installer/`: it places immutable binaries under `Program Files`,
 registers the LocalSystem service with SCM recovery, and exposes a normal
-elevated Windows Installer removal path. In-app maintenance remains gated by a
-signed device-bound removal/emergency grant. The PowerShell files under
+elevated Windows Installer removal path. The in-app approved-removal path asks
+LocalSystem to verify and consume a device-bound uninstall grant, then removes
+the installed MSI by its registered ProductCode. Direct elevated Windows
+Installer removal remains the administrator break-glass path; a protection
+pause does not authorize removal. The PowerShell files under
 `windows/scripts/` are developer/evidence helpers and are not shipped by the
 MSI. Windows runtime, signing, and uninstall behavior still require validation
 on a Windows VM/device.
@@ -168,7 +192,7 @@ runtime/SCM lifecycle, WebSocket handling, named-pipe commands, local state,
 local artifact loading and integrity checks, opt-in evidence capture, user-agent launch, and small
 platform support modules. The
 Flutter runner similarly uses `native_protection_*.{cpp,h}` modules for codec,
-channels, pipe transport, events, and settings monitoring. This keeps IPC,
+channels, pipe transport, intervention events, and browser actions. This keeps IPC,
 credential storage, and local artifact integrity logic independently reviewable. Pipe operations
 are cancellable during shutdown, and the Windows service joins its socket
 workers before Winsock teardown.

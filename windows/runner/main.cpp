@@ -9,14 +9,21 @@
 
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
+  std::vector<std::string> command_line_arguments =
+      GetCommandLineArguments();
+  const bool start_hidden =
+      std::find(command_line_arguments.begin(), command_line_arguments.end(),
+                "--protection-agent") != command_line_arguments.end();
   HANDLE instance_mutex =
       CreateMutexW(nullptr, TRUE, L"Local\\GamblockAIUserAgent");
   if (instance_mutex == nullptr || GetLastError() == ERROR_ALREADY_EXISTS) {
-    HWND existing =
-        FindWindowW(L"FLUTTER_RUNNER_WIN32_WINDOW", nullptr);
-    if (existing != nullptr) {
-      ShowWindow(existing, SW_RESTORE);
-      SetForegroundWindow(existing);
+    if (!start_hidden) {
+      HWND existing =
+          FindWindowW(L"FLUTTER_RUNNER_WIN32_WINDOW", nullptr);
+      if (existing != nullptr) {
+        ShowWindow(existing, SW_RESTORE);
+        SetForegroundWindow(existing);
+      }
     }
     if (instance_mutex != nullptr) CloseHandle(instance_mutex);
     return EXIT_SUCCESS;
@@ -32,12 +39,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
   flutter::DartProject project(L"data");
-
-  std::vector<std::string> command_line_arguments =
-      GetCommandLineArguments();
-  const bool start_hidden =
-      std::find(command_line_arguments.begin(), command_line_arguments.end(),
-                "--protection-agent") != command_line_arguments.end();
 
   project.set_dart_entrypoint_arguments(std::move(command_line_arguments));
 

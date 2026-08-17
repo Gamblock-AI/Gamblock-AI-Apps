@@ -87,11 +87,18 @@ Do not hardcode URLs in features or call Dio from presentation code.
   but not evaluated by project evidence; supplied metrics remain unverified.
 - Android native source is wired through the active manifest and Method/Event
   Channels for Chrome/Edge sensing, classification, intervention, grant state,
-  and aggregates. Real-device coverage, accessibility, lifecycle, and
-  performance evidence are still required.
+  and aggregates. Intervention delivery is ID-based: Flutter is preferred and
+  the native overlay owns the action only when the visible-frame acknowledgement
+  times out. Research-only removal sensing must remain action-aware so passive
+  App Info does not trigger friction; Play must remain Chrome/Edge-only without
+  Settings/package-installer monitoring. Real-device coverage, accessibility,
+  lifecycle, and performance evidence are still required.
 - Windows uses `windows/service/` for the LocalSystem authority and the
   small `windows/runner/native_protection_*.{cpp,h}` modules for the
-  user-session agent.
+  user-session agent. Pending interventions are replayed by ID until the agent
+  acknowledges visibility/completion. Partner-approved removal is initiated by
+  LocalSystem against the installed MSI; direct elevated MSI removal remains
+  the administrator break-glass path.
   Source/CMake/MSI/release wiring is present; a Windows build and VM/device
   trace are still required before calling it runtime-verified.
 - Any WebSocket shape change must be coordinated with the browser extension
@@ -142,7 +149,10 @@ CI builds the `play` and `research` Android flavors, the Windows debug bundle,
 and a diagnostic MSI without production keys. The CI diagnostic lane also
 produces a `research`-flavor staging APK pointed at `api-staging.gamblock-ai.com`
 (`STAGING_API_BASE_URL`/`STAGING_WEB_BASE_URL`), so test data stays in the
-`gamblock_staging` database. When executing a user release request (e.g. "buat release baru <version>"), follow `docs/ai/release-workflow.md`: trigger both `release.yml` (via tag) and `staging-release.yml` (via workflow_dispatch), monitor them to completion, and consolidate all 5+ build artifacts (Production + Staging) into the single canonical release `https://github.com/Gamblock-AI/Gamblock-AI-Apps/releases/tag/v<version>`. Signed release builds (`release.yml`) run from
+`gamblock_staging` database. Both Research Staging builds require
+`PROTECTION_GRANT_TRUST_STORE_BASE64`, validate that it decodes to a non-empty
+public-key JSON object, and embed it so staging remains grant-capable. When
+executing a user release request (e.g. "buat release baru <version>"), follow `docs/ai/release-workflow.md`: trigger both `release.yml` (via tag) and `staging-release.yml` (via workflow_dispatch), monitor them to completion, and consolidate all 5+ build artifacts (Production + Staging) into the single canonical release `https://github.com/Gamblock-AI/Gamblock-AI-Apps/releases/tag/v<version>`. Signed release builds (`release.yml`) run from
 an immutable semantic-version tag or a manual `workflow_dispatch` with the same
 semver input, in protected environments, and produce the signed Play AAB,
 Research APK, and Windows pilot MSI. See

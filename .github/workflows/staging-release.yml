@@ -38,8 +38,25 @@ jobs:
             'APP_ENV=staging' \
             "API_BASE_URL=$API_BASE_URL" \
             "WEB_BASE_URL=$WEB_BASE_URL" > .env
+      - name: Validate public grant trust store
+        env:
+          TRUST_STORE_BASE64: ${{ vars.PROTECTION_GRANT_TRUST_STORE_BASE64 }}
+        run: |
+          set -euo pipefail
+          : "${TRUST_STORE_BASE64:?PROTECTION_GRANT_TRUST_STORE_BASE64 is required}"
+          printf '%s' "$TRUST_STORE_BASE64" | base64 --decode > "$RUNNER_TEMP/grant-trust-store.json"
+          jq -e 'type == "object" and length > 0 and all(to_entries[]; (.key | length > 0) and (.value | type == "string" and length > 0))' \
+            "$RUNNER_TEMP/grant-trust-store.json" > /dev/null
+          while IFS= read -r public_key; do
+            printf '%s' "$public_key" | base64 --decode > "$RUNNER_TEMP/grant-public-key.der"
+            openssl ec -pubin -inform DER \
+              -in "$RUNNER_TEMP/grant-public-key.der" -text -noout 2> /dev/null | \
+              grep -Eq 'ASN1 OID: prime256v1|NIST CURVE: P-256'
+          done < <(jq -r '.[]' "$RUNNER_TEMP/grant-trust-store.json")
       - run: flutter pub get
       - name: Build Research staging APK
+        env:
+          PROTECTION_GRANT_TRUST_STORE_BASE64: ${{ vars.PROTECTION_GRANT_TRUST_STORE_BASE64 }}
         run: |
           flutter build apk --debug --flavor research \
             --build-name "${{ github.event.inputs.version }}" \
@@ -99,6 +116,42 @@ jobs:
           API_BASE_URL=$env:API_BASE_URL
           WEB_BASE_URL=$env:WEB_BASE_URL
           "@ | Set-Content -Encoding utf8NoBOM .env
+      - name: Validate public grant trust store
+        shell: pwsh
+        env:
+          TRUST_STORE_BASE64: ${{ vars.PROTECTION_GRANT_TRUST_STORE_BASE64 }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:TRUST_STORE_BASE64)) { throw "PROTECTION_GRANT_TRUST_STORE_BASE64 is required" }
+          $json = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($env:TRUST_STORE_BASE64))
+          $trustStore = $json | ConvertFrom-Json
+          if ($trustStore -isnot [pscustomobject] -or @($trustStore.PSObject.Properties).Count -eq 0) {
+            throw "PROTECTION_GRANT_TRUST_STORE_BASE64 must decode to a non-empty JSON object"
+          }
+          foreach ($property in $trustStore.PSObject.Properties) {
+            if ([string]::IsNullOrWhiteSpace($property.Name) -or $property.Value -isnot [string] -or [string]::IsNullOrWhiteSpace($property.Value)) {
+              throw "PROTECTION_GRANT_TRUST_STORE_BASE64 keys and values must be non-empty strings"
+            }
+            try {
+              $decodedKey = [Convert]::FromBase64String($property.Value)
+            } catch {
+              throw "PROTECTION_GRANT_TRUST_STORE_BASE64 values must be base64 DER public keys"
+            }
+            if ($decodedKey.Length -eq 0) {
+              throw "PROTECTION_GRANT_TRUST_STORE_BASE64 values must decode to non-empty public keys"
+            }
+            $ecdsa = [Security.Cryptography.ECDsa]::Create()
+            try {
+              $bytesRead = 0
+              $ecdsa.ImportSubjectPublicKeyInfo($decodedKey, [ref]$bytesRead)
+              if ($bytesRead -ne $decodedKey.Length -or $ecdsa.KeySize -ne 256) {
+                throw "unexpected key encoding or curve"
+              }
+            } catch {
+              throw "PROTECTION_GRANT_TRUST_STORE_BASE64 values must be DER P-256 public keys"
+            } finally {
+              $ecdsa.Dispose()
+            }
+          }
       - run: flutter pub get
       - name: Build Windows staging bundle
         env:

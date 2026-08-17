@@ -100,6 +100,9 @@ flutter::EncodableMap SnapshotMap(const std::string& json) {
        flutter::EncodableValue(JsonString(json, "sensor_status", "disconnected"))},
       {flutter::EncodableValue("permission_status"),
        flutter::EncodableValue(JsonString(json, "permission_status", "unknown"))},
+      {flutter::EncodableValue("supports_controlled_removal"),
+       flutter::EncodableValue(
+           JsonBool(json, "supports_controlled_removal", false))},
       {flutter::EncodableValue("model_version"),
        flutter::EncodableValue(JsonString(
            json, "model_version", "gamblock-lr-bfafb725511a"))},

@@ -107,6 +107,7 @@ android {
             dimension = "distribution"
             applicationId = "com.gamblock.gamblock_ai_apps"
             manifestPlaceholders["appLabel"] = "Gamblock-AI"
+            buildConfigField("boolean", "SUPPORTS_CONTROLLED_REMOVAL", "false")
             playSigning?.let {
                 signingConfig = signingConfigs.getByName("playRelease")
             }
@@ -116,6 +117,7 @@ android {
             applicationIdSuffix = ".research"
             versionNameSuffix = "-research"
             manifestPlaceholders["appLabel"] = "Gamblock-AI Research"
+            buildConfigField("boolean", "SUPPORTS_CONTROLLED_REMOVAL", "true")
             researchSigning?.let {
                 signingConfig = signingConfigs.getByName("researchRelease")
             }

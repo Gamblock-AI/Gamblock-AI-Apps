@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/auth/auth_state.dart';
@@ -56,6 +57,7 @@ final dashboardTourProvider =
 /// Gate for the first-time tour: an authenticated student who has not seen the
 /// tour yet. The host combines this with the current route path.
 final dashboardTourEligibleProvider = FutureProvider<bool>((ref) async {
+  if (kIsWeb) return false;
   final auth = ref.watch(authProvider);
   if (!auth.isAuthenticated) return false;
   final seen = await ref.watch(tourSeenProvider.future);

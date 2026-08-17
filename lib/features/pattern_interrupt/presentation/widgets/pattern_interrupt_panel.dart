@@ -41,42 +41,41 @@ class PatternInterruptPanel extends StatelessWidget {
         : inhaling
         ? l10n.patternPhaseInhale
         : l10n.patternPhaseExhale;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(AppRadius.banner),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          key: const ValueKey('interrupt'),
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 26),
-          decoration: BoxDecoration(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.32),
-            borderRadius: BorderRadius.circular(AppRadius.banner),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.18),
-              width: 1.2,
+
+    return Column(
+      key: const ValueKey('interrupt'),
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Top Floating Focus: Breathing Orb, Phase Cue, and Typography
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 4),
+            PatternBreathingOrb(
+              animation: breathingAnimation,
+              progress: pauseProgress,
+              disableAnimations: disableAnimations,
+              semanticsLabel: l10n.patternBreatheLabel,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.25),
-                blurRadius: 36,
-                offset: const Offset(0, 12),
+            const SizedBox(height: 10),
+            // Floating Breath Phase Pill
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F172A).withValues(alpha: 0.50),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.20),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.25),
+                    blurRadius: 10,
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Column(
-            children: [
-          PatternBreathingOrb(
-            animation: breathingAnimation,
-            progress: pauseProgress,
-            disableAnimations: disableAnimations,
-            semanticsLabel: l10n.patternBreatheLabel,
-          ),
-          const SizedBox(height: 12),
-          // Fixed-height slot: the breath-phase cue crossfades without moving
-          // anything below it.
-          SizedBox(
-            height: AppSpacing.xl,
-            child: Center(
               child: AnimatedSwitcher(
                 duration: disableAnimations
                     ? Duration.zero
@@ -84,61 +83,114 @@ class PatternInterruptPanel extends StatelessWidget {
                 child: Text(
                   phaseCue,
                   key: ValueKey(phaseCue),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.skyLight.withValues(alpha: 0.9),
-                    fontWeight: FontWeight.w600,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.skyLight,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                    letterSpacing: 0.2,
                   ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            l10n.patternInterruptTitle,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
-              fontSize: 22,
-              letterSpacing: -0.3,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.patternBreatheDesc,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.white.withValues(alpha: 0.78),
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Semantics(
-            liveRegion: true,
-            label: l10n.patternSecondsRemaining(secondsRemaining),
-            child: disableAnimations
-                ? _statusLabel(context, l10n, ready, secondsRemaining)
-                : AnimatedSize(
-                    duration: const Duration(milliseconds: 220),
-                    curve: Curves.easeOutCubic,
-                    child: _statusLabel(context, l10n, ready, secondsRemaining),
+            const SizedBox(height: 12),
+            Text(
+              l10n.patternInterruptTitle,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                fontSize: 21,
+                letterSpacing: -0.3,
+                shadows: [
+                  Shadow(
+                    color: Colors.black.withValues(alpha: 0.70),
+                    blurRadius: 14,
+                    offset: const Offset(0, 2),
                   ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              l10n.patternBreatheDesc,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.white.withValues(alpha: 0.85),
+                fontSize: 13,
+                height: 1.4,
+                shadows: [
+                  Shadow(
+                    color: Colors.black.withValues(alpha: 0.65),
+                    blurRadius: 8,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+
+        // Open Viewport Spacer: Allows the center video to be fully visible and highlighted
+        const Spacer(),
+
+        // Bottom Floating Action Dock
+        ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F172A).withValues(alpha: 0.42),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.18),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.35),
+                    blurRadius: 28,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Semantics(
+                    liveRegion: true,
+                    label: l10n.patternSecondsRemaining(secondsRemaining),
+                    child: disableAnimations
+                        ? _statusLabel(context, l10n, ready, secondsRemaining)
+                        : AnimatedSize(
+                            duration: const Duration(milliseconds: 220),
+                            curve: Curves.easeOutCubic,
+                            child: _statusLabel(
+                              context,
+                              l10n,
+                              ready,
+                              secondsRemaining,
+                            ),
+                          ),
+                  ),
+                  const SizedBox(height: 12),
+                  PatternInterruptActions(
+                    ready: ready,
+                    disableAnimations: disableAnimations,
+                    onContinue: onContinue,
+                    onOpenGrounding: onOpenGrounding,
+                    onOpenHelp: onOpenHelp,
+                    onLater: onLater,
+                  ),
+                ],
+              ),
+            ),
           ),
-          const SizedBox(height: 24),
-          PatternInterruptActions(
-            ready: ready,
-            disableAnimations: disableAnimations,
-            onContinue: onContinue,
-            onOpenGrounding: onOpenGrounding,
-            onOpenHelp: onOpenHelp,
-            onLater: onLater,
-          ),
-        ],
-      ),
-    ),
-  ),
-);
-}
+        ),
+      ],
+    );
+  }
 
   Widget _statusLabel(
     BuildContext context,
@@ -146,25 +198,25 @@ class PatternInterruptPanel extends StatelessWidget {
     bool ready,
     int secondsRemaining,
   ) => Container(
-    constraints: const BoxConstraints(minWidth: 180),
+    constraints: const BoxConstraints(minWidth: 160),
     padding: const EdgeInsets.symmetric(
-      horizontal: AppSpacing.lg,
-      vertical: 10,
+      horizontal: AppSpacing.md,
+      vertical: 8,
     ),
     decoration: BoxDecoration(
       color: ready
-          ? AppColors.sage.withValues(alpha: 0.20)
-          : AppColors.sky.withValues(alpha: 0.15),
+          ? AppColors.sage.withValues(alpha: 0.22)
+          : AppColors.sky.withValues(alpha: 0.18),
       borderRadius: BorderRadius.circular(AppRadius.pill),
       border: Border.all(
         color: ready
-            ? AppColors.sageLight.withValues(alpha: 0.5)
-            : AppColors.sky.withValues(alpha: 0.35),
+            ? AppColors.sageLight.withValues(alpha: 0.6)
+            : AppColors.sky.withValues(alpha: 0.45),
         width: 1,
       ),
       boxShadow: [
         BoxShadow(
-          color: (ready ? AppColors.sage : AppColors.sky).withValues(alpha: 0.2),
+          color: (ready ? AppColors.sage : AppColors.sky).withValues(alpha: 0.25),
           blurRadius: 12,
           spreadRadius: -2,
         ),
@@ -179,7 +231,8 @@ class PatternInterruptPanel extends StatelessWidget {
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
         color: ready ? AppColors.sageLight : AppColors.skyLight,
         fontWeight: FontWeight.w700,
-        letterSpacing: 0.4,
+        fontSize: 13,
+        letterSpacing: 0.3,
         fontFeatures: const [FontFeature.tabularFigures()],
       ),
     ),

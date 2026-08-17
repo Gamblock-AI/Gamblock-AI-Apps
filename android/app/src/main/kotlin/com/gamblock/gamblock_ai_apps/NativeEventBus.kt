@@ -17,6 +17,8 @@ object NativeEventBus {
         if (sink != null) sinks.remove(sink)
     }
 
+    fun hasListeners(): Boolean = sinks.isNotEmpty()
+
     fun emit(event: Map<String, Any?>) {
         mainHandler.post {
             sinks.forEach { sink ->

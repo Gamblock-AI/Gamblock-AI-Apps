@@ -21,9 +21,19 @@ class TamperWarningOverlay(private val service: AccessibilityService) {
     val isShowing: Boolean
         get() = root != null
 
-    fun show() {
+    fun show(
+        tamperAction: String,
+        onSafeDismiss: () -> Unit,
+    ) {
         if (root != null) return
         val isEnglish = Locale.getDefault().language == "en"
+        val actionLabel = when (tamperAction) {
+            "uninstall" -> if (isEnglish) "uninstall" else "pencopotan"
+            "disable_accessibility" -> if (isEnglish) "disable Accessibility" else "penonaktifan Aksesibilitas"
+            "force_stop" -> if (isEnglish) "force stop" else "berhenti paksa"
+            "clear_data" -> if (isEnglish) "clear data" else "penghapusan data"
+            else -> if (isEnglish) "protected change" else "perubahan terlindungi"
+        }
         val container = LinearLayout(service).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
@@ -40,9 +50,9 @@ class TamperWarningOverlay(private val service: AccessibilityService) {
         container.addView(
             text(
                 if (isEnglish) {
-                    "Open Gamblock-AI Research to request an approved pause or removal window."
+                    "Open Gamblock-AI Research to request approval for this $actionLabel action."
                 } else {
-                    "Buka Gamblock-AI Research untuk meminta jeda atau jendela pencopotan yang disetujui."
+                    "Buka Gamblock-AI Research untuk meminta persetujuan atas aksi $actionLabel ini."
                 },
                 17f,
                 Color.argb(210, 255, 255, 255),
@@ -50,16 +60,19 @@ class TamperWarningOverlay(private val service: AccessibilityService) {
         )
         container.addView(
             button(if (isEnglish) "Open Gamblock-AI" else "Buka Gamblock-AI") {
+                onSafeDismiss()
                 service.startActivity(
                     Intent(service, MainActivity::class.java).apply {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        putExtra("open_approval", true)
                     },
                 )
                 dismiss()
             },
         )
-        container.addView(button(if (isEnglish) "Go back" else "Kembali") { dismiss() })
+        container.addView(button(if (isEnglish) "Go back" else "Kembali") {
+            onSafeDismiss()
+            dismiss()
+        })
         root = container
         windowManager.addView(
             container,

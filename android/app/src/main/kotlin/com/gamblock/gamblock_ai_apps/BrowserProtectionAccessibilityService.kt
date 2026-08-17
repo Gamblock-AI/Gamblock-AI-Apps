@@ -6,11 +6,11 @@ import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.os.SystemClock
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import java.util.ArrayDeque
 import java.util.concurrent.Executors
+import java.lang.ref.WeakReference
 
 /**
  * Browser-only protection shared by both Android distributions.
@@ -30,23 +30,9 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             "com.chrome.canary",
             "com.google.android.apps.chrome",
             "com.microsoft.emmx",
-            "com.sec.android.app.sbrowser",
-            "com.sec.android.app.sbrowser.beta",
-            "com.brave.browser",
-            "com.opera.browser",
-            "com.opera.mini.native",
-            "com.opera.touch",
-            "org.mozilla.firefox",
-            "org.mozilla.firefox_beta",
-            "org.mozilla.focus",
-            "com.mi.globalbrowser",
-            "com.vivo.browser",
-            "com.heytap.browser",
-            "com.coloros.browser",
-            "com.oppo.browser",
-            "com.duckduckgo.mobile.android",
-            "com.uc.browser.en",
-            "com.UCMobile.intl",
+            "com.microsoft.emmx.beta",
+            "com.microsoft.emmx.dev",
+            "com.microsoft.emmx.canary",
         )
         private val URL_RESOURCE_IDS = listOf(
             "com.android.chrome:id/url_bar",
@@ -92,11 +78,28 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             if (candidateHasScheme != currentHasScheme) return candidateHasScheme
             return candidate.length > current.length
         }
+
+        @Volatile
+        private var activeService: WeakReference<BrowserProtectionAccessibilityService>? = null
+
+        fun notifyFlutterVisibilityClaimed(interventionId: String) {
+            activeService?.get()?.cancelNativeFallback(interventionId)
+        }
+
+        fun notifyInterventionCompleted(interventionId: String) {
+            activeService?.get()?.onExternalInterventionCompleted(interventionId)
+        }
+
+        fun notifyFlutterPresentationLost(interventionId: String) {
+            activeService?.get()?.onFlutterPresentationLost(interventionId)
+        }
     }
 
     protected open val additionalObservedPackages: Set<String> = emptySet()
 
     protected open val additionalBrowserPackages: Set<String> = emptySet()
+
+    protected open val additionalAccessibilityEventTypes: Int = 0
 
     private val observedBrowsers: Set<String>
         get() = SUPPORTED_BROWSERS + additionalBrowserPackages
@@ -111,13 +114,16 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
     private var lastSignature = 0
     private var lastDecisionAt = 0L
     private var pendingScan: Runnable? = null
+    private var nativeFallback: Runnable? = null
+    private var interventionExpiry: Runnable? = null
 
     override fun onServiceConnected() {
         super.onServiceConnected()
         serviceInfo = serviceInfo.apply {
             eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED or
                 AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED or
-                AccessibilityEvent.TYPE_VIEW_CLICKED
+                AccessibilityEvent.TYPE_VIEW_CLICKED or
+                additionalAccessibilityEventTypes
             feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC
             notificationTimeout = 150
             flags = AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or
@@ -129,14 +135,18 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         stateStore = ProtectionStateStore(applicationContext)
         overlay = PatternInterruptOverlay(this, NativeConfig.webBaseUrl(this))
         phase4Evidence = Phase4EvidenceRecorder(applicationContext)
+        activeService = WeakReference(this)
         HealthNotificationPreferences.show(this)
         NativeEventBus.emit(snapshotEvent())
         onProtectionServiceConnected()
+        restorePendingIntervention()
         worker.execute {
             val loaded = classifier.load()
             mainHandler.post {
                 if (loaded) {
-                    stateStore.setStatus("active")
+                    if (stateStore.status() != "degraded") {
+                        stateStore.setStatus("active")
+                    }
                 } else {
                     stateStore.setStatus("degraded", "artifact_invalid")
                 }
@@ -153,7 +163,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             scheduleBrowserScan(event)
             return
         }
-        handleAdditionalAccessibilityEvent(sourcePackage)
+        handleAdditionalAccessibilityEvent(event, sourcePackage)
     }
 
     private fun isNavigationLike(event: AccessibilityEvent): Boolean {
@@ -169,7 +179,10 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         }
     }
 
-    protected open fun handleAdditionalAccessibilityEvent(sourcePackage: String) = Unit
+    protected open fun handleAdditionalAccessibilityEvent(
+        event: AccessibilityEvent,
+        sourcePackage: String,
+    ) = Unit
 
     protected open fun onProtectionServiceConnected() = Unit
 
@@ -197,33 +210,19 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                 }
                 lastSignature = signature
                 lastDecisionAt = now
-                stateStore.setStatus("active")
                 stateStore.setLastEventNow()
                 if (result.decision == "block") {
-                    aggregateStore.increment("block_count_sync")
-                    aggregateStore.increment("intervention_shown")
+                    val acquisition = stateStore.acquireIntervention(
+                        reasonCode = result.reasonCode,
+                        modelVersion = result.modelVersion,
+                        rulesetVersion = result.rulesetVersion,
+                    )
+                    if (!acquisition.created) return@execute
                     mainHandler.post {
-                        try {
-                            performGlobalAction(GLOBAL_ACTION_BACK)
-                            startActivity(
-                                Intent(this@BrowserProtectionAccessibilityService, MainActivity::class.java).apply {
-                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                                    putExtra("open_intervention", true)
-                                },
-                            )
-                            NativeEventBus.emit(
-                                mapOf(
-                                    "type" to "intervention_shown",
-                                    "reason_code" to result.reasonCode,
-                                    "model_version" to result.modelVersion,
-                                    "ruleset_version" to result.rulesetVersion,
-                                ),
-                            )
-                        } catch (_: Exception) {
-                            overlay.showIntervention()
-                        }
+                        executeBlockAndIntervention(acquisition.intervention)
                     }
                 } else {
+                    stateStore.setStatus("active")
                     NativeEventBus.emit(snapshotEvent())
                 }
             }
@@ -322,6 +321,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             "permission_status" to "granted",
             "model_version" to classifier.modelVersion,
             "ruleset_version" to classifier.rulesetVersion,
+            "supports_controlled_removal" to BuildConfig.SUPPORTS_CONTROLLED_REMOVAL,
             "degraded_reason_code" to stateStore.degradedReason(),
             "last_event_at" to stateStore.lastEventAt(),
         )
@@ -329,11 +329,155 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
 
     override fun onInterrupt() = Unit
 
+    private fun executeBlockAndIntervention(intervention: PendingIntervention) {
+        val backAccepted = performGlobalAction(GLOBAL_ACTION_BACK)
+        val navigationAccepted = if (backAccepted) {
+            stateStore.setStatus("active")
+            true
+        } else {
+            val homeAccepted = performGlobalAction(GLOBAL_ACTION_HOME)
+            stateStore.setStatus(
+                "degraded",
+                if (homeAccepted) "browser_back_failed" else "browser_block_action_failed",
+            )
+            NativeEventBus.emit(snapshotEvent())
+            homeAccepted
+        }
+        if (navigationAccepted) {
+            // Count only after Android accepts the blocking navigation action.
+            aggregateStore.increment("block_count_sync")
+        }
+
+        NativeEventBus.emit(intervention.event())
+        val flutterLaunchAccepted = runCatching {
+            startActivity(
+                Intent(this, MainActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                },
+            )
+        }.isSuccess
+        if (flutterLaunchAccepted) {
+            scheduleNativeFallback(intervention)
+        } else {
+            showNativeIntervention(intervention.id)
+        }
+        scheduleInterventionExpiry(intervention)
+    }
+
+    private fun restorePendingIntervention() {
+        val stored = stateStore.activeIntervention() ?: return
+        val pending = if (
+            stored.owner == "flutter_visible" &&
+            (!MainActivity.isFlutterPresentationAvailable() ||
+                !NativeEventBus.hasListeners())
+        ) {
+            stateStore.releaseFlutterOwnershipForReplay(stored.id) ?: stored
+        } else {
+            stored
+        }
+        NativeEventBus.emit(pending.event())
+        when (pending.owner) {
+            "native_pending", "native_visible" -> {
+                showNativeIntervention(pending.id)
+                scheduleInterventionExpiry(pending)
+            }
+            "flutter_visible" -> scheduleInterventionExpiry(pending)
+            else -> {
+                runCatching {
+                    startActivity(
+                        Intent(this, MainActivity::class.java).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                        },
+                    )
+                }
+                scheduleNativeFallback(pending)
+                scheduleInterventionExpiry(pending)
+            }
+        }
+    }
+
+    private fun scheduleNativeFallback(intervention: PendingIntervention) {
+        nativeFallback?.let(mainHandler::removeCallbacks)
+        val runnable = Runnable {
+            nativeFallback = null
+            val active = stateStore.activeIntervention()
+            if (active?.id == intervention.id && active.owner == "none") {
+                showNativeIntervention(intervention.id)
+            }
+        }
+        nativeFallback = runnable
+        val delay = (intervention.ackDeadlineWallMs - System.currentTimeMillis()).coerceAtLeast(0L)
+        mainHandler.postDelayed(runnable, delay)
+    }
+
+    private fun scheduleInterventionExpiry(intervention: PendingIntervention) {
+        interventionExpiry?.let(mainHandler::removeCallbacks)
+        val runnable = Runnable {
+            interventionExpiry = null
+            stateStore.expireIntervention(intervention.id)
+            nativeFallback?.let(mainHandler::removeCallbacks)
+            nativeFallback = null
+            overlay.dismissIntervention(intervention.id)
+        }
+        interventionExpiry = runnable
+        val delay = (intervention.expiresWallMs - System.currentTimeMillis()).coerceAtLeast(0L) + 1L
+        mainHandler.postDelayed(runnable, delay)
+    }
+
+    private fun showNativeIntervention(interventionId: String) {
+        if (!stateStore.claimNativeOwnership(interventionId)) return
+        try {
+            overlay.showIntervention(
+                interventionId = interventionId,
+                onCommitted = {
+                    if (stateStore.markNativeVisible(interventionId)) {
+                        aggregateStore.increment("intervention_shown")
+                    }
+                },
+                onCompleted = {
+                    stateStore.completeIntervention(interventionId)
+                    onExternalInterventionCompleted(interventionId)
+                },
+            )
+        } catch (_: Exception) {
+            overlay.dismissIntervention(interventionId)
+            stateStore.releaseUncommittedNativeOwnership(interventionId)
+            stateStore.setStatus("degraded", "intervention_overlay_failed")
+            NativeEventBus.emit(snapshotEvent())
+        }
+    }
+
+    private fun cancelNativeFallback(interventionId: String) {
+        if (stateStore.activeIntervention()?.id != interventionId) return
+        nativeFallback?.let(mainHandler::removeCallbacks)
+        nativeFallback = null
+    }
+
+    private fun onExternalInterventionCompleted(interventionId: String) {
+        nativeFallback?.let(mainHandler::removeCallbacks)
+        nativeFallback = null
+        interventionExpiry?.let(mainHandler::removeCallbacks)
+        interventionExpiry = null
+        overlay.dismissIntervention(interventionId)
+    }
+
+    private fun onFlutterPresentationLost(interventionId: String) {
+        val pending = stateStore.activeIntervention()
+        if (pending?.id != interventionId || pending.owner != "none") return
+        NativeEventBus.emit(pending.event())
+        scheduleNativeFallback(pending)
+        scheduleInterventionExpiry(pending)
+    }
+
     override fun onDestroy() {
         onProtectionServiceDestroyed()
         pendingScan?.let(mainHandler::removeCallbacks)
         mainHandler.removeCallbacksAndMessages(null)
         overlay.dismiss()
+        if (activeService?.get() === this) {
+            activeService?.clear()
+            activeService = null
+        }
         worker.shutdownNow()
         aggregateStore.increment("permission_revoked")
         stateStore.setStatus("inactive", "accessibility_disabled")

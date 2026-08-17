@@ -66,10 +66,11 @@ bool ReadPipeMessage(HANDLE pipe,
 
 void ProtectionService::PipeLoop() {
   while (running_) {
+    const DWORD pipe_session_id = interactive_session_id_.load();
     SECURITY_ATTRIBUTES attributes{};
     PSECURITY_DESCRIPTOR descriptor = nullptr;
     PACL acl = nullptr;
-    if (!BuildPipeSecurity(&attributes, &descriptor, &acl)) {
+    if (!BuildPipeSecurity(pipe_session_id, &attributes, &descriptor, &acl)) {
       Sleep(2000);
       continue;
     }
@@ -85,14 +86,24 @@ void ProtectionService::PipeLoop() {
       Sleep(1000);
       continue;
     }
+    {
+      std::lock_guard lock(pipe_mutex_);
+      pipe_listener_ = pipe;
+    }
     if (!ConnectPipe(pipe, running_)) {
+      {
+        std::lock_guard lock(pipe_mutex_);
+        if (pipe_listener_ == pipe) pipe_listener_ = INVALID_HANDLE_VALUE;
+      }
       CloseHandle(pipe);
       continue;
     }
     bool active = false;
     {
       std::lock_guard lock(pipe_mutex_);
-      if (running_) {
+      if (pipe_listener_ == pipe) pipe_listener_ = INVALID_HANDLE_VALUE;
+      if (running_ && pipe_session_id == interactive_session_id_.load()) {
+        pipe_listener_ = INVALID_HANDLE_VALUE;
         pipe_client_ = pipe;
         active = true;
       }
@@ -100,8 +111,9 @@ void ProtectionService::PipeLoop() {
     if (!active) {
       DisconnectNamedPipe(pipe);
       CloseHandle(pipe);
-      break;
+      continue;
     }
+    FlushPendingIntervention();
     HandlePipeClient(pipe);
     {
       std::lock_guard lock(pipe_mutex_);
@@ -134,6 +146,31 @@ void ProtectionService::HandlePipeCommand(const std::string& command) {
         JsonString(command, "evidence_id").value_or(""));
     SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
                    EscapeJson(request_id) + "\",\"ok\":true}");
+  } else if (type == "ack_intervention_visible") {
+    const bool acknowledged = AcknowledgeInterventionVisible(
+        JsonString(command, "intervention_id").value_or(""));
+    SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
+                   EscapeJson(request_id) + "\",\"ok\":" +
+                   (acknowledged ? "true" : "false") + "}");
+  } else if (type == "complete_intervention") {
+    const bool completed = CompleteIntervention(
+        JsonString(command, "intervention_id").value_or(""));
+    SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
+                   EscapeJson(request_id) + "\",\"ok\":" +
+                   (completed ? "true" : "false") + "}");
+  } else if (type == "block_action_result") {
+    const bool recorded = RecordBlockAction(
+        JsonString(command, "intervention_id").value_or(""),
+        JsonBool(command, "succeeded").value_or(false));
+    SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
+                   EscapeJson(request_id) + "\",\"ok\":" +
+                   (recorded ? "true" : "false") + "}");
+    if (recorded) SendAgentEvent(SnapshotJson(""));
+  } else if (type == "begin_approved_removal") {
+    const bool launched = BeginApprovedRemoval();
+    SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
+                   EscapeJson(request_id) + "\",\"ok\":" +
+                   (launched ? "true" : "false") + "}");
   } else if (type == "snapshot") {
     SendAgentEvent(SnapshotJson(request_id));
   } else if (type == "self_test") {

@@ -7,6 +7,7 @@ class ProtectionStatus {
     required this.permissionStatus,
     required this.rulesetVersion,
     required this.modelVersion,
+    this.supportsControlledRemoval = false,
     this.degradedReasonCode,
     this.lastEventAt,
   });
@@ -18,6 +19,7 @@ class ProtectionStatus {
   final String permissionStatus;
   final String rulesetVersion;
   final String modelVersion;
+  final bool supportsControlledRemoval;
   final String? degradedReasonCode;
   final DateTime? lastEventAt;
 

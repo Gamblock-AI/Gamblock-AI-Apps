@@ -9,7 +9,7 @@ int wmain(int argc, wchar_t** argv) {
     return service.Install() ? 0 : 1;
   }
   if (command == L"--uninstall") {
-    return service.Uninstall() ? 0 : 1;
+    return service.BeginApprovedRemoval() ? 0 : 1;
   }
   if (command == L"--admin-uninstall") {
     // Windows SCM permissions are the explicit administrator break-glass

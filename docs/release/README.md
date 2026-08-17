@@ -9,10 +9,10 @@ real-device correctness.
 
 | Artifact | Identity | Audience | Required protection behavior |
 |---|---|---|---|
-| Play AAB | `com.gamblock.gamblock_ai_apps` / Gamblock-AI | Public Android | Browser-only Accessibility, local classification/block/Pattern Interrupt; no Settings or uninstall interception |
-| Research APK | `com.gamblock.gamblock_ai_apps.research` / Gamblock-AI Research | Approved PKM cohort | Full research prototype, including transparent best-effort settings/removal friction |
-| Pilot MSI | Gamblock-AI Pilot | Approved Windows cohort | Per-machine LocalSystem service, partner-approved normal maintenance, administrator break-glass |
-| Research staging APK + MSI | Research flavor + Gamblock-AI Pilot identity, staging backend | QA/test | Same protection behavior as the research/pilot variants but pointed at `api-staging.gamblock-ai.com`; published from the manual `staging-release.yml` lane |
+| Play AAB | `com.gamblock.gamblock_ai_apps` / Gamblock-AI | Public Android | Chrome/Edge Accessibility sensing, local classification/block/Pattern Interrupt; no Settings or uninstall interception |
+| Research APK | `com.gamblock.gamblock_ai_apps.research` / Gamblock-AI Research | Approved PKM cohort | Chrome/Edge plus documented non-standard browsers, action-aware best-effort removal friction, and partner-approved normal Android removal handoff |
+| Pilot MSI | Gamblock-AI Pilot | Approved Windows cohort | Per-machine LocalSystem service, in-app partner-approved MSI removal, and direct elevated administrator break-glass |
+| Research staging APK + MSI | Research flavor + Gamblock-AI Pilot identity, staging backend | QA/test | Grant-capable Research/pilot behavior pointed at `api-staging.gamblock-ai.com`; published from the manual `staging-release.yml` lane after public trust-store validation |
 
 Debug APKs, Windows ZIPs, and the diagnostic unsigned MSI are CI diagnostics
 only. The Research staging release is a separate QA lane: its APK is debug
@@ -44,7 +44,10 @@ PROTECTION_GRANT_TRUST_STORE_BASE64 = base64(
 The map contains the current and next public keys during rotation. Ship the new
 public key before changing the backend signing `kid`; remove the old key only
 after every supported client has moved beyond it. Empty, malformed, or unknown
-trust data fails closed.
+trust data fails closed. `release.yml` and both platform jobs in
+`staging-release.yml` require the value to decode to a non-empty JSON key map;
+the staging jobs additionally reject values that are not base64 DER P-256
+public keys. Only this public map is passed to native builds.
 
 ### Secret storage locations
 
@@ -77,6 +80,12 @@ inputs:
   `ANDROID_RESEARCH_KEY_ALIAS` is a non-secret environment variable;
 - Windows secrets: `WINDOWS_PILOT_SIGNING_PFX_BASE64` and password;
 - optional public timestamp endpoint: `WINDOWS_TIMESTAMP_URL`.
+
+The manual Research Staging workflow uses `STAGING_API_BASE_URL`,
+`STAGING_WEB_BASE_URL`, and the repository-level public
+`PROTECTION_GRANT_TRUST_STORE_BASE64` for both platform jobs. Its Windows job
+also uses the self-signed PFX from `pilot-signing`. Missing or malformed trust
+configuration aborts the workflow; do not substitute an empty map for QA.
 
 Adding or rotating these values requires explicit owner authorization. The
 diagnostic workflow never consumes these private inputs and creates only
@@ -297,6 +306,13 @@ separate product, partner, and research consent boundaries, and guide the user
 through Android's normal sideload and Restricted Settings screens. Do not
 disable Play Protect or add broad device security exceptions.
 
+Removal friction is based on a concrete user action, not merely the presence of
+an App Info window. Verify uninstall from both App Info and the supported
+launcher path, plus Accessibility-disable, force-stop, and clear-data as
+separate scenarios. Only a valid `uninstall_detected` grant may continue to the
+normal Android removal UI after explicit confirmation; a protection pause must
+not authorize it.
+
 Record the exact APK version, SHA-256, signing-certificate digest, device/OEM,
 Android version, installer source, and every warning shown. The participant is
 not promised irreversible protection: device administrators, recovery modes,
@@ -313,8 +329,10 @@ The MSI must install immutable application files under `Program Files`, put
 mutable machine state under `ProgramData`, register SCM recovery, expose repair
 and clean uninstall in Add/Remove Programs, and leave no service or executable
 after removal. Participants normally use standard-user accounts. A signed
-partner grant opens the normal maintenance path; the research administrator
-retains break-glass uninstall.
+partner uninstall grant opens the normal in-app path: LocalSystem verifies and
+consumes it, resolves the installed ProductCode, and invokes Windows Installer
+removal. The research administrator retains direct elevated MSI uninstall as
+the break-glass path. Neither path relies on window-title heuristics.
 
 Distinguish SmartScreen reputation warnings from Defender Antivirus detections.
 For a concrete Defender detection, preserve the exact artifact/hash and submit
@@ -328,9 +346,12 @@ Archive, without browsing content:
 - signature-verification output and SHA-256 manifests;
 - Android permission/flavor audit and disclosure screenshots/video;
 - Android 13–16 install, enable, reboot, update, decline, grant-expiry, and
-  uninstall traces across the available OEM matrix;
+  uninstall traces across the available OEM matrix, including passive App Info
+  with no false alarm and consecutive cold/background/foreground interventions
+  with one visible acknowledgement per ID;
 - Windows clean-install, ACL, standard-user overwrite denial, SCM recovery,
-  repair, upgrade, approved uninstall, admin break-glass, and removal traces;
+  repair, upgrade, user-agent reconnect/replay, approved in-app uninstall,
+  admin break-glass, and removal traces;
 - invalid-signature, wrong-device, wrong-action, excessive-TTL, clock rollback,
   restart, and key-rotation results on both native authorities.
 

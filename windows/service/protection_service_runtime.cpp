@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include <shlobj.h>
+#include <wtsapi32.h>
 
 #include "service_support.h"
 
@@ -48,7 +49,8 @@ void WINAPI ProtectionService::ServiceMain(DWORD, wchar_t**) {
   if (service.status_handle_ == nullptr) return;
   service.status_.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
   service.status_.dwControlsAccepted =
-      SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN;
+      SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN |
+      SERVICE_ACCEPT_SESSIONCHANGE;
   service.status_.dwCurrentState = SERVICE_START_PENDING;
   SetServiceStatus(service.status_handle_, &service.status_);
   if (!service.StartRuntime()) {
@@ -69,8 +71,8 @@ void WINAPI ProtectionService::ServiceMain(DWORD, wchar_t**) {
 }
 
 DWORD WINAPI ProtectionService::ControlHandler(DWORD control,
-                                               DWORD,
-                                               void*,
+                                               DWORD event_type,
+                                               void* event_data,
                                                void* context) {
   auto* service = static_cast<ProtectionService*>(context);
   if (control == SERVICE_CONTROL_INTERROGATE) {
@@ -88,6 +90,23 @@ DWORD WINAPI ProtectionService::ControlHandler(DWORD control,
   }
   if (control == SERVICE_CONTROL_SHUTDOWN) {
     service->running_ = false;
+    return NO_ERROR;
+  }
+  if (control == SERVICE_CONTROL_SESSIONCHANGE) {
+    if (event_type == WTS_SESSION_LOGON ||
+        event_type == WTS_SESSION_UNLOCK ||
+        event_type == WTS_CONSOLE_CONNECT ||
+        event_type == WTS_REMOTE_CONNECT ||
+        event_type == WTS_SESSION_LOGOFF ||
+        event_type == WTS_SESSION_LOCK ||
+        event_type == WTS_CONSOLE_DISCONNECT ||
+        event_type == WTS_REMOTE_DISCONNECT) {
+      const auto* notification =
+          static_cast<const WTSSESSION_NOTIFICATION*>(event_data);
+      service->RequestUserAgent(
+          notification == nullptr ? WTSGetActiveConsoleSessionId()
+                                  : notification->dwSessionId);
+    }
     return NO_ERROR;
   }
   return ERROR_CALL_NOT_IMPLEMENTED;
@@ -150,7 +169,7 @@ bool ProtectionService::Install() {
 }
 
 bool ProtectionService::Uninstall(bool require_grant) {
-  if (require_grant && !HasActiveGrant("uninstall")) {
+  if (require_grant && !ConsumeActiveGrant("uninstall")) {
     SetLastError(ERROR_ACCESS_DENIED);
     return false;
   }
@@ -200,14 +219,18 @@ bool ProtectionService::StartRuntime() {
       std::filesystem::remove(DataDirectory() / L"device-id.txt", error);
     }
   }
+  interactive_session_id_ = WTSGetActiveConsoleSessionId();
   websocket_thread_ = std::thread(&ProtectionService::WebSocketLoop, this);
   pipe_thread_ = std::thread(&ProtectionService::PipeLoop, this);
+  user_agent_thread_ = std::thread(&ProtectionService::UserAgentLoop, this);
+  RequestUserAgent(interactive_session_id_.load());
   return true;
 }
 
 void ProtectionService::StopRuntime() {
   if (!running_.exchange(false) && !websocket_thread_.joinable() &&
-      !pipe_thread_.joinable()) return;
+      !pipe_thread_.joinable() && !user_agent_thread_.joinable()) return;
+  user_agent_wakeup_.notify_all();
   {
     std::lock_guard lock(client_mutex_);
     for (const SOCKET client : connected_clients_) shutdown(client, SD_BOTH);
@@ -218,6 +241,9 @@ void ProtectionService::StopRuntime() {
       CancelIoEx(pipe_client_, nullptr);
       DisconnectNamedPipe(pipe_client_);
     }
+    if (pipe_listener_ != INVALID_HANDLE_VALUE) {
+      CancelIoEx(pipe_listener_, nullptr);
+    }
   }
   if (websocket_thread_.joinable()) websocket_thread_.join();
   for (auto& client_thread : websocket_client_threads_) {
@@ -225,6 +251,7 @@ void ProtectionService::StopRuntime() {
   }
   websocket_client_threads_.clear();
   if (pipe_thread_.joinable()) pipe_thread_.join();
+  if (user_agent_thread_.joinable()) user_agent_thread_.join();
   WSACleanup();
 }
 

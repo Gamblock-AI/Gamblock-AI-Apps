@@ -4,6 +4,7 @@
 #include <flutter/dart_project.h>
 #include <flutter/flutter_view_controller.h>
 
+#include <atomic>
 #include <memory>
 
 #include "native_protection_bridge.h"
@@ -28,6 +29,7 @@ class FlutterWindow : public Win32Window {
   // The project to run.
   flutter::DartProject project_;
   bool start_hidden_ = false;
+  std::atomic<bool> intervention_locked_{false};
 
   // The Flutter instance hosted by this window.
   std::unique_ptr<flutter::FlutterViewController> flutter_controller_;

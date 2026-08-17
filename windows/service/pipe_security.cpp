@@ -5,11 +5,13 @@
 
 namespace gamblock {
 
-bool BuildPipeSecurity(SECURITY_ATTRIBUTES* attributes,
+bool BuildPipeSecurity(DWORD session_id,
+                       SECURITY_ATTRIBUTES* attributes,
                        PSECURITY_DESCRIPTOR* descriptor,
                        PACL* acl) {
   HANDLE user_token = nullptr;
-  if (!WTSQueryUserToken(WTSGetActiveConsoleSessionId(), &user_token)) {
+  if (session_id == 0xffffffff ||
+      !WTSQueryUserToken(session_id, &user_token)) {
     return false;
   }
   DWORD token_bytes = 0;

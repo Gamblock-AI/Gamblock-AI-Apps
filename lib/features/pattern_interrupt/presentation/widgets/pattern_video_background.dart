@@ -144,18 +144,19 @@ class _PatternVideoBackgroundState extends State<PatternVideoBackground>
             ),
           ),
 
-        // Ambient vignette scrim overlay: protects text legibility without obscuring video
+        // Ambient vignette scrim overlay: protects text legibility at top & bottom without obscuring the central video
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.black.withValues(alpha: showVideo ? 0.30 : 0.45),
-                Colors.black.withValues(alpha: showVideo ? 0.15 : 0.40),
-                const Color(0xFF09090B).withValues(alpha: showVideo ? 0.55 : 0.65),
+                Colors.black.withValues(alpha: showVideo ? 0.38 : 0.50),
+                Colors.black.withValues(alpha: showVideo ? 0.05 : 0.25),
+                Colors.black.withValues(alpha: showVideo ? 0.05 : 0.25),
+                const Color(0xFF09090B).withValues(alpha: showVideo ? 0.72 : 0.80),
               ],
-              stops: const [0.0, 0.45, 1.0],
+              stops: const [0.0, 0.24, 0.62, 1.0],
             ),
           ),
         ),

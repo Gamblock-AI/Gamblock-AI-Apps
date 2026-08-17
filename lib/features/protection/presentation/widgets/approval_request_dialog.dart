@@ -17,7 +17,9 @@ class ApprovalDraft {
 }
 
 class ApprovalRequestDialog extends StatefulWidget {
-  const ApprovalRequestDialog({super.key});
+  const ApprovalRequestDialog({super.key, this.initialAction});
+
+  final String? initialAction;
 
   @override
   State<ApprovalRequestDialog> createState() => _ApprovalRequestDialogState();
@@ -27,6 +29,15 @@ class _ApprovalRequestDialogState extends State<ApprovalRequestDialog> {
   final _reasonController = TextEditingController();
   String _action = 'pause_protection';
   int _duration = 30;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialAction == 'uninstall_detected' ||
+        widget.initialAction == 'pause_protection') {
+      _action = widget.initialAction!;
+    }
+  }
 
   @override
   void dispose() {
@@ -75,7 +86,8 @@ class _ApprovalRequestDialogState extends State<ApprovalRequestDialog> {
                       children: [
                         Text(
                           l10n.protectionApprovalDialogTitle,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.navy,
                                 letterSpacing: -0.3,
@@ -103,28 +115,36 @@ class _ApprovalRequestDialogState extends State<ApprovalRequestDialog> {
                   isDense: true,
                   filled: true,
                   fillColor: AppColors.background,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.sm),
                     borderSide: const BorderSide(color: AppColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.sm),
-                    borderSide:
-                        const BorderSide(color: AppColors.navy, width: 1.5),
+                    borderSide: const BorderSide(
+                      color: AppColors.navy,
+                      width: 1.5,
+                    ),
                   ),
                 ),
                 items: [
                   DropdownMenuItem(
                     value: 'pause_protection',
-                    child: Text(l10n.protectionPauseAction,
-                        style: const TextStyle(fontSize: 13)),
+                    child: Text(
+                      l10n.protectionPauseAction,
+                      style: const TextStyle(fontSize: 13),
+                    ),
                   ),
                   DropdownMenuItem(
                     value: 'uninstall_detected',
-                    child: Text(l10n.protectionUninstallAction,
-                        style: const TextStyle(fontSize: 13)),
+                    child: Text(
+                      l10n.protectionUninstallAction,
+                      style: const TextStyle(fontSize: 13),
+                    ),
                   ),
                 ],
                 onChanged: (value) {
@@ -140,24 +160,30 @@ class _ApprovalRequestDialogState extends State<ApprovalRequestDialog> {
                     isDense: true,
                     filled: true,
                     fillColor: AppColors.background,
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 12,
+                    ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppRadius.sm),
                       borderSide: const BorderSide(color: AppColors.border),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppRadius.sm),
-                      borderSide:
-                          const BorderSide(color: AppColors.navy, width: 1.5),
+                      borderSide: const BorderSide(
+                        color: AppColors.navy,
+                        width: 1.5,
+                      ),
                     ),
                   ),
                   items: [15, 30, 60, 120]
                       .map(
                         (minutes) => DropdownMenuItem(
                           value: minutes,
-                          child: Text(l10n.minutesCount(minutes),
-                              style: const TextStyle(fontSize: 13)),
+                          child: Text(
+                            l10n.minutesCount(minutes),
+                            style: const TextStyle(fontSize: 13),
+                          ),
                         ),
                       )
                       .toList(),
@@ -179,16 +205,20 @@ class _ApprovalRequestDialogState extends State<ApprovalRequestDialog> {
                   isDense: true,
                   filled: true,
                   fillColor: AppColors.background,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.sm),
                     borderSide: const BorderSide(color: AppColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.sm),
-                    borderSide:
-                        const BorderSide(color: AppColors.navy, width: 1.5),
+                    borderSide: const BorderSide(
+                      color: AppColors.navy,
+                      width: 1.5,
+                    ),
                   ),
                 ),
               ),
@@ -209,7 +239,9 @@ class _ApprovalRequestDialogState extends State<ApprovalRequestDialog> {
                         child: Text(
                           l10n.cancel,
                           style: const TextStyle(
-                              fontWeight: FontWeight.w700, fontSize: 13),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ),
@@ -221,28 +253,30 @@ class _ApprovalRequestDialogState extends State<ApprovalRequestDialog> {
                       child: FilledButton(
                         style: FilledButton.styleFrom(
                           backgroundColor: AppColors.navy,
-                          disabledBackgroundColor:
-                              AppColors.navy.withValues(alpha: 0.25),
+                          disabledBackgroundColor: AppColors.navy.withValues(
+                            alpha: 0.25,
+                          ),
                           elevation: 0,
                           padding: EdgeInsets.zero,
                         ),
                         onPressed: _reasonController.text.trim().isEmpty
                             ? null
                             : () => Navigator.pop(
-                                  context,
-                                  ApprovalDraft(
-                                    action: _action,
-                                    reason: _reasonController.text.trim(),
-                                    durationMinutes:
-                                        _action == 'pause_protection'
-                                            ? _duration
-                                            : 0,
-                                  ),
+                                context,
+                                ApprovalDraft(
+                                  action: _action,
+                                  reason: _reasonController.text.trim(),
+                                  durationMinutes: _action == 'pause_protection'
+                                      ? _duration
+                                      : 0,
                                 ),
+                              ),
                         child: Text(
                           l10n.submit,
                           style: const TextStyle(
-                              fontWeight: FontWeight.w700, fontSize: 13),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ),

@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
@@ -24,6 +25,11 @@ class MainActivity : FlutterActivity() {
     companion object {
         private const val METHOD_CHANNEL = "com.gamblock/protection"
         private const val EVENT_CHANNEL = "com.gamblock/intervention"
+
+        @Volatile
+        private var flutterPresentationAvailable = false
+
+        fun isFlutterPresentationAvailable(): Boolean = flutterPresentationAvailable
     }
 
     private val worker = Executors.newSingleThreadExecutor()
@@ -35,6 +41,7 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        flutterPresentationAvailable = true
         classifier = HybridClassifier(applicationContext)
         // Model parsing + SHA-256 integrity verification are heavy; run them
         // on the single worker so later tasks (e.g. runLocalSelfTest) start
@@ -53,6 +60,11 @@ class MainActivity : FlutterActivity() {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
                 eventSink = events
                 NativeEventBus.add(events)
+                // EventChannel listeners are created after a cold Flutter
+                // engine starts. Replay only durable pending actions and keep
+                // their original IDs so Dart can deduplicate safely.
+                stateStore.activeIntervention()?.event()?.let(NativeEventBus::emit)
+                stateStore.pendingApprovalEvent()?.let(NativeEventBus::emit)
             }
 
             override fun onCancel(arguments: Any?) {
@@ -93,7 +105,30 @@ class MainActivity : FlutterActivity() {
                     val challengeToken = call.argument<String>("challenge_token").orEmpty()
                     stateStore.grantKeyEnrollment(deviceId, challengeToken)
                 }
-                "recordInterventionCommitted" -> result.success(true)
+                "ackInterventionVisible" -> {
+                    val interventionId = call.argument<String>("intervention_id").orEmpty()
+                    val claim = stateStore.claimFlutterVisibility(interventionId)
+                    if (claim.accepted) {
+                        BrowserProtectionAccessibilityService.notifyFlutterVisibilityClaimed(
+                            interventionId,
+                        )
+                    }
+                    if (claim.newlyVisible) {
+                        aggregates.increment("intervention_shown")
+                    }
+                    result.success(claim.accepted)
+                }
+                "completeIntervention" -> {
+                    val interventionId = call.argument<String>("intervention_id").orEmpty()
+                    val completed = stateStore.completeIntervention(interventionId)
+                    if (completed) {
+                        BrowserProtectionAccessibilityService.notifyInterventionCompleted(
+                            interventionId,
+                        )
+                    }
+                    result.success(completed)
+                }
+                "beginApprovedRemoval" -> result.success(beginApprovedRemoval())
                 "drainDailyAggregates" -> result.success(aggregates.completedDays())
                 "getCurrentDailyAggregates" -> result.success(aggregates.currentDay())
                 "ackDailyAggregates" -> {
@@ -117,29 +152,21 @@ class MainActivity : FlutterActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        if (intent.getBooleanExtra("open_approval", false)) {
-            NativeEventBus.emit(mapOf("type" to "approval_required"))
-        }
-        if (intent.getBooleanExtra("open_intervention", false)) {
-            NativeEventBus.emit(mapOf("type" to "intervention_shown"))
-            intent.removeExtra("open_intervention")
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (intent.getBooleanExtra("open_approval", false)) {
-            NativeEventBus.emit(mapOf("type" to "approval_required"))
-            intent.removeExtra("open_approval")
-        }
-        if (intent.getBooleanExtra("open_intervention", false)) {
-            NativeEventBus.emit(mapOf("type" to "intervention_shown"))
-            intent.removeExtra("open_intervention")
-        }
     }
 
     override fun onDestroy() {
+        flutterPresentationAvailable = false
         NativeEventBus.remove(eventSink)
+        if (!isChangingConfigurations && ::stateStore.isInitialized) {
+            stateStore.activeIntervention()?.let { pending ->
+                val released = stateStore.releaseFlutterOwnershipForReplay(pending.id)
+                if (released != null) {
+                    BrowserProtectionAccessibilityService.notifyFlutterPresentationLost(
+                        released.id,
+                    )
+                }
+            }
+        }
         worker.shutdownNow()
         super.onDestroy()
     }
@@ -150,7 +177,7 @@ class MainActivity : FlutterActivity() {
         val status = when {
             !enabled -> "inactive"
             stateStore.activeGrantAllowsProtectionPause() -> "paused"
-            storedStatus == "degraded" && stateStore.degradedReason() == "artifact_invalid" -> "degraded"
+            storedStatus == "degraded" -> "degraded"
             else -> "active"
         }
         val isHealthy = enabled && status != "degraded"
@@ -162,6 +189,7 @@ class MainActivity : FlutterActivity() {
             "permission_status" to if (enabled) "granted" else "revoked",
             "model_version" to classifier.modelVersion,
             "ruleset_version" to classifier.rulesetVersion,
+            "supports_controlled_removal" to BuildConfig.SUPPORTS_CONTROLLED_REMOVAL,
             "degraded_reason_code" to if (enabled) (if (status == "degraded") stateStore.degradedReason() else null) else "accessibility_disabled",
             "last_event_at" to stateStore.lastEventAt(),
         )
@@ -190,6 +218,26 @@ class MainActivity : FlutterActivity() {
                 2001,
             )
         }
+    }
+
+    private fun beginApprovedRemoval(): Boolean {
+        if (!BuildConfig.SUPPORTS_CONTROLLED_REMOVAL) return false
+        if (!stateStore.activeGrantAllowsControlledRemoval()) return false
+        val removalIntent = Intent(
+            Intent.ACTION_DELETE,
+            Uri.parse("package:$packageName"),
+        )
+        val handlerPackage = removalIntent.resolveActivity(packageManager)
+            ?.activityInfo
+            ?.packageName
+            ?.takeIf(String::isNotBlank)
+            ?: return false
+        removalIntent.setPackage(handlerPackage)
+        return runCatching {
+            startActivity(removalIntent)
+            stateStore.clearPendingTamperAction()
+            true
+        }.getOrDefault(false)
     }
 
     private fun openAccessibilitySetupWithDisclosure(result: MethodChannel.Result) {
