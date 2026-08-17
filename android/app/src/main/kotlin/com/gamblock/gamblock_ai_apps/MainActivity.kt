@@ -228,7 +228,6 @@ class MainActivity : FlutterActivity() {
             Uri.parse("package:$packageName"),
         )
         val handlerPackage = removalIntent.resolveActivity(packageManager)
-            ?.activityInfo
             ?.packageName
             ?.takeIf(String::isNotBlank)
             ?: return false
