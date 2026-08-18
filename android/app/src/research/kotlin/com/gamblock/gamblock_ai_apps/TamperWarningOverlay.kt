@@ -64,6 +64,7 @@ class TamperWarningOverlay(private val service: AccessibilityService) {
                 service.startActivity(
                     Intent(service, MainActivity::class.java).apply {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        putExtra("approval_action", tamperAction)
                     },
                 )
                 dismiss()

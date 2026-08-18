@@ -61,8 +61,10 @@ object TamperActionDetector {
         "uninstall app",
     )
     private val weakUninstallPhrases = listOf(
-        "hapus",
-        "ingin menghapus",
+        "ingin mencopot",
+        "ingin menghapus aplikasi",
+        "mencopot pemasangan",
+        "menghapus aplikasi ini",
         "menghapus aplikasi",
     )
     private val forceStopPhrases = listOf(
@@ -82,6 +84,8 @@ object TamperActionDetector {
         "turn off",
         "nonaktifkan",
         "matikan layanan",
+        "stop service",
+        "hentikan layanan",
     )
     private val confirmationPhrases = listOf(
         "are you sure",
@@ -90,7 +94,7 @@ object TamperActionDetector {
         "apakah kamu yakin",
         "apakah anda ingin",
         "ingin mencopot",
-        "ingin menghapus",
+        "ingin menghapus aplikasi",
         "menghapus aplikasi ini",
         "konfirmasi",
         "cancel",
@@ -115,10 +119,8 @@ object TamperActionDetector {
     fun detect(observation: TamperObservation): TamperAction {
         val window = normalizedCombined(observation.windowTexts)
         val source = normalizedCombined(observation.sourceTexts)
-        val targetsGamblock = observation.targetIdentifiers
-            .map(::normalize)
-            .filter(String::isNotBlank)
-            .any(window::contains)
+        val targetsGamblock = containsGamblockTarget(observation.windowTexts, observation.targetIdentifiers) ||
+            containsGamblockTarget(observation.sourceTexts, observation.targetIdentifiers)
         val sourceAction = actionFrom(source)
         val windowAction = actionFrom(window)
         val isConfirmation = confirmationPhrases.any(window::contains)
@@ -154,19 +156,19 @@ object TamperActionDetector {
             }
 
             TamperSurface.LAUNCHER -> when {
-                // OEM launchers (MIUI) may never emit TYPE_VIEW_LONG_CLICKED
-                // for the long-press popup; the dialog content itself is
-                // reliable evidence, so arming is not required.
+                // Clicking an uninstall button in launcher popup is valid only if
+                // Gamblock was the long-pressed icon (armed) or the clicked view specifically names Gamblock.
                 observation.eventKind == TamperEventKind.CLICK &&
-                    sourceAction == TamperAction.UNINSTALL -> TamperAction.UNINSTALL
+                    sourceAction == TamperAction.UNINSTALL &&
+                    (observation.launcherArmed || containsGamblockTarget(observation.sourceTexts, observation.targetIdentifiers)) ->
+                    TamperAction.UNINSTALL
 
-                observation.eventKind == TamperEventKind.WINDOW_CHANGED &&
-                    targetsGamblock && windowAction == TamperAction.UNINSTALL &&
-                    isConfirmation -> TamperAction.UNINSTALL
-
-                observation.eventKind == TamperEventKind.CONTENT_CHANGED &&
-                    targetsGamblock && windowAction == TamperAction.UNINSTALL &&
-                    isConfirmation -> TamperAction.UNINSTALL
+                // A confirmation dialog on launcher must be specifically armed OR contain a specific Gamblock uninstall prompt.
+                (observation.eventKind == TamperEventKind.WINDOW_CHANGED ||
+                    observation.eventKind == TamperEventKind.CONTENT_CHANGED) &&
+                    (observation.launcherArmed && targetsGamblock && windowAction == TamperAction.UNINSTALL && isConfirmation ||
+                        isSpecificGamblockUninstallDialog(observation.windowTexts, observation.targetIdentifiers) && isConfirmation) ->
+                    TamperAction.UNINSTALL
 
                 else -> TamperAction.NONE
             }
@@ -181,6 +183,22 @@ object TamperActionDetector {
             .map(::normalize)
             .filter(String::isNotBlank)
             .any(combined::contains)
+    }
+
+    fun isSpecificGamblockUninstallDialog(
+        texts: List<String>,
+        targetIdentifiers: Set<String>,
+    ): Boolean {
+        val normalizedTargets = targetIdentifiers
+            .map(::normalize)
+            .filter(String::isNotBlank)
+        val allUninstallPhrases = strongUninstallPhrases + weakUninstallPhrases
+        return texts.any { line ->
+            val normalizedLine = normalize(line)
+            val hasTarget = normalizedTargets.any { target -> normalizedLine.contains(target) }
+            val hasUninstall = allUninstallPhrases.any { phrase -> normalizedLine.contains(phrase) }
+            hasTarget && hasUninstall
+        }
     }
 
     private fun actionFrom(value: String): TamperAction {

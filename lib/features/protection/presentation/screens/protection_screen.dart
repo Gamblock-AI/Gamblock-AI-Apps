@@ -7,6 +7,7 @@ import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/feedback/feedback.dart';
+import '../../../../core/feedback/haptics.dart';
 import '../../../../core/messaging/app_messages.dart';
 import '../../../../core/platform/platform_bridge.dart';
 import '../../../accountability/domain/entities/accountability_models.dart';
@@ -120,10 +121,23 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
     _handleRequestedApproval();
   }
 
+  @override
+  void didUpdateWidget(covariant ProtectionScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.requestedApprovalAction != oldWidget.requestedApprovalAction ||
+        widget.requestedApprovalId != oldWidget.requestedApprovalId) {
+      _handledRequestedApproval = false;
+      _handleRequestedApproval();
+    }
+  }
+
   void _handleRequestedApproval() {
     if (_handledRequestedApproval || !mounted) return;
     final requested = widget.requestedApprovalAction?.trim() ?? '';
     if (requested.isEmpty) return;
+    if (_loading && _accountability == null) {
+      return;
+    }
     _handledRequestedApproval = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -143,8 +157,16 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
   }
 
   Future<void> _openDeviceAdmin() async {
-    await PlatformBridge.requestDeviceAdminActivation();
-    await _load();
+    Haptics.light();
+    setState(() => _actionLoading = true);
+    try {
+      await PlatformBridge.requestDeviceAdminActivation();
+    } finally {
+      if (mounted) {
+        await _load();
+        setState(() => _actionLoading = false);
+      }
+    }
   }
 
   Future<void> _runSelfTest() async {

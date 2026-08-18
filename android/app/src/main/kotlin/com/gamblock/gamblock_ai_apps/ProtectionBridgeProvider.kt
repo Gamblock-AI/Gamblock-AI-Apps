@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
  */
 class ProtectionBridgeProvider : ContentProvider() {
     companion object {
-        private const val WAIT_TIMEOUT_MS = 5_000L
+        private const val WAIT_TIMEOUT_MS = 1_000L
         private val mainHandler = Handler(Looper.getMainLooper())
     }
 
@@ -164,7 +164,7 @@ class ProtectionBridgeProvider : ContentProvider() {
     private fun snapshot(): Map<String, Any?> {
         val service = BrowserProtectionAccessibilityService.current()
         if (service != null) {
-            return onMain { service.snapshotMap() }
+            return service.snapshotMap()
         }
         val enabled = isAccessibilityEnabled()
         return mapOf(
@@ -209,7 +209,7 @@ class ProtectionBridgeProvider : ContentProvider() {
         val dpm = context!!.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
         runCatching {
             dpm.removeActiveAdmin(
-                ComponentName(context!!, "${context!!.packageName}.ProtectionDeviceAdminReceiver"),
+                ComponentName(context!!.packageName, "com.gamblock.gamblock_ai_apps.ProtectionDeviceAdminReceiver"),
             )
         }
         val removalIntent = Intent(
@@ -234,7 +234,7 @@ class ProtectionBridgeProvider : ContentProvider() {
         val dpm = context!!.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
         return runCatching {
             dpm.isAdminActive(
-                ComponentName(context!!, "${context!!.packageName}.ProtectionDeviceAdminReceiver"),
+                ComponentName(context!!.packageName, "com.gamblock.gamblock_ai_apps.ProtectionDeviceAdminReceiver"),
             )
         }.getOrDefault(false)
     }

@@ -109,35 +109,34 @@ class MainActivity : FlutterActivity() {
             METHOD_CHANNEL,
         ).setMethodCallHandler { call, result ->
             when (call.method) {
-                "getProtectionSnapshot" -> result.success(localSnapshot())
+                "getProtectionSnapshot" -> background(result) { localSnapshot() }
                 "openPlatformSetup" -> openAccessibilitySetupWithDisclosure(result)
                 "runLocalSelfTest" -> background(result) {
                     jsonToFlutter(classifier.runSelfTest())
                 }
-                "setHealthNotifications" -> {
+                "setHealthNotifications" -> background(result) {
                     val enabled = call.argument<Boolean>("enabled") == true
-                    HealthNotificationPreferences.setEnabled(this, enabled)
+                    HealthNotificationPreferences.setEnabled(this@MainActivity, enabled)
                     if (enabled) {
                         requestNotificationPermissionIfNeeded()
-                        HealthNotificationPreferences.show(this)
+                        HealthNotificationPreferences.show(this@MainActivity)
                         bridgeCall("ensure_background_protection", null, null)
                     } else {
                         val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
                         manager.cancel(BrowserProtectionAccessibilityService.NOTIFICATION_ID)
                         bridgeCall("ensure_background_protection", null, null)
                     }
-                    result.success(true)
+                    true
                 }
-                "ensureBackgroundProtection" -> {
-                    val enabled = bridgeCall("ensure_background_protection", null, null)
+                "ensureBackgroundProtection" -> background(result) {
+                    bridgeCall("ensure_background_protection", null, null)
                         ?.getBoolean("value", false) ?: false
-                    result.success(enabled)
                 }
                 "requestBatteryOptimizationExemption" -> {
                     result.success(requestBatteryOptimizationExemption())
                 }
-                "getDeviceAdminStatus" -> {
-                    result.success(isDeviceAdminActive())
+                "getDeviceAdminStatus" -> background(result) {
+                    isDeviceAdminActive()
                 }
                 "requestDeviceAdminActivation" -> {
                     result.success(requestDeviceAdminActivation())
@@ -245,6 +244,35 @@ class MainActivity : FlutterActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        handleIntentEvents(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        handleIntentEvents(intent)
+    }
+
+    private fun handleIntentEvents(incomingIntent: Intent?) {
+        val action = incomingIntent?.getStringExtra("approval_action")?.takeIf { it.isNotBlank() }
+        if (action != null) {
+            incomingIntent.removeExtra("approval_action")
+            val event = mapOf(
+                "type" to "approval_required",
+                "tamper_action" to action,
+                "action_id" to (incomingIntent.getStringExtra("approval_id") ?: java.util.UUID.randomUUID().toString()),
+            )
+            runOnUiThread { eventSink?.success(event) }
+        } else {
+            worker.execute {
+                val pending = bridgeCall("get_pending_events", null, null)
+                    ?.getParcelableArrayList<Bundle>("events")
+                if (!pending.isNullOrEmpty()) {
+                    runOnUiThread {
+                        pending.forEach { eventSink?.success(ProtectionBridge.bundleToMap(it)) }
+                    }
+                }
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -272,7 +300,7 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun deviceAdminComponent(): ComponentName {
-        return ComponentName(this, "$packageName.ProtectionDeviceAdminReceiver")
+        return ComponentName(packageName, "com.gamblock.gamblock_ai_apps.ProtectionDeviceAdminReceiver")
     }
 
     private fun isDeviceAdminActive(): Boolean {

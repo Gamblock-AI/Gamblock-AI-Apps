@@ -341,7 +341,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
         return runCatching {
             dpm.isAdminActive(
-                android.content.ComponentName(this, "$packageName.ProtectionDeviceAdminReceiver"),
+                android.content.ComponentName(packageName, "com.gamblock.gamblock_ai_apps.ProtectionDeviceAdminReceiver"),
             )
         }.getOrDefault(false)
     }
