@@ -1,14 +1,11 @@
 package com.gamblock.gamblock_ai_apps
 
-import android.Manifest
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
-import androidx.core.content.ContextCompat
 
 /**
  * Foreground keep-alive for the accessibility protection service.
@@ -26,35 +23,42 @@ class ProtectionKeepAliveService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val started = startInForeground()
-        if (!started) {
+        // Once startForegroundService() has been called the service MUST
+        // enter the foreground state within a short window, otherwise the
+        // system kills the process with ForegroundServiceDidNotStartInTime
+        // (which crash-looped the accessibility service). Enter foreground
+        // unconditionally first, then decide whether to keep running.
+        val enteredForeground = runCatching {
+            enterForeground()
+            true
+        }.getOrDefault(false)
+        if (!enteredForeground) {
+            stopSelf(startId)
+            return START_NOT_STICKY
+        }
+        if (!isProtectionEnabled() || !HealthNotificationPreferences.isEnabled(this)) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf(startId)
             return START_NOT_STICKY
         }
         return START_STICKY
     }
 
-    private fun startInForeground(): Boolean {
-        if (!isProtectionEnabled()) return false
-        if (!HealthNotificationPreferences.isEnabled(this)) return false
-        if (!hasNotificationPermission()) return false
-        return runCatching {
-            HealthNotificationPreferences.ensureChannel(this)
-            val notification = HealthNotificationPreferences.buildNotification(this)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                startForeground(
-                    BrowserProtectionAccessibilityService.NOTIFICATION_ID,
-                    notification,
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
-                )
-            } else {
-                startForeground(
-                    BrowserProtectionAccessibilityService.NOTIFICATION_ID,
-                    notification,
-                )
-            }
-            true
-        }.getOrDefault(false)
+    private fun enterForeground() {
+        HealthNotificationPreferences.ensureChannel(this)
+        val notification = HealthNotificationPreferences.buildNotification(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(
+                BrowserProtectionAccessibilityService.NOTIFICATION_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
+            )
+        } else {
+            startForeground(
+                BrowserProtectionAccessibilityService.NOTIFICATION_ID,
+                notification,
+            )
+        }
     }
 
     private fun isProtectionEnabled(): Boolean {
@@ -68,14 +72,9 @@ class ProtectionKeepAliveService : Service() {
         }
     }
 
-    private fun hasNotificationPermission(): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
-            PackageManager.PERMISSION_GRANTED
-    }
-
     companion object {
         fun start(context: Context) {
+            if (!HealthNotificationPreferences.isEnabled(context)) return
             val intent = Intent(context, ProtectionKeepAliveService::class.java)
             runCatching {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
