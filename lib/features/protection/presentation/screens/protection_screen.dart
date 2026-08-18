@@ -33,12 +33,17 @@ class ProtectionScreen extends ConsumerStatefulWidget {
 
 class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
     with WidgetsBindingObserver {
-  ProtectionStatus? _status;
-  AccountabilityOverview? _accountability;
-  List<ApprovalRequest> _requests = const [];
-  EmergencyRequest? _emergencyRequest;
+  static ProtectionStatus? _cachedStatus;
+  static AccountabilityOverview? _cachedAccountability;
+  static List<ApprovalRequest> _cachedRequests = const [];
+  static EmergencyRequest? _cachedEmergencyRequest;
+
+  ProtectionStatus? _status = _cachedStatus;
+  AccountabilityOverview? _accountability = _cachedAccountability;
+  List<ApprovalRequest> _requests = _cachedRequests;
+  EmergencyRequest? _emergencyRequest = _cachedEmergencyRequest;
   Object? _error;
-  bool _loading = true;
+  late bool _loading = _cachedStatus == null;
   bool _actionLoading = false;
   bool _handledRequestedApproval = false;
   bool _requestExemptionOnNextResume = false;
@@ -77,11 +82,13 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
   }
 
   Future<void> _load() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    ProtectionStatus status;
+    if (_status == null) {
+      setState(() {
+        _loading = true;
+        _error = null;
+      });
+    }
+    ProtectionStatus? status;
     try {
       status = await ProtectionCoordinator(ref).fetchLocalStatus();
     } catch (error) {
@@ -93,12 +100,17 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
       }
       return;
     }
-    if (mounted) setState(() => _status = status);
+    final auth = ref.read(authProvider);
     final accountability = await ProtectionCoordinator(
       ref,
-    ).loadAccountability(ref.read(authProvider));
+    ).loadAccountability(auth);
+    _cachedStatus = status;
+    _cachedAccountability = accountability.accountability;
+    _cachedRequests = accountability.requests;
+    _cachedEmergencyRequest = accountability.emergencyRequest;
     if (!mounted) return;
     setState(() {
+      _status = status;
       _accountability = accountability.accountability;
       _requests = accountability.requests;
       _emergencyRequest = accountability.emergencyRequest;

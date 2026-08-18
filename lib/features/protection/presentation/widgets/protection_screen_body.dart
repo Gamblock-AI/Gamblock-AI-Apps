@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 
@@ -65,16 +64,6 @@ class ProtectionScreenBody extends StatelessWidget {
   final VoidCallback onOpenAccountSetup;
   final VoidCallback onOpenDeviceAdmin;
 
-  /// Gentle staggered entrance for the main dashboard blocks; skipped
-  /// entirely (wrapper included) under reduced motion.
-  Widget _entrance(BuildContext context, int index, Widget child) {
-    if (MediaQuery.disableAnimationsOf(context)) return child;
-    return child
-        .animate(delay: (60 * index).ms)
-        .fadeIn(duration: 300.ms)
-        .slideY(begin: 0.05, end: 0, curve: Curves.easeOutCubic);
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -105,48 +94,32 @@ class ProtectionScreenBody extends StatelessWidget {
               if (isLoading && status == null)
                 const ProtectionScreenSkeleton()
               else ...[
-                _entrance(
-                  context,
-                  0,
-                  TourTarget(
-                    id: 'tour-hero',
-                    child: _StatusBanner(
-                      status: status,
-                      onOpenSetup: onOpenSetup,
-                    ),
+                TourTarget(
+                  id: 'tour-hero',
+                  child: _StatusBanner(
+                    status: status,
+                    onOpenSetup: onOpenSetup,
                   ),
                 ),
                 const SizedBox(height: 18),
                 const ProtectionWeeklyAppreciation(),
-                _entrance(
-                  context,
-                  1,
-                  ProtectionActions(
-                    isLoading: isActionLoading,
-                    onOpenSetup: onOpenSetup,
-                    onRunSelfTest: onRunSelfTest,
-                  ),
+                ProtectionActions(
+                  isLoading: isActionLoading,
+                  onOpenSetup: onOpenSetup,
+                  onRunSelfTest: onRunSelfTest,
                 ),
                 if (status?.supportsControlledRemoval == true &&
                     status?.deviceAdminActive == false) ...[
                   const SizedBox(height: 18),
-                  _entrance(
-                    context,
-                    2,
-                    _DeviceAdminCard(
-                      isActionLoading: isActionLoading,
-                      onOpenDeviceAdmin: onOpenDeviceAdmin,
-                    ),
+                  _DeviceAdminCard(
+                    isActionLoading: isActionLoading,
+                    onOpenDeviceAdmin: onOpenDeviceAdmin,
                   ),
                 ],
                 const SizedBox(height: 28),
-                _entrance(
-                  context,
-                  3,
-                  TourTarget(
-                    id: 'tour-protection',
-                    child: ProtectionSensorsGrid(status: status),
-                  ),
+                TourTarget(
+                  id: 'tour-protection',
+                  child: ProtectionSensorsGrid(status: status),
                 ),
                 const SizedBox(height: 28),
                 if (error != null) ...[
@@ -654,6 +627,10 @@ class _VerificationNoticeState extends ConsumerState<_VerificationNotice> {
               ),
               const SizedBox(width: 8),
               FilledButton(
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(0, 48),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                ),
                 onPressed: () async {
                   try {
                     final previewCode = await ref
@@ -754,63 +731,116 @@ class _DeviceAdminCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return SurfaceCard(
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: AppColors.crimson.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(AppRadius.sm),
+    const accent = AppColors.crimson;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        key: const ValueKey('dashboard-device-admin-activate'),
+        onTap: isActionLoading ? null : onOpenDeviceAdmin,
+        borderRadius: BorderRadius.circular(AppRadius.banner),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Color.alphaBlend(
+              accent.withValues(alpha: 0.08),
+              AppColors.surface,
             ),
-            child: const Icon(
-              Icons.admin_panel_settings_outlined,
-              size: 19,
-              color: AppColors.crimson,
-            ),
+            borderRadius: BorderRadius.circular(AppRadius.banner),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.9)),
+            boxShadow: AppColors.cardSoftShadow,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.deviceAdminSetupTitle,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.navyDark,
+          child: Stack(
+            children: [
+              Positioned(
+                right: -20,
+                bottom: -44,
+                child: Container(
+                  width: 104,
+                  height: 104,
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.07),
+                    shape: BoxShape.circle,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  l10n.deviceAdminSetupSubtitle,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    height: 1.3,
-                    color: AppColors.mutedForeground,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          FilledButton(
-            key: const ValueKey('dashboard-device-admin-activate'),
-            onPressed: isActionLoading ? null : onOpenDeviceAdmin,
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.crimson,
-              foregroundColor: Colors.white,
-              shape: const StadiumBorder(),
-              textStyle: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
               ),
-            ),
-            child: Text(l10n.deviceAdminSetupAction),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: accent.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                    ),
+                    child: const Icon(
+                      Icons.admin_panel_settings_outlined,
+                      size: 19,
+                      color: accent,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.deviceAdminSetupTitle,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            height: 1.2,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.navyDark,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          l10n.deviceAdminSetupSubtitle,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            height: 1.3,
+                            color: AppColors.mutedForeground,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: accent,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: accent.withValues(alpha: 0.25),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: isActionLoading
+                        ? const AppBusyIndicator(
+                            size: 13,
+                            strokeWidth: 1.8,
+                            color: Colors.white,
+                            trackColor: Color(0x55FFFFFF),
+                          )
+                        : const Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 15,
+                            color: Colors.white,
+                          ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
