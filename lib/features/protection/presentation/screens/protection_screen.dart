@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -40,16 +42,23 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
   bool _actionLoading = false;
   bool _handledRequestedApproval = false;
   bool _requestExemptionOnNextResume = false;
+  StreamSubscription<NativeProtectionEvent>? _statusSub;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _statusSub = PlatformBridge.events().listen((event) {
+      if (event.type == 'protection_status' && mounted) {
+        _load();
+      }
+    });
     Future<void>.microtask(_load);
   }
 
   @override
   void dispose() {
+    _statusSub?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

@@ -84,6 +84,9 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         @Volatile
         private var activeService: WeakReference<BrowserProtectionAccessibilityService>? = null
 
+        /** True only when a service instance is actually bound in this process. */
+        fun isRunning(): Boolean = activeService?.get() != null
+
         fun notifyFlutterVisibilityClaimed(interventionId: String) {
             activeService?.get()?.cancelNativeFallback(interventionId)
         }

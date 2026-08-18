@@ -190,24 +190,32 @@ class MainActivity : FlutterActivity() {
 
     private fun snapshot(): Map<String, Any?> {
         val enabled = isAccessibilityEnabled()
+        val serviceBound = BrowserProtectionAccessibilityService.isRunning()
         val storedStatus = stateStore.status()
         val status = when {
             !enabled -> "inactive"
+            !serviceBound -> "inactive"
             stateStore.activeGrantAllowsProtectionPause() -> "paused"
             storedStatus == "degraded" -> "degraded"
             else -> "active"
         }
-        val isHealthy = enabled && status != "degraded"
+        val degradedReason = when {
+            !enabled -> "accessibility_disabled"
+            !serviceBound -> "service_not_running"
+            status == "degraded" -> stateStore.degradedReason()
+            else -> null
+        }
+        val isHealthy = enabled && serviceBound && status != "degraded"
         return mapOf(
             "platform" to "android",
             "status" to status,
-            "service_running" to enabled,
+            "service_running" to (enabled && serviceBound),
             "sensor_status" to if (isHealthy) "connected" else if (enabled) "degraded" else "disconnected",
             "permission_status" to if (enabled) "granted" else "revoked",
             "model_version" to classifier.modelVersion,
             "ruleset_version" to classifier.rulesetVersion,
             "supports_controlled_removal" to BuildConfig.SUPPORTS_CONTROLLED_REMOVAL,
-            "degraded_reason_code" to if (enabled) (if (status == "degraded") stateStore.degradedReason() else null) else "accessibility_disabled",
+            "degraded_reason_code" to degradedReason,
             "last_event_at" to stateStore.lastEventAt(),
         )
     }
