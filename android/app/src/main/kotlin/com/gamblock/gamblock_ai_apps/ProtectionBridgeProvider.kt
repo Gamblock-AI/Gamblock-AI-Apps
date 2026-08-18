@@ -1,5 +1,8 @@
 package com.gamblock.gamblock_ai_apps
 
+import android.accessibilityservice.AccessibilityServiceInfo
+import android.app.admin.DevicePolicyManager
+import android.content.ComponentName
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.content.Context
@@ -11,7 +14,6 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.view.accessibility.AccessibilityManager
-import android.accessibilityservice.AccessibilityServiceInfo
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -174,6 +176,7 @@ class ProtectionBridgeProvider : ContentProvider() {
             "model_version" to HybridClassifier.DEFAULT_MODEL_VERSION,
             "ruleset_version" to HybridClassifier.DEFAULT_RULESET_VERSION,
             "supports_controlled_removal" to BuildConfig.SUPPORTS_CONTROLLED_REMOVAL,
+            "device_admin_active" to isDeviceAdminActive(),
             "degraded_reason_code" to if (enabled) "service_not_running" else "accessibility_disabled",
             "last_event_at" to stateStore.lastEventAt(),
         )
@@ -201,6 +204,14 @@ class ProtectionBridgeProvider : ContentProvider() {
     private fun beginApprovedRemoval(): Boolean {
         if (!BuildConfig.SUPPORTS_CONTROLLED_REMOVAL) return false
         if (!stateStore.activeGrantAllowsControlledRemoval()) return false
+        // Partner-approved removal: deactivate our own device administrator
+        // first so Android allows the uninstall.
+        val dpm = context!!.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        runCatching {
+            dpm.removeActiveAdmin(
+                ComponentName(context!!, "${context!!.packageName}.ProtectionDeviceAdminReceiver"),
+            )
+        }
         val removalIntent = Intent(
             Intent.ACTION_DELETE,
             Uri.parse("package:${context!!.packageName}"),
@@ -215,6 +226,16 @@ class ProtectionBridgeProvider : ContentProvider() {
             context!!.startActivity(removalIntent)
             stateStore.clearPendingTamperAction()
             true
+        }.getOrDefault(false)
+    }
+
+    private fun isDeviceAdminActive(): Boolean {
+        if (!BuildConfig.SUPPORTS_CONTROLLED_REMOVAL) return false
+        val dpm = context!!.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        return runCatching {
+            dpm.isAdminActive(
+                ComponentName(context!!, "${context!!.packageName}.ProtectionDeviceAdminReceiver"),
+            )
         }.getOrDefault(false)
     }
 

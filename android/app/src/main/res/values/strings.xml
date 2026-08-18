@@ -5,4 +5,5 @@
     <string name="accessibility_disclosure_body">Gamblock-AI menggunakan Accessibility Service di latar belakang untuk membaca URL bar, judul, heading, dan teks tautan pada Chrome dan Edge. Data ini diklasifikasikan hanya di perangkat. Jika konten perjudian terdeteksi, aplikasi menekan Kembali dan menampilkan Pattern Interrupt.\n\nURL, domain, dan teks halaman tidak pernah dikirim ke backend. Backend hanya dapat menerima hitungan proteksi agregat sesuai pilihan berbagi Anda.</string>
     <string name="accessibility_disclosure_accept">Saya setuju — buka pengaturan</string>
     <string name="accessibility_disclosure_decline">Nanti</string>
+    <string name="device_admin_explanation">Perlindungan penghapusan mencegah aplikasi dicopot tanpa persetujuan pendamping terdaftar. Setelah aktif, Android menolak pencopotan sampai administrator perangkat dinonaktifkan, dan hanya grant persetujuan pendamping yang dapat mencopot aplikasi secara normal.</string>
 </resources>

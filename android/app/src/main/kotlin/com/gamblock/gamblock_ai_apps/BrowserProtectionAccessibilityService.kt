@@ -330,9 +330,20 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             "model_version" to classifier.modelVersion,
             "ruleset_version" to classifier.rulesetVersion,
             "supports_controlled_removal" to BuildConfig.SUPPORTS_CONTROLLED_REMOVAL,
+            "device_admin_active" to deviceAdminActive(),
             "degraded_reason_code" to stateStore.degradedReason(),
             "last_event_at" to stateStore.lastEventAt(),
         )
+    }
+
+    private fun deviceAdminActive(): Boolean {
+        if (!BuildConfig.SUPPORTS_CONTROLLED_REMOVAL) return false
+        val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
+        return runCatching {
+            dpm.isAdminActive(
+                android.content.ComponentName(this, "$packageName.ProtectionDeviceAdminReceiver"),
+            )
+        }.getOrDefault(false)
     }
 
     override fun onInterrupt() = Unit

@@ -43,14 +43,27 @@ data class TamperObservation(
  * and never persists or emits them.
  */
 object TamperActionDetector {
-    private val uninstallPhrases = listOf(
+    /**
+     * Strong uninstall tokens take precedence over weak ones so OEM dialogs
+     * like MIUI's "Uninstal akan menghapus semua data aplikasi" classify as
+     * UNINSTALL instead of CLEAR_DATA.
+     */
+    private val strongUninstallPhrases = listOf(
         "uninstall",
         "uninstal",
         "copot pemasangan",
         "copot",
+        "bongkar",
         "remove app",
         "delete app",
         "hapus aplikasi",
+        "hapus instalan",
+        "uninstall app",
+    )
+    private val weakUninstallPhrases = listOf(
+        "hapus",
+        "ingin menghapus",
+        "menghapus aplikasi",
     )
     private val forceStopPhrases = listOf(
         "force stop",
@@ -75,10 +88,14 @@ object TamperActionDetector {
         "do you want to",
         "apakah anda yakin",
         "apakah kamu yakin",
+        "apakah anda ingin",
         "ingin mencopot",
+        "ingin menghapus",
+        "menghapus aplikasi ini",
         "konfirmasi",
         "cancel",
         "batal",
+        "batalkan",
     )
     private val accessibilityContextPhrases = listOf(
         "accessibility service",
@@ -87,6 +104,12 @@ object TamperActionDetector {
         "gunakan gamblock-ai",
         "downloaded apps",
         "aplikasi yang didownload",
+        "device admin",
+        "admin perangkat",
+        "administrator perangkat",
+        "aplikasi admin",
+        "deactivate",
+        "nonaktifkan admin",
     )
 
     fun detect(observation: TamperObservation): TamperAction {
@@ -131,11 +154,17 @@ object TamperActionDetector {
             }
 
             TamperSurface.LAUNCHER -> when {
-                !observation.launcherArmed -> TamperAction.NONE
+                // OEM launchers (MIUI) may never emit TYPE_VIEW_LONG_CLICKED
+                // for the long-press popup; the dialog content itself is
+                // reliable evidence, so arming is not required.
                 observation.eventKind == TamperEventKind.CLICK &&
                     sourceAction == TamperAction.UNINSTALL -> TamperAction.UNINSTALL
 
                 observation.eventKind == TamperEventKind.WINDOW_CHANGED &&
+                    targetsGamblock && windowAction == TamperAction.UNINSTALL &&
+                    isConfirmation -> TamperAction.UNINSTALL
+
+                observation.eventKind == TamperEventKind.CONTENT_CHANGED &&
                     targetsGamblock && windowAction == TamperAction.UNINSTALL &&
                     isConfirmation -> TamperAction.UNINSTALL
 
@@ -156,8 +185,9 @@ object TamperActionDetector {
 
     private fun actionFrom(value: String): TamperAction {
         if (forceStopPhrases.any(value::contains)) return TamperAction.FORCE_STOP
+        if (strongUninstallPhrases.any(value::contains)) return TamperAction.UNINSTALL
         if (clearDataPhrases.any(value::contains)) return TamperAction.CLEAR_DATA
-        if (uninstallPhrases.any(value::contains)) return TamperAction.UNINSTALL
+        if (weakUninstallPhrases.any(value::contains)) return TamperAction.UNINSTALL
         if (disablePhrases.any(value::contains)) return TamperAction.DISABLE_ACCESSIBILITY
         return TamperAction.NONE
     }

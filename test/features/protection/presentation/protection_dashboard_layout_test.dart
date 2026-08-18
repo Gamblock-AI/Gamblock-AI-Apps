@@ -56,6 +56,7 @@ Widget _dashboard({required VoidCallback onOpenSetup}) {
               onEnterEmergencyKey: () {},
               onLogin: () {},
               onOpenAccountSetup: () {},
+              onOpenDeviceAdmin: () {},
             ),
           ),
         ),

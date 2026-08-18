@@ -15,6 +15,7 @@ class ProtectionRepositoryImpl implements ProtectionRepository {
       rulesetVersion: snapshot.rulesetVersion,
       modelVersion: snapshot.modelVersion,
       supportsControlledRemoval: snapshot.supportsControlledRemoval,
+      deviceAdminActive: snapshot.deviceAdminActive,
       degradedReasonCode: snapshot.degradedReasonCode,
       lastEventAt: snapshot.lastEventAt,
     );

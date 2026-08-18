@@ -52,5 +52,8 @@
   "statusReviewed": "reviewed",
   "statusApproved": "approved",
   "statusRejected": "rejected",
-  "statusExpired": "expired"
+  "statusExpired": "expired",
+  "deviceAdminSetupTitle": "Removal protection is not active",
+  "deviceAdminSetupSubtitle": "Turn it on so Android refuses uninstallation without your partner's approval.",
+  "deviceAdminSetupAction": "Activate"
 }

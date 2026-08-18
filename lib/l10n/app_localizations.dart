@@ -2036,6 +2036,24 @@ abstract class AppLocalizations {
   /// **'kedaluwarsa'**
   String get statusExpired;
 
+  /// No description provided for @deviceAdminSetupTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Perlindungan penghapusan belum aktif'**
+  String get deviceAdminSetupTitle;
+
+  /// No description provided for @deviceAdminSetupSubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Aktifkan agar Android menolak pencopotan tanpa persetujuan pendamping.'**
+  String get deviceAdminSetupSubtitle;
+
+  /// No description provided for @deviceAdminSetupAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Aktifkan'**
+  String get deviceAdminSetupAction;
+
   /// No description provided for @analyticsTitle.
   ///
   /// In id, this message translates to:

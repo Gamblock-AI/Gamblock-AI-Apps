@@ -4,7 +4,9 @@ import android.accessibilityservice.AccessibilityServiceInfo
 import android.Manifest
 import android.app.AlertDialog
 import android.app.NotificationManager
+import android.app.admin.DevicePolicyManager
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -134,6 +136,12 @@ class MainActivity : FlutterActivity() {
                 "requestBatteryOptimizationExemption" -> {
                     result.success(requestBatteryOptimizationExemption())
                 }
+                "getDeviceAdminStatus" -> {
+                    result.success(isDeviceAdminActive())
+                }
+                "requestDeviceAdminActivation" -> {
+                    result.success(requestDeviceAdminActivation())
+                }
                 "setDeviceId" -> background(result) {
                     bridgeCall("set_device_id", call.argument<String>("device_id").orEmpty(), null)
                         ?.getBoolean("value", false) ?: false
@@ -228,6 +236,7 @@ class MainActivity : FlutterActivity() {
             "model_version" to classifier.modelVersion,
             "ruleset_version" to classifier.rulesetVersion,
             "supports_controlled_removal" to BuildConfig.SUPPORTS_CONTROLLED_REMOVAL,
+            "device_admin_active" to isDeviceAdminActive(),
             "degraded_reason_code" to if (enabled) "service_not_running" else "accessibility_disabled",
             "last_event_at" to null,
         )
@@ -260,6 +269,33 @@ class MainActivity : FlutterActivity() {
                 (it.resolveInfo.serviceInfo.name.contains("AccessibilityService") ||
                     it.resolveInfo.serviceInfo.name.contains("Gamblock"))
         }
+    }
+
+    private fun deviceAdminComponent(): ComponentName {
+        return ComponentName(this, "$packageName.ProtectionDeviceAdminReceiver")
+    }
+
+    private fun isDeviceAdminActive(): Boolean {
+        if (!BuildConfig.SUPPORTS_CONTROLLED_REMOVAL) return false
+        val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        return runCatching { dpm.isAdminActive(deviceAdminComponent()) }.getOrDefault(false)
+    }
+
+    private fun requestDeviceAdminActivation(): Boolean {
+        if (!BuildConfig.SUPPORTS_CONTROLLED_REMOVAL) return false
+        val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        if (dpm.isAdminActive(deviceAdminComponent())) return true
+        return runCatching {
+            val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+                putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminComponent())
+                putExtra(
+                    DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                    getString(R.string.device_admin_explanation),
+                )
+            }
+            startActivity(intent)
+            true
+        }.getOrDefault(false)
     }
 
     private fun requestNotificationPermissionIfNeeded() {

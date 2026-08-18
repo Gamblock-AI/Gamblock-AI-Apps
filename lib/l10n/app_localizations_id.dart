@@ -1065,6 +1065,16 @@ class AppLocalizationsId extends AppLocalizations {
   String get statusExpired => 'kedaluwarsa';
 
   @override
+  String get deviceAdminSetupTitle => 'Perlindungan penghapusan belum aktif';
+
+  @override
+  String get deviceAdminSetupSubtitle =>
+      'Aktifkan agar Android menolak pencopotan tanpa persetujuan pendamping.';
+
+  @override
+  String get deviceAdminSetupAction => 'Aktifkan';
+
+  @override
   String get analyticsTitle => 'Analitik';
 
   @override

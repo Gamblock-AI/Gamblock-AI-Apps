@@ -164,9 +164,26 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
 
     private fun collectSingleNodeTexts(node: AccessibilityNodeInfo?): List<String> {
         if (node == null) return emptyList()
-        return listOfNotNull(
-            node.text?.toString()?.trim()?.takeIf(String::isNotEmpty),
-            node.contentDescription?.toString()?.trim()?.takeIf(String::isNotEmpty),
-        )
+        val result = mutableListOf<String>()
+        node.text?.toString()?.trim()?.takeIf(String::isNotEmpty)?.let(result::add)
+        node.contentDescription?.toString()?.trim()?.takeIf(String::isNotEmpty)?.let(result::add)
+        // Some OEM buttons keep their label in a child view; walk a shallow
+        // bounded subtree so the label still reaches the detector.
+        val queue = ArrayDeque<AccessibilityNodeInfo>()
+        for (index in 0 until node.childCount) {
+            node.getChild(index)?.let(queue::add)
+        }
+        var visited = 0
+        while (queue.isNotEmpty() && visited < 8 && result.size < 8) {
+            val child = queue.removeFirst()
+            visited++
+            child.text?.toString()?.trim()?.takeIf(String::isNotEmpty)?.let(result::add)
+            child.contentDescription?.toString()?.trim()?.takeIf(String::isNotEmpty)
+                ?.let(result::add)
+            for (index in 0 until child.childCount) {
+                child.getChild(index)?.let(queue::add)
+            }
+        }
+        return result.distinct()
     }
 }

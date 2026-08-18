@@ -8,6 +8,7 @@ class ProtectionStatus {
     required this.rulesetVersion,
     required this.modelVersion,
     this.supportsControlledRemoval = false,
+    this.deviceAdminActive = false,
     this.degradedReasonCode,
     this.lastEventAt,
   });
@@ -20,6 +21,7 @@ class ProtectionStatus {
   final String rulesetVersion;
   final String modelVersion;
   final bool supportsControlledRemoval;
+  final bool deviceAdminActive;
   final String? degradedReasonCode;
   final DateTime? lastEventAt;
 

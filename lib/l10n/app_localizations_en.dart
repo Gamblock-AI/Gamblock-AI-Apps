@@ -1068,6 +1068,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statusExpired => 'expired';
 
   @override
+  String get deviceAdminSetupTitle => 'Removal protection is not active';
+
+  @override
+  String get deviceAdminSetupSubtitle =>
+      'Turn it on so Android refuses uninstallation without your partner\'s approval.';
+
+  @override
+  String get deviceAdminSetupAction => 'Activate';
+
+  @override
   String get analyticsTitle => 'Analytics';
 
   @override

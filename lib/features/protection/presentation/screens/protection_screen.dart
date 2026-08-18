@@ -130,6 +130,11 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
     await PlatformBridge.ensureBackgroundProtection();
   }
 
+  Future<void> _openDeviceAdmin() async {
+    await PlatformBridge.requestDeviceAdminActivation();
+    await _load();
+  }
+
   Future<void> _runSelfTest() async {
     setState(() => _actionLoading = true);
     final result = await ProtectionCoordinator(ref).runLocalSelfTest();
@@ -283,6 +288,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
           onEnterEmergencyKey: _enterEmergencyKey,
           onLogin: () => context.go('/login'),
           onOpenAccountSetup: () => context.go('/setup'),
+          onOpenDeviceAdmin: _openDeviceAdmin,
         ),
       ),
     );

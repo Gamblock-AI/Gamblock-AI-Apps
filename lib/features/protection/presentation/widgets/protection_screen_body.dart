@@ -42,6 +42,7 @@ class ProtectionScreenBody extends StatelessWidget {
     required this.onEnterEmergencyKey,
     required this.onLogin,
     required this.onOpenAccountSetup,
+    required this.onOpenDeviceAdmin,
   });
 
   final bool isLoading;
@@ -62,6 +63,7 @@ class ProtectionScreenBody extends StatelessWidget {
   final VoidCallback onEnterEmergencyKey;
   final VoidCallback onLogin;
   final VoidCallback onOpenAccountSetup;
+  final VoidCallback onOpenDeviceAdmin;
 
   /// Gentle staggered entrance for the main dashboard blocks; skipped
   /// entirely (wrapper included) under reduced motion.
@@ -125,10 +127,22 @@ class ProtectionScreenBody extends StatelessWidget {
                     onRunSelfTest: onRunSelfTest,
                   ),
                 ),
+                if (status?.supportsControlledRemoval == true &&
+                    status?.deviceAdminActive == false) ...[
+                  const SizedBox(height: 18),
+                  _entrance(
+                    context,
+                    2,
+                    _DeviceAdminCard(
+                      isActionLoading: isActionLoading,
+                      onOpenDeviceAdmin: onOpenDeviceAdmin,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 28),
                 _entrance(
                   context,
-                  2,
+                  3,
                   TourTarget(
                     id: 'tour-protection',
                     child: ProtectionSensorsGrid(status: status),
@@ -718,6 +732,83 @@ class _VerificationNoticeState extends ConsumerState<_VerificationNotice> {
               }
             },
             child: Text(l10n.verifyCode),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Research-only removal protection: prompts the student to activate the
+/// device administrator so Android itself refuses uninstallation until the
+/// partner approval flow grants a valid removal.
+class _DeviceAdminCard extends StatelessWidget {
+  const _DeviceAdminCard({
+    required this.isActionLoading,
+    required this.onOpenDeviceAdmin,
+  });
+
+  final bool isActionLoading;
+  final VoidCallback onOpenDeviceAdmin;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return SurfaceCard(
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: AppColors.crimson.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(AppRadius.sm),
+            ),
+            child: const Icon(
+              Icons.admin_panel_settings_outlined,
+              size: 19,
+              color: AppColors.crimson,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.deviceAdminSetupTitle,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.navyDark,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  l10n.deviceAdminSetupSubtitle,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    height: 1.3,
+                    color: AppColors.mutedForeground,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          FilledButton(
+            key: const ValueKey('dashboard-device-admin-activate'),
+            onPressed: isActionLoading ? null : onOpenDeviceAdmin,
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.crimson,
+              foregroundColor: Colors.white,
+              shape: const StadiumBorder(),
+              textStyle: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            child: Text(l10n.deviceAdminSetupAction),
           ),
         ],
       ),

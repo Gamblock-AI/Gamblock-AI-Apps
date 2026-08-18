@@ -60,6 +60,11 @@ class PlatformBridge {
   static Future<bool> requestBatteryOptimizationExemption() =>
       _boolMethod('requestBatteryOptimizationExemption');
 
+  /// Opens the system Device Admin activation screen (research builds only).
+  /// Returns true when already active or the activation screen was shown.
+  static Future<bool> requestDeviceAdminActivation() =>
+      _boolMethod('requestDeviceAdminActivation');
+
   static Future<Map<String, dynamic>> runLocalSelfTest() async {
     try {
       final result = await _channel.invokeMethod<Map<Object?, Object?>>(

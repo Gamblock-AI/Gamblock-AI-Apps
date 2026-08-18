@@ -9,6 +9,7 @@ class ProtectionSnapshot {
     required this.modelVersion,
     required this.rulesetVersion,
     this.supportsControlledRemoval = false,
+    this.deviceAdminActive = false,
     this.degradedReasonCode,
     this.lastEventAt,
   });
@@ -21,6 +22,7 @@ class ProtectionSnapshot {
   final String modelVersion;
   final String rulesetVersion;
   final bool supportsControlledRemoval;
+  final bool deviceAdminActive;
   final String? degradedReasonCode;
   final DateTime? lastEventAt;
 
@@ -42,6 +44,7 @@ class ProtectionSnapshot {
           map['ruleset_version']?.toString() ??
           'gambling-keywords-b4f2932a7647',
       supportsControlledRemoval: map['supports_controlled_removal'] == true,
+      deviceAdminActive: map['device_admin_active'] == true,
       degradedReasonCode: map['degraded_reason_code']?.toString(),
       lastEventAt: lastEvent == null ? null : DateTime.tryParse(lastEvent),
     );
