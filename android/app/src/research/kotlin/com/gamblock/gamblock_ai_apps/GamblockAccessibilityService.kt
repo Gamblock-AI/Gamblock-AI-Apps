@@ -114,7 +114,9 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
             },
         )
         if (newlyPending) {
-            stateStore.pendingApprovalEvent()?.let(NativeEventBus::emit)
+            stateStore.pendingApprovalEvent()?.let {
+                ProtectionBridge.emit(this, it)
+            }
         }
     }
 

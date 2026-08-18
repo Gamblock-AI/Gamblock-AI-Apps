@@ -29,9 +29,12 @@
             </intent-filter>
         </activity>
 
-        <!-- Accessibility Service — local Chrome/Edge sensing and intervention. -->
+        <!-- Accessibility Service — local Chrome/Edge sensing and intervention.
+             Runs in a dedicated process so aggressive OEM task-killers (MIUI)
+             cannot stop protection when the UI task is removed from Recents. -->
         <service
             android:name=".GamblockAccessibilityService"
+            android:process=":protection"
             android:exported="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
@@ -42,17 +45,26 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
-        <!-- Foreground keep-alive: keeps the accessibility service process
-             alive when the user removes the UI task from Recents so local
-             blocking continues without the app being open. -->
+        <!-- Foreground keep-alive: anchors the dedicated protection process
+             when the user removes the UI task from Recents so local blocking
+             continues without the app being open. -->
         <service
             android:name=".ProtectionKeepAliveService"
+            android:process=":protection"
             android:exported="false"
             android:foregroundServiceType="specialUse">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="accessibility-based local protection must stay alive so on-device blocking continues while the app UI is closed" />
         </service>
+
+        <!-- Cross-process bridge: the Flutter UI process queries protection
+             state and receives events from the dedicated protection process. -->
+        <provider
+            android:name=".ProtectionBridgeProvider"
+            android:authorities="${applicationId}.protection.bridge"
+            android:process=":protection"
+            android:exported="false" />
 
         <meta-data
             android:name="flutterEmbedding"

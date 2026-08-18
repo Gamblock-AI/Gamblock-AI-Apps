@@ -87,6 +87,8 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         /** True only when a service instance is actually bound in this process. */
         fun isRunning(): Boolean = activeService?.get() != null
 
+        fun current(): BrowserProtectionAccessibilityService? = activeService?.get()
+
         fun notifyFlutterVisibilityClaimed(interventionId: String) {
             activeService?.get()?.cancelNativeFallback(interventionId)
         }
@@ -143,7 +145,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         activeService = WeakReference(this)
         runCatching { HealthNotificationPreferences.show(this) }
         ProtectionKeepAliveService.start(this)
-        NativeEventBus.emit(snapshotEvent())
+        ProtectionBridge.emit(this, snapshotEvent())
         onProtectionServiceConnected()
         restorePendingIntervention()
         worker.execute {
@@ -156,7 +158,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                 } else {
                     stateStore.setStatus("degraded", "artifact_invalid")
                 }
-                NativeEventBus.emit(snapshotEvent())
+                ProtectionBridge.emit(this, snapshotEvent())
             }
         }
     }
@@ -197,7 +199,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
     private fun scheduleBrowserScan(event: AccessibilityEvent) {
         if (stateStore.activeGrantAllowsProtectionPause()) {
             stateStore.setStatus("paused")
-            NativeEventBus.emit(snapshotEvent())
+            ProtectionBridge.emit(this, snapshotEvent())
             return
         }
         pendingScan?.let(mainHandler::removeCallbacks)
@@ -229,7 +231,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                     }
                 } else {
                     stateStore.setStatus("active")
-                    NativeEventBus.emit(snapshotEvent())
+                    ProtectionBridge.emit(this, snapshotEvent())
                 }
             }
         }
@@ -335,6 +337,19 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
 
     override fun onInterrupt() = Unit
 
+    /** Bridge surface for [ProtectionBridgeProvider] (same protection process). */
+    fun snapshotMap(): Map<String, Any?> = snapshotEvent()
+
+    /** Bridge surface for [ProtectionBridgeProvider] (same protection process). */
+    fun claimFlutterVisibility(interventionId: String): InterventionVisibilityClaim {
+        return stateStore.claimFlutterVisibility(interventionId)
+    }
+
+    /** Bridge surface for [ProtectionBridgeProvider] (same protection process). */
+    fun completeIntervention(interventionId: String): Boolean {
+        return stateStore.completeIntervention(interventionId)
+    }
+
     private fun executeBlockAndIntervention(intervention: PendingIntervention) {
         val backAccepted = performGlobalAction(GLOBAL_ACTION_BACK)
         val navigationAccepted = if (backAccepted) {
@@ -346,7 +361,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                 "degraded",
                 if (homeAccepted) "browser_back_failed" else "browser_block_action_failed",
             )
-            NativeEventBus.emit(snapshotEvent())
+            ProtectionBridge.emit(this, snapshotEvent())
             homeAccepted
         }
         if (navigationAccepted) {
@@ -354,7 +369,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             aggregateStore.increment("block_count_sync")
         }
 
-        NativeEventBus.emit(intervention.event())
+        ProtectionBridge.emit(this, intervention.event())
         val flutterLaunchAccepted = runCatching {
             startActivity(
                 Intent(this, MainActivity::class.java).apply {
@@ -374,14 +389,13 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         val stored = stateStore.activeIntervention() ?: return
         val pending = if (
             stored.owner == "flutter_visible" &&
-            (!MainActivity.isFlutterPresentationAvailable() ||
-                !NativeEventBus.hasListeners())
+            !ProtectionBridge.uiRegistered
         ) {
             stateStore.releaseFlutterOwnershipForReplay(stored.id) ?: stored
         } else {
             stored
         }
-        NativeEventBus.emit(pending.event())
+        ProtectionBridge.emit(this, pending.event())
         when (pending.owner) {
             "native_pending", "native_visible" -> {
                 showNativeIntervention(pending.id)
@@ -449,7 +463,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             overlay.dismissIntervention(interventionId)
             stateStore.releaseUncommittedNativeOwnership(interventionId)
             stateStore.setStatus("degraded", "intervention_overlay_failed")
-            NativeEventBus.emit(snapshotEvent())
+            ProtectionBridge.emit(this, snapshotEvent())
         }
     }
 
@@ -470,7 +484,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
     private fun onFlutterPresentationLost(interventionId: String) {
         val pending = stateStore.activeIntervention()
         if (pending?.id != interventionId || pending.owner != "none") return
-        NativeEventBus.emit(pending.event())
+        ProtectionBridge.emit(this, pending.event())
         scheduleNativeFallback(pending)
         scheduleInterventionExpiry(pending)
     }
@@ -490,7 +504,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             ProtectionKeepAliveService.stop(this)
         }
         stateStore.setStatus("inactive", "accessibility_disabled")
-        NativeEventBus.emit(snapshotEvent())
+        ProtectionBridge.emit(this, snapshotEvent())
         super.onDestroy()
     }
 

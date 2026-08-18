@@ -4,11 +4,15 @@ import android.accessibilityservice.AccessibilityServiceInfo
 import android.Manifest
 import android.app.AlertDialog
 import android.app.NotificationManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Binder
 import android.os.Build
+import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
@@ -18,31 +22,35 @@ import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import org.json.JSONArray
-import org.json.JSONObject
 import java.util.concurrent.Executors
 
 class MainActivity : FlutterActivity() {
     companion object {
         private const val METHOD_CHANNEL = "com.gamblock/protection"
         private const val EVENT_CHANNEL = "com.gamblock/intervention"
-
-        @Volatile
-        private var flutterPresentationAvailable = false
-
-        fun isFlutterPresentationAvailable(): Boolean = flutterPresentationAvailable
     }
 
     private val worker = Executors.newSingleThreadExecutor()
     private lateinit var classifier: HybridClassifier
-    private lateinit var aggregates: DailyAggregateStore
-    private lateinit var stateStore: ProtectionStateStore
     private lateinit var consentStore: AccessibilityConsentStore
     private var eventSink: EventChannel.EventSink? = null
+    private var protectionReceiver: BroadcastReceiver? = null
+    private val uiToken = Binder()
+
+    private fun bridgeUri(): Uri {
+        return Uri.parse("content://${packageName}.protection.bridge")
+    }
+
+    private fun bridgeCall(method: String, arg: String?, extras: Bundle?): Bundle? {
+        return try {
+            contentResolver.call(bridgeUri(), method, arg, extras)
+        } catch (_: Exception) {
+            null
+        }
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        flutterPresentationAvailable = true
         classifier = HybridClassifier(applicationContext)
         // Model parsing + SHA-256 integrity verification are heavy; run them
         // on the single worker so later tasks (e.g. runLocalSelfTest) start
@@ -50,8 +58,6 @@ class MainActivity : FlutterActivity() {
         worker.execute {
             classifier.load()
         }
-        aggregates = DailyAggregateStore(applicationContext)
-        stateStore = ProtectionStateStore(applicationContext)
         consentStore = AccessibilityConsentStore(applicationContext)
 
         EventChannel(
@@ -60,16 +66,38 @@ class MainActivity : FlutterActivity() {
         ).setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
                 eventSink = events
-                NativeEventBus.add(events)
-                // EventChannel listeners are created after a cold Flutter
-                // engine starts. Replay only durable pending actions and keep
-                // their original IDs so Dart can deduplicate safely.
-                stateStore.activeIntervention()?.event()?.let(NativeEventBus::emit)
-                stateStore.pendingApprovalEvent()?.let(NativeEventBus::emit)
+                if (protectionReceiver == null) {
+                    protectionReceiver = object : BroadcastReceiver() {
+                        override fun onReceive(context: Context?, intent: Intent?) {
+                            val map = ProtectionBridge.bundleToMap(intent?.extras)
+                            eventSink?.success(map)
+                        }
+                    }
+                    ContextCompat.registerReceiver(
+                        this@MainActivity,
+                        protectionReceiver!!,
+                        IntentFilter(ProtectionBridge.ACTION_EVENT),
+                        ContextCompat.RECEIVER_NOT_EXPORTED,
+                    )
+                }
+                bridgeCall(
+                    "register_ui",
+                    null,
+                    Bundle().apply { putBinder("token", uiToken) },
+                )
+                // Replay only durable pending actions and keep their original
+                // IDs so Dart can deduplicate safely.
+                bridgeCall("get_pending_events", null, null)
+                    ?.getParcelableArrayList<Bundle>("events")
+                    ?.forEach { events.success(ProtectionBridge.bundleToMap(it)) }
             }
 
             override fun onCancel(arguments: Any?) {
-                NativeEventBus.remove(eventSink)
+                bridgeCall("unregister_ui", null, null)
+                protectionReceiver?.let {
+                    runCatching { unregisterReceiver(it) }
+                }
+                protectionReceiver = null
                 eventSink = null
             }
         })
@@ -79,7 +107,7 @@ class MainActivity : FlutterActivity() {
             METHOD_CHANNEL,
         ).setMethodCallHandler { call, result ->
             when (call.method) {
-                "getProtectionSnapshot" -> result.success(snapshot())
+                "getProtectionSnapshot" -> result.success(localSnapshot())
                 "openPlatformSetup" -> openAccessibilitySetupWithDisclosure(result)
                 "runLocalSelfTest" -> background(result) {
                     jsonToFlutter(classifier.runSelfTest())
@@ -90,74 +118,87 @@ class MainActivity : FlutterActivity() {
                     if (enabled) {
                         requestNotificationPermissionIfNeeded()
                         HealthNotificationPreferences.show(this)
-                        if (isAccessibilityEnabled()) {
-                            ProtectionKeepAliveService.start(this)
-                        }
+                        bridgeCall("ensure_background_protection", null, null)
                     } else {
                         val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
                         manager.cancel(BrowserProtectionAccessibilityService.NOTIFICATION_ID)
-                        ProtectionKeepAliveService.stop(this)
+                        bridgeCall("ensure_background_protection", null, null)
                     }
                     result.success(true)
                 }
                 "ensureBackgroundProtection" -> {
-                    val enabled = isAccessibilityEnabled()
-                    if (enabled) {
-                        ProtectionKeepAliveService.start(this)
-                    } else {
-                        ProtectionKeepAliveService.stop(this)
-                    }
+                    val enabled = bridgeCall("ensure_background_protection", null, null)
+                        ?.getBoolean("value", false) ?: false
                     result.success(enabled)
                 }
                 "requestBatteryOptimizationExemption" -> {
                     result.success(requestBatteryOptimizationExemption())
                 }
-                "setDeviceId" -> {
-                    result.success(
-                        stateStore.setDeviceId(call.argument<String>("device_id").orEmpty()),
-                    )
+                "setDeviceId" -> background(result) {
+                    bridgeCall("set_device_id", call.argument<String>("device_id").orEmpty(), null)
+                        ?.getBoolean("value", false) ?: false
                 }
                 "getGrantKeyEnrollment" -> background(result) {
                     val deviceId = call.argument<String>("device_id").orEmpty()
                     val challengeToken = call.argument<String>("challenge_token").orEmpty()
-                    stateStore.grantKeyEnrollment(deviceId, challengeToken)
+                    val bundle = bridgeCall(
+                        "grant_key_enrollment",
+                        null,
+                        Bundle().apply {
+                            putString("device_id", deviceId)
+                            putString("challenge_token", challengeToken)
+                        },
+                    ) ?: return@background null
+                    mapOf(
+                        "public_jwk" to (bundle.getString("public_jwk") ?: ""),
+                        "jwk_thumbprint" to (bundle.getString("jwk_thumbprint") ?: ""),
+                        "proof" to (bundle.getString("proof") ?: ""),
+                    )
                 }
-                "ackInterventionVisible" -> {
-                    val interventionId = call.argument<String>("intervention_id").orEmpty()
-                    val claim = stateStore.claimFlutterVisibility(interventionId)
-                    if (claim.accepted) {
-                        BrowserProtectionAccessibilityService.notifyFlutterVisibilityClaimed(
-                            interventionId,
-                        )
-                    }
-                    if (claim.newlyVisible) {
-                        aggregates.increment("intervention_shown")
-                    }
-                    result.success(claim.accepted)
+                "ackInterventionVisible" -> background(result) {
+                    bridgeCall(
+                        "ack_intervention_visible",
+                        call.argument<String>("intervention_id").orEmpty(),
+                        null,
+                    )?.getBoolean("value", false) ?: false
                 }
-                "completeIntervention" -> {
-                    val interventionId = call.argument<String>("intervention_id").orEmpty()
-                    val completed = stateStore.completeIntervention(interventionId)
-                    if (completed) {
-                        BrowserProtectionAccessibilityService.notifyInterventionCompleted(
-                            interventionId,
-                        )
-                    }
-                    result.success(completed)
+                "completeIntervention" -> background(result) {
+                    bridgeCall(
+                        "complete_intervention",
+                        call.argument<String>("intervention_id").orEmpty(),
+                        null,
+                    )?.getBoolean("value", false) ?: false
                 }
-                "beginApprovedRemoval" -> result.success(beginApprovedRemoval())
-                "drainDailyAggregates" -> result.success(aggregates.completedDays())
-                "getCurrentDailyAggregates" -> result.success(aggregates.currentDay())
-                "ackDailyAggregates" -> {
-                    aggregates.acknowledge(call.argument<List<String>>("keys") ?: emptyList())
-                    result.success(null)
+                "beginApprovedRemoval" -> background(result) {
+                    bridgeCall("begin_approved_removal", null, null)
+                        ?.getBoolean("value", false) ?: false
                 }
-                "storeProtectionGrant" -> {
+                "drainDailyAggregates" -> background(result) {
+                    bridgeAggregateRows("drain_daily_aggregates")
+                }
+                "getCurrentDailyAggregates" -> background(result) {
+                    bridgeAggregateRows("get_current_daily_aggregates")
+                }
+                "ackDailyAggregates" -> background(result) {
+                    bridgeCall(
+                        "ack_daily_aggregates",
+                        null,
+                        Bundle().apply {
+                            putStringArrayList(
+                                "keys",
+                                ArrayList(call.argument<List<String>>("keys") ?: emptyList()),
+                            )
+                        },
+                    )
+                    null
+                }
+                "storeProtectionGrant" -> background(result) {
                     val grantToken = call.argument<String>("grant_token").orEmpty()
                     if (grantToken.isBlank()) {
-                        result.success(false)
+                        false
                     } else {
-                        background(result) { stateStore.storeGrant(grantToken) }
+                        bridgeCall("store_grant", grantToken, null)
+                            ?.getBoolean("value", false) ?: false
                     }
                 }
                 "getPairingToken", "rotatePairingToken" -> result.success(null)
@@ -166,58 +207,48 @@ class MainActivity : FlutterActivity() {
         }
     }
 
+    private fun bridgeAggregateRows(method: String): List<Map<String, Any?>> {
+        val bundle = bridgeCall(method, null, null) ?: return emptyList()
+        return bundle.getParcelableArrayList<Bundle>("rows")
+            ?.map(ProtectionBridge::bundleToMap)
+            ?: emptyList()
+    }
+
+    private fun localSnapshot(): Map<String, Any?> {
+        val bridgeSnapshot = bridgeCall("get_snapshot", null, null)
+        if (bridgeSnapshot != null) return ProtectionBridge.bundleToMap(bridgeSnapshot)
+        // Protection process unreachable: report the truthful local view.
+        val enabled = isAccessibilityEnabled()
+        return mapOf(
+            "platform" to "android",
+            "status" to "inactive",
+            "service_running" to false,
+            "sensor_status" to "disconnected",
+            "permission_status" to if (enabled) "granted" else "revoked",
+            "model_version" to classifier.modelVersion,
+            "ruleset_version" to classifier.rulesetVersion,
+            "supports_controlled_removal" to BuildConfig.SUPPORTS_CONTROLLED_REMOVAL,
+            "degraded_reason_code" to if (enabled) "service_not_running" else "accessibility_disabled",
+            "last_event_at" to null,
+        )
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
     }
 
     override fun onDestroy() {
-        flutterPresentationAvailable = false
-        NativeEventBus.remove(eventSink)
-        if (!isChangingConfigurations && ::stateStore.isInitialized) {
-            stateStore.activeIntervention()?.let { pending ->
-                val released = stateStore.releaseFlutterOwnershipForReplay(pending.id)
-                if (released != null) {
-                    BrowserProtectionAccessibilityService.notifyFlutterPresentationLost(
-                        released.id,
-                    )
-                }
-            }
+        protectionReceiver?.let {
+            runCatching { unregisterReceiver(it) }
+        }
+        protectionReceiver = null
+        if (!isChangingConfigurations) {
+            bridgeCall("ui_presentation_lost", null, null)
+            bridgeCall("unregister_ui", null, null)
         }
         worker.shutdownNow()
         super.onDestroy()
-    }
-
-    private fun snapshot(): Map<String, Any?> {
-        val enabled = isAccessibilityEnabled()
-        val serviceBound = BrowserProtectionAccessibilityService.isRunning()
-        val storedStatus = stateStore.status()
-        val status = when {
-            !enabled -> "inactive"
-            !serviceBound -> "inactive"
-            stateStore.activeGrantAllowsProtectionPause() -> "paused"
-            storedStatus == "degraded" -> "degraded"
-            else -> "active"
-        }
-        val degradedReason = when {
-            !enabled -> "accessibility_disabled"
-            !serviceBound -> "service_not_running"
-            status == "degraded" -> stateStore.degradedReason()
-            else -> null
-        }
-        val isHealthy = enabled && serviceBound && status != "degraded"
-        return mapOf(
-            "platform" to "android",
-            "status" to status,
-            "service_running" to (enabled && serviceBound),
-            "sensor_status" to if (isHealthy) "connected" else if (enabled) "degraded" else "disconnected",
-            "permission_status" to if (enabled) "granted" else "revoked",
-            "model_version" to classifier.modelVersion,
-            "ruleset_version" to classifier.rulesetVersion,
-            "supports_controlled_removal" to BuildConfig.SUPPORTS_CONTROLLED_REMOVAL,
-            "degraded_reason_code" to degradedReason,
-            "last_event_at" to stateStore.lastEventAt(),
-        )
     }
 
     private fun isAccessibilityEnabled(): Boolean {
@@ -227,7 +258,7 @@ class MainActivity : FlutterActivity() {
         ).any {
             it.resolveInfo.serviceInfo.packageName == packageName &&
                 (it.resolveInfo.serviceInfo.name.contains("AccessibilityService") ||
-                 it.resolveInfo.serviceInfo.name.contains("Gamblock"))
+                    it.resolveInfo.serviceInfo.name.contains("Gamblock"))
         }
     }
 
@@ -253,25 +284,6 @@ class MainActivity : FlutterActivity() {
                 Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
                     .setData(Uri.parse("package:$packageName")),
             )
-            true
-        }.getOrDefault(false)
-    }
-
-    private fun beginApprovedRemoval(): Boolean {
-        if (!BuildConfig.SUPPORTS_CONTROLLED_REMOVAL) return false
-        if (!stateStore.activeGrantAllowsControlledRemoval()) return false
-        val removalIntent = Intent(
-            Intent.ACTION_DELETE,
-            Uri.parse("package:$packageName"),
-        )
-        val handlerPackage = removalIntent.resolveActivity(packageManager)
-            ?.packageName
-            ?.takeIf(String::isNotBlank)
-            ?: return false
-        removalIntent.setPackage(handlerPackage)
-        return runCatching {
-            startActivity(removalIntent)
-            stateStore.clearPendingTamperAction()
             true
         }.getOrDefault(false)
     }
@@ -311,9 +323,9 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun jsonToFlutter(value: Any?): Any? = when (value) {
-        is JSONObject -> value.keys().asSequence().associateWith { jsonToFlutter(value.opt(it)) }
-        is JSONArray -> (0 until value.length()).map { jsonToFlutter(value.opt(it)) }
-        JSONObject.NULL -> null
+        is org.json.JSONObject -> value.keys().asSequence().associateWith { jsonToFlutter(value.opt(it)) }
+        is org.json.JSONArray -> (0 until value.length()).map { jsonToFlutter(value.opt(it)) }
+        org.json.JSONObject.NULL -> null
         else -> value
     }
 
