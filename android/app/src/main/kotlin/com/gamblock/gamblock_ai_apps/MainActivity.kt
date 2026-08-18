@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.os.PowerManager
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 import io.flutter.embedding.android.FlutterActivity
@@ -89,11 +90,27 @@ class MainActivity : FlutterActivity() {
                     if (enabled) {
                         requestNotificationPermissionIfNeeded()
                         HealthNotificationPreferences.show(this)
+                        if (isAccessibilityEnabled()) {
+                            ProtectionKeepAliveService.start(this)
+                        }
                     } else {
                         val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
                         manager.cancel(BrowserProtectionAccessibilityService.NOTIFICATION_ID)
+                        ProtectionKeepAliveService.stop(this)
                     }
                     result.success(true)
+                }
+                "ensureBackgroundProtection" -> {
+                    val enabled = isAccessibilityEnabled()
+                    if (enabled) {
+                        ProtectionKeepAliveService.start(this)
+                    } else {
+                        ProtectionKeepAliveService.stop(this)
+                    }
+                    result.success(enabled)
+                }
+                "requestBatteryOptimizationExemption" -> {
+                    result.success(requestBatteryOptimizationExemption())
                 }
                 "setDeviceId" -> {
                     result.success(
@@ -218,6 +235,18 @@ class MainActivity : FlutterActivity() {
                 2001,
             )
         }
+    }
+
+    private fun requestBatteryOptimizationExemption(): Boolean {
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        if (powerManager.isIgnoringBatteryOptimizations(packageName)) return true
+        return runCatching {
+            startActivity(
+                Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                    .setData(Uri.parse("package:$packageName")),
+            )
+            true
+        }.getOrDefault(false)
     }
 
     private fun beginApprovedRemoval(): Boolean {

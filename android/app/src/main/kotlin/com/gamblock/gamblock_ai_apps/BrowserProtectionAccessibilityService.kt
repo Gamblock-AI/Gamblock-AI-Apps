@@ -2,11 +2,13 @@ package com.gamblock.gamblock_ai_apps
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityManager
 import android.view.accessibility.AccessibilityNodeInfo
 import java.util.ArrayDeque
 import java.util.concurrent.Executors
@@ -110,7 +112,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
     protected lateinit var aggregateStore: DailyAggregateStore
     protected lateinit var stateStore: ProtectionStateStore
     protected lateinit var overlay: PatternInterruptOverlay
-    private lateinit var phase4Evidence: Phase4EvidenceRecorder
+    private var phase4Evidence: Phase4EvidenceRecorder? = null
     private var lastSignature = 0
     private var lastDecisionAt = 0L
     private var pendingScan: Runnable? = null
@@ -134,9 +136,10 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         aggregateStore = DailyAggregateStore(applicationContext)
         stateStore = ProtectionStateStore(applicationContext)
         overlay = PatternInterruptOverlay(this, NativeConfig.webBaseUrl(this))
-        phase4Evidence = Phase4EvidenceRecorder(applicationContext)
+        runCatching { phase4Evidence = Phase4EvidenceRecorder(applicationContext) }
         activeService = WeakReference(this)
-        HealthNotificationPreferences.show(this)
+        runCatching { HealthNotificationPreferences.show(this) }
+        ProtectionKeepAliveService.start(this)
         NativeEventBus.emit(snapshotEvent())
         onProtectionServiceConnected()
         restorePendingIntervention()
@@ -479,9 +482,27 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             activeService = null
         }
         worker.shutdownNow()
-        aggregateStore.increment("permission_revoked")
+        if (isAccessibilityComponentDisabled()) {
+            aggregateStore.increment("permission_revoked")
+            ProtectionKeepAliveService.stop(this)
+        }
         stateStore.setStatus("inactive", "accessibility_disabled")
         NativeEventBus.emit(snapshotEvent())
         super.onDestroy()
+    }
+
+    /**
+     * Only a real disable (Settings toggle, force-stop semantics) removes the
+     * component from the enabled list. Process restarts and task removals must
+     * not be counted as permission revocation.
+     */
+    private fun isAccessibilityComponentDisabled(): Boolean {
+        val manager = getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+        return manager.getEnabledAccessibilityServiceList(
+            AccessibilityServiceInfo.FEEDBACK_ALL_MASK,
+        ).none {
+            it.resolveInfo.serviceInfo.packageName == packageName &&
+                it.resolveInfo.serviceInfo.name == javaClass.name
+        }
     }
 }

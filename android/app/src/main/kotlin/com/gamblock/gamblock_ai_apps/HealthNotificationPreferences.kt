@@ -1,6 +1,7 @@
 package com.gamblock.gamblock_ai_apps
 
 import android.Manifest
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -25,15 +26,7 @@ object HealthNotificationPreferences {
             .getBoolean(ENABLED_KEY, true)
     }
 
-    fun show(context: Context) {
-        if (!isEnabled(context)) return
-        if (
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
-            PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
+    fun ensureChannel(context: Context) {
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             manager.createNotificationChannel(
@@ -46,18 +39,35 @@ object HealthNotificationPreferences {
                 },
             )
         }
+    }
+
+    fun buildNotification(context: Context): Notification {
+        return NotificationCompat.Builder(
+            context,
+            BrowserProtectionAccessibilityService.CHANNEL_ID,
+        )
+            .setContentTitle("Gamblock AI")
+            .setContentText("Local protection service is running")
+            .setSmallIcon(android.R.drawable.ic_lock_lock)
+            .setOngoing(true)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
+    }
+
+    fun show(context: Context) {
+        if (!isEnabled(context)) return
+        if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        ensureChannel(context)
         manager.notify(
             BrowserProtectionAccessibilityService.NOTIFICATION_ID,
-            NotificationCompat.Builder(
-                context,
-                BrowserProtectionAccessibilityService.CHANNEL_ID,
-            )
-                .setContentTitle("Gamblock AI")
-                .setContentText("Local protection service is running")
-                .setSmallIcon(android.R.drawable.ic_lock_lock)
-                .setOngoing(true)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .build(),
+            buildNotification(context),
         )
     }
 }

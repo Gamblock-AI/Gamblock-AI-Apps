@@ -120,9 +120,11 @@ class _GamblockAppState extends ConsumerState<GamblockApp>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed &&
-        ref.read(authProvider).isAuthenticated) {
-      ref.read(authProvider.notifier).refreshProfile().catchError((_) {});
+    if (state == AppLifecycleState.resumed) {
+      PlatformBridge.ensureBackgroundProtection().catchError((_) => false);
+      if (ref.read(authProvider).isAuthenticated) {
+        ref.read(authProvider.notifier).refreshProfile().catchError((_) {});
+      }
     }
   }
 }

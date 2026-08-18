@@ -6,6 +6,7 @@ import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/feedback/feedback.dart';
 import '../../../../core/messaging/app_messages.dart';
+import '../../../../core/platform/platform_bridge.dart';
 import '../../../accountability/domain/entities/accountability_models.dart';
 import '../../domain/entities/protection_status.dart';
 import '../protection_coordinator.dart';
@@ -38,6 +39,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
   bool _loading = true;
   bool _actionLoading = false;
   bool _handledRequestedApproval = false;
+  bool _requestExemptionOnNextResume = false;
 
   @override
   void initState() {
@@ -56,6 +58,12 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _load();
+      PlatformBridge.ensureBackgroundProtection().catchError((_) => false);
+      if (_requestExemptionOnNextResume) {
+        _requestExemptionOnNextResume = false;
+        PlatformBridge.requestBatteryOptimizationExemption()
+            .catchError((_) => false);
+      }
     }
   }
 
@@ -107,8 +115,10 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
   }
 
   Future<void> _openSetup() async {
+    _requestExemptionOnNextResume = true;
     await ProtectionCoordinator(ref).openPlatformSetup();
     await _load();
+    await PlatformBridge.ensureBackgroundProtection();
   }
 
   Future<void> _runSelfTest() async {

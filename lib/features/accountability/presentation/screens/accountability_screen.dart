@@ -106,11 +106,11 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
       context: context,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: Container(
           constraints: const BoxConstraints(maxWidth: 380),
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,56 +160,49 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                 style: const TextStyle(
                   color: AppColors.mutedForeground,
                   fontSize: 12,
-                  height: 1.35,
+                  height: 1.4,
                 ),
               ),
-              const SizedBox(height: 16),
-              Row(
+              const SizedBox(height: 20),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 42,
-                      child: FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.muted,
-                          foregroundColor: AppColors.navy,
-                          elevation: 0,
-                          padding: EdgeInsets.zero,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppRadius.pill),
-                          ),
+                  SizedBox(
+                    height: 46,
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.navy,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.pill),
                         ),
-                        onPressed: () => Navigator.pop(context, false),
-                        child: Text(
-                          l10n.cancel,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13,
-                          ),
+                      ),
+                      onPressed: () => Navigator.pop(context, true),
+                      child: Text(
+                        l10n.accountabilityJoinAction,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: SizedBox(
-                      height: 42,
-                      child: FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.navy,
-                          elevation: 0,
-                          padding: EdgeInsets.zero,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppRadius.pill),
-                          ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 42,
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.mutedForeground,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.pill),
                         ),
-                        onPressed: () => Navigator.pop(context, true),
-                        child: Text(
-                          l10n.accountabilityJoinAction,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13,
-                          ),
+                      ),
+                      onPressed: () => Navigator.pop(context, false),
+                      child: Text(
+                        l10n.cancel,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
                         ),
                       ),
                     ),
@@ -525,11 +518,11 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
       context: context,
       builder: (dialogContext) => Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: Container(
           constraints: const BoxConstraints(maxWidth: 380),
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(20),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -634,59 +627,48 @@ class _AccountabilityScreenState extends ConsumerState<AccountabilityScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                Row(
+                const SizedBox(height: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 42,
-                        child: FilledButton(
-                          style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.muted,
-                            foregroundColor: AppColors.navy,
-                            elevation: 0,
-                            padding: EdgeInsets.zero,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppRadius.pill,
-                              ),
-                            ),
+                    SizedBox(
+                      height: 46,
+                      child: FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: isUnsafe
+                              ? AppColors.crimson
+                              : AppColors.navy,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.pill),
                           ),
-                          onPressed: () => Navigator.pop(dialogContext, false),
-                          child: Text(
-                            l10n.cancel,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 13,
-                            ),
+                        ),
+                        onPressed: () => Navigator.pop(dialogContext, true),
+                        child: Text(
+                          l10n.accSendRequest,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: SizedBox(
-                        height: 42,
-                        child: FilledButton(
-                          style: FilledButton.styleFrom(
-                            backgroundColor: isUnsafe
-                                ? AppColors.crimson
-                                : AppColors.navy,
-                            elevation: 0,
-                            padding: EdgeInsets.zero,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppRadius.pill,
-                              ),
-                            ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 42,
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.mutedForeground,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.pill),
                           ),
-                          onPressed: () => Navigator.pop(dialogContext, true),
-                          child: Text(
-                            l10n.accSendRequest,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 13,
-                            ),
+                        ),
+                        onPressed: () => Navigator.pop(dialogContext, false),
+                        child: Text(
+                          l10n.cancel,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
                           ),
                         ),
                       ),

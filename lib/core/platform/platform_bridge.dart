@@ -48,6 +48,18 @@ class PlatformBridge {
 
   static Future<bool> openPlatformSetup() => _boolMethod('openPlatformSetup');
 
+  /// Starts the foreground keep-alive when accessibility protection is
+  /// enabled, or stops it when protection is off. Returns whether protection
+  /// is currently enabled.
+  static Future<bool> ensureBackgroundProtection() =>
+      _boolMethod('ensureBackgroundProtection');
+
+  /// Requests the battery-optimization exemption so the keep-alive survives
+  /// aggressive OEM task-killing. Returns true when already exempt or the
+  /// system dialog was shown.
+  static Future<bool> requestBatteryOptimizationExemption() =>
+      _boolMethod('requestBatteryOptimizationExemption');
+
   static Future<Map<String, dynamic>> runLocalSelfTest() async {
     try {
       final result = await _channel.invokeMethod<Map<Object?, Object?>>(

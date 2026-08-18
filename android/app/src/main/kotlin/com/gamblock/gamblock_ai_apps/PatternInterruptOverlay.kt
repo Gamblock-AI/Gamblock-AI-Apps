@@ -4,21 +4,33 @@ import android.accessibilityservice.AccessibilityService
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
+import android.content.res.AssetFileDescriptor
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.PixelFormat
+import android.graphics.SurfaceTexture
+import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.RippleDrawable
+import android.content.res.ColorStateList
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.util.TypedValue
 import android.view.Gravity
+import android.view.Surface
+import android.view.TextureView
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import io.flutter.FlutterInjector
 import java.util.Locale
 
 class PatternInterruptOverlay(
@@ -31,6 +43,9 @@ class PatternInterruptOverlay(
     private var animator: ValueAnimator? = null
     private var activeInterventionId: String? = null
     private var completion: (() -> Unit)? = null
+    private var mediaPlayer: MediaPlayer? = null
+    private var videoSurface: Surface? = null
+    private var textureView: TextureView? = null
 
     fun showIntervention(
         interventionId: String,
@@ -43,43 +58,203 @@ class PatternInterruptOverlay(
         completion = onCompleted
         val locale = if (Locale.getDefault().language == "en") "en" else "id"
         val isEnglish = locale == "en"
-        val container = LinearLayout(service).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER
-            setPadding(dp(24), dp(32), dp(24), dp(32))
-            setBackgroundColor(Color.rgb(13, 27, 53))
+
+        // Root container covering full screen
+        val rootLayout = FrameLayout(service).apply {
+            setBackgroundColor(Color.rgb(11, 19, 43))
         }
+
+        // Background Video Layer
+        setupVideoBackground(rootLayout)
+
+        // Gradient Scrim Layer: Dark at top & bottom for legibility, translucent in center
+        val scrim = View(service).apply {
+            background = GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                intArrayOf(
+                    Color.argb(175, 5, 10, 20),
+                    Color.argb(45, 5, 10, 20),
+                    Color.argb(55, 5, 10, 20),
+                    Color.argb(230, 9, 9, 11),
+                ),
+            )
+        }
+        rootLayout.addView(
+            scrim,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT,
+            ),
+        )
+
+        // Foreground UI: Floating Header at Top, Empty Center Viewport, Action Dock at Bottom
+        val foreground = LinearLayout(service).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_HORIZONTAL
+            setPadding(dp(20), dp(44), dp(20), dp(28))
+        }
+
+        // --- Top Floating Header ---
+        val headerLayout = LinearLayout(service).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_HORIZONTAL
+        }
+
         val breathing = View(service).apply {
             background = GradientDrawable().apply {
                 shape = GradientDrawable.OVAL
-                setColor(Color.TRANSPARENT)
-                setStroke(dp(4), Color.rgb(191, 233, 245))
+                setColor(Color.argb(35, 56, 189, 248))
+                setStroke(dp(3), Color.rgb(186, 230, 253))
             }
             contentDescription = if (isEnglish) "Slow breathing guide" else "Panduan napas perlahan"
         }
+        headerLayout.addView(
+            breathing,
+            LinearLayout.LayoutParams(dp(68), dp(68)).apply {
+                gravity = Gravity.CENTER_HORIZONTAL
+                bottomMargin = dp(12)
+            },
+        )
+
         val title = text(
             if (isEnglish) "Take a pause before continuing" else "Ambil jeda sebelum melanjutkan",
-            26f,
+            21f,
             Color.WHITE,
+            isBold = true,
+        ).apply {
+            setShadowLayer(10f, 0f, 2f, Color.argb(200, 0, 0, 0))
+        }
+        headerLayout.addView(
+            title,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+            ).apply {
+                gravity = Gravity.CENTER_HORIZONTAL
+                bottomMargin = dp(6)
+            },
         )
+
         val body = text(
             if (isEnglish) {
                 "Breathe slowly. This brief pause is here to help you choose your next step."
             } else {
                 "Tarik napas perlahan. Jeda singkat ini membantu Anda memilih langkah berikutnya."
             },
-            17f,
-            Color.argb(210, 255, 255, 255),
+            13f,
+            Color.argb(230, 241, 245, 249),
+            isBold = false,
+        ).apply {
+            setShadowLayer(8f, 0f, 1f, Color.argb(180, 0, 0, 0))
+        }
+        headerLayout.addView(
+            body,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+            ).apply {
+                gravity = Gravity.CENTER_HORIZONTAL
+            },
         )
-        val countdown = text("7", 18f, Color.rgb(191, 233, 245))
+
+        foreground.addView(
+            headerLayout,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+            ),
+        )
+
+        // --- Center Open Viewport (Spacer) ---
+        // Keeps the middle screen open so the calm intervention video loop is completely unobstructed
+        val centerSpacer = View(service)
+        foreground.addView(
+            centerSpacer,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                0,
+                1.0f,
+            ),
+        )
+
+        // --- Bottom Floating Action Dock ---
+        val dockLayout = LinearLayout(service).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_HORIZONTAL
+            background = GradientDrawable().apply {
+                setColor(Color.argb(185, 15, 23, 42))
+                cornerRadius = dp(22).toFloat()
+                setStroke(dp(1), Color.argb(50, 255, 255, 255))
+            }
+            setPadding(dp(16), dp(16), dp(16), dp(12))
+        }
+
+        val countdownBadge = TextView(service).apply {
+            text = if (isEnglish) "Wait 7 seconds" else "Tunggu 7 detik"
+            textSize = 12f
+            setTypeface(typeface, Typeface.BOLD)
+            setTextColor(Color.rgb(186, 230, 253))
+            gravity = Gravity.CENTER
+            setPadding(dp(14), dp(6), dp(14), dp(6))
+            background = GradientDrawable().apply {
+                setColor(Color.argb(60, 56, 189, 248))
+                cornerRadius = dp(999).toFloat()
+                setStroke(dp(1), Color.argb(120, 56, 189, 248))
+            }
+        }
+        dockLayout.addView(
+            countdownBadge,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+            ).apply {
+                gravity = Gravity.CENTER_HORIZONTAL
+                bottomMargin = dp(14)
+            },
+        )
+
+        fun buttonBackground(enabled: Boolean, isPrimary: Boolean): GradientDrawable {
+            return GradientDrawable().apply {
+                cornerRadius = dp(999).toFloat()
+                if (enabled) {
+                    if (isPrimary) {
+                        setColor(Color.rgb(2, 132, 199))
+                        setStroke(dp(1), Color.argb(100, 255, 255, 255))
+                    } else {
+                        setColor(Color.argb(35, 255, 255, 255))
+                        setStroke(dp(1), Color.argb(90, 255, 255, 255))
+                    }
+                } else {
+                    setColor(Color.argb(20, 255, 255, 255))
+                    setStroke(dp(1), Color.argb(25, 255, 255, 255))
+                }
+            }
+        }
+
         val continueButton = button(
             if (isEnglish) "Continue to recovery" else "Lanjut ke pemulihan",
+            isPrimary = true,
         ) {
             runCatching { openWeb("$locale/post-intervention?source=pattern_interrupt") }
             completeAndDismiss()
-        }.apply { isEnabled = false }
+        }.apply {
+            isEnabled = false
+            background = buttonBackground(enabled = false, isPrimary = true)
+            setTextColor(Color.argb(100, 255, 255, 255))
+        }
+        dockLayout.addView(
+            continueButton,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(46),
+            ).apply {
+                bottomMargin = dp(10)
+            },
+        )
+
         val groundingButton = button(
             if (isEnglish) "Offline grounding" else "Grounding offline",
+            isPrimary = false,
         ) {
             title.text = if (isEnglish) "Notice five things around you" else "Perhatikan lima hal di sekitar Anda"
             body.text = if (isEnglish) {
@@ -88,40 +263,90 @@ class PatternInterruptOverlay(
                 "Sebutkan lima hal yang terlihat, empat yang terasa, tiga yang terdengar, dua yang tercium, dan satu hal yang ingin Anda lindungi hari ini."
             }
             breathing.visibility = View.GONE
+            countdownBadge.visibility = View.GONE
             continueButton.text = if (isEnglish) "Finish" else "Selesai"
+            continueButton.isEnabled = true
+            continueButton.background = buttonBackground(enabled = true, isPrimary = true)
+            continueButton.setTextColor(Color.WHITE)
             continueButton.setOnClickListener { completeAndDismiss() }
-        }.apply { isEnabled = false }
-        val helpButton = button(if (isEnglish) "I need help" else "Butuh bantuan") {
+        }.apply {
+            isEnabled = false
+            background = buttonBackground(enabled = false, isPrimary = false)
+            setTextColor(Color.argb(90, 255, 255, 255))
+        }
+        dockLayout.addView(
+            groundingButton,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(42),
+            ).apply {
+                bottomMargin = dp(6)
+            },
+        )
+
+        val bottomRow = LinearLayout(service).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+
+        val helpButton = textAction(if (isEnglish) "I need help" else "Butuh bantuan") {
             runCatching { openWeb("$locale/help") }
         }
-        val laterButton = button(if (isEnglish) "Return to protection" else "Kembali ke proteksi") {
-            completeAndDismiss()
-        }.apply { isEnabled = false }
+        bottomRow.addView(
+            helpButton,
+            LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f).apply {
+                gravity = Gravity.START
+            },
+        )
 
-        listOf(breathing, title, body, countdown, continueButton, groundingButton, helpButton, laterButton)
-            .forEach { view ->
-                container.addView(
-                    view,
-                    LinearLayout.LayoutParams(
-                        if (view == breathing) dp(160) else LinearLayout.LayoutParams.MATCH_PARENT,
-                        if (view == breathing) dp(160) else LinearLayout.LayoutParams.WRAP_CONTENT,
-                    ).apply {
-                        gravity = Gravity.CENTER_HORIZONTAL
-                        topMargin = if (view == breathing) 0 else dp(12)
-                    },
-                )
-            }
+        val laterButton = textAction(if (isEnglish) "Return to protection" else "Kembali ke proteksi") {
+            completeAndDismiss()
+        }.apply {
+            alpha = 0f
+            isEnabled = false
+        }
+        bottomRow.addView(
+            laterButton,
+            LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f).apply {
+                gravity = Gravity.END
+            },
+        )
+
+        dockLayout.addView(
+            bottomRow,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+            ),
+        )
+
+        foreground.addView(
+            dockLayout,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+            ),
+        )
+
+        rootLayout.addView(
+            foreground,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT,
+            ),
+        )
+
         onCommitted?.let { callback ->
-            container.viewTreeObserver.addOnDrawListener(
+            rootLayout.viewTreeObserver.addOnDrawListener(
                 object : ViewTreeObserver.OnDrawListener {
                     private var delivered = false
 
                     override fun onDraw() {
                         if (delivered) return
                         delivered = true
-                        container.post {
-                            if (container.viewTreeObserver.isAlive) {
-                                container.viewTreeObserver.removeOnDrawListener(this)
+                        rootLayout.post {
+                            if (rootLayout.viewTreeObserver.isAlive) {
+                                rootLayout.viewTreeObserver.removeOnDrawListener(this)
                             }
                             callback()
                         }
@@ -129,9 +354,11 @@ class PatternInterruptOverlay(
                 },
             )
         }
-        attach(container)
+
+        attach(rootLayout)
+
         if (!reducedMotion()) {
-            animator = ValueAnimator.ofFloat(0.88f, 1.0f).apply {
+            animator = ValueAnimator.ofFloat(0.88f, 1.06f).apply {
                 duration = 4000
                 repeatMode = ValueAnimator.REVERSE
                 repeatCount = ValueAnimator.INFINITE
@@ -144,15 +371,31 @@ class PatternInterruptOverlay(
                 start()
             }
         }
+
         var remaining = 7
         fun tick() {
             if (root == null) return
-            countdown.text = remaining.toString()
-            if (remaining == 0) {
-                countdown.text = if (isEnglish) "Choose your next step" else "Pilih langkah berikutnya"
+            if (remaining > 0) {
+                countdownBadge.text = if (isEnglish) "Wait $remaining seconds" else "Tunggu $remaining detik"
+            } else {
+                countdownBadge.text = if (isEnglish) "Choose your next step" else "Pilih langkah berikutnya"
+                countdownBadge.setTextColor(Color.rgb(167, 243, 208))
+                countdownBadge.background = GradientDrawable().apply {
+                    setColor(Color.argb(70, 16, 185, 129))
+                    cornerRadius = dp(999).toFloat()
+                    setStroke(dp(1), Color.argb(130, 52, 211, 153))
+                }
+
                 continueButton.isEnabled = true
+                continueButton.background = buttonBackground(enabled = true, isPrimary = true)
+                continueButton.setTextColor(Color.WHITE)
+
                 groundingButton.isEnabled = true
+                groundingButton.background = buttonBackground(enabled = true, isPrimary = false)
+                groundingButton.setTextColor(Color.WHITE)
+
                 laterButton.isEnabled = true
+                laterButton.animate().alpha(1.0f).setDuration(250).start()
                 return
             }
             remaining--
@@ -161,10 +404,116 @@ class PatternInterruptOverlay(
         tick()
     }
 
+    private fun setupVideoBackground(rootLayout: FrameLayout) {
+        if (reducedMotion()) return
+
+        val afd = openVideoAssetFd() ?: return
+        try {
+            val mp = MediaPlayer().apply {
+                setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                isLooping = true
+                setVolume(0f, 0f)
+            }
+            mediaPlayer = mp
+
+            val tv = TextureView(service).apply {
+                surfaceTextureListener = object : TextureView.SurfaceTextureListener {
+                    override fun onSurfaceTextureAvailable(surfaceTexture: SurfaceTexture, width: Int, height: Int) {
+                        val surface = Surface(surfaceTexture)
+                        videoSurface = surface
+                        mp.setSurface(surface)
+                        mp.setOnPreparedListener { player ->
+                            adjustAspectRatio(this@apply, player.videoWidth, player.videoHeight)
+                            player.start()
+                        }
+                        mp.setOnVideoSizeChangedListener { _, vw, vh ->
+                            adjustAspectRatio(this@apply, vw, vh)
+                        }
+                        try {
+                            mp.prepareAsync()
+                        } catch (_: Exception) {
+                        }
+                    }
+
+                    override fun onSurfaceTextureSizeChanged(surfaceTexture: SurfaceTexture, width: Int, height: Int) {
+                        if (mp.isPlaying) {
+                            adjustAspectRatio(this@apply, mp.videoWidth, mp.videoHeight)
+                        }
+                    }
+
+                    override fun onSurfaceTextureDestroyed(surfaceTexture: SurfaceTexture): Boolean {
+                        mp.setSurface(null)
+                        videoSurface?.release()
+                        videoSurface = null
+                        return true
+                    }
+
+                    override fun onSurfaceTextureUpdated(surfaceTexture: SurfaceTexture) {}
+                }
+            }
+            textureView = tv
+            rootLayout.addView(
+                tv,
+                FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                ),
+            )
+        } catch (_: Exception) {
+            runCatching { afd.close() }
+        }
+    }
+
+    private fun openVideoAssetFd(): AssetFileDescriptor? {
+        return try {
+            val loader = FlutterInjector.instance().flutterLoader()
+            val key = loader.getLookupKeyForAsset("assets/videos/intervention-android.mp4")
+            service.assets.openFd(key)
+        } catch (_: Exception) {
+            try {
+                service.assets.openFd("flutter_assets/assets/videos/intervention-android.mp4")
+            } catch (_: Exception) {
+                null
+            }
+        }
+    }
+
+    private fun adjustAspectRatio(tv: TextureView, videoWidth: Int, videoHeight: Int) {
+        val viewWidth = tv.width
+        val viewHeight = tv.height
+        if (viewWidth == 0 || viewHeight == 0 || videoWidth == 0 || videoHeight == 0) return
+
+        val viewRatio = viewWidth.toFloat() / viewHeight.toFloat()
+        val videoRatio = videoWidth.toFloat() / videoHeight.toFloat()
+        val scaleX: Float
+        val scaleY: Float
+
+        if (viewRatio > videoRatio) {
+            scaleX = 1f
+            scaleY = (viewWidth.toFloat() / videoWidth.toFloat()) / (viewHeight.toFloat() / videoHeight.toFloat())
+        } else {
+            scaleX = (viewHeight.toFloat() / videoHeight.toFloat()) / (viewWidth.toFloat() / videoWidth.toFloat())
+            scaleY = 1f
+        }
+
+        val matrix = Matrix()
+        matrix.setScale(scaleX, scaleY, viewWidth / 2f, viewHeight / 2f)
+        tv.setTransform(matrix)
+    }
+
     fun dismiss() {
         handler.removeCallbacksAndMessages(null)
         animator?.cancel()
         animator = null
+        try {
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+        } catch (_: Exception) {
+        }
+        mediaPlayer = null
+        videoSurface?.release()
+        videoSurface = null
+        textureView = null
         root?.let {
             try {
                 windowManager.removeView(it)
@@ -200,21 +549,36 @@ class PatternInterruptOverlay(
         root = view
     }
 
-    private fun text(value: String, size: Float, color: Int): TextView {
+    private fun text(value: String, size: Float, color: Int, isBold: Boolean = false): TextView {
         return TextView(service).apply {
             text = value
             textSize = size
             setTextColor(color)
+            if (isBold) setTypeface(typeface, Typeface.BOLD)
             gravity = Gravity.CENTER
             setLineSpacing(0f, 1.25f)
         }
     }
 
-    private fun button(label: String, action: () -> Unit): Button {
+    private fun button(label: String, isPrimary: Boolean, action: () -> Unit): Button {
         return Button(service).apply {
             text = label
-            minHeight = dp(52)
+            textSize = if (isPrimary) 14f else 13.5f
+            setTypeface(typeface, Typeface.BOLD)
             isAllCaps = false
+            setOnClickListener { action() }
+            stateListAnimator = null
+        }
+    }
+
+    private fun textAction(label: String, action: () -> Unit): TextView {
+        return TextView(service).apply {
+            text = label
+            textSize = 12.5f
+            setTextColor(Color.argb(200, 255, 255, 255))
+            setPadding(dp(8), dp(6), dp(8), dp(6))
+            isClickable = true
+            isFocusable = true
             setOnClickListener { action() }
         }
     }
