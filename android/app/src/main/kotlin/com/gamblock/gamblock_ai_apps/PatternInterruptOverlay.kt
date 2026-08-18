@@ -419,31 +419,40 @@ class PatternInterruptOverlay(
             val tv = TextureView(service).apply {
                 surfaceTextureListener = object : TextureView.SurfaceTextureListener {
                     override fun onSurfaceTextureAvailable(surfaceTexture: SurfaceTexture, width: Int, height: Int) {
-                        val surface = Surface(surfaceTexture)
-                        videoSurface = surface
-                        mp.setSurface(surface)
-                        mp.setOnPreparedListener { player ->
-                            adjustAspectRatio(this@apply, player.videoWidth, player.videoHeight)
-                            player.start()
-                        }
-                        mp.setOnVideoSizeChangedListener { _, vw, vh ->
-                            adjustAspectRatio(this@apply, vw, vh)
-                        }
-                        try {
+                        runCatching {
+                            val surface = Surface(surfaceTexture)
+                            videoSurface = surface
+                            mp.setSurface(surface)
+                            mp.setOnPreparedListener { player ->
+                                runCatching {
+                                    adjustAspectRatio(this@apply, player.videoWidth, player.videoHeight)
+                                    player.start()
+                                }
+                            }
+                            mp.setOnVideoSizeChangedListener { _, vw, vh ->
+                                runCatching {
+                                    adjustAspectRatio(this@apply, vw, vh)
+                                }
+                            }
                             mp.prepareAsync()
-                        } catch (_: Exception) {
                         }
                     }
 
                     override fun onSurfaceTextureSizeChanged(surfaceTexture: SurfaceTexture, width: Int, height: Int) {
-                        if (mp.isPlaying) {
-                            adjustAspectRatio(this@apply, mp.videoWidth, mp.videoHeight)
+                        runCatching {
+                            if (mp.isPlaying) {
+                                adjustAspectRatio(this@apply, mp.videoWidth, mp.videoHeight)
+                            }
                         }
                     }
 
                     override fun onSurfaceTextureDestroyed(surfaceTexture: SurfaceTexture): Boolean {
-                        mp.setSurface(null)
-                        videoSurface?.release()
+                        // These callbacks can fire after dismiss() already
+                        // released the player; a released MediaPlayer throws
+                        // IllegalStateException on any call, which would crash
+                        // the protection process.
+                        runCatching { mp.setSurface(null) }
+                        runCatching { videoSurface?.release() }
                         videoSurface = null
                         return true
                     }
