@@ -93,6 +93,12 @@ class ProtectionCoordinator {
         .applyApproval(requestId: requestId, deviceId: deviceId);
   }
 
+  Future<void> requestStandaloneRemoval({required String deviceId}) {
+    return _ref
+        .read(accountabilityRepositoryProvider)
+        .requestStandaloneRemoval(deviceId: deviceId);
+  }
+
   Future<void> requestEmergency(String deviceId) {
     return _ref
         .read(accountabilityRepositoryProvider)

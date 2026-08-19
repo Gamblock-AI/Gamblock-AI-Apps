@@ -500,6 +500,42 @@ abstract class AppLocalizations {
   /// **'Permintaan terikat pada perangkat dan harus disetujui pendamping aktif. Proteksi tetap berjalan sampai grant diterapkan.'**
   String get protectionApprovalDialogBody;
 
+  /// No description provided for @protectionStandaloneRemovalButton.
+  ///
+  /// In id, this message translates to:
+  /// **'Copot Aplikasi'**
+  String get protectionStandaloneRemovalButton;
+
+  /// No description provided for @protectionStandaloneRemovalTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Copot Aplikasi Tanpa Pendamping'**
+  String get protectionStandaloneRemovalTitle;
+
+  /// No description provided for @protectionStandaloneRemovalBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Anda tidak memiliki pendamping aktif. Untuk mencegah penghapusan tidak sengaja, tunggu hitung mundur lalu ketik {phrase} untuk mencopot aplikasi dan menonaktifkan admin perangkat.'**
+  String protectionStandaloneRemovalBody(String phrase);
+
+  /// No description provided for @protectionStandaloneRemovalCountdown.
+  ///
+  /// In id, this message translates to:
+  /// **'{seconds} detik'**
+  String protectionStandaloneRemovalCountdown(int seconds);
+
+  /// No description provided for @protectionStandaloneRemovalPhraseMismatch.
+  ///
+  /// In id, this message translates to:
+  /// **'Ketik {phrase} persis untuk melanjutkan.'**
+  String protectionStandaloneRemovalPhraseMismatch(String phrase);
+
+  /// No description provided for @protectionStandaloneRemovalSuccess.
+  ///
+  /// In id, this message translates to:
+  /// **'Proteksi dicopot. Ikuti prompt sistem untuk menghapus aplikasi.'**
+  String get protectionStandaloneRemovalSuccess;
+
   /// No description provided for @protectionPauseAction.
   ///
   /// In id, this message translates to:

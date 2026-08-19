@@ -140,6 +140,19 @@ class AccountabilityRepositoryImpl implements AccountabilityRepository {
   }
 
   @override
+  Future<void> requestStandaloneRemoval({required String deviceId}) async {
+    final response = await _dio.post(
+      '/v1/devices/standalone-removal-grant',
+      data: {'device_id': deviceId},
+    );
+    final grantToken =
+        (ApiResponse.map(response)?['grant_token']?.toString() ?? '').trim();
+    if (!await PlatformBridge.storeProtectionGrant(grantToken)) {
+      throw StateError('Native protection service did not accept the grant');
+    }
+  }
+
+  @override
   Future<EmergencyRequest> requestEmergency(String deviceId) async {
     final response = await _dio.post(
       '/v1/emergency-key-requests',

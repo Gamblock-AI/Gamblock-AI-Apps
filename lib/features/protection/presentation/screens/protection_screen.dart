@@ -17,6 +17,7 @@ import '../widgets/approval_request_dialog.dart';
 import '../widgets/emergency_key_dialog.dart';
 import '../widgets/protection_screen_body.dart';
 import '../widgets/self_test_result_dialog.dart';
+import '../widgets/standalone_removal_dialog.dart';
 
 class ProtectionScreen extends ConsumerStatefulWidget {
   const ProtectionScreen({
@@ -139,10 +140,18 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
       return;
     }
     _handledRequestedApproval = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       if (requested == 'uninstall' || requested == 'uninstall_detected') {
-        _requestApproval(initialAction: 'uninstall_detected');
+        final membership = _accountability?.activeMembership;
+        final canStandalone = membership == null &&
+            _status?.supportsControlledRemoval == true &&
+            _status?.deviceAdminActive == true;
+        if (canStandalone) {
+          await _requestStandaloneRemoval();
+        } else {
+          _requestApproval(initialAction: 'uninstall_detected');
+        }
       } else {
         AppFeedback.error(context, AppLocalizations.of(context)!.emergencyBody);
       }
@@ -188,6 +197,12 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
       return;
     }
     if (membership == null) {
+      final canStandalone = _status?.supportsControlledRemoval == true &&
+          _status?.deviceAdminActive == true;
+      if (canStandalone) {
+        await _requestStandaloneRemoval();
+        return;
+      }
       AppFeedback.error(
         context,
         AppLocalizations.of(context)!.protectionPartnerRequired,
@@ -209,6 +224,31 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
       ),
       AppLocalizations.of(context)!.protectionRequestSent,
     );
+  }
+
+  Future<void> _requestStandaloneRemoval() async {
+    final auth = ref.read(authProvider);
+    final deviceId = auth.deviceId;
+    if (deviceId == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => const StandaloneRemovalDialog(),
+    );
+    if (confirmed != true || !mounted) return;
+    await _runAccountabilityAction(
+      () => ProtectionCoordinator(ref).requestStandaloneRemoval(
+        deviceId: deviceId,
+      ),
+      l10n.protectionStandaloneRemovalSuccess,
+    );
+    if (!mounted) return;
+    setState(() => _actionLoading = true);
+    final started = await ProtectionCoordinator(ref).beginApprovedRemoval();
+    if (mounted && !started) {
+      AppFeedback.error(context, l10n.msgErrGeneric);
+    }
+    if (mounted) setState(() => _actionLoading = false);
   }
 
   Future<void> _applyApproval(ApprovalRequest request) async {
@@ -323,6 +363,10 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
           onLogin: () => context.go('/login'),
           onOpenAccountSetup: () => context.go('/setup'),
           onOpenDeviceAdmin: _openDeviceAdmin,
+          canStandaloneRemoval:
+              _status?.supportsControlledRemoval == true &&
+              _status?.deviceAdminActive == true,
+          onRequestStandaloneRemoval: _requestStandaloneRemoval,
         ),
       ),
     );

@@ -225,6 +225,31 @@ class AppLocalizationsEn extends AppLocalizations {
       'This request needs your active partner\'s approval. Protection stays on until the change is applied.';
 
   @override
+  String get protectionStandaloneRemovalButton => 'Remove app';
+
+  @override
+  String get protectionStandaloneRemovalTitle => 'Remove app without a partner';
+
+  @override
+  String protectionStandaloneRemovalBody(String phrase) {
+    return 'You have no active partner. To prevent accidental removal, wait for the countdown and type $phrase to remove the app and disable the device admin.';
+  }
+
+  @override
+  String protectionStandaloneRemovalCountdown(int seconds) {
+    return '$seconds seconds';
+  }
+
+  @override
+  String protectionStandaloneRemovalPhraseMismatch(String phrase) {
+    return 'Type $phrase exactly to continue.';
+  }
+
+  @override
+  String get protectionStandaloneRemovalSuccess =>
+      'Protection removed. Follow the system prompt to delete the app.';
+
+  @override
   String get protectionPauseAction => 'Pause';
 
   @override

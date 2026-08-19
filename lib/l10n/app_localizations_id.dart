@@ -227,6 +227,32 @@ class AppLocalizationsId extends AppLocalizations {
       'Permintaan terikat pada perangkat dan harus disetujui pendamping aktif. Proteksi tetap berjalan sampai grant diterapkan.';
 
   @override
+  String get protectionStandaloneRemovalButton => 'Copot Aplikasi';
+
+  @override
+  String get protectionStandaloneRemovalTitle =>
+      'Copot Aplikasi Tanpa Pendamping';
+
+  @override
+  String protectionStandaloneRemovalBody(String phrase) {
+    return 'Anda tidak memiliki pendamping aktif. Untuk mencegah penghapusan tidak sengaja, tunggu hitung mundur lalu ketik $phrase untuk mencopot aplikasi dan menonaktifkan admin perangkat.';
+  }
+
+  @override
+  String protectionStandaloneRemovalCountdown(int seconds) {
+    return '$seconds detik';
+  }
+
+  @override
+  String protectionStandaloneRemovalPhraseMismatch(String phrase) {
+    return 'Ketik $phrase persis untuk melanjutkan.';
+  }
+
+  @override
+  String get protectionStandaloneRemovalSuccess =>
+      'Proteksi dicopot. Ikuti prompt sistem untuk menghapus aplikasi.';
+
+  @override
   String get protectionPauseAction => 'Jeda';
 
   @override

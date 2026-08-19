@@ -74,6 +74,33 @@
   "protectionApprovalApplied": "The approval was applied to the device.",
   "protectionApprovalDialogTitle": "Request a protection change",
   "protectionApprovalDialogBody": "This request needs your active partner's approval. Protection stays on until the change is applied.",
+  "protectionStandaloneRemovalButton": "Remove app",
+  "protectionStandaloneRemovalTitle": "Remove app without a partner",
+  "protectionStandaloneRemovalBody": "You have no active partner. To prevent accidental removal, wait for the countdown and type {phrase} to remove the app and disable the device admin.",
+  "@protectionStandaloneRemovalBody": {
+    "placeholders": {
+      "phrase": {
+        "type": "String"
+      }
+    }
+  },
+  "protectionStandaloneRemovalCountdown": "{seconds} seconds",
+  "@protectionStandaloneRemovalCountdown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "protectionStandaloneRemovalPhraseMismatch": "Type {phrase} exactly to continue.",
+  "@protectionStandaloneRemovalPhraseMismatch": {
+    "placeholders": {
+      "phrase": {
+        "type": "String"
+      }
+    }
+  },
+  "protectionStandaloneRemovalSuccess": "Protection removed. Follow the system prompt to delete the app.",
   "protectionPauseAction": "Pause",
   "protectionDisableAction": "Disable",
   "protectionUninstallAction": "Uninstall",

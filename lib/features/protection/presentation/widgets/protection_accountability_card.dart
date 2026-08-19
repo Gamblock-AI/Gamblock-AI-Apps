@@ -19,6 +19,8 @@ class ProtectionAccountabilityCard extends StatelessWidget {
     required this.onManagePartner,
     required this.onRequestEmergency,
     required this.onEnterEmergencyKey,
+    this.canStandaloneRemoval = false,
+    this.onRequestStandaloneRemoval,
   });
 
   final AccountabilityOverview? accountability;
@@ -30,6 +32,8 @@ class ProtectionAccountabilityCard extends StatelessWidget {
   final VoidCallback onManagePartner;
   final VoidCallback onRequestEmergency;
   final VoidCallback onEnterEmergencyKey;
+  final bool canStandaloneRemoval;
+  final VoidCallback? onRequestStandaloneRemoval;
 
   @override
   Widget build(BuildContext context) {
@@ -131,6 +135,30 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                             fit: BoxFit.scaleDown,
                             child: Text(
                               l10n.protectionApplyApproval,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        )
+                      : canStandaloneRemoval
+                      ? FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.crimson,
+                            padding: const EdgeInsets.symmetric(horizontal: 6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: isLoading || onRequestStandaloneRemoval == null
+                              ? null
+                              : onRequestStandaloneRemoval,
+                          icon: const Icon(Icons.dangerous_outlined, size: 16),
+                          label: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              l10n.protectionStandaloneRemovalButton,
                               style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,

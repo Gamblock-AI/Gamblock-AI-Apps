@@ -133,6 +133,11 @@ class AppMessages {
       case 'accountability_member_remove_failed':
       case 'partner_contact_create_failed':
       case 'partner_contact_transition_failed':
+      case 'standalone_removal_failed':
+      case 'standalone_removal_device_not_owned':
+      case 'standalone_removal_partner_active':
+      case 'standalone_removal_already_active':
+      case 'standalone_removal_sign_unavailable':
         return loc.msgErrInvalidRequest;
       case 'name_required':
         return loc.msgErrGroupNameRequired;

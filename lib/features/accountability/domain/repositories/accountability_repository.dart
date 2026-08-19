@@ -27,6 +27,7 @@ abstract class AccountabilityRepository {
     required String requestId,
     required String deviceId,
   });
+  Future<void> requestStandaloneRemoval({required String deviceId});
   Future<EmergencyRequest> requestEmergency(String deviceId);
   Future<EmergencyRequest?> currentEmergency(String deviceId);
   Future<void> applyEmergencyKey({

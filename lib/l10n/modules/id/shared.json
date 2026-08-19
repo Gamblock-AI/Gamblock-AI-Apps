@@ -74,6 +74,33 @@
   "protectionApprovalApplied": "Persetujuan diterapkan pada perangkat.",
   "protectionApprovalDialogTitle": "Minta perubahan proteksi",
   "protectionApprovalDialogBody": "Permintaan terikat pada perangkat dan harus disetujui pendamping aktif. Proteksi tetap berjalan sampai grant diterapkan.",
+  "protectionStandaloneRemovalButton": "Copot Aplikasi",
+  "protectionStandaloneRemovalTitle": "Copot Aplikasi Tanpa Pendamping",
+  "protectionStandaloneRemovalBody": "Anda tidak memiliki pendamping aktif. Untuk mencegah penghapusan tidak sengaja, tunggu hitung mundur lalu ketik {phrase} untuk mencopot aplikasi dan menonaktifkan admin perangkat.",
+  "@protectionStandaloneRemovalBody": {
+    "placeholders": {
+      "phrase": {
+        "type": "String"
+      }
+    }
+  },
+  "protectionStandaloneRemovalCountdown": "{seconds} detik",
+  "@protectionStandaloneRemovalCountdown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "protectionStandaloneRemovalPhraseMismatch": "Ketik {phrase} persis untuk melanjutkan.",
+  "@protectionStandaloneRemovalPhraseMismatch": {
+    "placeholders": {
+      "phrase": {
+        "type": "String"
+      }
+    }
+  },
+  "protectionStandaloneRemovalSuccess": "Proteksi dicopot. Ikuti prompt sistem untuk menghapus aplikasi.",
   "protectionPauseAction": "Jeda",
   "protectionDisableAction": "Nonaktifkan",
   "protectionUninstallAction": "Copot",
