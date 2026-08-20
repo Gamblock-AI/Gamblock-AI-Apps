@@ -58,7 +58,7 @@ manager. Never commit these values to Git.
 | Material | GitHub (Actions) | Local backup (mode 0600) | Password manager entry |
 |---|---|---|---|
 | Play keystore | env `release-signing` → `ANDROID_PLAY_KEYSTORE_BASE64` + passwords | `~/.gamblock/secrets/gamblock-play-upload.jks` | `Gamblock-AI / Play Signing Keystore` |
-| Research keystore | env `release-signing` → `ANDROID_RESEARCH_KEYSTORE_BASE64` + passwords | `~/.gamblock/secrets/gamblock-research.jks` | `Gamblock-AI / Research Signing Keystore` |
+| Research keystore | env `release-signing` & `pilot-signing` → `ANDROID_RESEARCH_KEYSTORE_BASE64` + passwords | `~/.gamblock/secrets/gamblock-research.jks` | `Gamblock-AI / Research Signing Keystore` |
 | Windows pilot PFX (self-signed) | env `pilot-signing` → `WINDOWS_PILOT_SIGNING_PFX_BASE64` + `WINDOWS_PILOT_SIGNING_PFX_PASSWORD` | `~/.gamblock/secrets/gamblock-pilot-signing.pfx` (key `.key`, cert `.crt`, password `.pfx_password`) | `Gamblock-AI / Windows Pilot Signing PFX` |
 | Backend protection-grant ES256 key | vault only (never copied to Flutter) | encrypted Ansible vault | via infra vault credentials |
 
@@ -83,9 +83,10 @@ inputs:
 
 The manual Research Staging workflow uses `STAGING_API_BASE_URL`,
 `STAGING_WEB_BASE_URL`, and the repository-level public
-`PROTECTION_GRANT_TRUST_STORE_BASE64` for both platform jobs. Its Windows job
-also uses the self-signed PFX from `pilot-signing`. Missing or malformed trust
-configuration aborts the workflow; do not substitute an empty map for QA.
+`PROTECTION_GRANT_TRUST_STORE_BASE64` for both platform jobs. Its Android and
+Windows jobs use the persistent Research signing keystore and self-signed PFX
+from `pilot-signing`. Missing or malformed trust configuration aborts the
+workflow; do not substitute an empty map for QA.
 
 Adding or rotating these values requires explicit owner authorization. The
 diagnostic workflow never consumes these private inputs and creates only
@@ -151,10 +152,13 @@ open a new PowerShell window.
 
 ### Linux path (recommended for this project)
 
-Open an existing terminal with **Ctrl+Alt+T**. Do not double-click a `.sh`
-file or a command file: a terminal launched that way may close as soon as a
-command fails. Run each numbered block below separately so an error remains
-visible in the terminal.
+For automated generation and upload of the Android Research signing keystore, you can simply run:
+
+```sh
+./scripts/setup-research-signing.sh
+```
+
+Or execute the individual steps manually below:
 
 First check that Java/keytool is available and create a private directory
 outside the repository:
@@ -236,6 +240,7 @@ gh variable set ENABLE_WINDOWS_PILOT_RELEASE --repo "$APP_REPO" --body "false"
 gh variable set PROTECTION_GRANT_TRUST_STORE_BASE64 --repo "$APP_REPO" --body "$PROTECTION_GRANT_TRUST_STORE_BASE64"
 gh variable set ANDROID_PLAY_KEY_ALIAS --repo "$APP_REPO" --env release-signing --body "gamblock-play-upload"
 gh variable set ANDROID_RESEARCH_KEY_ALIAS --repo "$APP_REPO" --env release-signing --body "gamblock-research"
+gh variable set ANDROID_RESEARCH_KEY_ALIAS --repo "$APP_REPO" --env pilot-signing --body "gamblock-research"
 ```
 
 Upload private values directly from the temporary files or from shell prompts;
@@ -246,6 +251,8 @@ base64 < "$KEY_DIR/gamblock-play-upload.jks" | tr -d '\n' |
   gh secret set ANDROID_PLAY_KEYSTORE_BASE64 --repo "$APP_REPO" --env release-signing --app actions
 base64 < "$KEY_DIR/gamblock-research.jks" | tr -d '\n' |
   gh secret set ANDROID_RESEARCH_KEYSTORE_BASE64 --repo "$APP_REPO" --env release-signing --app actions
+base64 < "$KEY_DIR/gamblock-research.jks" | tr -d '\n' |
+  gh secret set ANDROID_RESEARCH_KEYSTORE_BASE64 --repo "$APP_REPO" --env pilot-signing --app actions
 
 read -rsp 'Play keystore password: ' PLAY_PASSWORD; echo
 printf '%s' "$PLAY_PASSWORD" | gh secret set ANDROID_PLAY_KEYSTORE_PASSWORD --repo "$APP_REPO" --env release-signing --app actions
@@ -254,9 +261,11 @@ printf '%s' "$PLAY_PASSWORD" | gh secret set ANDROID_PLAY_KEY_PASSWORD --repo "$
 read -rsp 'Research keystore password: ' RESEARCH_PASSWORD; echo
 printf '%s' "$RESEARCH_PASSWORD" | gh secret set ANDROID_RESEARCH_KEYSTORE_PASSWORD --repo "$APP_REPO" --env release-signing --app actions
 printf '%s' "$RESEARCH_PASSWORD" | gh secret set ANDROID_RESEARCH_KEY_PASSWORD --repo "$APP_REPO" --env release-signing --app actions
+printf '%s' "$RESEARCH_PASSWORD" | gh secret set ANDROID_RESEARCH_KEYSTORE_PASSWORD --repo "$APP_REPO" --env pilot-signing --app actions
+printf '%s' "$RESEARCH_PASSWORD" | gh secret set ANDROID_RESEARCH_KEY_PASSWORD --repo "$APP_REPO" --env pilot-signing --app actions
 ```
 
-Upload the Windows PFX only to the `pilot-signing` environment:
+Upload the Windows PFX to the `pilot-signing` environment:
 
 ```sh
 PFX_PATH="/absolute/path/to/gamblock-pilot-signing.pfx"
@@ -272,6 +281,7 @@ Verify only names and metadata, never values:
 ```sh
 gh variable list --repo "$APP_REPO"
 gh variable list --repo "$APP_REPO" --env release-signing
+gh variable list --repo "$APP_REPO" --env pilot-signing
 gh secret list --repo "$APP_REPO" --env release-signing --app actions
 gh secret list --repo "$APP_REPO" --env pilot-signing --app actions
 ```

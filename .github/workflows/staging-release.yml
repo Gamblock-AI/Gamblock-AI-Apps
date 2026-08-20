@@ -21,12 +21,26 @@ env:
 jobs:
   android:
     runs-on: ubuntu-latest
+    environment: pilot-signing
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
+      - name: Restore and validate Research Android signing inputs
+        env:
+          RESEARCH_KEYSTORE_BASE64: ${{ secrets.ANDROID_RESEARCH_KEYSTORE_BASE64 }}
+          RESEARCH_STORE_PASSWORD: ${{ secrets.ANDROID_RESEARCH_KEYSTORE_PASSWORD }}
+          RESEARCH_KEY_ALIAS: ${{ vars.ANDROID_RESEARCH_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          : "${RESEARCH_KEYSTORE_BASE64:?ANDROID_RESEARCH_KEYSTORE_BASE64 is required}"
+          : "${RESEARCH_STORE_PASSWORD:?ANDROID_RESEARCH_KEYSTORE_PASSWORD is required}"
+          : "${RESEARCH_KEY_ALIAS:?ANDROID_RESEARCH_KEY_ALIAS is required}"
+          printf '%s' "$RESEARCH_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/gamblock-research.jks"
+          keytool -list -keystore "$RUNNER_TEMP/gamblock-research.jks" \
+            -storepass "$RESEARCH_STORE_PASSWORD" -alias "$RESEARCH_KEY_ALIAS" > /dev/null
       - name: Create staging configuration
         env:
           API_BASE_URL: ${{ vars.STAGING_API_BASE_URL }}
@@ -54,18 +68,22 @@ jobs:
               grep -Eq 'ASN1 OID: prime256v1|NIST CURVE: P-256'
           done < <(jq -r '.[]' "$RUNNER_TEMP/grant-trust-store.json")
       - run: flutter pub get
-      - name: Build Research staging APK
+      - name: Build signed Research staging APK
         env:
+          RESEARCH_KEYSTORE_PATH: ${{ runner.temp }}/gamblock-research.jks
+          RESEARCH_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_RESEARCH_KEYSTORE_PASSWORD }}
+          RESEARCH_KEY_ALIAS: ${{ vars.ANDROID_RESEARCH_KEY_ALIAS }}
+          RESEARCH_KEY_PASSWORD: ${{ secrets.ANDROID_RESEARCH_KEY_PASSWORD }}
           PROTECTION_GRANT_TRUST_STORE_BASE64: ${{ vars.PROTECTION_GRANT_TRUST_STORE_BASE64 }}
         run: |
-          flutter build apk --debug --flavor research \
+          flutter build apk --release --flavor research \
             --build-name "${{ github.event.inputs.version }}" \
             --build-number "$GITHUB_RUN_NUMBER"
       - name: Name and hash artifact
         run: |
           version="${{ github.event.inputs.version }}"
           mkdir -p staging-artifacts
-          cp build/app/outputs/flutter-apk/app-research-debug.apk \
+          cp build/app/outputs/flutter-apk/app-research-release.apk \
             "staging-artifacts/gamblock-ai-research-staging-${version}+${GITHUB_RUN_NUMBER}.apk"
           sha256sum staging-artifacts/gamblock-ai-research-staging-*.apk > staging-artifacts/android-SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
@@ -226,7 +244,7 @@ jobs:
             (`api-staging.gamblock-ai.com`). Test data lands in the
             `gamblock_staging` database and never mixes with production.
 
-            - APK: research flavor, debug-signed (diagnostic)
+            - APK: research flavor, signed (persistent staging/pilot key)
             - Windows MSI: self-signed Authenticode pilot certificate
             - Verified: CI build only; no real-device evidence claimed
           files: |
