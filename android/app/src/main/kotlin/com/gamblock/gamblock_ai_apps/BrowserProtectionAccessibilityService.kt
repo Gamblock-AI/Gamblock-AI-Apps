@@ -53,6 +53,20 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             "com.brave.browser:id/url_bar",
             "com.opera.browser:id/url_field",
         )
+        private val TAB_SWITCHER_SURFACE_RESOURCE_MARKERS = listOf(
+            "tab_switcher_view",
+            "tab_switcher_toolbar",
+            "tab_switcher_layout",
+            "tab_grid",
+            "tab_list",
+            "tab_overview",
+            "tab_model",
+        )
+        private val TAB_SWITCHER_CONTROL_RESOURCE_MARKERS = listOf(
+            "tab_switcher",
+            "tab_grid_button",
+        )
+        private const val TAB_SWITCHER_SETTLE_WINDOW_MS = 500L
 
         fun isNavigationContentChange(changeTypes: Int): Boolean {
             return (changeTypes and (
@@ -80,6 +94,32 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                 current.startsWith("http://") || current.startsWith("https://")
             if (candidateHasScheme != currentHasScheme) return candidateHasScheme
             return candidate.length > current.length
+        }
+
+        /**
+         * Browser tab overview controls are browser chrome, not page content.
+         * Keep this local structural check deliberately narrow: it only uses
+         * native accessibility metadata and never sends it outside the device.
+         */
+        fun isTabSwitcherResourceId(viewId: String): Boolean {
+            val normalized = viewId.trim().lowercase()
+            return normalized.isNotEmpty() &&
+                TAB_SWITCHER_SURFACE_RESOURCE_MARKERS.any { normalized.contains(it) }
+        }
+
+        fun isTabSwitcherClassName(className: String): Boolean {
+            val normalized = className.trim().lowercase()
+            return normalized.contains("tab") && (
+                normalized.contains("grid") ||
+                    normalized.contains("list") ||
+                    normalized.contains("overview") ||
+                    normalized.contains("model") ||
+                    (normalized.contains("tabswitcher") && !normalized.contains("button"))
+                )
+        }
+
+        fun isTabSwitcherUi(viewIds: List<String>, classNames: List<String>): Boolean {
+            return viewIds.any(::isTabSwitcherResourceId) || classNames.any(::isTabSwitcherClassName)
         }
 
         @Volatile
@@ -122,6 +162,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
     private var lastSignature = 0
     private var lastDecisionAt = 0L
     private var pendingScan: Runnable? = null
+    private var tabSwitcherSettleUntilElapsed = 0L
     private var nativeFallback: Runnable? = null
     private var interventionExpiry: Runnable? = null
 
@@ -169,6 +210,12 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         if (event == null) return
         val sourcePackage = event.packageName?.toString() ?: return
         if (sourcePackage in observedBrowsers) {
+            if (isTabSwitcherTrigger(event)) {
+                pendingScan?.let(mainHandler::removeCallbacks)
+                tabSwitcherSettleUntilElapsed =
+                    SystemClock.elapsedRealtime() + TAB_SWITCHER_SETTLE_WINDOW_MS
+                return
+            }
             if (!isNavigationLike(event)) return
             scheduleBrowserScan(event)
             return
@@ -198,6 +245,17 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
 
     protected open fun onProtectionServiceDestroyed() = Unit
 
+    private fun isTabSwitcherTrigger(event: AccessibilityEvent): Boolean {
+        if (event.eventType != AccessibilityEvent.TYPE_VIEW_CLICKED) return false
+        val source = event.source ?: return false
+        val sourceViewId = source.viewIdResourceName?.toString().orEmpty().lowercase()
+        val sourceClassName = source.className?.toString().orEmpty().lowercase()
+        return TAB_SWITCHER_CONTROL_RESOURCE_MARKERS.any { sourceViewId.contains(it) } ||
+            (sourceClassName.contains("tab") && sourceClassName.contains("switch")) ||
+            isTabSwitcherResourceId(sourceViewId) ||
+            isTabSwitcherClassName(sourceClassName)
+    }
+
     private fun scheduleBrowserScan(event: AccessibilityEvent) {
         if (stateStore.activeGrantAllowsProtectionPause()) {
             stateStore.setStatus("paused")
@@ -207,7 +265,9 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         pendingScan?.let(mainHandler::removeCallbacks)
         val scanStartedNanos = SystemClock.elapsedRealtimeNanos()
         val runnable = Runnable {
+            if (SystemClock.elapsedRealtime() < tabSwitcherSettleUntilElapsed) return@Runnable
             val root = rootInActiveWindow ?: event.source
+            if (isTabSwitcherEvent(event)) return@Runnable
             val input = extractSignals(event, root)
             // Transient intermediate frames during navigation are normal; ignore without degrading
             if (input == null) return@Runnable
@@ -262,6 +322,17 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         mainHandler.postDelayed(runnable, 50)
     }
 
+    private fun isTabSwitcherEvent(event: AccessibilityEvent): Boolean {
+        if (isTabSwitcherClassName(event.className?.toString().orEmpty())) return true
+        val sourceViewId = event.source?.viewIdResourceName?.toString().orEmpty().lowercase()
+        if (isTabSwitcherResourceId(sourceViewId) ||
+            TAB_SWITCHER_CONTROL_RESOURCE_MARKERS.any { sourceViewId.contains(it) }
+        ) {
+            return true
+        }
+        return false
+    }
+
     private fun extractSignals(
         event: AccessibilityEvent,
         root: AccessibilityNodeInfo?,
@@ -286,6 +357,13 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         while (queue.isNotEmpty() && visited < 500) {
             val node = queue.removeFirst()
             visited++
+            if (isTabSwitcherResourceId(node.viewIdResourceName?.toString().orEmpty()) ||
+                isTabSwitcherClassName(node.className?.toString().orEmpty())
+            ) {
+                // Tab cards are stale browser chrome, not a committed page.
+                // Return before collecting their text for local classification.
+                return null
+            }
             val rawText = (node.text?.toString() ?: node.contentDescription?.toString() ?: "").trim()
             val text = rawText.take(256)
 

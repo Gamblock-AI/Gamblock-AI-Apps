@@ -45,4 +45,40 @@ class NavigationSensingTest {
         )
         assertEquals(true, result)
     }
+
+    @Test
+    fun browserTabGridIsRecognizedAsTabSwitcherUi() {
+        val result = BrowserProtectionAccessibilityService.isTabSwitcherUi(
+            viewIds = listOf("com.android.chrome:id/tab_grid_view"),
+            classNames = emptyList(),
+        )
+        assertEquals(true, result)
+    }
+
+    @Test
+    fun browserTabSwitcherClassIsRecognizedAsTabSwitcherUi() {
+        val result = BrowserProtectionAccessibilityService.isTabSwitcherUi(
+            viewIds = emptyList(),
+            classNames = listOf("org.chromium.chrome.browser.tab.TabListView"),
+        )
+        assertEquals(true, result)
+    }
+
+    @Test
+    fun browserTabSwitcherButtonAloneIsNotTheTabSwitcherSurface() {
+        val result = BrowserProtectionAccessibilityService.isTabSwitcherUi(
+            viewIds = listOf("com.android.chrome:id/tab_switcher_button"),
+            classNames = listOf("android.widget.ImageButton"),
+        )
+        assertEquals(false, result)
+    }
+
+    @Test
+    fun ordinaryBrowserContentIsNotRecognizedAsTabSwitcherUi() {
+        val result = BrowserProtectionAccessibilityService.isTabSwitcherUi(
+            viewIds = listOf("com.android.chrome:id/url_bar"),
+            classNames = listOf("android.webkit.WebView"),
+        )
+        assertEquals(false, result)
+    }
 }
