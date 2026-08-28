@@ -18,6 +18,7 @@ inline constexpr int kWebSocketPort = 9090;
 inline constexpr size_t kMaximumHttpBytes = 16384;
 inline constexpr size_t kMaximumFrameBytes = 65536;
 inline constexpr size_t kMaximumDomMessageBytes = 32768;
+inline constexpr DWORD kWebSocketAcceptPollMs = 10;
 inline constexpr DWORD kWebSocketHandshakeTimeoutMs = 10000;
 inline constexpr DWORD kWebSocketIdleTimeoutMs = 45000;
 

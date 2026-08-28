@@ -37,7 +37,8 @@ void ProtectionService::WebSocketLoop() {
     SOCKET client = accept(listener, nullptr, nullptr);
     if (client == INVALID_SOCKET) {
       if (!running_) break;
-      if (WSAGetLastError() == WSAEWOULDBLOCK) Sleep(100);
+      if (WSAGetLastError() == WSAEWOULDBLOCK)
+        Sleep(kWebSocketAcceptPollMs);
       continue;
     }
     bool accepted = false;

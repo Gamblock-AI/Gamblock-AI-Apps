@@ -10,6 +10,7 @@ NativeProtectionBridge::NativeProtectionBridge(flutter::FlutterEngine* engine,
       intervention_lock_changed_(std::move(intervention_lock_changed)) {
   ConfigureMethodChannel(engine);
   ConfigureEventChannel(engine);
+  PrepareNativeInterventionShell();
   pipe_thread_ = std::thread(&NativeProtectionBridge::ConnectLoop, this);
 }
 
@@ -23,4 +24,5 @@ NativeProtectionBridge::~NativeProtectionBridge() {
   }
   response_ready_.notify_all();
   if (pipe_thread_.joinable()) pipe_thread_.join();
+  DestroyNativeInterventionShell();
 }

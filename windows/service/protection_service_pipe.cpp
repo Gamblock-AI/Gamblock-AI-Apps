@@ -183,11 +183,18 @@ void ProtectionService::HandlePipeCommand(const std::string &command) {
     SendAgentEvent(SnapshotJson(request_id));
   } else if (type == "self_test") {
     ClassificationDecision positive;
+    ClassificationDecision dom_model_only;
     ClassificationDecision negative;
     {
       std::lock_guard lock(state_mutex_);
       positive = classifier_.Classify(
           {"https://contoh-judi.invalid/slot-gacor", "", {}, {}});
+      dom_model_only = classifier_.Classify({
+          "https://dynamic.invalid/", "Academic Information Portal",
+          {"Lottery gaming and prize information", "Trusted alternative games"},
+          {"View the numbers guide", "Login for prediction information",
+           "Download the trusted APK", "Live chat support"},
+      });
       negative = classifier_.Classify({
           "https://kampus.ac.id/penelitian",
           "Portal penelitian universitas",
@@ -198,10 +205,15 @@ void ProtectionService::HandlePipeCommand(const std::string &command) {
     std::ostringstream response;
     response << "{\"type\":\"response\",\"request_id\":\""
              << EscapeJson(request_id) << "\",\"passed\":"
-             << (positive.block && !negative.block ? "true" : "false")
+             << (positive.block && dom_model_only.block &&
+                         dom_model_only.rule_score == 0.0 && !negative.block
+                     ? "true"
+                     : "false")
              << ",\"reason_code\":\""
-             << (positive.block && !negative.block ? "fixtures_passed"
-                                                   : "fixture_mismatch")
+             << (positive.block && dom_model_only.block &&
+                         dom_model_only.rule_score == 0.0 && !negative.block
+                     ? "fixtures_passed"
+                     : "fixture_mismatch")
              << "\",\"model_version\":\"" << EscapeJson(positive.model_version)
              << "\",\"ruleset_version\":\""
              << EscapeJson(positive.ruleset_version) << "\"}";

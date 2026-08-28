@@ -170,7 +170,8 @@ The Windows build contains two native processes:
   removal, and aggregate counters;
 - `gamblock_ai_apps.exe` — user-session Flutter agent that connects through a
   logon-SID-restricted named pipe, performs browser-scoped `SendInput` Back or
-  close-tab fallback,
+  close-tab fallback without a blocking navigation wait, pre-warms its native
+  intervention shell,
   acknowledges visible/completed Pattern Interrupt state, and surfaces native
   state through Method/Event Channels.
 

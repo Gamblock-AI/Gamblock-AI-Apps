@@ -19,11 +19,18 @@ bool ProtectionService::LoadArtifacts() {
                           &artifact_error_)) return false;
     const auto positive = classifier_.Classify({
         "https://contoh-judi.invalid/slot-gacor", "", {}, {}});
+    const auto dom_model_only = classifier_.Classify({
+        "https://dynamic.invalid/", "Academic Information Portal",
+        {"Lottery gaming and prize information", "Trusted alternative games"},
+        {"View the numbers guide", "Login for prediction information",
+         "Download the trusted APK", "Live chat support"},
+    });
     const auto negative = classifier_.Classify({
         "https://kampus.ac.id/penelitian", "Portal penelitian universitas",
         {"Pendidikan dan beasiswa"}, {"Jurnal research"},
     });
-    return positive.block && !negative.block;
+    return positive.block && dom_model_only.block &&
+           dom_model_only.rule_score == 0.0 && !negative.block;
   };
   return load_verified(installed) || load_verified(bundled);
 }

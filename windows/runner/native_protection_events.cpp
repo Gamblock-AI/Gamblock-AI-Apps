@@ -53,27 +53,51 @@ ATOM EnsureNativeInterventionShellClass() {
 
 } // namespace
 
-void NativeProtectionBridge::ShowNativeInterventionShell() {
-  if (native_intervention_shell_ == nullptr) {
-    if (EnsureNativeInterventionShellClass() == 0)
-      return;
-    RECT bounds{};
-    GetClientRect(window_, &bounds);
-    native_intervention_shell_ =
-        CreateWindowExW(WS_EX_NOACTIVATE, kNativeInterventionShellClass,
-                        L"Gamblock-AI", WS_CHILD | WS_VISIBLE, 0, 0,
-                        bounds.right - bounds.left, bounds.bottom - bounds.top,
-                        window_, nullptr, GetModuleHandleW(nullptr), nullptr);
-  }
+void NativeProtectionBridge::PrepareNativeInterventionShell() {
+  if (native_intervention_shell_ != nullptr)
+    return;
+  if (EnsureNativeInterventionShellClass() == 0)
+    return;
+  RECT bounds{};
+  GetClientRect(window_, &bounds);
+  native_intervention_shell_ =
+      CreateWindowExW(WS_EX_NOACTIVATE, kNativeInterventionShellClass,
+                      L"Gamblock-AI", WS_CHILD, 0, 0,
+                      bounds.right - bounds.left, bounds.bottom - bounds.top,
+                      window_, nullptr, GetModuleHandleW(nullptr), nullptr);
   if (native_intervention_shell_ == nullptr)
     return;
-  SetWindowPos(native_intervention_shell_, HWND_TOP, 0, 0, 0, 0,
-               SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+  // The runner window is still hidden during Flutter startup, so render one
+  // shell frame now. The first protection event can then reveal an existing
+  // native surface instead of paying class/window creation and first-paint
+  // costs on the latency-critical path.
+  ShowWindow(native_intervention_shell_, SW_SHOWNA);
+  RedrawWindow(native_intervention_shell_, nullptr, nullptr,
+               RDW_INVALIDATE | RDW_UPDATENOW | RDW_ERASE);
+  ShowWindow(native_intervention_shell_, SW_HIDE);
+}
+
+void NativeProtectionBridge::ShowNativeInterventionShell() {
+  PrepareNativeInterventionShell();
+  if (native_intervention_shell_ == nullptr)
+    return;
+  RECT bounds{};
+  GetClientRect(window_, &bounds);
+  SetWindowPos(native_intervention_shell_, HWND_TOP, 0, 0,
+               bounds.right - bounds.left, bounds.bottom - bounds.top,
+               SWP_NOMOVE | SWP_SHOWWINDOW | SWP_NOACTIVATE);
+  ShowWindow(native_intervention_shell_, SW_SHOWNA);
   RedrawWindow(native_intervention_shell_, nullptr, nullptr,
                RDW_INVALIDATE | RDW_UPDATENOW | RDW_ERASE);
 }
 
 void NativeProtectionBridge::HideNativeInterventionShell() {
+  if (native_intervention_shell_ == nullptr)
+    return;
+  ShowWindow(native_intervention_shell_, SW_HIDE);
+}
+
+void NativeProtectionBridge::DestroyNativeInterventionShell() {
   if (native_intervention_shell_ == nullptr)
     return;
   DestroyWindow(native_intervention_shell_);

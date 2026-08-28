@@ -27,13 +27,6 @@ void Lowercase(std::wstring* value) {
                  });
 }
 
-std::wstring WindowTitle(HWND window) {
-  std::array<wchar_t, 512> title{};
-  const int length = GetWindowTextW(
-      window, title.data(), static_cast<int>(title.size()));
-  return length > 0 ? std::wstring(title.data(), length) : std::wstring();
-}
-
 bool SendKeyChord(WORD modifier, WORD key) {
   INPUT inputs[4]{};
   inputs[0].type = INPUT_KEYBOARD;
@@ -61,19 +54,11 @@ bool NativeProtectionBridge::SendBrowserBack() {
       executable.find(L"opera.exe") == std::wstring::npos &&
       executable.find(L"firefox.exe") == std::wstring::npos &&
       executable.find(L"ucbrowser.exe") == std::wstring::npos) return false;
-  const std::wstring title_before = WindowTitle(foreground);
-  if (SendKeyChord(VK_MENU, VK_LEFT)) {
-    // A browser with no Back entry accepts the chord but leaves the protected
-    // page in place. Compare only transient, device-local window state; never
-    // persist or emit the title. If navigation did not become observable,
-    // close the browser tab as the supported no-history fallback.
-    Sleep(200);
-    if (GetForegroundWindow() != foreground) return false;
-    const std::wstring title_after = WindowTitle(foreground);
-    if (!title_before.empty() && title_after != title_before) return true;
-  }
-  // If UIPI rejects Back, or no navigation was observable, use the
-  // browser-scoped close-tab shortcut. Failure remains degraded while the
-  // Pattern Interrupt is still presented.
+  // SendInput returns once Windows accepts the browser-scoped chord. Do not
+  // synchronously wait for browser navigation here: this handler is on the
+  // user-session UI thread and the native shell must be visible within the
+  // protection latency budget. If input injection is rejected, use the
+  // browser-scoped close-tab shortcut as the last local fallback.
+  if (SendKeyChord(VK_MENU, VK_LEFT)) return true;
   return SendKeyChord(VK_CONTROL, 'W');
 }

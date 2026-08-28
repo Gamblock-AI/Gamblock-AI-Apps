@@ -85,7 +85,10 @@ void NativeProtectionBridge::ConnectLoop() {
                               nullptr, OPEN_EXISTING, FILE_FLAG_OVERLAPPED,
                               nullptr);
     if (pipe == INVALID_HANDLE_VALUE) {
-      Sleep(1500);
+      // The service can be restarting or still creating the named pipe. Keep
+      // reconnect polling short so a pending intervention is not held behind
+      // a coarse retry interval.
+      Sleep(100);
       continue;
     }
     if (!running_) {

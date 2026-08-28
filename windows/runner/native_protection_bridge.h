@@ -43,8 +43,10 @@ private:
   void HandlePipeMessage(const std::string &message);
   void DispatchEvent(const std::string &message);
   void FlushPendingBlockAction(DWORD timeout_ms);
+  void PrepareNativeInterventionShell();
   void ShowNativeInterventionShell();
   void HideNativeInterventionShell();
+  void DestroyNativeInterventionShell();
   static bool SendBrowserBack();
 
   HWND window_;

@@ -34,6 +34,18 @@ int main(int argc, char **argv) {
   });
   assert(dom_only.block);
 
+  const auto dom_model_only = classifier.Classify({
+      "https://dynamic.invalid/",
+      "Academic Information Portal",
+      {"Lottery gaming and prize information", "Trusted alternative games"},
+      {"View the numbers guide", "Login for prediction information",
+       "Download the trusted APK", "Live chat support"},
+  });
+  assert(dom_model_only.block);
+  assert(dom_model_only.rule_score == 0.0);
+  assert(dom_model_only.model_score > 0.5);
+  assert(dom_model_only.reason_code == "model_threshold");
+
   const auto benign = classifier.Classify({
       "https://kampus.ac.id/penelitian",
       "Portal penelitian universitas",
