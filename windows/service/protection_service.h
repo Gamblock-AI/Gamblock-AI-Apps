@@ -1,8 +1,8 @@
 #ifndef GAMBLOCK_SERVICE_PROTECTION_SERVICE_H_
 #define GAMBLOCK_SERVICE_PROTECTION_SERVICE_H_
 
-#include <windows.h>
 #include <winsock2.h>
+#include <windows.h>
 
 #include <atomic>
 #include <chrono>
