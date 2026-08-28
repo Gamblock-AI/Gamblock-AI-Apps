@@ -54,6 +54,6 @@
   "statusRejected": "ditolak",
   "statusExpired": "kedaluwarsa",
   "deviceAdminSetupTitle": "Perlindungan penghapusan belum aktif",
-  "deviceAdminSetupSubtitle": "Aktifkan agar Android menolak pencopotan tanpa persetujuan pendamping.",
+  "deviceAdminSetupSubtitle": "Aktifkan terlebih dahulu agar Android menolak pencopotan tanpa persetujuan pendamping.",
   "deviceAdminSetupAction": "Aktifkan"
 }

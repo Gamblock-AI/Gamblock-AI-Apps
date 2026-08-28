@@ -1655,7 +1655,7 @@ abstract class AppLocalizations {
   /// No description provided for @legalPrivacyS1Body.
   ///
   /// In id, this message translates to:
-  /// **'Dengan persetujuan terpisah, Accessibility Service Android membaca teks yang terlihat pada Chrome dan Edge yang didukung, termasuk bilah URL, judul, heading, dan teks tautan. Data tersebut diproses sementara untuk inferensi AI di perangkat, lalu aplikasi dapat menjalankan aksi Kembali dan menampilkan Pattern Interrupt.\nURL, domain, teks halaman, screenshot, dan riwayat penelusuran tidak pernah dikirim ke server atau layanan AI eksternal.'**
+  /// **'Dengan persetujuan terpisah, Accessibility Service Android membaca teks yang terlihat pada Chrome dan Edge yang didukung; edisi Research juga mendukung Samsung Internet, termasuk bilah URL, judul, heading, dan teks tautan. Data tersebut diproses sementara untuk inferensi AI di perangkat, lalu aplikasi dapat menjalankan aksi Kembali dan menampilkan Pattern Interrupt.\nURL, domain, teks halaman, screenshot, dan riwayat penelusuran tidak pernah dikirim ke server atau layanan AI eksternal.'**
   String get legalPrivacyS1Body;
 
   /// No description provided for @legalPrivacyS2Title.
@@ -2081,7 +2081,7 @@ abstract class AppLocalizations {
   /// No description provided for @deviceAdminSetupSubtitle.
   ///
   /// In id, this message translates to:
-  /// **'Aktifkan agar Android menolak pencopotan tanpa persetujuan pendamping.'**
+  /// **'Aktifkan terlebih dahulu agar Android menolak pencopotan tanpa persetujuan pendamping.'**
   String get deviceAdminSetupSubtitle;
 
   /// No description provided for @deviceAdminSetupAction.

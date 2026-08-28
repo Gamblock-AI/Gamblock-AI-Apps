@@ -97,6 +97,10 @@ object TamperActionDetector {
         "ingin menghapus aplikasi",
         "menghapus aplikasi ini",
         "konfirmasi",
+        "confirm",
+        "yes",
+        "ya",
+        "ok",
         "cancel",
         "batal",
         "batalkan",
@@ -137,7 +141,8 @@ object TamperActionDetector {
                 observation.eventKind == TamperEventKind.CLICK &&
                     targetsGamblock && sourceAction != TamperAction.NONE -> sourceAction
 
-                observation.eventKind == TamperEventKind.WINDOW_CHANGED &&
+                (observation.eventKind == TamperEventKind.WINDOW_CHANGED ||
+                    observation.eventKind == TamperEventKind.CONTENT_CHANGED) &&
                     targetsGamblock && windowAction != TamperAction.NONE &&
                     isConfirmation -> windowAction
 
@@ -148,7 +153,9 @@ object TamperActionDetector {
                 targetsGamblock && observation.eventKind == TamperEventKind.CLICK &&
                     sourceAction == TamperAction.UNINSTALL -> TamperAction.UNINSTALL
 
-                targetsGamblock && observation.eventKind == TamperEventKind.WINDOW_CHANGED &&
+                targetsGamblock &&
+                    (observation.eventKind == TamperEventKind.WINDOW_CHANGED ||
+                        observation.eventKind == TamperEventKind.CONTENT_CHANGED) &&
                     windowAction == TamperAction.UNINSTALL && isConfirmation ->
                     TamperAction.UNINSTALL
 

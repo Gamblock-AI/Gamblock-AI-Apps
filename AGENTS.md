@@ -94,6 +94,9 @@ Do not hardcode URLs in features or call Dio from presentation code.
   App Info does not trigger friction; Play must remain Chrome/Edge-only without
   Settings/package-installer monitoring. Real-device coverage, accessibility,
   lifecycle, and performance evidence are still required.
+  Research prompts for Device Admin activation on first app resume and from
+  setup; the active-admin state is the primary uninstall guard, while the
+  action-aware Accessibility detector remains an OEM-specific fallback.
 - Windows uses `windows/service/` for the LocalSystem authority and the
   small `windows/runner/native_protection_*.{cpp,h}` modules for the
   user-session agent. Pending interventions are replayed by ID until the agent

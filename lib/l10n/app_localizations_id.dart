@@ -857,7 +857,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get legalPrivacyS1Body =>
-      'Dengan persetujuan terpisah, Accessibility Service Android membaca teks yang terlihat pada Chrome dan Edge yang didukung, termasuk bilah URL, judul, heading, dan teks tautan. Data tersebut diproses sementara untuk inferensi AI di perangkat, lalu aplikasi dapat menjalankan aksi Kembali dan menampilkan Pattern Interrupt.\nURL, domain, teks halaman, screenshot, dan riwayat penelusuran tidak pernah dikirim ke server atau layanan AI eksternal.';
+      'Dengan persetujuan terpisah, Accessibility Service Android membaca teks yang terlihat pada Chrome dan Edge yang didukung; edisi Research juga mendukung Samsung Internet, termasuk bilah URL, judul, heading, dan teks tautan. Data tersebut diproses sementara untuk inferensi AI di perangkat, lalu aplikasi dapat menjalankan aksi Kembali dan menampilkan Pattern Interrupt.\nURL, domain, teks halaman, screenshot, dan riwayat penelusuran tidak pernah dikirim ke server atau layanan AI eksternal.';
 
   @override
   String get legalPrivacyS2Title => 'Data yang Kami Proses';
@@ -1095,7 +1095,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get deviceAdminSetupSubtitle =>
-      'Aktifkan agar Android menolak pencopotan tanpa persetujuan pendamping.';
+      'Aktifkan terlebih dahulu agar Android menolak pencopotan tanpa persetujuan pendamping.';
 
   @override
   String get deviceAdminSetupAction => 'Aktifkan';

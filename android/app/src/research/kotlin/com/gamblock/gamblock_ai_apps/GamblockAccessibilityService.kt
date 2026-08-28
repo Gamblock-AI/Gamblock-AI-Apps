@@ -11,6 +11,7 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
         private val NON_STANDARD_BROWSERS = setOf(
             "com.sec.android.app.sbrowser",
             "com.sec.android.app.sbrowser.beta",
+            "com.samsung.android.app.sbrowser",
             "com.brave.browser",
             "com.opera.browser",
             "com.opera.mini.native",

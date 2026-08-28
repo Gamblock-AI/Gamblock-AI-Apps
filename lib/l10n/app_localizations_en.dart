@@ -857,7 +857,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get legalPrivacyS1Body =>
-      'With separate consent, the Android Accessibility Service reads visible text from supported Chrome and Edge surfaces, including the URL bar, title, headings, and link text. That data is processed transiently for on-device AI inference, after which the app may perform Back and show a Pattern Interrupt.\nURLs, domains, page text, screenshots, and browsing history are never sent to the server or an external AI service.';
+      'With separate consent, the Android Accessibility Service reads visible text from supported Chrome and Edge surfaces; the Research edition also supports Samsung Internet, including the URL bar, title, headings, and link text. That data is processed transiently for on-device AI inference, after which the app may perform Back and show a Pattern Interrupt.\nURLs, domains, page text, screenshots, and browsing history are never sent to the server or an external AI service.';
 
   @override
   String get legalPrivacyS2Title => 'Data We Process';
@@ -1097,7 +1097,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deviceAdminSetupSubtitle =>
-      'Turn it on so Android refuses uninstallation without your partner\'s approval.';
+      'Activate it first so Android refuses uninstallation without your partner\'s approval.';
 
   @override
   String get deviceAdminSetupAction => 'Activate';

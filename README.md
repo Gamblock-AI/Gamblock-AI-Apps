@@ -143,13 +143,16 @@ used where available; the remaining packages use a best-effort editable-URL
 fallback. It contains transparent settings/removal friction tied to bounded
 approval or emergency grants. Its detector is
 action-aware: merely opening App Info is not tamper evidence, while an explicit
-uninstall, Accessibility-disable, force-stop, or clear-data action is handled
-according to its own purpose. A valid `uninstall_detected` grant can open the
-normal Android removal UI after explicit user confirmation; a protection pause
-does not authorize uninstall. Other browsers and arbitrary Android WebViews
-are not claimed as covered. A sideloaded app cannot make itself impossible to
-uninstall; the research prototype adds best-effort, OS-supported friction and
-transparent recovery rather than unsafe device-owner behavior.
+  uninstall, Accessibility-disable, force-stop, or clear-data action is handled
+  according to its own purpose. A valid `uninstall_detected` grant can open the
+  normal Android removal UI after explicit user confirmation; a protection pause
+  does not authorize uninstall. Other browsers and arbitrary Android WebViews
+  are not claimed as covered. A sideloaded app cannot make itself impossible to
+  uninstall; the research prototype adds best-effort, OS-supported friction and
+  transparent recovery rather than unsafe device-owner behavior. Research asks
+  for Device Admin activation on the first app resume and from the setup card;
+  Android's active-admin check is the primary uninstall guard, while the
+  Accessibility detector remains an OEM-specific fallback.
 
 Release signing is intentionally separate. Play uses
 `PLAY_KEYSTORE_PATH`, `PLAY_KEYSTORE_PASSWORD`, `PLAY_KEY_ALIAS`, and

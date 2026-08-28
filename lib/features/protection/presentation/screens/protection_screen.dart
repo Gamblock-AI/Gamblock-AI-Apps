@@ -49,6 +49,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
   bool _actionLoading = false;
   bool _handledRequestedApproval = false;
   bool _requestExemptionOnNextResume = false;
+  bool _openAccessibilitySetupOnNextResume = false;
   StreamSubscription<NativeProtectionEvent>? _statusSub;
 
   @override
@@ -75,6 +76,10 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
     if (state == AppLifecycleState.resumed) {
       _load();
       PlatformBridge.ensureBackgroundProtection().catchError((_) => false);
+      if (_openAccessibilitySetupOnNextResume) {
+        _openAccessibilitySetupOnNextResume = false;
+        unawaited(_openAccessibilitySetup());
+      }
       if (_requestExemptionOnNextResume) {
         _requestExemptionOnNextResume = false;
         PlatformBridge.requestBatteryOptimizationExemption()
@@ -160,6 +165,25 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
 
   Future<void> _openSetup() async {
     _requestExemptionOnNextResume = true;
+    final needsRemovalProtection =
+        _status?.supportsControlledRemoval == true &&
+        _status?.deviceAdminActive != true;
+    if (needsRemovalProtection) {
+      // Device Admin must be confirmed by Android before Accessibility setup
+      // is opened; otherwise a Research install remains uninstallable through
+      // Samsung/Oppo system surfaces even when the partner has not approved.
+      _openAccessibilitySetupOnNextResume = true;
+      final started = await PlatformBridge.requestDeviceAdminActivation();
+      if (!started && mounted) {
+        _openAccessibilitySetupOnNextResume = false;
+        await _openAccessibilitySetup();
+      }
+      return;
+    }
+    await _openAccessibilitySetup();
+  }
+
+  Future<void> _openAccessibilitySetup() async {
     await ProtectionCoordinator(ref).openPlatformSetup();
     await _load();
     await PlatformBridge.ensureBackgroundProtection();

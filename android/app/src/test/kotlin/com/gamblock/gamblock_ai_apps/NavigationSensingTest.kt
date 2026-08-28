@@ -81,4 +81,20 @@ class NavigationSensingTest {
         )
         assertEquals(false, result)
     }
+
+    @Test
+    fun samsungBrowserWebViewSubclassIsRecognizedAsPageContent() {
+        val result = BrowserProtectionAccessibilityService.isBrowserWebContentClassName(
+            "com.sec.android.app.sbrowser.browser.SamsungWebView",
+        )
+        assertEquals(true, result)
+    }
+
+    @Test
+    fun ordinaryBrowserViewIsNotRecognizedAsPageContent() {
+        val result = BrowserProtectionAccessibilityService.isBrowserWebContentClassName(
+            "android.widget.FrameLayout",
+        )
+        assertEquals(false, result)
+    }
 }

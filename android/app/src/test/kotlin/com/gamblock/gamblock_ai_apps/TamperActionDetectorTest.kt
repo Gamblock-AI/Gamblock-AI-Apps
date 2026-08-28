@@ -104,6 +104,47 @@ class TamperActionDetectorTest {
     }
 
     @Test
+    fun samsungStylePackageInstallerContentChangeTriggersUninstall() {
+        val observation = TamperObservation(
+            surface = TamperSurface.PACKAGE_INSTALLER,
+            eventKind = TamperEventKind.CONTENT_CHANGED,
+            sourceTexts = emptyList(),
+            windowTexts = listOf(
+                "Uninstall app?",
+                "Gamblock-AI Research",
+                "Cancel",
+                "OK",
+            ),
+            targetIdentifiers = targetIdentifiers,
+            launcherArmed = false,
+            sourceCheckable = false,
+            sourceChecked = false,
+        )
+        val action = TamperActionDetector.detect(observation)
+        assertEquals(TamperAction.UNINSTALL, action)
+    }
+
+    @Test
+    fun oppoStyleSettingsContentChangeTriggersUninstall() {
+        val observation = TamperObservation(
+            surface = TamperSurface.SETTINGS,
+            eventKind = TamperEventKind.CONTENT_CHANGED,
+            sourceTexts = emptyList(),
+            windowTexts = listOf(
+                "Hapus aplikasi Gamblock-AI Research?",
+                "Batal",
+                "OK",
+            ),
+            targetIdentifiers = targetIdentifiers,
+            launcherArmed = false,
+            sourceCheckable = false,
+            sourceChecked = false,
+        )
+        val action = TamperActionDetector.detect(observation)
+        assertEquals(TamperAction.UNINSTALL, action)
+    }
+
+    @Test
     fun settingsTurningOffGamblockAccessibilityTriggersDisableAccessibility() {
         val observation = TamperObservation(
             surface = TamperSurface.SETTINGS,

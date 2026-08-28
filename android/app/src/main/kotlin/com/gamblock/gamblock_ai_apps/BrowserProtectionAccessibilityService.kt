@@ -47,7 +47,12 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             "com.microsoft.emmx:id/location_bar_edit_text",
             "com.microsoft.emmx:id/search_box_text",
             "com.sec.android.app.sbrowser:id/location_bar_edit_text",
+            "com.sec.android.app.sbrowser:id/location_bar",
             "com.sec.android.app.sbrowser:id/url_bar",
+            "com.sec.android.app.sbrowser:id/url_bar_text",
+            "com.sec.android.app.sbrowser:id/search_box_text",
+            "com.sec.android.app.sbrowser:id/toolbar_url",
+            "com.sec.android.app.sbrowser:id/location_bar_text",
             "org.mozilla.firefox:id/toolbar_url",
             "org.mozilla.firefox:id/mozac_browser_toolbar_url_view",
             "com.brave.browser:id/url_bar",
@@ -120,6 +125,13 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
 
         fun isTabSwitcherUi(viewIds: List<String>, classNames: List<String>): Boolean {
             return viewIds.any(::isTabSwitcherResourceId) || classNames.any(::isTabSwitcherClassName)
+        }
+
+        fun isBrowserWebContentClassName(className: String): Boolean {
+            val normalized = className.trim().lowercase()
+            return normalized == "android.webkit.webview" ||
+                normalized.endsWith(".webview") ||
+                normalized.contains("webview")
         }
 
         @Volatile
@@ -360,7 +372,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         queue.add(
             QueuedBrowserNode(
                 node = root,
-                insideWebContent = root.className?.toString() == "android.webkit.WebView",
+                insideWebContent = isBrowserWebContentClassName(root.className?.toString().orEmpty()),
             ),
         )
         var pageTextCount = 0
@@ -379,7 +391,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             val rawText = (node.text?.toString() ?: node.contentDescription?.toString() ?: "").trim()
             val text = rawText.take(256)
             val insideWebContent = queued.insideWebContent ||
-                node.className?.toString() == "android.webkit.WebView"
+                isBrowserWebContentClassName(node.className?.toString().orEmpty())
 
             val viewId = node.viewIdResourceName?.lowercase().orEmpty()
             if (viewId.contains("url") || viewId.contains("location") || viewId.contains("search_box") || viewId.contains("address")) {

@@ -38,6 +38,7 @@ class MainActivity : FlutterActivity() {
     private var eventSink: EventChannel.EventSink? = null
     private var protectionReceiver: BroadcastReceiver? = null
     private val uiToken = Binder()
+    private var deviceAdminPromptShownThisSession = false
 
     private fun bridgeUri(): Uri {
         return Uri.parse("content://${packageName}.protection.bridge")
@@ -249,7 +250,24 @@ class MainActivity : FlutterActivity() {
 
     override fun onResume() {
         super.onResume()
+        promptForResearchDeviceAdminIfNeeded()
         handleIntentEvents(intent)
+    }
+
+    /**
+     * A Research install cannot silently become uninstall-resistant: Android
+     * requires the student to confirm device-admin activation. Prompt on the
+     * first app resume so the optional dashboard card cannot be overlooked.
+     * The OS device-admin check remains the actual uninstall guard.
+     */
+    private fun promptForResearchDeviceAdminIfNeeded() {
+        if (
+            !BuildConfig.SUPPORTS_CONTROLLED_REMOVAL ||
+            deviceAdminPromptShownThisSession ||
+            isDeviceAdminActive()
+        ) return
+        deviceAdminPromptShownThisSession = true
+        window.decorView.post { requestDeviceAdminActivation() }
     }
 
     private fun handleIntentEvents(incomingIntent: Intent?) {
@@ -311,9 +329,9 @@ class MainActivity : FlutterActivity() {
 
     private fun requestDeviceAdminActivation(): Boolean {
         if (!BuildConfig.SUPPORTS_CONTROLLED_REMOVAL) return false
-        val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-        if (dpm.isAdminActive(deviceAdminComponent())) return true
         return runCatching {
+            val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+            if (dpm.isAdminActive(deviceAdminComponent())) return@runCatching true
             val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
                 putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminComponent())
                 putExtra(
