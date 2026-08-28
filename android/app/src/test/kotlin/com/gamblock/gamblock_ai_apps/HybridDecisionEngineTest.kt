@@ -41,6 +41,7 @@ class HybridDecisionEngineTest {
                 title = "",
                 headings = emptyList(),
                 anchorTexts = emptyList(),
+                hasDomContent = false,
             ),
         )
         assertEquals("block", result.decision)
@@ -59,10 +60,101 @@ class HybridDecisionEngineTest {
                 title = "casino judi slot",
                 headings = listOf("taruhan"),
                 anchorTexts = emptyList(),
+                hasDomContent = true,
             ),
         )
         assertEquals("block", result.decision)
         assertTrue(result.modelScore >= 0.5)
+    }
+
+    @Test
+    fun urlShapeOnlyDoesNotBlockOpaqueShortLink() {
+        val urlShapeModel = model.copy(
+            bias = -1.0,
+            unigramWeights = emptyMap(),
+            bigramWeights = emptyMap(),
+            urlFeatures = listOf(
+                UrlFeatureSpec(
+                    name = "url_has_number",
+                    offset = 0.0,
+                    scale = 1.0,
+                    weight = 2.0,
+                ),
+            ),
+        )
+        val result = HybridDecisionEngine.classify(
+            raw = ClassificationInput(
+                url = "https://share.google/dhxRArcuBGBvAx4vw",
+                title = "",
+                headings = emptyList(),
+                anchorTexts = emptyList(),
+                hasDomContent = false,
+            ),
+            model = urlShapeModel,
+            rules = rules,
+            modelVersion = "gamblock-lr-test",
+            rulesetVersion = "gambling-keywords-test",
+        )
+        assertEquals("allow", result.decision)
+        assertEquals(0.0, result.ruleScore, 0.0)
+        assertTrue(result.modelScore > 0.5)
+    }
+
+    @Test
+    fun modelOnlyDecisionStillBlocksWithCommittedDom() {
+        val modelOnlyModel = model.copy(
+            unigramWeights = mapOf("casino" to 2.4),
+            bigramWeights = emptyMap(),
+            urlFeatures = emptyList(),
+        )
+        val result = HybridDecisionEngine.classify(
+            raw = ClassificationInput(
+                url = "https://dynamic.invalid/",
+                title = "casino",
+                headings = emptyList(),
+                anchorTexts = emptyList(),
+                hasDomContent = true,
+            ),
+            model = modelOnlyModel,
+            rules = rules,
+            modelVersion = "gamblock-lr-test",
+            rulesetVersion = "gambling-keywords-test",
+        )
+        assertEquals("block", result.decision)
+        assertEquals(0.0, result.ruleScore, 0.0)
+        assertEquals("model_threshold", result.reasonCode)
+    }
+
+    @Test
+    fun urlShapeScoreDoesNotOverrideBenignCommittedDom() {
+        val urlShapeModel = model.copy(
+            bias = -1.0,
+            unigramWeights = emptyMap(),
+            bigramWeights = emptyMap(),
+            urlFeatures = listOf(
+                UrlFeatureSpec(
+                    name = "url_has_number",
+                    offset = 0.0,
+                    scale = 1.0,
+                    weight = 2.0,
+                ),
+            ),
+        )
+        val result = HybridDecisionEngine.classify(
+            raw = ClassificationInput(
+                url = "https://share.google/dhxRArcuBGBvAx4vw",
+                title = "Google shared link",
+                headings = listOf("Continue to shared content"),
+                anchorTexts = emptyList(),
+                hasDomContent = true,
+            ),
+            model = urlShapeModel,
+            rules = rules,
+            modelVersion = "gamblock-lr-test",
+            rulesetVersion = "gambling-keywords-test",
+        )
+        assertEquals("allow", result.decision)
+        assertTrue(result.modelScore > 0.5)
     }
 
     @Test
@@ -73,6 +165,7 @@ class HybridDecisionEngineTest {
                 title = "penelitian universitas",
                 headings = emptyList(),
                 anchorTexts = emptyList(),
+                hasDomContent = true,
             ),
         )
         assertEquals("allow", result.decision)

@@ -12,6 +12,9 @@ struct ClassificationInput {
   std::string title;
   std::vector<std::string> headings;
   std::vector<std::string> anchor_texts;
+  // Set by the local browser adapter only after committed page content is
+  // available; this metadata never crosses the privacy boundary.
+  bool has_dom_content = false;
 };
 
 struct ClassificationDecision {

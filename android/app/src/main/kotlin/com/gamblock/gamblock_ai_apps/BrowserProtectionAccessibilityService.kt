@@ -166,6 +166,11 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
     private var nativeFallback: Runnable? = null
     private var interventionExpiry: Runnable? = null
 
+    private data class QueuedBrowserNode(
+        val node: AccessibilityNodeInfo,
+        val insideWebContent: Boolean,
+    )
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         serviceInfo = serviceInfo.apply {
@@ -351,11 +356,18 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         val anchors = mutableListOf<String>()
         val bodyTexts = mutableListOf<String>()
         var fallbackUrlCandidate = ""
-        val queue = ArrayDeque<AccessibilityNodeInfo>()
-        queue.add(root)
+        val queue = ArrayDeque<QueuedBrowserNode>()
+        queue.add(
+            QueuedBrowserNode(
+                node = root,
+                insideWebContent = root.className?.toString() == "android.webkit.WebView",
+            ),
+        )
+        var pageTextCount = 0
         var visited = 0
         while (queue.isNotEmpty() && visited < 500) {
-            val node = queue.removeFirst()
+            val queued = queue.removeFirst()
+            val node = queued.node
             visited++
             if (isTabSwitcherResourceId(node.viewIdResourceName?.toString().orEmpty()) ||
                 isTabSwitcherClassName(node.className?.toString().orEmpty())
@@ -366,6 +378,8 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             }
             val rawText = (node.text?.toString() ?: node.contentDescription?.toString() ?: "").trim()
             val text = rawText.take(256)
+            val insideWebContent = queued.insideWebContent ||
+                node.className?.toString() == "android.webkit.WebView"
 
             val viewId = node.viewIdResourceName?.lowercase().orEmpty()
             if (viewId.contains("url") || viewId.contains("location") || viewId.contains("search_box") || viewId.contains("address")) {
@@ -376,7 +390,8 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                 fallbackUrlCandidate = rawText
             }
 
-            if (text.isNotEmpty()) {
+            if (insideWebContent && text.isNotEmpty()) {
+                pageTextCount++
                 val isHeadingNode = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && node.isHeading) ||
                     (text.length in 4..80 && (node.className == "android.widget.TextView" || node.className == "android.view.View"))
                 if (isHeadingNode && headings.size < 32) {
@@ -388,7 +403,9 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                 }
             }
             for (index in 0 until node.childCount) {
-                node.getChild(index)?.let(queue::add)
+                node.getChild(index)?.let {
+                    queue.add(QueuedBrowserNode(it, insideWebContent))
+                }
             }
         }
 
@@ -399,13 +416,15 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             else -> ""
         }
 
-        val title = (
-            event.contentDescription?.toString()
-                ?: event.text.firstOrNull()?.toString()
-                ?: (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) root.paneTitle?.toString() else null)
-                ?: headings.firstOrNull()
-                ?: ""
-        ).take(512)
+        val title = sequenceOf(
+            event.contentDescription?.toString(),
+            event.text.firstOrNull()?.toString(),
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) root.paneTitle?.toString() else null,
+            headings.firstOrNull(),
+        ).map { it?.trim().orEmpty() }
+            .firstOrNull { it.isNotEmpty() && !looksLikeUrl(it) }
+            .orEmpty()
+            .take(512)
 
         // Combine collected body text into anchors list to feed the classifier unigrams/bigrams
         val allSignals = anchors + bodyTexts
@@ -417,6 +436,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             title = title,
             headings = headings,
             anchorTexts = allSignals.take(64),
+            hasDomContent = pageTextCount > 0,
         )
     }
 

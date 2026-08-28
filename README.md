@@ -103,7 +103,10 @@ python3 scripts/export_onnx_linear_model.py \
 2. compute the 14 ordered URL features and keyword rule locally;
 3. count the exported 5,664 unigrams and 4,336 bigrams;
 4. apply the exported StandardScaler values and Logistic Regression sigmoid;
-5. compute `0.75 × model_probability + 0.25 × rule_score` and block at `0.4`.
+5. compute `0.75 × model_probability + 0.25 × rule_score`; block at `0.4`
+   only when an explicit URL/content rule matches or committed page content
+   is independently suspicious without URL-shape features. URL-shape evidence
+   alone cannot block opaque short links.
 
 The artifact is marked `trained: true` and `evaluated: false`. Its supplied
 accuracy/precision/recall/F1 values are retained only as unverified metadata:

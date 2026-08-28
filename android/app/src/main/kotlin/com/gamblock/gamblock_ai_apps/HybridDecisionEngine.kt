@@ -95,6 +95,18 @@ object HybridDecisionEngine {
             linear += (model.bigramWeights[token] ?: 0.0) * count
         }
 
+        // Keep a text-only score for model-only decisions. The full score
+        // below includes URL-shape features, which are useful supporting
+        // evidence but are not reliable evidence of gambling by themselves.
+        var contentLinear = model.bias
+        for ((token, count) in unigramCounts) {
+            contentLinear += (model.unigramWeights[token] ?: 0.0) * count
+        }
+        for ((token, count) in bigramCounts) {
+            contentLinear += (model.bigramWeights[token] ?: 0.0) * count
+        }
+        val contentModelScore = 1.0 / (1.0 + exp(-contentLinear))
+
         val featureValues = urlFeatureValues(input.url, urlKeywordCount)
         for (feature in model.urlFeatures) {
             val rawValue = featureValues[feature.name] ?: 0.0
@@ -106,7 +118,14 @@ object HybridDecisionEngine {
 
         val decisionStarted = inferenceFinished
         val hybridScore = (model.mlWeight * modelScore) + (model.ruleWeight * ruleScore)
-        val block = hybridScore >= model.threshold
+        // URL-shape features are useful as supporting evidence, but they are
+        // not sufficient on their own. Short links commonly contain digits
+        // and opaque path segments that resemble the trained URL distribution
+        // without indicating gambling. Explicit URL rules remain decisive;
+        // model-only decisions require committed page/DOM content that is
+        // independently suspicious without URL-shape features.
+        val block = hybridScore >= model.threshold &&
+            (ruleScore > 0.0 || (input.hasDomContent && contentModelScore >= model.threshold))
         val reason = when {
             block && ruleScore > 0.0 -> "hybrid_keyword_match"
             block -> "model_threshold"
@@ -163,6 +182,7 @@ object HybridDecisionEngine {
             title = input.title.take(512),
             headings = input.headings.take(32).map { it.take(256) },
             anchorTexts = input.anchorTexts.take(64).map { it.take(256) },
+            hasDomContent = input.hasDomContent,
         )
     }
 

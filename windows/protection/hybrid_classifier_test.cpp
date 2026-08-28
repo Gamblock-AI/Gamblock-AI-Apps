@@ -31,8 +31,29 @@ int main(int argc, char **argv) {
       "Bonus jackpot hari ini",
       {"Main slot gacor dan casino"},
       {"Deposit sekarang", "Taruhan langsung"},
+      true,
   });
   assert(dom_only.block);
+
+  const auto short_link = classifier.Classify({
+      "https://share.google/dhxRArcuBGBvAx4vw",
+      "",
+      {},
+      {},
+      false,
+  });
+  assert(!short_link.block);
+  assert(short_link.rule_score == 0.0);
+  assert(short_link.model_score > 0.5);
+
+  const auto benign_short_link_dom = classifier.Classify({
+      "https://share.google/dhxRArcuBGBvAx4vw",
+      "Google shared link",
+      {"Continue to shared content"},
+      {},
+      true,
+  });
+  assert(!benign_short_link_dom.block);
 
   const auto dom_model_only = classifier.Classify({
       "https://dynamic.invalid/",
@@ -40,6 +61,7 @@ int main(int argc, char **argv) {
       {"Lottery gaming and prize information", "Trusted alternative games"},
       {"View the numbers guide", "Login for prediction information",
        "Download the trusted APK", "Live chat support"},
+      true,
   });
   assert(dom_model_only.block);
   assert(dom_model_only.rule_score == 0.0);
@@ -51,6 +73,7 @@ int main(int argc, char **argv) {
       "Portal penelitian universitas",
       {"Pendidikan dan beasiswa"},
       {"Jurnal research"},
+      true,
   });
   assert(!benign.block);
 

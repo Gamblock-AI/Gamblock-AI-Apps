@@ -11,6 +11,8 @@ data class ClassificationInput(
     val title: String,
     val headings: List<String>,
     val anchorTexts: List<String>,
+    /** True only when the browser supplied committed page content. */
+    val hasDomContent: Boolean = false,
 )
 
 data class ClassificationResult(
@@ -164,6 +166,9 @@ class HybridClassifier(private val context: Context) {
                     title = fixture.optString("title"),
                     headings = fixture.optJSONArray("headings")?.toStringList() ?: emptyList(),
                     anchorTexts = fixture.optJSONArray("anchorTexts")?.toStringList() ?: emptyList(),
+                    hasDomContent = fixture.optString("title").isNotBlank() ||
+                        (fixture.optJSONArray("headings")?.length() ?: 0) > 0 ||
+                        (fixture.optJSONArray("anchorTexts")?.length() ?: 0) > 0,
                 ),
             )
             if (result.decision != fixture.getString("expected")) {

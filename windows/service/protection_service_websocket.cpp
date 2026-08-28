@@ -183,6 +183,8 @@ void ProtectionService::HandleWebSocketClient(SOCKET client) {
     input.title = JsonString(payload, "title").value_or("");
     input.headings = JsonStringArray(payload, "headings", 32, 256);
     input.anchor_texts = JsonStringArray(payload, "anchorTexts", 64, 256);
+    input.has_dom_content = !input.title.empty() || !input.headings.empty() ||
+                            !input.anchor_texts.empty();
     const auto input_ready = std::chrono::steady_clock::now();
     const double input_ready_epoch_ms =
         std::chrono::duration<double, std::milli>(

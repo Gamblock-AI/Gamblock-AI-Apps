@@ -330,6 +330,21 @@ HybridClassifier::Classify(const ClassificationInput &raw) const {
     if (weight != bigram_weights_.end())
       linear += weight->second * count;
   }
+  // Keep a text-only score for model-only decisions. URL-shape features are
+  // supporting evidence, not reliable evidence of gambling by themselves.
+  double content_linear = bias_;
+  for (const auto &[token, count] : unigrams) {
+    const auto weight = unigram_weights_.find(token);
+    if (weight != unigram_weights_.end())
+      content_linear += weight->second * count;
+  }
+  for (const auto &[token, count] : bigrams) {
+    const auto weight = bigram_weights_.find(token);
+    if (weight != bigram_weights_.end())
+      content_linear += weight->second * count;
+  }
+  const double content_model_score =
+      1.0 / (1.0 + std::exp(-content_linear));
   const auto feature_values = UrlFeatureValues(url, url_keyword_count);
   for (const auto &feature : url_features_) {
     const auto value = feature_values.find(feature.name);
@@ -344,7 +359,14 @@ HybridClassifier::Classify(const ClassificationInput &raw) const {
   const auto decision_started = inference_finished;
   const double hybrid_score =
       ml_weight_ * decision.model_score + rule_weight_ * decision.rule_score;
-  decision.block = hybrid_score >= threshold_;
+  // URL-shape features are supporting evidence only. Opaque short-link paths
+  // can look statistically similar to gambling URLs, so a model-only block
+  // requires committed page/DOM content that is independently suspicious
+  // without URL-shape features. Explicit URL rules remain decisive.
+  decision.block = hybrid_score >= threshold_ &&
+                   (decision.rule_score > 0.0 ||
+                    (raw.has_dom_content &&
+                     content_model_score >= threshold_));
   if (decision.block && decision.rule_score > 0.0) {
     decision.reason_code = "hybrid_keyword_match";
   } else if (decision.block) {
