@@ -21,6 +21,10 @@ struct ClassificationDecision {
   std::string reason_code = "below_threshold";
   std::string model_version;
   std::string ruleset_version;
+  double preprocessing_duration_ms = 0.0;
+  double rule_duration_ms = 0.0;
+  double inference_duration_ms = 0.0;
+  double decision_duration_ms = 0.0;
 };
 
 struct UrlFeatureSpec {
@@ -55,6 +59,7 @@ private:
   std::unordered_map<std::string, double> bigram_weights_;
   std::vector<UrlFeatureSpec> url_features_;
   std::vector<std::string> rule_keywords_;
+  std::vector<std::string> normalized_rule_keywords_;
 };
 
 } // namespace gamblock

@@ -87,9 +87,10 @@ Do not hardcode URLs in features or call Dio from presentation code.
   but not evaluated by project evidence; supplied metrics remain unverified.
 - Android native source is wired through the active manifest and Method/Event
   Channels for Chrome/Edge sensing, classification, intervention, grant state,
-  and aggregates. Intervention delivery is ID-based: Flutter is preferred and
-  the native overlay owns the action only when the visible-frame acknowledgement
-  times out. Research-only removal sensing must remain action-aware so passive
+  and aggregates. Intervention delivery is ID-based and native-first: the
+  resident overlay owns the first committed frame while Flutter is retained as
+  the acknowledgement-safe fallback if Android rejects overlay attachment.
+  Research-only removal sensing must remain action-aware so passive
   App Info does not trigger friction; Play must remain Chrome/Edge-only without
   Settings/package-installer monitoring. Real-device coverage, accessibility,
   lifecycle, and performance evidence are still required.

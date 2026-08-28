@@ -122,9 +122,9 @@ an Accessibility Service that supports:
   Firefox, Xiaomi/Vivo/Oppo browsers, DuckDuckGo, and UC Browser package
   families;
 - bounded, debounced, single-threaded local classification;
-- local Back navigation plus Flutter-first Pattern Interrupt delivery, with a
-  native Accessibility overlay fallback when Flutter does not acknowledge its
-  first visible frame in time;
+- local Back navigation plus native-first Pattern Interrupt delivery from the
+  resident Accessibility process; Flutter remains an acknowledgement-safe
+  fallback when Android rejects the overlay attachment;
 - versioned prominent disclosure before the user is sent to Accessibility
   Settings;
 - signed, device-bound ES256 grants verified against pinned backend public
@@ -203,8 +203,16 @@ Latency evidence is disabled by default and remains device-local. When an
 approved evaluator enables it, Android and Windows write bounded JSON Lines
 containing opaque run/device/scenario labels, artifact versions, and durations
 only. They never record URL, domain, DOM, title, decision score, account ID, or
-browsing timestamp. `input_to_visible_ms` measures complete supported local
-input through the first committed Pattern Interrupt frame.
+browsing timestamp. Schema v2 separates extraction, relay/queue,
+preprocessing, rule, inference, decision, block action, and presentation.
+`input_to_visible_ms` measures complete supported local input through the
+first committed Pattern Interrupt frame. The engineering gate is p95 strictly
+below 200 ms for each platform/device/scenario group, with at least 30 samples
+and no failed block or visibility outcome.
+`SCENARIO` is one of `warm_foreground_online`, `warm_foreground_offline`,
+`warm_background_online`, `warm_background_offline`, `cold_foreground_online`,
+`cold_foreground_offline`, `cold_background_online`, or
+`cold_background_offline`.
 
 Android evidence mode and export:
 
@@ -214,6 +222,7 @@ Android evidence mode and export:
 ./scripts/phase4-android-evidence.sh export --device SERIAL \
   --output android-latency.jsonl
 ./scripts/phase4-android-evidence.sh disable --device SERIAL
+python3 scripts/phase4_latency_report.py android-latency.jsonl
 ```
 
 Windows evidence mode/export and the ordinary process-kill recovery scenario
@@ -224,6 +233,7 @@ run from an elevated PowerShell on an approved disposable VM:
   -RunId RUN_ID -DeviceAlias DEVICE_ALIAS -Scenario SCENARIO
 .\windows\scripts\phase4-evidence.ps1 Export -Output windows-latency.jsonl
 .\windows\scripts\phase4-evidence.ps1 Disable
+python scripts\phase4_latency_report.py windows-latency.jsonl
 .\windows\scripts\run-phase4-hardening.ps1 `
   -RunId RUN_ID -DeviceAlias DEVICE_ALIAS `
   -Output windows-resilience.json -AcknowledgeDisposableVm

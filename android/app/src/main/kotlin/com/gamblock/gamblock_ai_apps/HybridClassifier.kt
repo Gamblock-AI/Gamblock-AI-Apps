@@ -20,6 +20,7 @@ data class ClassificationResult(
     val reasonCode: String,
     val modelVersion: String,
     val rulesetVersion: String,
+    val timings: ClassificationTimings = ClassificationTimings(0, 0, 0, 0),
 )
 
 class HybridClassifier(private val context: Context) {

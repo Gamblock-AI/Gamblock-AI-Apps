@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityManager
 import android.view.accessibility.AccessibilityNodeInfo
@@ -203,14 +204,18 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             return
         }
         pendingScan?.let(mainHandler::removeCallbacks)
+        val scanStartedNanos = SystemClock.elapsedRealtimeNanos()
         val runnable = Runnable {
             val root = rootInActiveWindow ?: event.source
             val input = extractSignals(event, root)
             // Transient intermediate frames during navigation are normal; ignore without degrading
             if (input == null) return@Runnable
+            val inputReadyNanos = SystemClock.elapsedRealtimeNanos()
 
             worker.execute {
+                val classificationStartedNanos = SystemClock.elapsedRealtimeNanos()
                 val result = classifier.classify(input)
+                val classificationFinishedNanos = SystemClock.elapsedRealtimeNanos()
                 val signature = listOf(input.url, input.title, input.headings, input.anchorTexts).hashCode()
                 val now = System.currentTimeMillis()
                 if (signature == lastSignature && now - lastDecisionAt < 500 && result.decision != "block") {
@@ -226,6 +231,18 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                         rulesetVersion = result.rulesetVersion,
                     )
                     if (!acquisition.created) return@execute
+                    phase4Evidence?.begin(
+                        acquisition.intervention.id,
+                        Phase4LatencyStart(
+                            scanStartedNanos = scanStartedNanos,
+                            inputReadyNanos = inputReadyNanos,
+                            classificationStartedNanos = classificationStartedNanos,
+                            classificationFinishedNanos = classificationFinishedNanos,
+                            timings = result.timings,
+                            modelVersion = result.modelVersion,
+                            rulesetVersion = result.rulesetVersion,
+                        ),
+                    )
                     mainHandler.post {
                         executeBlockAndIntervention(acquisition.intervention)
                     }
@@ -236,7 +253,9 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             }
         }
         pendingScan = runnable
-        mainHandler.postDelayed(runnable, 300)
+        // Accessibility already coalesces events for 150ms. Keep only a small
+        // settle window so local protection does not add another 300ms.
+        mainHandler.postDelayed(runnable, 50)
     }
 
     private fun extractSignals(
@@ -353,7 +372,15 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
 
     /** Bridge surface for [ProtectionBridgeProvider] (same protection process). */
     fun claimFlutterVisibility(interventionId: String): InterventionVisibilityClaim {
-        return stateStore.claimFlutterVisibility(interventionId)
+        val claim = stateStore.claimFlutterVisibility(interventionId)
+        if (claim.newlyVisible) {
+            phase4Evidence?.complete(
+                interventionId,
+                SystemClock.elapsedRealtimeNanos(),
+                "flutter_fallback",
+            )
+        }
+        return claim
     }
 
     /** Bridge surface for [ProtectionBridgeProvider] (same protection process). */
@@ -362,6 +389,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
     }
 
     private fun executeBlockAndIntervention(intervention: PendingIntervention) {
+        val blockActionStartedNanos = SystemClock.elapsedRealtimeNanos()
         val backAccepted = performGlobalAction(GLOBAL_ACTION_BACK)
         val navigationAccepted = if (backAccepted) {
             stateStore.setStatus("active")
@@ -375,24 +403,20 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             ProtectionBridge.emit(this, snapshotEvent())
             homeAccepted
         }
+        phase4Evidence?.recordBlockAction(
+            intervention.id,
+            blockActionStartedNanos,
+            SystemClock.elapsedRealtimeNanos(),
+            navigationAccepted,
+        )
         if (navigationAccepted) {
             // Count only after Android accepts the blocking navigation action.
             aggregateStore.increment("block_count_sync")
         }
 
-        ProtectionBridge.emit(this, intervention.event())
-        val flutterLaunchAccepted = runCatching {
-            startActivity(
-                Intent(this, MainActivity::class.java).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                },
-            )
-        }.isSuccess
-        if (flutterLaunchAccepted) {
-            scheduleNativeFallback(intervention)
-        } else {
-            showNativeIntervention(intervention.id)
-        }
+        // This process already owns the Accessibility window token. Showing the
+        // native overlay first avoids waiting for a cold Flutter engine.
+        showNativeIntervention(intervention.id)
         scheduleInterventionExpiry(intervention)
     }
 
@@ -446,6 +470,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         val runnable = Runnable {
             interventionExpiry = null
             stateStore.expireIntervention(intervention.id)
+            phase4Evidence?.fail(intervention.id, "expired")
             nativeFallback?.let(mainHandler::removeCallbacks)
             nativeFallback = null
             overlay.dismissIntervention(intervention.id)
@@ -463,6 +488,11 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                 onCommitted = {
                     if (stateStore.markNativeVisible(interventionId)) {
                         aggregateStore.increment("intervention_shown")
+                        phase4Evidence?.complete(
+                            interventionId,
+                            SystemClock.elapsedRealtimeNanos(),
+                            "native",
+                        )
                     }
                 },
                 onCompleted = {
@@ -473,6 +503,18 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         } catch (_: Exception) {
             overlay.dismissIntervention(interventionId)
             stateStore.releaseUncommittedNativeOwnership(interventionId)
+            val pending = stateStore.activeIntervention()
+            if (pending != null) {
+                ProtectionBridge.emit(this, pending.event())
+                val flutterLaunchAccepted = runCatching {
+                    startActivity(
+                        Intent(this, MainActivity::class.java).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                        },
+                    )
+                }.isSuccess
+                if (flutterLaunchAccepted) scheduleNativeFallback(pending)
+            }
             stateStore.setStatus("degraded", "intervention_overlay_failed")
             ProtectionBridge.emit(this, snapshotEvent())
         }

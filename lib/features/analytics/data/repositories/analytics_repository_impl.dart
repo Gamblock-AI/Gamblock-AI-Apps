@@ -53,6 +53,10 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
         dataState: 'local_only',
       );
     }
+
+    // Reconcile the local cumulative row with the server's current-day
+    // snapshot. This remains correct when a multi-row sync partially succeeds:
+    // only the unsynced local delta is added, never the whole row again.
     final current = await PlatformBridge.getCurrentDailyAggregates();
     if (current.isEmpty) return server;
 
@@ -64,13 +68,17 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
     for (final item in current) {
       final day = daysByDate[item.date];
       if (day == null) continue;
-      final block = item.eventType == 'block_count_sync' ? item.count : 0;
-      final intervention = item.eventType == 'intervention_shown'
-          ? item.count
+      final block = item.eventType == 'block_count_sync'
+          ? _positiveDelta(item.count, day.blocked)
           : 0;
-      final tamper = item.eventType == 'tamper_detected' ? item.count : 0;
+      final intervention = item.eventType == 'intervention_shown'
+          ? _positiveDelta(item.count, day.interventions)
+          : 0;
+      final tamper = item.eventType == 'tamper_detected'
+          ? _positiveDelta(item.count, day.tamperEvents)
+          : 0;
       final permission = item.eventType == 'permission_revoked'
-          ? item.count
+          ? _positiveDelta(item.count, day.permissionRevoked)
           : 0;
       daysByDate[item.date] = day.add(
         blocked: block,
@@ -101,5 +109,10 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
           .toList(),
       dataState: server.dataState == 'empty' ? 'local_only' : server.dataState,
     );
+  }
+
+  int _positiveDelta(int localCount, int serverCount) {
+    final delta = localCount - serverCount;
+    return delta > 0 ? delta : 0;
   }
 }

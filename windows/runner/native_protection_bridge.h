@@ -20,13 +20,12 @@
 #include <thread>
 
 class NativeProtectionBridge {
- public:
+public:
   static constexpr UINT kNativeEventMessage = WM_APP + 73;
   static constexpr UINT_PTR kInterventionExpiryTimer = 0x47424c4b;
   static constexpr UINT_PTR kInterventionCloseGateTimer = 0x47424c4c;
 
-  NativeProtectionBridge(flutter::FlutterEngine* engine,
-                         HWND window,
+  NativeProtectionBridge(flutter::FlutterEngine *engine, HWND window,
                          std::function<void(bool)> intervention_lock_changed);
   ~NativeProtectionBridge();
 
@@ -34,16 +33,18 @@ class NativeProtectionBridge {
   void HandleInterventionTimeout();
   void PrepareForWindowClose();
 
- private:
-  void ConfigureMethodChannel(flutter::FlutterEngine* engine);
-  void ConfigureEventChannel(flutter::FlutterEngine* engine);
+private:
+  void ConfigureMethodChannel(flutter::FlutterEngine *engine);
+  void ConfigureEventChannel(flutter::FlutterEngine *engine);
   void ConnectLoop();
-  std::string CallService(const std::string& type,
-                          const std::string& fields = "",
+  std::string CallService(const std::string &type,
+                          const std::string &fields = "",
                           DWORD timeout_ms = 5000);
-  void HandlePipeMessage(const std::string& message);
-  void DispatchEvent(const std::string& message);
+  void HandlePipeMessage(const std::string &message);
+  void DispatchEvent(const std::string &message);
   void FlushPendingBlockAction(DWORD timeout_ms);
+  void ShowNativeInterventionShell();
+  void HideNativeInterventionShell();
   static bool SendBrowserBack();
 
   HWND window_;
@@ -59,7 +60,9 @@ class NativeProtectionBridge {
   std::queue<std::string> events_;
   std::queue<std::string> pending_flutter_events_;
   std::string active_intervention_id_;
+  HWND native_intervention_shell_ = nullptr;
   std::optional<bool> pending_block_action_result_;
+  std::optional<double> pending_block_action_duration_ms_;
   int intervention_expiry_retries_ = 0;
   std::function<void(bool)> intervention_lock_changed_;
   std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>>
@@ -69,4 +72,4 @@ class NativeProtectionBridge {
   std::unique_ptr<flutter::EventSink<flutter::EncodableValue>> event_sink_;
 };
 
-#endif  // RUNNER_NATIVE_PROTECTION_BRIDGE_H_
+#endif // RUNNER_NATIVE_PROTECTION_BRIDGE_H_

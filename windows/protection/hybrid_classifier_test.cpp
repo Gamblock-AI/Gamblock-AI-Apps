@@ -21,6 +21,10 @@ int main(int argc, char **argv) {
   });
   assert(explicit_url.block);
   assert(explicit_url.reason_code == "hybrid_keyword_match");
+  assert(explicit_url.preprocessing_duration_ms >= 0.0);
+  assert(explicit_url.rule_duration_ms >= 0.0);
+  assert(explicit_url.inference_duration_ms >= 0.0);
+  assert(explicit_url.decision_duration_ms >= 0.0);
 
   const auto dom_only = classifier.Classify({
       "https://dynamic.invalid/",

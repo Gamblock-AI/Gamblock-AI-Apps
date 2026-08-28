@@ -23,11 +23,25 @@ function Assert-SafeLabel {
     }
 }
 
+function Assert-Scenario {
+    param([string]$Value)
+    $allowed = @(
+        'warm_foreground_online', 'warm_foreground_offline',
+        'warm_background_online', 'warm_background_offline',
+        'cold_foreground_online', 'cold_foreground_offline',
+        'cold_background_online', 'cold_background_offline'
+    )
+    if ($Value -notin $allowed) {
+        throw 'Scenario must combine warm/cold, foreground/background, and online/offline.'
+    }
+}
+
 switch ($Action) {
     'Enable' {
         Assert-SafeLabel 'RunId' $RunId
         Assert-SafeLabel 'DeviceAlias' $DeviceAlias
         Assert-SafeLabel 'Scenario' $Scenario
+        Assert-Scenario $Scenario
         New-Item -ItemType Directory -Path $EvidenceDirectory -Force | Out-Null
         @{
             run_id = $RunId

@@ -7,6 +7,13 @@ usage() {
   echo "Export option: --output FILE" >&2
 }
 
+valid_scenario() {
+  case "$1" in
+    warm_foreground_online|warm_foreground_offline|warm_background_online|warm_background_offline|cold_foreground_online|cold_foreground_offline|cold_background_online|cold_background_offline) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 action="${1:-}"
 if [[ -z "$action" ]]; then
   usage
@@ -45,6 +52,10 @@ case "$action" in
        [[ ! "$device_alias" =~ ^[A-Za-z0-9_-]{1,64}$ ]] ||
        [[ ! "$scenario" =~ ^[A-Za-z0-9_-]{1,64}$ ]]; then
       echo "run ID, device alias, and scenario must be opaque safe labels" >&2
+      exit 2
+    fi
+    if ! valid_scenario "$scenario"; then
+      echo "scenario must be one of warm/cold + foreground/background + online/offline" >&2
       exit 2
     fi
     temp_file="$(mktemp)"

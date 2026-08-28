@@ -1,5 +1,6 @@
 #include "protection_service.h"
 
+#include <algorithm>
 #include <chrono>
 #include <sstream>
 
@@ -10,29 +11,26 @@ namespace {
 
 constexpr auto kInterventionLifetime = std::chrono::seconds(30);
 
-std::string InterventionJson(const std::string& intervention_id,
-                             const std::string& reason_code,
-                             const std::string& model_version,
-                             const std::string& ruleset_version) {
+std::string InterventionJson(const std::string &intervention_id,
+                             const std::string &reason_code,
+                             const std::string &model_version,
+                             const std::string &ruleset_version) {
   std::ostringstream event;
   event << "{\"type\":\"intervention_required\",\"intervention_id\":\""
-        << EscapeJson(intervention_id)
-        << "\",\"reason_code\":\"" << EscapeJson(reason_code)
-        << "\",\"model_version\":\"" << EscapeJson(model_version)
-        << "\",\"ruleset_version\":\""
+        << EscapeJson(intervention_id) << "\",\"reason_code\":\""
+        << EscapeJson(reason_code) << "\",\"model_version\":\""
+        << EscapeJson(model_version) << "\",\"ruleset_version\":\""
         << EscapeJson(ruleset_version) << "\"}";
   return event.str();
 }
 
-}  // namespace
+} // namespace
 
 std::optional<std::string> ProtectionService::BeginIntervention(
     std::chrono::steady_clock::time_point input_ready,
-    double pre_input_duration_ms,
-    double extraction_duration_ms,
-    double queue_duration_ms,
-    double classification_duration_ms,
-    const ClassificationDecision& decision) {
+    double pre_input_duration_ms, double extraction_duration_ms,
+    double queue_duration_ms, double classification_duration_ms,
+    const ClassificationDecision &decision) {
   const auto now = std::chrono::steady_clock::now();
   std::lock_guard lock(intervention_mutex_);
   if (pending_intervention_ && now < pending_intervention_->deadline) {
@@ -41,7 +39,8 @@ std::optional<std::string> ProtectionService::BeginIntervention(
   pending_intervention_.reset();
 
   const std::string intervention_id = Hex(RandomBytes(16));
-  if (intervention_id.size() != 32) return std::nullopt;
+  if (intervention_id.size() != 32)
+    return std::nullopt;
   const std::string evidence_id = BeginPhase4Latency(
       input_ready, pre_input_duration_ms, extraction_duration_ms,
       queue_duration_ms, classification_duration_ms, decision);
@@ -54,39 +53,46 @@ std::optional<std::string> ProtectionService::BeginIntervention(
       now + kInterventionLifetime,
       false,
       false,
+      false,
   };
-  return InterventionJson(
-      pending_intervention_->intervention_id,
-      pending_intervention_->reason_code,
-      pending_intervention_->model_version,
-      pending_intervention_->ruleset_version);
+  return InterventionJson(pending_intervention_->intervention_id,
+                          pending_intervention_->reason_code,
+                          pending_intervention_->model_version,
+                          pending_intervention_->ruleset_version);
 }
 
 void ProtectionService::FlushPendingIntervention() {
   std::string event;
+  std::string expired_evidence_id;
   {
     std::lock_guard lock(intervention_mutex_);
-    if (!pending_intervention_) return;
+    if (!pending_intervention_)
+      return;
     if (std::chrono::steady_clock::now() >= pending_intervention_->deadline) {
       event = "{\"type\":\"intervention_completed\","
               "\"intervention_id\":\"" +
               EscapeJson(pending_intervention_->intervention_id) +
               "\",\"completion_reason\":\"expired\"}";
+      expired_evidence_id = pending_intervention_->evidence_id;
       pending_intervention_.reset();
     } else {
-      event = InterventionJson(
-          pending_intervention_->intervention_id,
-          pending_intervention_->reason_code,
-          pending_intervention_->model_version,
-          pending_intervention_->ruleset_version);
+      event = InterventionJson(pending_intervention_->intervention_id,
+                               pending_intervention_->reason_code,
+                               pending_intervention_->model_version,
+                               pending_intervention_->ruleset_version);
     }
+  }
+  if (!expired_evidence_id.empty()) {
+    CompletePhase4Latency(expired_evidence_id, "expired", false);
   }
   SendAgentEvent(event);
 }
 
 bool ProtectionService::AcknowledgeInterventionVisible(
-    const std::string& intervention_id) {
+    const std::string &intervention_id) {
   std::string evidence_id;
+  bool block_succeeded = false;
+  double block_action_duration_ms = 0.0;
   bool first_acknowledgement = false;
   {
     std::lock_guard lock(intervention_mutex_);
@@ -98,28 +104,22 @@ bool ProtectionService::AcknowledgeInterventionVisible(
     first_acknowledgement = !pending_intervention_->visible;
     pending_intervention_->visible = true;
     evidence_id = pending_intervention_->evidence_id;
+    block_succeeded = pending_intervention_->block_action_reported &&
+                      pending_intervention_->block_action_succeeded;
+    block_action_duration_ms = pending_intervention_->block_action_duration_ms;
   }
   if (first_acknowledgement) {
     IncrementAggregate("intervention_shown");
-    CompletePhase4Latency(evidence_id);
+    CompletePhase4Latency(evidence_id,
+                          block_succeeded ? "visible" : "block_failed",
+                          block_succeeded, block_action_duration_ms);
   }
   return true;
 }
 
 bool ProtectionService::CompleteIntervention(
-    const std::string& intervention_id) {
-  std::lock_guard lock(intervention_mutex_);
-  if (!pending_intervention_ || intervention_id.empty() ||
-      !ConstantTimeEqual(pending_intervention_->intervention_id,
-                         intervention_id)) {
-    return false;
-  }
-  pending_intervention_.reset();
-  return true;
-}
-
-bool ProtectionService::RecordBlockAction(const std::string& intervention_id,
-                                          bool succeeded) {
+    const std::string &intervention_id) {
+  std::string unfinished_evidence_id;
   {
     std::lock_guard lock(intervention_mutex_);
     if (!pending_intervention_ || intervention_id.empty() ||
@@ -127,12 +127,37 @@ bool ProtectionService::RecordBlockAction(const std::string& intervention_id,
                            intervention_id)) {
       return false;
     }
-    if (pending_intervention_->block_action_reported) return true;
-    pending_intervention_->block_action_reported = true;
+    if (!pending_intervention_->visible) {
+      unfinished_evidence_id = pending_intervention_->evidence_id;
+    }
+    pending_intervention_.reset();
   }
-  block_action_degraded_ = !succeeded;
-  if (succeeded) IncrementAggregate("block_count_sync");
+  if (!unfinished_evidence_id.empty()) {
+    CompletePhase4Latency(unfinished_evidence_id, "completed_unseen", false);
+  }
   return true;
 }
 
-}  // namespace gamblock
+bool ProtectionService::RecordBlockAction(const std::string &intervention_id,
+                                          bool succeeded, double duration_ms) {
+  {
+    std::lock_guard lock(intervention_mutex_);
+    if (!pending_intervention_ || intervention_id.empty() ||
+        !ConstantTimeEqual(pending_intervention_->intervention_id,
+                           intervention_id)) {
+      return false;
+    }
+    if (pending_intervention_->block_action_reported)
+      return true;
+    pending_intervention_->block_action_reported = true;
+    pending_intervention_->block_action_succeeded = succeeded;
+    pending_intervention_->block_action_duration_ms =
+        std::clamp(duration_ms, 0.0, 10000.0);
+  }
+  block_action_degraded_ = !succeeded;
+  if (succeeded)
+    IncrementAggregate("block_count_sync");
+  return true;
+}
+
+} // namespace gamblock

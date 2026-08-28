@@ -4,6 +4,12 @@ import java.net.URI
 import java.util.Locale
 import kotlin.math.exp
 
+private val hybridRuleSeparator = Regex("[^a-z0-9_]+")
+
+private fun normalizeRuleKeyword(value: String): String {
+    return value.lowercase(Locale.ROOT).replace(hybridRuleSeparator, " ").trim()
+}
+
 data class UrlFeatureSpec(
     val name: String,
     val offset: Double,
@@ -24,11 +30,19 @@ data class HybridModelConfig(
 data class HybridRuleConfig(
     val keywords: List<String>,
     val matchScore: Double,
+    val normalizedKeywords: List<String> = keywords.map(::normalizeRuleKeyword),
+)
+
+/** Monotonic classifier-stage durations used only by local Phase 4 evidence. */
+data class ClassificationTimings(
+    val preprocessingNanos: Long,
+    val ruleNanos: Long,
+    val inferenceNanos: Long,
+    val decisionNanos: Long,
 )
 
 object HybridDecisionEngine {
     private val tokenRegex = Regex("[a-zA-Z0-9_]+")
-    private val ruleSeparator = Regex("[^a-z0-9_]+")
 
     fun classify(
         raw: ClassificationInput,
@@ -36,13 +50,11 @@ object HybridDecisionEngine {
         rules: HybridRuleConfig,
         modelVersion: String,
         rulesetVersion: String,
+        nowNanos: () -> Long = System::nanoTime,
     ): ClassificationResult {
+        val preprocessingStarted = nowNanos()
         val input = bounded(raw)
         val normalizedUrl = normalizeForRules(input.url)
-        val urlKeywordCount = rules.keywords.count { keyword ->
-            containsPhrase(normalizedUrl, normalizeForRules(keyword))
-        }
-
         val document = buildString {
             append(input.title)
             append(' ')
@@ -55,17 +67,26 @@ object HybridDecisionEngine {
                 append(' ')
             }
         }
-        val normalizedRuleInput = "$normalizedUrl ${normalizeForRules(document)}".trim()
-        val hasRuleMatch = rules.keywords.any { keyword ->
-            containsPhrase(normalizedRuleInput, normalizeForRules(keyword))
-        }
-        val ruleScore = if (hasRuleMatch) rules.matchScore else 0.0
+        val normalizedDocument = normalizeForRules(document)
         val tokens = tokenRegex.findAll(normalizeText(document)).map { it.value }.toList()
         val unigramCounts = tokens.groupingBy { it }.eachCount()
         val bigramCounts = tokens.zipWithNext { left, right -> "$left $right" }
             .groupingBy { it }
             .eachCount()
+        val preprocessingFinished = nowNanos()
 
+        val ruleStarted = preprocessingFinished
+        val urlKeywordCount = rules.normalizedKeywords.count { keyword ->
+            containsPhrase(normalizedUrl, keyword)
+        }
+        val normalizedRuleInput = "$normalizedUrl $normalizedDocument".trim()
+        val hasRuleMatch = rules.normalizedKeywords.any { keyword ->
+            containsPhrase(normalizedRuleInput, keyword)
+        }
+        val ruleScore = if (hasRuleMatch) rules.matchScore else 0.0
+        val ruleFinished = nowNanos()
+
+        val inferenceStarted = ruleFinished
         var linear = model.bias
         for ((token, count) in unigramCounts) {
             linear += (model.unigramWeights[token] ?: 0.0) * count
@@ -81,6 +102,9 @@ object HybridDecisionEngine {
         }
 
         val modelScore = 1.0 / (1.0 + exp(-linear))
+        val inferenceFinished = nowNanos()
+
+        val decisionStarted = inferenceFinished
         val hybridScore = (model.mlWeight * modelScore) + (model.ruleWeight * ruleScore)
         val block = hybridScore >= model.threshold
         val reason = when {
@@ -88,13 +112,22 @@ object HybridDecisionEngine {
             block -> "model_threshold"
             else -> "below_threshold"
         }
-        return ClassificationResult(
+        val result = ClassificationResult(
             decision = if (block) "block" else "allow",
             ruleScore = ruleScore,
             modelScore = modelScore,
             reasonCode = reason,
             modelVersion = modelVersion,
             rulesetVersion = rulesetVersion,
+        )
+        val decisionFinished = nowNanos()
+        return result.copy(
+            timings = ClassificationTimings(
+                preprocessingNanos = (preprocessingFinished - preprocessingStarted).coerceAtLeast(0),
+                ruleNanos = (ruleFinished - ruleStarted).coerceAtLeast(0),
+                inferenceNanos = (inferenceFinished - inferenceStarted).coerceAtLeast(0),
+                decisionNanos = (decisionFinished - decisionStarted).coerceAtLeast(0),
+            ),
         )
     }
 
@@ -138,7 +171,7 @@ object HybridDecisionEngine {
     }
 
     private fun normalizeForRules(value: String): String {
-        return normalizeText(value).replace(ruleSeparator, " ").trim()
+        return normalizeRuleKeyword(value)
     }
 
     private fun containsPhrase(haystack: String, needle: String): Boolean {

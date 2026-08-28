@@ -148,7 +148,19 @@ class PlatformBridge {
     return _aggregateMethod('getCurrentDailyAggregates');
   }
 
+  /// Reads today's aggregate rows and preserves bridge failures for callers
+  /// that must distinguish "no activity" from "native process unavailable".
+  static Future<List<NativeDailyAggregate>?> readCurrentDailyAggregates() {
+    return _aggregateMethodNullable('getCurrentDailyAggregates');
+  }
+
   static Future<List<NativeDailyAggregate>> _aggregateMethod(
+    String method,
+  ) async {
+    return await _aggregateMethodNullable(method) ?? const [];
+  }
+
+  static Future<List<NativeDailyAggregate>?> _aggregateMethodNullable(
     String method,
   ) async {
     try {
@@ -165,7 +177,7 @@ class PlatformBridge {
           )
           .toList();
     } catch (_) {
-      return const [];
+      return null;
     }
   }
 

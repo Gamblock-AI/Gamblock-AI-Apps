@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <chrono>
 #include <cmath>
 #include <fstream>
 #include <iterator>
@@ -251,6 +252,11 @@ bool HybridClassifier::Load(const std::string &model_path,
     rule_keywords_ = ParseStrings(rules, "keywords");
     if (rule_keywords_.empty())
       throw std::runtime_error("artifact_rules_empty");
+    normalized_rule_keywords_.clear();
+    normalized_rule_keywords_.reserve(rule_keywords_.size());
+    for (const auto &keyword : rule_keywords_) {
+      normalized_rule_keywords_.push_back(NormalizeForRules(keyword));
+    }
     loaded_ = true;
     return true;
   } catch (const std::exception &exception) {
@@ -271,15 +277,9 @@ HybridClassifier::Classify(const ClassificationInput &raw) const {
     return decision;
   }
 
+  const auto preprocessing_started = std::chrono::steady_clock::now();
   const std::string url = LowerAndBound(raw.url, 2048);
   const std::string normalized_url = NormalizeForRules(url);
-  int url_keyword_count = 0;
-  for (const auto &keyword : rule_keywords_) {
-    if (ContainsPhrase(normalized_url, NormalizeForRules(keyword))) {
-      ++url_keyword_count;
-    }
-  }
-
   std::ostringstream document;
   document << LowerAndBound(raw.title, 512) << ' ';
   for (size_t index = 0; index < std::min<size_t>(raw.headings.size(), 32);
@@ -291,15 +291,7 @@ HybridClassifier::Classify(const ClassificationInput &raw) const {
     document << LowerAndBound(raw.anchor_texts[index], 256) << ' ';
   }
   const std::string document_text = document.str();
-  const std::string rule_input =
-      normalized_url + " " + NormalizeForRules(document_text);
-  for (const auto &keyword : rule_keywords_) {
-    if (ContainsPhrase(rule_input, NormalizeForRules(keyword))) {
-      decision.rule_score = rule_match_score_;
-      break;
-    }
-  }
-
+  const std::string normalized_document = NormalizeForRules(document_text);
   const auto tokens = Tokens(document_text);
   std::unordered_map<std::string, int> unigrams;
   std::unordered_map<std::string, int> bigrams;
@@ -308,6 +300,25 @@ HybridClassifier::Classify(const ClassificationInput &raw) const {
     if (index > 0)
       ++bigrams[tokens[index - 1] + " " + tokens[index]];
   }
+  const auto preprocessing_finished = std::chrono::steady_clock::now();
+
+  const auto rule_started = preprocessing_finished;
+  int url_keyword_count = 0;
+  for (const auto &keyword : normalized_rule_keywords_) {
+    if (ContainsPhrase(normalized_url, keyword)) {
+      ++url_keyword_count;
+    }
+  }
+  const std::string rule_input = normalized_url + " " + normalized_document;
+  for (const auto &keyword : normalized_rule_keywords_) {
+    if (ContainsPhrase(rule_input, keyword)) {
+      decision.rule_score = rule_match_score_;
+      break;
+    }
+  }
+  const auto rule_finished = std::chrono::steady_clock::now();
+
+  const auto inference_started = rule_finished;
   double linear = bias_;
   for (const auto &[token, count] : unigrams) {
     const auto weight = unigram_weights_.find(token);
@@ -328,6 +339,9 @@ HybridClassifier::Classify(const ClassificationInput &raw) const {
   }
 
   decision.model_score = 1.0 / (1.0 + std::exp(-linear));
+  const auto inference_finished = std::chrono::steady_clock::now();
+
+  const auto decision_started = inference_finished;
   const double hybrid_score =
       ml_weight_ * decision.model_score + rule_weight_ * decision.rule_score;
   decision.block = hybrid_score >= threshold_;
@@ -336,6 +350,20 @@ HybridClassifier::Classify(const ClassificationInput &raw) const {
   } else if (decision.block) {
     decision.reason_code = "model_threshold";
   }
+  const auto decision_finished = std::chrono::steady_clock::now();
+  decision.preprocessing_duration_ms =
+      std::chrono::duration<double, std::milli>(preprocessing_finished -
+                                                preprocessing_started)
+          .count();
+  decision.rule_duration_ms =
+      std::chrono::duration<double, std::milli>(rule_finished - rule_started)
+          .count();
+  decision.inference_duration_ms = std::chrono::duration<double, std::milli>(
+                                       inference_finished - inference_started)
+                                       .count();
+  decision.decision_duration_ms = std::chrono::duration<double, std::milli>(
+                                      decision_finished - decision_started)
+                                      .count();
   return decision;
 }
 

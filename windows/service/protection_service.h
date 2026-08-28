@@ -1,13 +1,13 @@
 #ifndef GAMBLOCK_SERVICE_PROTECTION_SERVICE_H_
 #define GAMBLOCK_SERVICE_PROTECTION_SERVICE_H_
 
-#include <winsock2.h>
 #include <windows.h>
+#include <winsock2.h>
 
 #include <atomic>
 #include <chrono>
-#include <cstdint>
 #include <condition_variable>
+#include <cstdint>
 #include <map>
 #include <mutex>
 #include <optional>
@@ -21,24 +21,22 @@
 namespace gamblock {
 
 class ProtectionService {
- public:
-  static ProtectionService& Instance();
-  static void WINAPI ServiceMain(DWORD argc, wchar_t** argv);
-  static DWORD WINAPI ControlHandler(DWORD control,
-                                     DWORD event_type,
-                                     void* event_data,
-                                     void* context);
+public:
+  static ProtectionService &Instance();
+  static void WINAPI ServiceMain(DWORD argc, wchar_t **argv);
+  static DWORD WINAPI ControlHandler(DWORD control, DWORD event_type,
+                                     void *event_data, void *context);
 
   bool Install();
   bool Uninstall(bool require_grant = true);
   bool BeginApprovedRemoval();
   int RunConsole();
 
- private:
+private:
   ProtectionService() = default;
   ~ProtectionService();
-  ProtectionService(const ProtectionService&) = delete;
-  ProtectionService& operator=(const ProtectionService&) = delete;
+  ProtectionService(const ProtectionService &) = delete;
+  ProtectionService &operator=(const ProtectionService &) = delete;
 
   bool StartRuntime();
   void StopRuntime();
@@ -46,47 +44,47 @@ class ProtectionService {
   void HandleWebSocketClient(SOCKET client);
   void PipeLoop();
   void HandlePipeClient(HANDLE pipe);
-  void HandlePipeCommand(const std::string& command);
-  void SendAgentEvent(const std::string& json);
+  void HandlePipeCommand(const std::string &command);
+  void SendAgentEvent(const std::string &json);
   void FlushPendingIntervention();
   void RequestUserAgent(DWORD session_id);
   void UserAgentLoop();
   void EnsureUserAgentRunning();
 
   bool LoadArtifacts();
-  std::string SnapshotJson(const std::string& request_id);
+  std::string SnapshotJson(const std::string &request_id);
   std::string PairingToken(bool rotate);
-  bool LoadDeviceId(const std::string& device_id);
-  bool SetDeviceId(const std::string& device_id);
-  std::string GrantKeyEnrollmentJson(const std::string& request_id,
-                                     const std::string& device_id,
-                                     const std::string& challenge_token);
-  bool StoreGrant(const std::string& compact_jws);
-  bool HasActiveGrant(const char* purpose = nullptr);
-  bool ConsumeActiveGrant(const char* purpose);
-  bool CheckActiveGrant(const char* purpose, bool consume);
-  void IncrementAggregate(const std::string& type);
-  std::string AggregatesJson(const std::string& request_id,
+  bool LoadDeviceId(const std::string &device_id);
+  bool SetDeviceId(const std::string &device_id);
+  std::string GrantKeyEnrollmentJson(const std::string &request_id,
+                                     const std::string &device_id,
+                                     const std::string &challenge_token);
+  bool StoreGrant(const std::string &compact_jws);
+  bool HasActiveGrant(const char *purpose = nullptr);
+  bool ConsumeActiveGrant(const char *purpose);
+  bool CheckActiveGrant(const char *purpose, bool consume);
+  void IncrementAggregate(const std::string &type);
+  std::string AggregatesJson(const std::string &request_id,
                              bool completed_only);
-  void AcknowledgeAggregates(const std::string& command);
-  std::string BeginPhase4Latency(
-      std::chrono::steady_clock::time_point input_ready,
-      double pre_input_duration_ms,
-      double extraction_duration_ms,
-      double queue_duration_ms,
-      double classification_duration_ms,
-      const ClassificationDecision& decision);
-  void CompletePhase4Latency(const std::string& evidence_id);
-  std::optional<std::string> BeginIntervention(
-      std::chrono::steady_clock::time_point input_ready,
-      double pre_input_duration_ms,
-      double extraction_duration_ms,
-      double queue_duration_ms,
-      double classification_duration_ms,
-      const ClassificationDecision& decision);
-  bool AcknowledgeInterventionVisible(const std::string& intervention_id);
-  bool CompleteIntervention(const std::string& intervention_id);
-  bool RecordBlockAction(const std::string& intervention_id, bool succeeded);
+  void AcknowledgeAggregates(const std::string &command);
+  std::string
+  BeginPhase4Latency(std::chrono::steady_clock::time_point input_ready,
+                     double pre_input_duration_ms,
+                     double extraction_duration_ms, double queue_duration_ms,
+                     double classification_duration_ms,
+                     const ClassificationDecision &decision);
+  void CompletePhase4Latency(const std::string &evidence_id,
+                             const std::string &outcome, bool block_succeeded,
+                             double block_action_duration_ms = 0.0);
+  std::optional<std::string>
+  BeginIntervention(std::chrono::steady_clock::time_point input_ready,
+                    double pre_input_duration_ms, double extraction_duration_ms,
+                    double queue_duration_ms, double classification_duration_ms,
+                    const ClassificationDecision &decision);
+  bool AcknowledgeInterventionVisible(const std::string &intervention_id);
+  bool CompleteIntervention(const std::string &intervention_id);
+  bool RecordBlockAction(const std::string &intervention_id, bool succeeded,
+                         double duration_ms = 0.0);
 
   struct PendingPhase4Latency {
     std::chrono::steady_clock::time_point input_ready;
@@ -94,6 +92,10 @@ class ProtectionService {
     double extraction_duration_ms = 0;
     double queue_duration_ms = 0;
     double classification_duration_ms = 0;
+    double preprocessing_duration_ms = 0;
+    double rule_duration_ms = 0;
+    double inference_duration_ms = 0;
+    double decision_duration_ms = 0;
     std::string run_id;
     std::string device_alias;
     std::string scenario;
@@ -110,6 +112,8 @@ class ProtectionService {
     std::chrono::steady_clock::time_point deadline;
     bool visible = false;
     bool block_action_reported = false;
+    bool block_action_succeeded = false;
+    double block_action_duration_ms = 0.0;
   };
 
   SERVICE_STATUS_HANDLE status_handle_ = nullptr;
@@ -151,6 +155,6 @@ class ProtectionService {
   std::chrono::steady_clock::time_point active_grant_deadline_{};
 };
 
-}  // namespace gamblock
+} // namespace gamblock
 
-#endif  // GAMBLOCK_SERVICE_PROTECTION_SERVICE_H_
+#endif // GAMBLOCK_SERVICE_PROTECTION_SERVICE_H_

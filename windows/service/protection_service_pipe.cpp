@@ -1,7 +1,7 @@
 #include "protection_service.h"
 
-#include <atomic>
 #include <array>
+#include <atomic>
 #include <fstream>
 #include <sstream>
 
@@ -12,57 +12,57 @@ namespace {
 
 constexpr DWORD kPipeOperationPollMs = 200;
 
-bool WaitForPipeOperation(HANDLE pipe,
-                          OVERLAPPED* operation,
-                          const std::atomic<bool>& running,
-                          DWORD* transferred) {
+bool WaitForPipeOperation(HANDLE pipe, OVERLAPPED *operation,
+                          const std::atomic<bool> &running,
+                          DWORD *transferred) {
   while (running.load()) {
-    const DWORD wait = WaitForSingleObject(operation->hEvent,
-                                           kPipeOperationPollMs);
+    const DWORD wait =
+        WaitForSingleObject(operation->hEvent, kPipeOperationPollMs);
     if (wait == WAIT_OBJECT_0) {
       return GetOverlappedResult(pipe, operation, transferred, FALSE) != FALSE;
     }
-    if (wait != WAIT_TIMEOUT) break;
+    if (wait != WAIT_TIMEOUT)
+      break;
   }
   CancelIoEx(pipe, operation);
   GetOverlappedResult(pipe, operation, transferred, TRUE);
   return false;
 }
 
-bool ConnectPipe(HANDLE pipe, const std::atomic<bool>& running) {
+bool ConnectPipe(HANDLE pipe, const std::atomic<bool> &running) {
   HANDLE event = CreateEventW(nullptr, TRUE, FALSE, nullptr);
-  if (event == nullptr) return false;
+  if (event == nullptr)
+    return false;
   OVERLAPPED operation{};
   operation.hEvent = event;
   const BOOL connected = ConnectNamedPipe(pipe, &operation);
   const DWORD error = connected ? ERROR_SUCCESS : GetLastError();
   DWORD transferred = 0;
-  const bool complete = connected || error == ERROR_PIPE_CONNECTED ||
+  const bool complete =
+      connected || error == ERROR_PIPE_CONNECTED ||
       (error == ERROR_IO_PENDING &&
        WaitForPipeOperation(pipe, &operation, running, &transferred));
   CloseHandle(event);
   return complete && running.load();
 }
 
-bool ReadPipeMessage(HANDLE pipe,
-                     void* buffer,
-                     DWORD capacity,
-                     const std::atomic<bool>& running,
-                     DWORD* read) {
+bool ReadPipeMessage(HANDLE pipe, void *buffer, DWORD capacity,
+                     const std::atomic<bool> &running, DWORD *read) {
   HANDLE event = CreateEventW(nullptr, TRUE, FALSE, nullptr);
-  if (event == nullptr) return false;
+  if (event == nullptr)
+    return false;
   OVERLAPPED operation{};
   operation.hEvent = event;
   const BOOL completed = ReadFile(pipe, buffer, capacity, read, &operation);
   const DWORD error = completed ? ERROR_SUCCESS : GetLastError();
-  const bool success = completed ||
-      (error == ERROR_IO_PENDING &&
-       WaitForPipeOperation(pipe, &operation, running, read));
+  const bool success =
+      completed || (error == ERROR_IO_PENDING &&
+                    WaitForPipeOperation(pipe, &operation, running, read));
   CloseHandle(event);
   return success && running.load();
 }
 
-}  // namespace
+} // namespace
 
 void ProtectionService::PipeLoop() {
   while (running_) {
@@ -74,12 +74,13 @@ void ProtectionService::PipeLoop() {
       Sleep(2000);
       continue;
     }
-    HANDLE pipe = CreateNamedPipeW(
-        kPipeName, PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE |
-                       FILE_FLAG_OVERLAPPED,
-        PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT |
-            PIPE_REJECT_REMOTE_CLIENTS,
-        1, 65536, 65536, 1000, &attributes);
+    HANDLE pipe =
+        CreateNamedPipeW(kPipeName,
+                         PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE |
+                             FILE_FLAG_OVERLAPPED,
+                         PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT |
+                             PIPE_REJECT_REMOTE_CLIENTS,
+                         1, 65536, 65536, 1000, &attributes);
     LocalFree(descriptor);
     LocalFree(acl);
     if (pipe == INVALID_HANDLE_VALUE) {
@@ -93,7 +94,8 @@ void ProtectionService::PipeLoop() {
     if (!ConnectPipe(pipe, running_)) {
       {
         std::lock_guard lock(pipe_mutex_);
-        if (pipe_listener_ == pipe) pipe_listener_ = INVALID_HANDLE_VALUE;
+        if (pipe_listener_ == pipe)
+          pipe_listener_ = INVALID_HANDLE_VALUE;
       }
       CloseHandle(pipe);
       continue;
@@ -101,7 +103,8 @@ void ProtectionService::PipeLoop() {
     bool active = false;
     {
       std::lock_guard lock(pipe_mutex_);
-      if (pipe_listener_ == pipe) pipe_listener_ = INVALID_HANDLE_VALUE;
+      if (pipe_listener_ == pipe)
+        pipe_listener_ = INVALID_HANDLE_VALUE;
       if (running_ && pipe_session_id == interactive_session_id_.load()) {
         pipe_listener_ = INVALID_HANDLE_VALUE;
         pipe_client_ = pipe;
@@ -117,9 +120,11 @@ void ProtectionService::PipeLoop() {
     HandlePipeClient(pipe);
     {
       std::lock_guard lock(pipe_mutex_);
-      if (pipe_client_ == pipe) pipe_client_ = INVALID_HANDLE_VALUE;
+      if (pipe_client_ == pipe)
+        pipe_client_ = INVALID_HANDLE_VALUE;
     }
-    if (running_) FlushFileBuffers(pipe);
+    if (running_)
+      FlushFileBuffers(pipe);
     DisconnectNamedPipe(pipe);
     CloseHandle(pipe);
   }
@@ -132,45 +137,48 @@ void ProtectionService::HandlePipeClient(HANDLE pipe) {
     if (!ReadPipeMessage(pipe, buffer.data(),
                          static_cast<DWORD>(buffer.size() - 1), running_,
                          &read) ||
-        read == 0) break;
+        read == 0)
+      break;
     buffer[read] = '\0';
     HandlePipeCommand(std::string(buffer.data(), read));
   }
 }
 
-void ProtectionService::HandlePipeCommand(const std::string& command) {
+void ProtectionService::HandlePipeCommand(const std::string &command) {
   const std::string type = JsonString(command, "type").value_or("");
   const std::string request_id = RequestId(command);
   if (type == "intervention_committed") {
-    CompletePhase4Latency(
-        JsonString(command, "evidence_id").value_or(""));
+    CompletePhase4Latency(JsonString(command, "evidence_id").value_or(""),
+                          "visible", true);
     SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
                    EscapeJson(request_id) + "\",\"ok\":true}");
   } else if (type == "ack_intervention_visible") {
     const bool acknowledged = AcknowledgeInterventionVisible(
         JsonString(command, "intervention_id").value_or(""));
     SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
-                   EscapeJson(request_id) + "\",\"ok\":" +
-                   (acknowledged ? "true" : "false") + "}");
+                   EscapeJson(request_id) +
+                   "\",\"ok\":" + (acknowledged ? "true" : "false") + "}");
   } else if (type == "complete_intervention") {
     const bool completed = CompleteIntervention(
         JsonString(command, "intervention_id").value_or(""));
     SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
-                   EscapeJson(request_id) + "\",\"ok\":" +
-                   (completed ? "true" : "false") + "}");
+                   EscapeJson(request_id) +
+                   "\",\"ok\":" + (completed ? "true" : "false") + "}");
   } else if (type == "block_action_result") {
-    const bool recorded = RecordBlockAction(
-        JsonString(command, "intervention_id").value_or(""),
-        JsonBool(command, "succeeded").value_or(false));
+    const bool recorded =
+        RecordBlockAction(JsonString(command, "intervention_id").value_or(""),
+                          JsonBool(command, "succeeded").value_or(false),
+                          JsonNumber(command, "duration_ms").value_or(0.0));
     SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
-                   EscapeJson(request_id) + "\",\"ok\":" +
-                   (recorded ? "true" : "false") + "}");
-    if (recorded) SendAgentEvent(SnapshotJson(""));
+                   EscapeJson(request_id) +
+                   "\",\"ok\":" + (recorded ? "true" : "false") + "}");
+    if (recorded)
+      SendAgentEvent(SnapshotJson(""));
   } else if (type == "begin_approved_removal") {
     const bool launched = BeginApprovedRemoval();
     SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
-                   EscapeJson(request_id) + "\",\"ok\":" +
-                   (launched ? "true" : "false") + "}");
+                   EscapeJson(request_id) +
+                   "\",\"ok\":" + (launched ? "true" : "false") + "}");
   } else if (type == "snapshot") {
     SendAgentEvent(SnapshotJson(request_id));
   } else if (type == "self_test") {
@@ -178,11 +186,13 @@ void ProtectionService::HandlePipeCommand(const std::string& command) {
     ClassificationDecision negative;
     {
       std::lock_guard lock(state_mutex_);
-      positive = classifier_.Classify({
-          "https://contoh-judi.invalid/slot-gacor", "", {}, {}});
+      positive = classifier_.Classify(
+          {"https://contoh-judi.invalid/slot-gacor", "", {}, {}});
       negative = classifier_.Classify({
-          "https://kampus.ac.id/penelitian", "Portal penelitian universitas",
-          {"Pendidikan dan beasiswa"}, {"Jurnal research"},
+          "https://kampus.ac.id/penelitian",
+          "Portal penelitian universitas",
+          {"Pendidikan dan beasiswa"},
+          {"Jurnal research"},
       });
     }
     std::ostringstream response;
@@ -192,8 +202,7 @@ void ProtectionService::HandlePipeCommand(const std::string& command) {
              << ",\"reason_code\":\""
              << (positive.block && !negative.block ? "fixtures_passed"
                                                    : "fixture_mismatch")
-             << "\",\"model_version\":\""
-             << EscapeJson(positive.model_version)
+             << "\",\"model_version\":\"" << EscapeJson(positive.model_version)
              << "\",\"ruleset_version\":\""
              << EscapeJson(positive.ruleset_version) << "\"}";
     SendAgentEvent(response.str());
@@ -206,18 +215,18 @@ void ProtectionService::HandlePipeCommand(const std::string& command) {
     const bool stored =
         SetDeviceId(JsonString(command, "device_id").value_or(""));
     SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
-                   EscapeJson(request_id) + "\",\"ok\":" +
-                   (stored ? "true" : "false") + "}");
+                   EscapeJson(request_id) +
+                   "\",\"ok\":" + (stored ? "true" : "false") + "}");
   } else if (type == "get_grant_key_enrollment") {
     SendAgentEvent(GrantKeyEnrollmentJson(
         request_id, JsonString(command, "device_id").value_or(""),
         JsonString(command, "challenge_token").value_or("")));
   } else if (type == "store_grant") {
-    const bool stored = StoreGrant(
-        JsonString(command, "grant_token").value_or(""));
+    const bool stored =
+        StoreGrant(JsonString(command, "grant_token").value_or(""));
     SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
-                   EscapeJson(request_id) + "\",\"ok\":" +
-                   (stored ? "true" : "false") + "}");
+                   EscapeJson(request_id) +
+                   "\",\"ok\":" + (stored ? "true" : "false") + "}");
   } else if (type == "current_aggregates") {
     SendAgentEvent(AggregatesJson(request_id, false));
   } else if (type == "drain_aggregates") {
@@ -229,4 +238,4 @@ void ProtectionService::HandlePipeCommand(const std::string& command) {
   }
 }
 
-}  // namespace gamblock
+} // namespace gamblock

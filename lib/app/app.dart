@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/theme/app_theme.dart';
 import '../core/auth/auth_state.dart';
+import '../core/device/aggregate_sync.dart';
 import '../core/notifications/daily_reminder_service.dart';
 import '../core/platform/platform_bridge.dart';
 import '../core/settings/app_settings.dart';
@@ -35,6 +36,7 @@ class _GamblockAppState extends ConsumerState<GamblockApp>
       final router = ref.read(routerProvider);
       if (event.type == 'intervention_required' ||
           event.type == 'intervention_shown') {
+        unawaited(_flushCurrentAggregate());
         final nativeId =
             event.payload['intervention_id']?.toString().trim() ?? '';
         final interventionId = nativeId.isNotEmpty
@@ -64,6 +66,12 @@ class _GamblockAppState extends ConsumerState<GamblockApp>
         }
       }
     });
+  }
+
+  Future<void> _flushCurrentAggregate() async {
+    final auth = ref.read(authProvider);
+    if (!auth.isAuthenticated) return;
+    await AggregateSync.flushCurrentDay(auth.deviceId);
   }
 
   void _resumePendingApproval(AuthState auth) {
@@ -122,6 +130,7 @@ class _GamblockAppState extends ConsumerState<GamblockApp>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       PlatformBridge.ensureBackgroundProtection().catchError((_) => false);
+      unawaited(_flushCurrentAggregate());
       if (ref.read(authProvider).isAuthenticated) {
         ref.read(authProvider.notifier).refreshProfile().catchError((_) {});
       }

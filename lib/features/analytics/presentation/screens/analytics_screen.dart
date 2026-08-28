@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -27,7 +29,8 @@ class AnalyticsScreen extends ConsumerStatefulWidget {
   ConsumerState<AnalyticsScreen> createState() => _AnalyticsScreenState();
 }
 
-class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
+class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen>
+    with WidgetsBindingObserver {
   int _days = 7;
   bool _loading = false;
   ProtectionAnalytics? _analytics;
@@ -36,6 +39,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     Future<void>.microtask(_load);
   }
 
@@ -47,6 +51,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       _error = null;
     });
     try {
+      await AggregateSync.flushCurrentDay(auth.deviceId);
       await AggregateSync.flushCompletedDays(auth.deviceId);
       final analytics = await ref
           .read(analyticsRepositoryProvider)
@@ -57,6 +62,19 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && mounted) {
+      unawaited(_load());
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override

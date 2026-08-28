@@ -64,9 +64,6 @@ class PatternInterruptOverlay(
             setBackgroundColor(Color.rgb(11, 19, 43))
         }
 
-        // Background Video Layer
-        setupVideoBackground(rootLayout)
-
         // Gradient Scrim Layer: Dark at top & bottom for legibility, translucent in center
         val scrim = View(service).apply {
             background = GradientDrawable(
@@ -349,6 +346,9 @@ class PatternInterruptOverlay(
                                 rootLayout.viewTreeObserver.removeOnDrawListener(this)
                             }
                             callback()
+                            // Video initialization is intentionally deferred:
+                            // the opaque first frame is the latency boundary.
+                            setupVideoBackground(rootLayout)
                         }
                     }
                 },
@@ -463,6 +463,7 @@ class PatternInterruptOverlay(
             textureView = tv
             rootLayout.addView(
                 tv,
+                0,
                 FrameLayout.LayoutParams(
                     FrameLayout.LayoutParams.MATCH_PARENT,
                     FrameLayout.LayoutParams.MATCH_PARENT,

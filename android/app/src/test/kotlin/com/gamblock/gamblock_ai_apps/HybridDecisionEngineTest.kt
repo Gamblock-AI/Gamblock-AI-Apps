@@ -45,6 +45,10 @@ class HybridDecisionEngineTest {
         )
         assertEquals("block", result.decision)
         assertEquals("hybrid_keyword_match", result.reasonCode)
+        assertTrue(result.timings.preprocessingNanos >= 0)
+        assertTrue(result.timings.ruleNanos >= 0)
+        assertTrue(result.timings.inferenceNanos >= 0)
+        assertTrue(result.timings.decisionNanos >= 0)
     }
 
     @Test
