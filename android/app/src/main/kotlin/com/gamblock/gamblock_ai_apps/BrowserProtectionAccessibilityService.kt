@@ -142,6 +142,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         aggregateStore = DailyAggregateStore(applicationContext)
         stateStore = ProtectionStateStore(applicationContext)
         overlay = PatternInterruptOverlay(this, NativeConfig.webBaseUrl(this))
+        runCatching { overlay.prepare() }
         runCatching { phase4Evidence = Phase4EvidenceRecorder(applicationContext) }
         activeService = WeakReference(this)
         runCatching { HealthNotificationPreferences.show(this) }
@@ -243,7 +244,10 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                             rulesetVersion = result.rulesetVersion,
                         ),
                     )
-                    mainHandler.post {
+                    // Prioritize the accepted block and native overlay over
+                    // follow-up browser accessibility scans. Those scans are
+                    // best-effort and must not delay the protection boundary.
+                    mainHandler.postAtFrontOfQueue {
                         executeBlockAndIntervention(acquisition.intervention)
                     }
                 } else {
@@ -485,12 +489,12 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         try {
             overlay.showIntervention(
                 interventionId = interventionId,
-                onCommitted = {
+                onCommitted = { firstFrameNanos ->
                     if (stateStore.markNativeVisible(interventionId)) {
                         aggregateStore.increment("intervention_shown")
                         phase4Evidence?.complete(
                             interventionId,
-                            SystemClock.elapsedRealtimeNanos(),
+                            firstFrameNanos,
                             "native",
                         )
                     }
@@ -546,7 +550,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         onProtectionServiceDestroyed()
         pendingScan?.let(mainHandler::removeCallbacks)
         mainHandler.removeCallbacksAndMessages(null)
-        overlay.dismiss()
+        overlay.destroy()
         if (activeService?.get() === this) {
             activeService?.clear()
             activeService = null

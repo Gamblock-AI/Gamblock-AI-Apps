@@ -17,6 +17,7 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.provider.Settings
 import android.util.TypedValue
 import android.view.Gravity
@@ -39,7 +40,8 @@ class PatternInterruptOverlay(
 ) {
     private val windowManager = service.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val handler = Handler(Looper.getMainLooper())
-    private var root: View? = null
+    private var root: FrameLayout? = null
+    private var prepared = false
     private var animator: ValueAnimator? = null
     private var activeInterventionId: String? = null
     private var completion: (() -> Unit)? = null
@@ -47,20 +49,53 @@ class PatternInterruptOverlay(
     private var videoSurface: Surface? = null
     private var textureView: TextureView? = null
 
+    private data class ForegroundContent(
+        val view: LinearLayout,
+        val breathing: View,
+        val title: TextView,
+        val body: TextView,
+        val countdownBadge: TextView,
+        val continueButton: Button,
+        val groundingButton: Button,
+        val laterButton: TextView,
+        val buttonBackground: (Boolean, Boolean) -> GradientDrawable,
+    )
+
+    /**
+     * Allocate the accessibility window while the service is idle. Android can
+     * then reuse the surface for a block instead of creating a new overlay in
+     * the latency-critical path.
+     */
+    fun prepare() {
+        if (root != null) return
+        val preparedRoot = FrameLayout(service).apply {
+            setBackgroundColor(Color.TRANSPARENT)
+            visibility = View.INVISIBLE
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+        val params = windowParams(idle = true)
+        runCatching {
+            windowManager.addView(preparedRoot, params)
+            root = preparedRoot
+            prepared = true
+        }
+    }
+
     fun showIntervention(
         interventionId: String,
-        onCommitted: (() -> Unit)? = null,
+        onCommitted: ((Long) -> Unit)? = null,
         onCompleted: (() -> Unit)? = null,
     ) {
-        if (root != null && activeInterventionId == interventionId) return
-        if (root != null) dismiss()
+        if (activeInterventionId == interventionId) return
+        if (activeInterventionId != null) dismiss()
         activeInterventionId = interventionId
         completion = onCompleted
         val locale = if (Locale.getDefault().language == "en") "en" else "id"
         val isEnglish = locale == "en"
 
         // Root container covering full screen
-        val rootLayout = FrameLayout(service).apply {
+        val rootLayout = (root ?: FrameLayout(service)).apply {
+            removeAllViews()
             setBackgroundColor(Color.rgb(11, 19, 43))
         }
 
@@ -84,6 +119,9 @@ class PatternInterruptOverlay(
             ),
         )
 
+        // Foreground UI is lazy so the first native frame does not pay for
+        // constructing controls that are not needed to establish visibility.
+        val foregroundContent by lazy {
         // Foreground UI: Floating Header at Top, Empty Center Viewport, Action Dock at Bottom
         val foreground = LinearLayout(service).apply {
             orientation = LinearLayout.VERTICAL
@@ -325,14 +363,49 @@ class PatternInterruptOverlay(
             ),
         )
 
-        rootLayout.addView(
-            foreground,
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT,
-            ),
+        ForegroundContent(
+            view = foreground,
+            breathing = breathing,
+            title = title,
+            body = body,
+            countdownBadge = countdownBadge,
+            continueButton = continueButton,
+            groundingButton = groundingButton,
+            laterButton = laterButton,
+            buttonBackground = ::buttonBackground,
+        )
+        }
+
+        val foregroundParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT,
         )
 
+        // Keep the first committed frame intentionally small. The protection
+        // boundary only needs an opaque, recognisable pause shell; the full
+        // action dock and its controls can be attached immediately after that
+        // frame is drawn without delaying native visibility acknowledgement.
+        val firstFrameShell = text(
+            if (isEnglish) "Take a pause" else "Ambil jeda",
+            21f,
+            Color.WHITE,
+            isBold = true,
+        ).apply {
+            setPadding(dp(24), dp(24), dp(24), dp(24))
+            setShadowLayer(10f, 0f, 2f, Color.argb(200, 0, 0, 0))
+        }
+        val firstFrameParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            Gravity.CENTER,
+        )
+        if (onCommitted == null) {
+            rootLayout.addView(foregroundContent.view, foregroundParams)
+        } else {
+            rootLayout.addView(firstFrameShell, firstFrameParams)
+        }
+
+        var runCountdownAfterCommit: (() -> Unit)? = null
         onCommitted?.let { callback ->
             rootLayout.viewTreeObserver.addOnDrawListener(
                 object : ViewTreeObserver.OnDrawListener {
@@ -341,14 +414,26 @@ class PatternInterruptOverlay(
                     override fun onDraw() {
                         if (delivered) return
                         delivered = true
+                        // Capture the first frame boundary before dispatching
+                        // state and file I/O back through the UI queue.
+                        val firstFrameNanos = SystemClock.elapsedRealtimeNanos()
                         rootLayout.post {
                             if (rootLayout.viewTreeObserver.isAlive) {
                                 rootLayout.viewTreeObserver.removeOnDrawListener(this)
                             }
-                            callback()
+                            if (root !== rootLayout) return@post
+                            // A small opaque shell has already been drawn. Record
+                            // that boundary before constructing the full UI.
+                            callback(firstFrameNanos)
+                            if (root !== rootLayout) return@post
+                            rootLayout.removeView(firstFrameShell)
+                            val content = foregroundContent
+                            rootLayout.addView(content.view, foregroundParams)
+                            startBreathingAnimation(content.breathing)
                             // Video initialization is intentionally deferred:
                             // the opaque first frame is the latency boundary.
                             setupVideoBackground(rootLayout)
+                            runCountdownAfterCommit?.invoke()
                         }
                     }
                 },
@@ -357,51 +442,58 @@ class PatternInterruptOverlay(
 
         attach(rootLayout)
 
-        if (!reducedMotion()) {
-            animator = ValueAnimator.ofFloat(0.88f, 1.06f).apply {
-                duration = 4000
-                repeatMode = ValueAnimator.REVERSE
-                repeatCount = ValueAnimator.INFINITE
-                interpolator = AccelerateDecelerateInterpolator()
-                addUpdateListener {
-                    val scale = it.animatedValue as Float
-                    breathing.scaleX = scale
-                    breathing.scaleY = scale
-                }
-                start()
-            }
+        if (onCommitted == null) {
+            startBreathingAnimation(foregroundContent.breathing)
         }
 
         var remaining = 7
         fun tick() {
             if (root == null) return
+            val content = foregroundContent
             if (remaining > 0) {
-                countdownBadge.text = if (isEnglish) "Wait $remaining seconds" else "Tunggu $remaining detik"
+                content.countdownBadge.text = if (isEnglish) "Wait $remaining seconds" else "Tunggu $remaining detik"
             } else {
-                countdownBadge.text = if (isEnglish) "Choose your next step" else "Pilih langkah berikutnya"
-                countdownBadge.setTextColor(Color.rgb(167, 243, 208))
-                countdownBadge.background = GradientDrawable().apply {
+                content.countdownBadge.text = if (isEnglish) "Choose your next step" else "Pilih langkah berikutnya"
+                content.countdownBadge.setTextColor(Color.rgb(167, 243, 208))
+                content.countdownBadge.background = GradientDrawable().apply {
                     setColor(Color.argb(70, 16, 185, 129))
                     cornerRadius = dp(999).toFloat()
                     setStroke(dp(1), Color.argb(130, 52, 211, 153))
                 }
 
-                continueButton.isEnabled = true
-                continueButton.background = buttonBackground(enabled = true, isPrimary = true)
-                continueButton.setTextColor(Color.WHITE)
+                content.continueButton.isEnabled = true
+                content.continueButton.background = content.buttonBackground(true, true)
+                content.continueButton.setTextColor(Color.WHITE)
 
-                groundingButton.isEnabled = true
-                groundingButton.background = buttonBackground(enabled = true, isPrimary = false)
-                groundingButton.setTextColor(Color.WHITE)
+                content.groundingButton.isEnabled = true
+                content.groundingButton.background = content.buttonBackground(true, false)
+                content.groundingButton.setTextColor(Color.WHITE)
 
-                laterButton.isEnabled = true
-                laterButton.animate().alpha(1.0f).setDuration(250).start()
+                content.laterButton.isEnabled = true
+                content.laterButton.animate().alpha(1.0f).setDuration(250).start()
                 return
             }
             remaining--
             handler.postDelayed(::tick, 1000)
         }
-        tick()
+        runCountdownAfterCommit = { tick() }
+        if (onCommitted == null) tick()
+    }
+
+    private fun startBreathingAnimation(breathing: View) {
+        if (reducedMotion()) return
+        animator = ValueAnimator.ofFloat(0.88f, 1.06f).apply {
+            duration = 4000
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = AccelerateDecelerateInterpolator()
+            addUpdateListener {
+                val scale = it.animatedValue as Float
+                breathing.scaleX = scale
+                breathing.scaleY = scale
+            }
+            start()
+        }
     }
 
     private fun setupVideoBackground(rootLayout: FrameLayout) {
@@ -525,14 +617,32 @@ class PatternInterruptOverlay(
         videoSurface = null
         textureView = null
         root?.let {
-            try {
-                windowManager.removeView(it)
-            } catch (_: Exception) {
+            if (prepared) {
+                it.removeAllViews()
+                it.setBackgroundColor(Color.TRANSPARENT)
+                it.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+                it.visibility = View.INVISIBLE
+                updateWindow(it, idle = true)
+            } else {
+                try {
+                    windowManager.removeView(it)
+                } catch (_: Exception) {
+                }
+                root = null
             }
         }
-        root = null
         activeInterventionId = null
         completion = null
+    }
+
+    /** Release the pre-warmed window when the Accessibility service is destroyed. */
+    fun destroy() {
+        dismiss()
+        root?.let {
+            runCatching { windowManager.removeView(it) }
+        }
+        root = null
+        prepared = false
     }
 
     fun dismissIntervention(interventionId: String) {
@@ -545,18 +655,38 @@ class PatternInterruptOverlay(
         callback?.invoke()
     }
 
-    private fun attach(view: View) {
-        windowManager.addView(
-            view,
-            WindowManager.LayoutParams(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
-                PixelFormat.TRANSLUCENT,
-            ),
-        )
+    private fun attach(view: FrameLayout) {
+        if (prepared && root === view) {
+            view.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+            view.visibility = View.VISIBLE
+            updateWindow(view, idle = false)
+            return
+        }
+        val params = windowParams(idle = false)
+        windowManager.addView(view, params)
         root = view
+    }
+
+    private fun updateWindow(view: View, idle: Boolean) {
+        val params = windowParams(idle)
+        runCatching { windowManager.updateViewLayout(view, params) }
+    }
+
+    private fun windowParams(idle: Boolean): WindowManager.LayoutParams {
+        val flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+            if (idle) {
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+            } else {
+                0
+            }
+        return WindowManager.LayoutParams(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+            flags,
+            PixelFormat.TRANSLUCENT,
+        )
     }
 
     private fun text(value: String, size: Float, color: Int, isBold: Boolean = false): TextView {
