@@ -48,7 +48,14 @@ class AppShell extends ConsumerWidget {
         '/settings',
       ),
     ];
-    final selectedIndex = _index(location);
+    final miniGamesDestination = _Destination(
+      Icons.sports_esports_outlined,
+      Icons.sports_esports_rounded,
+      l10n.miniGamesTitle,
+      '/mini-games',
+    );
+    final railDestinations = [...destinations, miniGamesDestination];
+    final selectedIndex = _index(location, miniGamesIndex: destinations.length);
     Future<void> navigateTo(String path) async {
       if (location == path) return;
       Haptics.selection();
@@ -85,7 +92,9 @@ class AppShell extends ConsumerWidget {
                         NavigationRail(
                           backgroundColor: Colors.white.withValues(alpha: 0.74),
                           selectedIndex: selectedIndex,
-                          onDestinationSelected: select,
+                          onDestinationSelected: (index) {
+                            unawaited(navigateTo(railDestinations[index].path));
+                          },
                           labelType: constraints.maxWidth >= 1000
                               ? NavigationRailLabelType.none
                               : NavigationRailLabelType.all,
@@ -101,7 +110,9 @@ class AppShell extends ConsumerWidget {
                                     children: [
                                       Image.asset(
                                         'assets/images/gamblock-1.png',
-                                        key: const ValueKey('sidebar-brand-logo'),
+                                        key: const ValueKey(
+                                          'sidebar-brand-logo',
+                                        ),
                                         width: 32,
                                         height: 32,
                                         fit: BoxFit.contain,
@@ -128,7 +139,7 @@ class AppShell extends ConsumerWidget {
                                   ),
                           ),
                           destinations: [
-                            for (final destination in destinations)
+                            for (final destination in railDestinations)
                               NavigationRailDestination(
                                 icon: Icon(destination.icon),
                                 selectedIcon: Icon(destination.selectedIcon),
@@ -146,9 +157,7 @@ class AppShell extends ConsumerWidget {
                   ),
                 ),
               ),
-              Positioned.fill(
-                child: DashboardTourHost(currentPath: location),
-              ),
+              Positioned.fill(child: DashboardTourHost(currentPath: location)),
             ],
           );
         }
@@ -169,17 +178,15 @@ class AppShell extends ConsumerWidget {
                 ),
               ),
             ),
-            Positioned.fill(
-              child: DashboardTourHost(currentPath: location),
-            ),
+            Positioned.fill(child: DashboardTourHost(currentPath: location)),
           ],
         );
       },
     );
   }
 
-  int? _index(String path) {
-    if (path.startsWith('/mini-games')) return null;
+  int? _index(String path, {required int miniGamesIndex}) {
+    if (path.startsWith('/mini-games')) return miniGamesIndex;
     if (path.startsWith('/analytics')) return 1;
     if (path.startsWith('/accountability')) return 2;
     if (path.startsWith('/settings')) return 3;
