@@ -24,6 +24,8 @@ jobs:
     environment: pilot-signing
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: "v${{ github.event.inputs.version }}"
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
@@ -97,6 +99,8 @@ jobs:
     environment: pilot-signing
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: "v${{ github.event.inputs.version }}"
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
@@ -229,6 +233,11 @@ jobs:
   publish:
     needs: [android, windows]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: unified-flutter-release-v${{ github.event.inputs.version }}
+      cancel-in-progress: false
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -237,10 +246,12 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Research Staging v${{ github.event.inputs.version }}"
-          tag_name: "research-staging-v${{ github.event.inputs.version }}"
+          name: "Gamblock-AI Apps v${{ github.event.inputs.version }}"
+          tag_name: "v${{ github.event.inputs.version }}"
           body: |
-            Research staging artifacts pointing at the staging backend
+            Complete release candidate bundle containing both **Production** and **Staging** builds for Android and Windows.
+
+            Staging artifacts in this release point at the staging backend
             (`api-staging.gamblock-ai.com`). Test data lands in the
             `gamblock_staging` database and never mixes with production.
 
@@ -249,3 +260,5 @@ jobs:
             - Verified: CI build only; no real-device evidence claimed
           files: |
             staging-artifacts/**/*
+          fail_on_unmatched_files: true
+          make_latest: true

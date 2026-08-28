@@ -74,39 +74,28 @@ flowchart TD
    ```
 
 ### Langkah 4: Pemantauan Build CI/CD
-1. Pantau status kedua workflow menggunakan timer `schedule`:
+1. Pantau status kedua workflow menggunakan GitHub CLI:
    ```bash
    gh run list --limit 5
    ```
 2. Pastikan kedua workflow selesai dengan status sukses (`✓` / conclusion `success`).
-   - Jika terjadi kegagalan (misalnya error kompilasi/test), segera perbaiki, verifikasi ulang, perbarui commit, perbarui tag (`git tag -f`), dan force push tag (`git push origin v<VERSION> --force`).
+   - `release.yml` memvalidasi dan mengunggah asset production ke `v<VERSION>`.
+   - `staging-release.yml` memvalidasi dan mengunggah asset staging ke release `v<VERSION>` yang sama.
+   - Kedua publish job menggunakan concurrency key yang sama agar upload tidak saling menimpa.
+   - Jika terjadi kegagalan (misalnya error kompilasi/test), perbaiki pada commit baru, buat tag semver baru, dan jalankan ulang kedua workflow. Jangan memindahkan tag immutable yang sudah dipublikasikan.
 
-### Langkah 5: Konsolidasi Asset ke Satu GitHub Release Tunggal
-1. Unduh artifact hasil build Production:
+### Langkah 5: Verifikasi Satu GitHub Release Tunggal
+1. Setelah kedua workflow sukses, verifikasi seluruh asset pada tag yang sama:
    ```bash
-   # Dapatkan run ID dari workflow release.yml
-   gh run download <PROD_RUN_ID> --dir /tmp/release_prod_<VERSION>
+   gh release view v<VERSION> --json tagName,assets,isDraft,isPrerelease
    ```
-2. Unduh artifact hasil build Staging:
-   ```bash
-   # Dapatkan run ID dari workflow staging-release.yml
-   gh run download <STAGING_RUN_ID> --dir /tmp/release_staging_<VERSION>
-   ```
-3. Jika workflow staging secara otomatis membuat release terpisah (`research-staging-v<VERSION>`), hapus release dan tag terpisah tersebut agar tidak terjadi duplikasi:
-   ```bash
-   gh release delete research-staging-v<VERSION> --yes || true
-   git push origin :refs/tags/research-staging-v<VERSION> || true
-   ```
-4. Buat / perbarui rilis tunggal resmi pada tag `v<VERSION>`:
-   ```bash
-   gh release create v<VERSION> \
-     /tmp/release_prod_<VERSION>/*/* \
-     /tmp/release_staging_<VERSION>/*/* \
-     --title "Gamblock-AI Apps v<VERSION>" \
-     --notes-file /tmp/release_notes_<VERSION>.md
-   ```
-   *(Atau gunakan `gh release upload v<VERSION> ... --clobber` jika rilis sudah ada).*
-5. Bersihkan direktori temporary `/tmp`.
+2. Pastikan release `v<VERSION>` memuat lima binary utama dan tiga manifest:
+   - production Play AAB, Research APK, dan Windows MSI;
+   - staging Research APK dan Windows MSI;
+   - `android-SHA256SUMS.txt`, `windows-SHA256SUMS.txt`, dan
+     `android-research-permissions.txt`.
+3. Tidak ada workflow yang membuat `research-staging-v<VERSION>` atau asset
+   `latest` terpisah.
 
 ### Langkah 6: Sinkronisasi Umbrella Repository
 1. Masuk ke root direktori umbrella repository `gamblock-ai`:

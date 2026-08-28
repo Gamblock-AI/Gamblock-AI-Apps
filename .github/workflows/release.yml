@@ -286,3 +286,48 @@ jobs:
             GamblockAI-Pilot-*.msi
             windows-SHA256SUMS.txt
           retention-days: 30
+
+  publish:
+    needs: [verify, android, windows_pilot]
+    if: ${{ needs.android.result == 'success' && needs.windows_pilot.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: unified-flutter-release-v${{ needs.verify.outputs.version }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: signed-*
+          path: release-artifacts
+          merge-multiple: true
+      - name: Validate production release artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          play=(release-artifacts/gamblock-ai-play-*.aab)
+          research=(release-artifacts/gamblock-ai-research-*.apk)
+          pilot=(release-artifacts/GamblockAI-Pilot-*.msi)
+          [[ ${#play[@]} -eq 1 ]]
+          [[ ${#research[@]} -eq 1 ]]
+          [[ ${#pilot[@]} -eq 1 ]]
+          test -f release-artifacts/android-SHA256SUMS.txt
+          test -f release-artifacts/android-research-permissions.txt
+          test -f release-artifacts/windows-SHA256SUMS.txt
+      - name: Publish production artifacts to unified release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Gamblock-AI Apps v${{ needs.verify.outputs.version }}"
+          tag_name: "v${{ needs.verify.outputs.version }}"
+          body: |
+            Complete release candidate bundle containing both **Production** and **Staging** builds for Android and Windows.
+
+            Production artifacts in this release are connected to `api.gamblock-ai.com`.
+            Staging artifacts are added by the separate staging workflow and are connected to `api-staging.gamblock-ai.com`.
+
+            CI verifies compilation, signing, packaging, and checksums. Play submission, pilot handoff, and device/VM evidence remain separate approval gates.
+          files: release-artifacts/*
+          fail_on_unmatched_files: true
+          make_latest: true

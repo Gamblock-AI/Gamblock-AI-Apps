@@ -18,8 +18,8 @@ capability and signing boundaries. Pull requests and `main` build diagnostic
 artifacts without production keys; those artifacts remain short-retention CI
 outputs and are not user-facing releases. A Research staging APK and a Windows
 staging pilot MSI are also built against `api-staging.gamblock-ai.com` so test
-data never mixes with the production backend, and are published on demand as a
-"Research Staging" GitHub Release for QA. Both staging builds require the same
+data never mixes with the production backend, and are attached on demand to the
+same versioned GitHub Release for QA. Both staging builds require the same
 non-empty public protection-grant trust store, so partner-approved removal can
 be exercised without copying a private signing key into the client. Signed
 Play/Research/Windows candidates are built only from immutable version tags (or a manual
@@ -289,8 +289,9 @@ checks. The portable Windows Hybrid-v2 fixture can also be compiled directly
 from `windows/protection/hybrid_classifier_test.cpp`.
 
 CI uploads only clearly labelled, short-retention debug artifacts; it does not
-create a public `latest` release. Tag-triggered signed candidates are gated by
-protected environments and are retained as workflow artifacts only. The
+create a public `latest` artifact. Tag-triggered signed candidates are gated by
+protected environments and are published only to the matching versioned GitHub
+Release after all required variants succeed. The
 artifact matrix, signing inputs, Play submission checklist, Research APK
 pilot, and Windows MSI pilot are documented in
 [`docs/release/README.md`](docs/release/README.md). No debug or unsigned file

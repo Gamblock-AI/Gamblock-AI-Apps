@@ -12,12 +12,13 @@ real-device correctness.
 | Play AAB | `com.gamblock.gamblock_ai_apps` / Gamblock-AI | Public Android | Chrome/Edge Accessibility sensing, local classification/block/Pattern Interrupt; no Settings or uninstall interception |
 | Research APK | `com.gamblock.gamblock_ai_apps.research` / Gamblock-AI Research | Approved PKM cohort | Chrome/Edge plus documented non-standard browsers, action-aware best-effort removal friction, and partner-approved normal Android removal handoff |
 | Pilot MSI | Gamblock-AI Pilot | Approved Windows cohort | Per-machine LocalSystem service, in-app partner-approved MSI removal, and direct elevated administrator break-glass |
-| Research staging APK + MSI | Research flavor + Gamblock-AI Pilot identity, staging backend | QA/test | Grant-capable Research/pilot behavior pointed at `api-staging.gamblock-ai.com`; published from the manual `staging-release.yml` lane after public trust-store validation |
+| Research staging APK + MSI | Research flavor + Gamblock-AI Pilot identity, staging backend | QA/test | Grant-capable Research/pilot behavior pointed at `api-staging.gamblock-ai.com`; attached to the matching unified versioned release by the manual `staging-release.yml` lane after public trust-store validation |
 
 Debug APKs, Windows ZIPs, and the diagnostic unsigned MSI are CI diagnostics
-only. The Research staging release is a separate QA lane: its APK is debug
-signed and its MSI uses the owner self-signed Authenticode PFX, so it must be
-labelled staging-backed and not be presented as signed or production-ready.
+only. The Research staging artifacts are a separate QA lane within the same
+versioned GitHub Release: its APK is debug signed and its MSI uses the owner
+self-signed Authenticode PFX, so both must be labelled staging-backed and not be
+presented as signed or production-ready.
 
 ## Signing boundaries
 
@@ -86,13 +87,16 @@ The manual Research Staging workflow uses `STAGING_API_BASE_URL`,
 `PROTECTION_GRANT_TRUST_STORE_BASE64` for both platform jobs. Its Android and
 Windows jobs use the persistent Research signing keystore and self-signed PFX
 from `pilot-signing`. Missing or malformed trust configuration aborts the
-workflow; do not substitute an empty map for QA.
+workflow; do not substitute an empty map for QA. Its publish job attaches the
+staging artifacts to the matching `v<VERSION>` release and never creates a
+`research-staging-v<VERSION>` release.
 
 Adding or rotating these values requires explicit owner authorization. The
 diagnostic workflow never consumes these private inputs and creates only
 short-retention Actions artifacts. The signed workflow creates retained,
-versioned candidate artifacts; it does not publish to Google Play, create a
-public Windows download, or mutate a `latest` tag.
+versioned candidate artifacts and publishes them to the matching GitHub
+Release; it does not publish to Google Play or create a public Windows download
+outside that release.
 
 ## Local key preparation and GitHub CLI upload
 
