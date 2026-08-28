@@ -1,5 +1,9 @@
 package com.gamblock.gamblock_ai_apps
 
+import android.app.admin.DevicePolicyManager
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.os.SystemClock
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
@@ -30,6 +34,7 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
             "com.UCMobile.intl",
         )
         private const val LAUNCHER_ARM_TTL_MS = 5_000L
+        private const val DEVICE_ADMIN_PROMPT_COOLDOWN_MS = 10_000L
     }
 
     private val resolvedTamperPackages: ResolvedTamperPackages by lazy {
@@ -43,9 +48,15 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
 
     private lateinit var tamperOverlay: TamperWarningOverlay
     private var launcherArmedUntilElapsedMs = 0L
+    private var lastDeviceAdminPromptAtElapsedMs = 0L
 
     override fun onProtectionServiceConnected() {
         tamperOverlay = TamperWarningOverlay(this)
+        if (!isDeviceAdminActiveForResearch()) {
+            stateStore.setStatus("degraded", "device_admin_inactive")
+            requestDeviceAdminActivationIfNeeded()
+            ProtectionBridge.emit(this, snapshotMap())
+        }
     }
 
     override fun onProtectionServiceDestroyed() {
@@ -106,19 +117,61 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
             aggregateStore.increment("tamper_detected")
         }
         var surfaceCleared = safelyLeaveTamperSurface()
-        tamperOverlay.show(
-            tamperAction = action.wireValue,
-            onSafeDismiss = {
-                if (!surfaceCleared) {
-                    surfaceCleared = safelyLeaveTamperSurface()
-                }
-            },
-        )
+        // Xiaomi/Redmi can terminate the protection process immediately after
+        // confirming force-stop. Re-request the OS uninstall guard while the
+        // Accessibility event is still available; the durable tamper event is
+        // already persisted above for replay after the next app launch.
+        val adminPromptStarted = requestDeviceAdminActivationIfNeeded()
+        if (!adminPromptStarted) {
+            tamperOverlay.show(
+                tamperAction = action.wireValue,
+                onSafeDismiss = {
+                    if (!surfaceCleared) {
+                        surfaceCleared = safelyLeaveTamperSurface()
+                    }
+                },
+            )
+        }
         if (newlyPending) {
             stateStore.pendingApprovalEvent()?.let {
                 ProtectionBridge.emit(this, it)
             }
         }
+    }
+
+    /**
+     * Device Admin is the only supported uninstall guard for a sideloaded
+     * Research app. It cannot prevent force-stop itself, so this is a
+     * best-effort re-arm before an OEM completes the force-stop action.
+     */
+    private fun requestDeviceAdminActivationIfNeeded(): Boolean {
+        if (!BuildConfig.SUPPORTS_CONTROLLED_REMOVAL) return false
+        if (isDeviceAdminActiveForResearch()) return false
+
+        val now = SystemClock.elapsedRealtime()
+        if (now - lastDeviceAdminPromptAtElapsedMs < DEVICE_ADMIN_PROMPT_COOLDOWN_MS) {
+            return false
+        }
+        lastDeviceAdminPromptAtElapsedMs = now
+
+        return runCatching {
+            val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+            val component = ComponentName(
+                packageName,
+                "com.gamblock.gamblock_ai_apps.ProtectionDeviceAdminReceiver",
+            )
+            if (dpm.isAdminActive(component)) return@runCatching false
+            val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+                putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, component)
+                putExtra(
+                    DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                    getString(R.string.device_admin_explanation),
+                )
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            startActivity(intent)
+            true
+        }.getOrDefault(false)
     }
 
     private fun safelyLeaveTamperSurface(): Boolean {

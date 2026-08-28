@@ -71,6 +71,8 @@ object TamperActionDetector {
         "force stop",
         "paksa berhenti",
         "berhenti paksa",
+        "paksa henti",
+        "memaksa berhenti",
     )
     private val clearDataPhrases = listOf(
         "clear data",
@@ -127,7 +129,9 @@ object TamperActionDetector {
             containsGamblockTarget(observation.sourceTexts, observation.targetIdentifiers)
         val sourceAction = actionFrom(source)
         val windowAction = actionFrom(window)
-        val isConfirmation = confirmationPhrases.any(window::contains)
+        val isConfirmation = confirmationPhrases.any { phrase ->
+            containsPhrase(window, phrase)
+        }
         val accessibilityToggleOff = observation.sourceCheckable &&
             !observation.sourceChecked &&
             accessibilityContextPhrases.any(window::contains)
@@ -222,6 +226,16 @@ object TamperActionDetector {
             .map(::normalize)
             .filter(String::isNotBlank)
             .joinToString(" ")
+    }
+
+    /**
+     * Confirmation labels such as "ya" and "ok" must be whole phrases.
+     * Substring matching made ordinary App Info labels such as "layanan" or
+     * "blokir" look like a confirmation dialog on Xiaomi/Redmi.
+     */
+    private fun containsPhrase(value: String, phrase: String): Boolean {
+        val pattern = "(^|[^\\p{L}\\p{N}])${Regex.escape(phrase)}($|[^\\p{L}\\p{N}])"
+        return Regex(pattern).containsMatchIn(value)
     }
 
     private fun normalize(value: String): String {

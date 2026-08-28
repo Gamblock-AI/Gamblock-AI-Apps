@@ -237,4 +237,49 @@ class TamperActionDetectorTest {
         val action = TamperActionDetector.detect(observation)
         assertEquals(TamperAction.FORCE_STOP, action)
     }
+
+    @Test
+    fun passiveXiaomiAppInfoLabelsDoNotLookLikeConfirmation() {
+        val observation = TamperObservation(
+            surface = TamperSurface.SETTINGS,
+            eventKind = TamperEventKind.WINDOW_CHANGED,
+            sourceTexts = emptyList(),
+            windowTexts = listOf(
+                "Info aplikasi",
+                "Gamblock-AI Research",
+                "Layanan",
+                "Blokir notifikasi",
+                "Paksa berhenti",
+                "Hapus data",
+            ),
+            targetIdentifiers = targetIdentifiers,
+            launcherArmed = false,
+            sourceCheckable = false,
+            sourceChecked = false,
+        )
+        val action = TamperActionDetector.detect(observation)
+        assertEquals(TamperAction.NONE, action)
+    }
+
+    @Test
+    fun xiaomiForceStopConfirmationStillTriggersForceStop() {
+        val observation = TamperObservation(
+            surface = TamperSurface.SETTINGS,
+            eventKind = TamperEventKind.WINDOW_CHANGED,
+            sourceTexts = emptyList(),
+            windowTexts = listOf(
+                "Paksa henti?",
+                "Jika Anda paksa henti suatu apl, maka apl tersebut kemungkinan tidak dapat bekerja normal.",
+                "Gamblock-AI Research",
+                "Batal",
+                "Oke",
+            ),
+            targetIdentifiers = targetIdentifiers,
+            launcherArmed = false,
+            sourceCheckable = false,
+            sourceChecked = false,
+        )
+        val action = TamperActionDetector.detect(observation)
+        assertEquals(TamperAction.FORCE_STOP, action)
+    }
 }

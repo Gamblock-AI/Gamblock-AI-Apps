@@ -51,6 +51,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
   bool _requestExemptionOnNextResume = false;
   bool _openAccessibilitySetupOnNextResume = false;
   StreamSubscription<NativeProtectionEvent>? _statusSub;
+  int _loadGeneration = 0;
 
   @override
   void initState() {
@@ -89,6 +90,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
   }
 
   Future<void> _load() async {
+    final loadGeneration = ++_loadGeneration;
     if (_status == null) {
       setState(() {
         _loading = true;
@@ -99,7 +101,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
     try {
       status = await ProtectionCoordinator(ref).fetchLocalStatus();
     } catch (error) {
-      if (mounted) {
+      if (mounted && loadGeneration == _loadGeneration) {
         setState(() {
           _error = error;
           _loading = false;
@@ -107,15 +109,27 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
       }
       return;
     }
+    if (!mounted || loadGeneration != _loadGeneration) return;
+    // The local native snapshot is authoritative and must not wait for the
+    // remote accountability requests below. Otherwise a stale inactive label
+    // can remain visible while the backend is slow or offline.
+    _cachedStatus = status;
+    if (mounted) {
+      setState(() {
+        _status = status;
+        _loading = false;
+        _error = null;
+      });
+    }
+
     final auth = ref.read(authProvider);
     final accountability = await ProtectionCoordinator(
       ref,
     ).loadAccountability(auth);
-    _cachedStatus = status;
+    if (!mounted || loadGeneration != _loadGeneration) return;
     _cachedAccountability = accountability.accountability;
     _cachedRequests = accountability.requests;
     _cachedEmergencyRequest = accountability.emergencyRequest;
-    if (!mounted) return;
     setState(() {
       _status = status;
       _accountability = accountability.accountability;

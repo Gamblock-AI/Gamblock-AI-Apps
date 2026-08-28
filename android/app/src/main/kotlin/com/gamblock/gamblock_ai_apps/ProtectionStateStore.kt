@@ -54,6 +54,7 @@ class ProtectionStateStore(private val context: Context) {
         private const val PENDING_TAMPER_ACTION_KEY = "pending_tamper_action"
         private const val PENDING_TAMPER_ACTION_ID_KEY = "pending_tamper_action_id"
         private const val PENDING_TAMPER_ACTION_AT_KEY = "pending_tamper_action_at"
+        private const val RUNTIME_CONNECTED_KEY = "runtime_connected"
         private const val CLOCK_ROLLBACK_TOLERANCE_MS = 2 * 60 * 1000L
         private const val INTERVENTION_TTL_MS = 30_000L
         private const val FLUTTER_ACK_TIMEOUT_MS = 2_000L
@@ -112,6 +113,13 @@ class ProtectionStateStore(private val context: Context) {
     fun status(): String = preferences.getString("status", "inactive") ?: "inactive"
 
     fun degradedReason(): String? = preferences.getString("degraded_reason_code", null)
+
+    /** Records the protection process' last lifecycle state for bridge fallback. */
+    fun setRuntimeConnected(connected: Boolean) {
+        preferences.edit().putBoolean(RUNTIME_CONNECTED_KEY, connected).apply()
+    }
+
+    fun runtimeConnected(): Boolean = preferences.getBoolean(RUNTIME_CONNECTED_KEY, false)
 
     fun setLastEventNow() {
         preferences.edit().putString("last_event_at", isoDateFormat().format(Date())).apply()

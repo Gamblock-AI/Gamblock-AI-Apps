@@ -152,7 +152,16 @@ action-aware: merely opening App Info is not tamper evidence, while an explicit
   transparent recovery rather than unsafe device-owner behavior. Research asks
   for Device Admin activation on the first app resume and from the setup card;
   Android's active-admin check is the primary uninstall guard, while the
-  Accessibility detector remains an OEM-specific fallback.
+  Accessibility detector remains an OEM-specific fallback. The Research
+  service re-checks that guard when it connects and re-opens the activation
+  flow when an OEM reports an explicit tamper attempt while the admin is
+  inactive; the warning overlay is held back while that system prompt is
+  visible. This does not claim to make Android force-stop itself
+  unresistible. After prior Accessibility consent, reopening the app requests
+  a normal system rebind or opens Accessibility Settings when Xiaomi/Redmi has
+  removed the service from its enabled list; Android still requires the user to
+  toggle that permission manually; when the service remains enabled, the app
+  keeps the protection bridge ready and leaves binding to Android.
 
 Release signing is intentionally separate. Play uses
 `PLAY_KEYSTORE_PATH`, `PLAY_KEYSTORE_PASSWORD`, `PLAY_KEY_ALIAS`, and

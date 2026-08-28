@@ -39,6 +39,7 @@ class MainActivity : FlutterActivity() {
     private var protectionReceiver: BroadcastReceiver? = null
     private val uiToken = Binder()
     private var deviceAdminPromptShownThisSession = false
+    private var accessibilityRecoveryOpenedThisSession = false
 
     private fun bridgeUri(): Uri {
         return Uri.parse("content://${packageName}.protection.bridge")
@@ -62,6 +63,13 @@ class MainActivity : FlutterActivity() {
             classifier.load()
         }
         consentStore = AccessibilityConsentStore(applicationContext)
+        // FlutterActivity may dispatch the first onResume before the bridge
+        // has finished configuring. Retry recovery after the consent store is
+        // ready so an OEM-disabled Accessibility service cannot be missed.
+        window.decorView.post {
+            promptForResearchDeviceAdminIfNeeded()
+            recoverAccessibilityAfterOemStop()
+        }
 
         EventChannel(
             flutterEngine.dartExecutor.binaryMessenger,
@@ -225,20 +233,28 @@ class MainActivity : FlutterActivity() {
     private fun localSnapshot(): Map<String, Any?> {
         val bridgeSnapshot = bridgeCall("get_snapshot", null, null)
         if (bridgeSnapshot != null) return ProtectionBridge.bundleToMap(bridgeSnapshot)
-        // Protection process unreachable: report the truthful local view.
+        // Protection process may be briefly unavailable while the service or
+        // provider is starting. Use the shared last-known runtime state only
+        // when Accessibility is still enabled; otherwise report inactive.
         val enabled = isAccessibilityEnabled()
+        val runtimeState = ProtectionStateStore(applicationContext)
+        val runtimeConnected = enabled && runtimeState.runtimeConnected()
         return mapOf(
             "platform" to "android",
-            "status" to "inactive",
-            "service_running" to false,
-            "sensor_status" to "disconnected",
+            "status" to if (runtimeConnected) runtimeState.status() else "inactive",
+            "service_running" to runtimeConnected,
+            "sensor_status" to if (runtimeConnected) "connected" else "disconnected",
             "permission_status" to if (enabled) "granted" else "revoked",
             "model_version" to classifier.modelVersion,
             "ruleset_version" to classifier.rulesetVersion,
             "supports_controlled_removal" to BuildConfig.SUPPORTS_CONTROLLED_REMOVAL,
             "device_admin_active" to isDeviceAdminActive(),
-            "degraded_reason_code" to if (enabled) "service_not_running" else "accessibility_disabled",
-            "last_event_at" to null,
+            "degraded_reason_code" to when {
+                runtimeConnected -> runtimeState.degradedReason()
+                enabled -> "service_not_running"
+                else -> "accessibility_disabled"
+            },
+            "last_event_at" to runtimeState.lastEventAt(),
         )
     }
 
@@ -251,7 +267,31 @@ class MainActivity : FlutterActivity() {
     override fun onResume() {
         super.onResume()
         promptForResearchDeviceAdminIfNeeded()
+        recoverAccessibilityAfterOemStop()
         handleIntentEvents(intent)
+    }
+
+    /**
+     * Some OEMs, including Xiaomi/Redmi, remove an Accessibility service from
+     * the enabled list after the user confirms force-stop. Android does not
+     * allow an app to enable that permission silently, so reopen the system
+     * settings after prior disclosure consent. If the OEM kept the service
+     * enabled, keep the protection bridge alive and let Android own the
+     * service binding lifecycle.
+     */
+    private fun recoverAccessibilityAfterOemStop() {
+        if (!::consentStore.isInitialized || !consentStore.hasCurrentConsent()) return
+        if (isAccessibilityEnabled()) {
+            bridgeCall("ensure_background_protection", null, null)
+            return
+        }
+        if (accessibilityRecoveryOpenedThisSession) return
+        accessibilityRecoveryOpenedThisSession = true
+        window.decorView.post {
+            if (!isFinishing && !isAccessibilityEnabled()) {
+                startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+            }
+        }
     }
 
     /**

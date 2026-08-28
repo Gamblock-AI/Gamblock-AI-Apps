@@ -60,6 +60,11 @@ class ProtectionBridgeProvider : ContentProvider() {
                     runCatching { token.linkToDeath(uiDeath, 0) }
                 }
                 ProtectionBridge.uiRegistered = true
+                // The service may have connected before Flutter finished
+                // attaching its EventChannel listener. Replay the current
+                // snapshot now so startup cannot leave a stale cached status
+                // in the dashboard.
+                ProtectionBridge.emit(context!!, snapshot())
                 null
             }
             "unregister_ui" -> {
@@ -167,17 +172,23 @@ class ProtectionBridgeProvider : ContentProvider() {
             return service.snapshotMap()
         }
         val enabled = isAccessibilityEnabled()
+        val runtimeConnected = enabled && stateStore.runtimeConnected()
+        val storedStatus = stateStore.status()
         return mapOf(
             "platform" to "android",
-            "status" to "inactive",
-            "service_running" to false,
-            "sensor_status" to "disconnected",
+            "status" to if (runtimeConnected) storedStatus else "inactive",
+            "service_running" to runtimeConnected,
+            "sensor_status" to if (runtimeConnected) "connected" else "disconnected",
             "permission_status" to if (enabled) "granted" else "revoked",
             "model_version" to HybridClassifier.DEFAULT_MODEL_VERSION,
             "ruleset_version" to HybridClassifier.DEFAULT_RULESET_VERSION,
             "supports_controlled_removal" to BuildConfig.SUPPORTS_CONTROLLED_REMOVAL,
             "device_admin_active" to isDeviceAdminActive(),
-            "degraded_reason_code" to if (enabled) "service_not_running" else "accessibility_disabled",
+            "degraded_reason_code" to when {
+                runtimeConnected -> stateStore.degradedReason()
+                enabled -> "service_not_running"
+                else -> "accessibility_disabled"
+            },
             "last_event_at" to stateStore.lastEventAt(),
         )
     }

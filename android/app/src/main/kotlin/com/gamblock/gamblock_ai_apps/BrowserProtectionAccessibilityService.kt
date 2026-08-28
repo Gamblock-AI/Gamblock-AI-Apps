@@ -13,7 +13,6 @@ import android.view.accessibility.AccessibilityManager
 import android.view.accessibility.AccessibilityNodeInfo
 import java.util.ArrayDeque
 import java.util.concurrent.Executors
-import java.lang.ref.WeakReference
 
 /**
  * Browser-only protection shared by both Android distributions.
@@ -134,24 +133,29 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                 normalized.contains("webview")
         }
 
+        /**
+         * The provider runs in this same protection process and needs a live
+         * service instance for truthful snapshots and bridge commands. Keep a
+         * strong reference only for the service lifetime; onDestroy clears it.
+         */
         @Volatile
-        private var activeService: WeakReference<BrowserProtectionAccessibilityService>? = null
+        private var activeService: BrowserProtectionAccessibilityService? = null
 
         /** True only when a service instance is actually bound in this process. */
-        fun isRunning(): Boolean = activeService?.get() != null
+        fun isRunning(): Boolean = activeService != null
 
-        fun current(): BrowserProtectionAccessibilityService? = activeService?.get()
+        fun current(): BrowserProtectionAccessibilityService? = activeService
 
         fun notifyFlutterVisibilityClaimed(interventionId: String) {
-            activeService?.get()?.cancelNativeFallback(interventionId)
+            activeService?.cancelNativeFallback(interventionId)
         }
 
         fun notifyInterventionCompleted(interventionId: String) {
-            activeService?.get()?.onExternalInterventionCompleted(interventionId)
+            activeService?.onExternalInterventionCompleted(interventionId)
         }
 
         fun notifyFlutterPresentationLost(interventionId: String) {
-            activeService?.get()?.onFlutterPresentationLost(interventionId)
+            activeService?.onFlutterPresentationLost(interventionId)
         }
     }
 
@@ -199,10 +203,11 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         classifier = HybridClassifier(applicationContext)
         aggregateStore = DailyAggregateStore(applicationContext)
         stateStore = ProtectionStateStore(applicationContext)
+        stateStore.setRuntimeConnected(true)
         overlay = PatternInterruptOverlay(this, NativeConfig.webBaseUrl(this))
         runCatching { overlay.prepare() }
         runCatching { phase4Evidence = Phase4EvidenceRecorder(applicationContext) }
-        activeService = WeakReference(this)
+        activeService = this
         runCatching { HealthNotificationPreferences.show(this) }
         ProtectionKeepAliveService.start(this)
         ProtectionBridge.emit(this, snapshotEvent())
@@ -469,7 +474,13 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         )
     }
 
-    private fun deviceAdminActive(): Boolean {
+    /**
+     * Research exposes Device Admin as the OS-supported uninstall guard. Keep
+     * this helper in the shared service so the Research-only subclass can
+     * re-check the guard without adding any removal behavior to the Play
+     * flavor.
+     */
+    protected fun isDeviceAdminActiveForResearch(): Boolean {
         if (!BuildConfig.SUPPORTS_CONTROLLED_REMOVAL) return false
         val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
         return runCatching {
@@ -478,6 +489,8 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             )
         }.getOrDefault(false)
     }
+
+    private fun deviceAdminActive(): Boolean = isDeviceAdminActiveForResearch()
 
     override fun onInterrupt() = Unit
 
@@ -661,10 +674,10 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         pendingScan?.let(mainHandler::removeCallbacks)
         mainHandler.removeCallbacksAndMessages(null)
         overlay.destroy()
-        if (activeService?.get() === this) {
-            activeService?.clear()
+        if (activeService === this) {
             activeService = null
         }
+        stateStore.setRuntimeConnected(false)
         worker.shutdownNow()
         if (isAccessibilityComponentDisabled()) {
             aggregateStore.increment("permission_revoked")
