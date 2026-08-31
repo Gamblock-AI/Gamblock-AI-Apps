@@ -24,6 +24,7 @@ public:
   static constexpr UINT kNativeEventMessage = WM_APP + 73;
   static constexpr UINT_PTR kInterventionExpiryTimer = 0x47424c4b;
   static constexpr UINT_PTR kInterventionCloseGateTimer = 0x47424c4c;
+  static constexpr UINT kPatternInterruptDurationMs = 7000;
 
   NativeProtectionBridge(flutter::FlutterEngine *engine, HWND window,
                          std::function<void(bool)> intervention_lock_changed);

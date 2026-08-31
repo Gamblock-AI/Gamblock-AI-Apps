@@ -101,18 +101,24 @@ python3 scripts/export_onnx_linear_model.py \
 
 1. normalize and bound supported URL/title/heading/anchor inputs;
 2. compute the 14 ordered URL features and keyword rule locally;
-3. count the exported 5,664 unigrams and 4,336 bigrams;
+3. count the exported 5,852 unigrams and 4,148 bigrams;
 4. apply the exported StandardScaler values and Logistic Regression sigmoid;
-5. compute `0.75 × model_probability + 0.25 × rule_score`; block at `0.4`
+5. compute `0.80 × model_probability + 0.20 × rule_score`; block at `0.45`
    only when an explicit URL/content rule matches or committed page content
    is independently suspicious without URL-shape features. URL-shape evidence
    alone cannot block opaque short links.
 
-The artifact is marked `trained: true` and `evaluated: false`. Its supplied
-accuracy/precision/recall/F1 values are retained only as unverified metadata:
-the dataset card, split manifest, training source, FPR slices, and preprocessing
-parity evidence are still missing. Replace it only through the governed
-dataset/training/evaluation workflow.
+The exporter accepts any valid unary/bigram vocabulary width emitted by the
+governed training pipeline; it verifies the ONNX feature layout rather than a
+historical fixed vocabulary count. A new artifact still requires fixture,
+integrity, validation, and final-test review before replacing the bundled pair.
+
+The active artifact is `trained: true` and retains `evaluated: false` because
+its evidence maturity is still provisional. Its governed 2,592-row offline
+deployment projection passes the numeric gates: accuracy 97.22%, precision
+96.25%, recall 95.10%, F1 95.67%, and FPR 1.77%. Dataset provenance,
+domain-grouped evaluation, and physical Android/Windows runtime evidence remain
+required before a production-readiness claim.
 
 ## Android runtime
 
@@ -222,9 +228,10 @@ only. They never record URL, domain, DOM, title, decision score, account ID, or
 browsing timestamp. Schema v2 separates extraction, relay/queue,
 preprocessing, rule, inference, decision, block action, and presentation.
 `input_to_visible_ms` measures complete supported local input through the
-first committed Pattern Interrupt frame. The engineering gate is p95 strictly
-below 200 ms for each platform/device/scenario group, with at least 30 samples
-and no failed block or visibility outcome.
+first committed Pattern Interrupt frame. Schema v3 adds allowlisted
+`browser_family` and `build_mode` labels, so the engineering gate is p95
+strictly below 200 ms for each platform/device/scenario/browser/build group,
+with at least 30 samples and no failed block or visibility outcome.
 `SCENARIO` is one of `warm_foreground_online`, `warm_foreground_offline`,
 `warm_background_online`, `warm_background_offline`, `cold_foreground_online`,
 `cold_foreground_offline`, `cold_background_online`, or
@@ -234,7 +241,8 @@ Android evidence mode and export:
 
 ```sh
 ./scripts/phase4-android-evidence.sh enable --device SERIAL \
-  --run-id RUN_ID --device-alias DEVICE_ALIAS --scenario SCENARIO
+  --run-id RUN_ID --device-alias DEVICE_ALIAS --scenario SCENARIO \
+  --browser chrome --build-mode profile
 ./scripts/phase4-android-evidence.sh export --device SERIAL \
   --output android-latency.jsonl
 ./scripts/phase4-android-evidence.sh disable --device SERIAL
@@ -246,7 +254,8 @@ run from an elevated PowerShell on an approved disposable VM:
 
 ```powershell
 .\windows\scripts\phase4-evidence.ps1 Enable `
-  -RunId RUN_ID -DeviceAlias DEVICE_ALIAS -Scenario SCENARIO
+  -RunId RUN_ID -DeviceAlias DEVICE_ALIAS -Scenario SCENARIO `
+  -BrowserFamily chrome -BuildMode profile
 .\windows\scripts\phase4-evidence.ps1 Export -Output windows-latency.jsonl
 .\windows\scripts\phase4-evidence.ps1 Disable
 python scripts\phase4_latency_report.py windows-latency.jsonl

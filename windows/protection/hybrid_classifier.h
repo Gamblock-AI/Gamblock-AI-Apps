@@ -56,7 +56,7 @@ private:
   double rule_weight_ = 0.25;
   double threshold_ = 0.4;
   double rule_match_score_ = 1.0;
-  std::string model_version_ = "gamblock-lr-bfafb725511a";
+  std::string model_version_ = "gamblock-lr-14012bec0479";
   std::string ruleset_version_ = "gambling-keywords-b4f2932a7647";
   std::unordered_map<std::string, double> unigram_weights_;
   std::unordered_map<std::string, double> bigram_weights_;

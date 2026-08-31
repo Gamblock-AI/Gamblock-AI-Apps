@@ -28,7 +28,7 @@ data class ClassificationResult(
 class HybridClassifier(private val context: Context) {
     companion object {
         const val CONTRACT_VERSION = "hybrid-v2"
-        const val DEFAULT_MODEL_VERSION = "gamblock-lr-bfafb725511a"
+        const val DEFAULT_MODEL_VERSION = "gamblock-lr-14012bec0479"
         const val DEFAULT_RULESET_VERSION = "gambling-keywords-b4f2932a7647"
         private const val ASSET_ROOT = "flutter_assets/assets/protection"
     }

@@ -225,7 +225,11 @@ class PatternInterruptOverlay(
         }
 
         val countdownBadge = TextView(service).apply {
-            text = if (isEnglish) "Wait 7 seconds" else "Tunggu 7 detik"
+            text = if (isEnglish) {
+                "Wait ${ProtectionTimingContract.PATTERN_INTERRUPT_SECONDS} seconds"
+            } else {
+                "Tunggu ${ProtectionTimingContract.PATTERN_INTERRUPT_SECONDS} detik"
+            }
             textSize = 12f
             setTypeface(typeface, Typeface.BOLD)
             setTextColor(Color.rgb(186, 230, 253))
@@ -446,7 +450,7 @@ class PatternInterruptOverlay(
             startBreathingAnimation(foregroundContent.breathing)
         }
 
-        var remaining = 7
+        var remaining = ProtectionTimingContract.PATTERN_INTERRUPT_SECONDS
         fun tick() {
             if (root == null) return
             val content = foregroundContent

@@ -12,7 +12,7 @@ void main() {
       'service_running': true,
       'sensor_status': 'disconnected',
       'permission_status': 'granted',
-      'model_version': 'gamblock-lr-bfafb725511a',
+      'model_version': 'gamblock-lr-14012bec0479',
       'ruleset_version': 'gambling-keywords-b4f2932a7647',
       'degraded_reason_code': 'browser_sensor_disconnected',
       'last_event_at': '2026-07-16T03:00:00Z',

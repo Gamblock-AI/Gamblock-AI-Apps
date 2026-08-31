@@ -8,6 +8,10 @@ param(
     [string]$RunId,
     [string]$DeviceAlias,
     [string]$Scenario,
+    [ValidateSet('chrome', 'edge', 'opera')]
+    [string]$BrowserFamily,
+    [ValidateSet('debug', 'profile', 'release')]
+    [string]$BuildMode,
     [string]$Output
 )
 
@@ -41,12 +45,16 @@ switch ($Action) {
         Assert-SafeLabel 'RunId' $RunId
         Assert-SafeLabel 'DeviceAlias' $DeviceAlias
         Assert-SafeLabel 'Scenario' $Scenario
+        Assert-SafeLabel 'BrowserFamily' $BrowserFamily
+        Assert-SafeLabel 'BuildMode' $BuildMode
         Assert-Scenario $Scenario
         New-Item -ItemType Directory -Path $EvidenceDirectory -Force | Out-Null
         @{
             run_id = $RunId
             device_alias = $DeviceAlias
             scenario = $Scenario
+            browser_family = $BrowserFamily
+            build_mode = $BuildMode
         } | ConvertTo-Json | Set-Content -Path $ConfigPath -Encoding utf8
         Write-Host "Windows Phase 4 evidence mode enabled for $Scenario."
     }

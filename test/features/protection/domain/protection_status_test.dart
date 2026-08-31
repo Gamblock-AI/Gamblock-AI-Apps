@@ -12,7 +12,7 @@ void main() {
         sensorStatus: 'disconnected',
         permissionStatus: 'granted',
         rulesetVersion: 'gambling-keywords-b4f2932a7647',
-        modelVersion: 'gamblock-lr-bfafb725511a',
+        modelVersion: 'gamblock-lr-14012bec0479',
         degradedReasonCode: 'browser_sensor_disconnected',
       );
 
@@ -29,7 +29,7 @@ void main() {
       sensorStatus: 'connected',
       permissionStatus: 'granted',
       rulesetVersion: 'gambling-keywords-b4f2932a7647',
-      modelVersion: 'gamblock-lr-bfafb725511a',
+        modelVersion: 'gamblock-lr-14012bec0479',
     );
 
     expect(status.isActive, isFalse);

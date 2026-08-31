@@ -12,12 +12,14 @@ SPEC.loader.exec_module(REPORT)
 
 def sample(**overrides):
     value = {
-        "schema_version": 2,
+        "schema_version": 3,
         "platform": "android",
         "run_id": "run_1",
         "sample_id": "sample_1",
         "device_alias": "pixel_1",
         "scenario": "warm_foreground_online",
+        "browser_family": "chrome",
+        "build_mode": "profile",
         "model_version": "model_1",
         "ruleset_version": "rules_1",
         "outcome": "visible",

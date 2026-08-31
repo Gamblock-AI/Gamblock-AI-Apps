@@ -105,7 +105,7 @@ flutter::EncodableMap SnapshotMap(const std::string& json) {
            JsonBool(json, "supports_controlled_removal", false))},
       {flutter::EncodableValue("model_version"),
        flutter::EncodableValue(JsonString(
-           json, "model_version", "gamblock-lr-bfafb725511a"))},
+           json, "model_version", "gamblock-lr-14012bec0479"))},
       {flutter::EncodableValue("ruleset_version"),
        flutter::EncodableValue(JsonString(
            json, "ruleset_version", "gambling-keywords-b4f2932a7647"))},

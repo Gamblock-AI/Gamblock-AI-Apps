@@ -7,6 +7,7 @@ import 'package:gamblock_ai_apps/l10n/app_localizations.dart';
 import '../../../../core/feedback/feedback.dart';
 import '../../../../core/feedback/haptics.dart';
 import '../../../../core/platform/platform_bridge.dart';
+import '../../../../core/platform/protection_timing_contract.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../../../core/theme/app_dimens.dart';
@@ -25,7 +26,8 @@ class PatternInterruptScreen extends StatefulWidget {
 
 class _PatternInterruptScreenState extends State<PatternInterruptScreen>
     with TickerProviderStateMixin {
-  static const _durationSeconds = 7;
+  static const _durationSeconds =
+      ProtectionTimingContract.patternInterruptSeconds;
 
   late final AnimationController _breathingController;
   late final AnimationController _ringController;

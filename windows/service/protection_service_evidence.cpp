@@ -23,6 +23,8 @@ struct Phase4Config {
   std::string run_id;
   std::string device_alias;
   std::string scenario;
+  std::string browser_family;
+  std::string build_mode;
 };
 
 std::optional<Phase4Config> ReadPhase4Config() {
@@ -33,13 +35,18 @@ std::optional<Phase4Config> ReadPhase4Config() {
   const auto run_id = JsonString(*value, "run_id");
   const auto device_alias = JsonString(*value, "device_alias");
   const auto scenario = JsonString(*value, "scenario");
-  if (!run_id || !device_alias || !scenario ||
+  const auto browser_family = JsonString(*value, "browser_family");
+  const auto build_mode = JsonString(*value, "build_mode");
+  if (!run_id || !device_alias || !scenario || !browser_family || !build_mode ||
       !std::regex_match(*run_id, kSafeLabel) ||
       !std::regex_match(*device_alias, kSafeLabel) ||
-      !std::regex_match(*scenario, kSafeLabel)) {
+      !std::regex_match(*scenario, kSafeLabel) ||
+      !std::regex_match(*browser_family, kSafeLabel) ||
+      !std::regex_match(*build_mode, kSafeLabel)) {
     return std::nullopt;
   }
-  return Phase4Config{*run_id, *device_alias, *scenario};
+  return Phase4Config{*run_id, *device_alias, *scenario, *browser_family,
+                      *build_mode};
 }
 
 double Milliseconds(std::chrono::steady_clock::duration duration) {
@@ -88,6 +95,8 @@ std::string ProtectionService::BeginPhase4Latency(
           config->run_id,
           config->device_alias,
           config->scenario,
+          config->browser_family,
+          config->build_mode,
           decision.model_version,
           decision.ruleset_version,
       });
@@ -133,11 +142,14 @@ void ProtectionService::CompletePhase4Latency(const std::string &evidence_id,
   if (!output)
     return;
   output << std::fixed << std::setprecision(3)
-         << "{\"schema_version\":2,\"platform\":\"windows\","
+         << "{\"schema_version\":3,\"platform\":\"windows\","
          << "\"run_id\":\"" << EscapeJson(sample.run_id) << "\","
          << "\"sample_id\":\"" << EscapeJson(evidence_id) << "\","
          << "\"device_alias\":\"" << EscapeJson(sample.device_alias) << "\","
          << "\"scenario\":\"" << EscapeJson(sample.scenario) << "\","
+         << "\"browser_family\":\"" << EscapeJson(sample.browser_family)
+         << "\","
+         << "\"build_mode\":\"" << EscapeJson(sample.build_mode) << "\","
          << "\"model_version\":\"" << EscapeJson(sample.model_version) << "\","
          << "\"ruleset_version\":\"" << EscapeJson(sample.ruleset_version)
          << "\","

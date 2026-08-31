@@ -1,9 +1,9 @@
 {
   "contract_version": "hybrid-v2",
   "model": {
-    "version": "gamblock-lr-bfafb725511a",
+    "version": "gamblock-lr-14012bec0479",
     "path": "gamblock-lr-v2.json",
-    "sha256": "2197ba11956210418492e938f386660a928ec768488efcddb5ee28402450617c"
+    "sha256": "ff3f157f0c0af85a0fa4b02a12f23687468cd004d895e48f1da3644c18ba0b2a"
   },
   "ruleset": {
     "version": "gambling-keywords-b4f2932a7647",

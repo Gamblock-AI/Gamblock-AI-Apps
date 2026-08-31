@@ -19,6 +19,8 @@ ALLOWED_FIELDS = {
     "sample_id",
     "device_alias",
     "scenario",
+    "browser_family",
+    "build_mode",
     "model_version",
     "ruleset_version",
     "outcome",
@@ -41,6 +43,8 @@ IDENTITY_FIELDS = (
     "platform",
     "device_alias",
     "scenario",
+    "browser_family",
+    "build_mode",
     "model_version",
     "ruleset_version",
 )
@@ -69,8 +73,8 @@ def validate_record(record: Any, source: str, line_number: int) -> list[str]:
     unexpected = set(record) - ALLOWED_FIELDS
     if unexpected:
         errors.append(f"{prefix}: privacy allowlist rejected fields {sorted(unexpected)}")
-    if record.get("schema_version") != 2:
-        errors.append(f"{prefix}: schema_version must be 2")
+    if record.get("schema_version") != 3:
+        errors.append(f"{prefix}: schema_version must be 3")
     for field in IDENTITY_FIELDS + ("run_id", "sample_id", "outcome", "presentation_path"):
         if not isinstance(record.get(field), str) or not record[field]:
             errors.append(f"{prefix}: {field} must be a non-empty string")

@@ -36,6 +36,8 @@ class Phase4EvidenceRecorder(context: Context) {
         val runId: String,
         val deviceAlias: String,
         val scenario: String,
+        val browserFamily: String,
+        val buildMode: String,
     )
 
     private data class PendingSample(
@@ -115,12 +117,14 @@ class Phase4EvidenceRecorder(context: Context) {
                 ((it - start).coerceAtLeast(0)) / nanosPerMillisecond
             }
             val record = JSONObject().apply {
-                put("schema_version", 2)
+                put("schema_version", 3)
                 put("platform", "android")
                 put("run_id", sample.config.runId)
                 put("sample_id", "android_${sequence.incrementAndGet()}")
                 put("device_alias", sample.config.deviceAlias)
                 put("scenario", sample.config.scenario)
+                put("browser_family", sample.config.browserFamily)
+                put("build_mode", sample.config.buildMode)
                 put("model_version", sample.start.modelVersion)
                 put("ruleset_version", sample.start.rulesetVersion)
                 put("outcome", outcome)
@@ -171,8 +175,18 @@ class Phase4EvidenceRecorder(context: Context) {
                 config.optBoolean("enabled", false) &&
                     safeLabel.matches(config.optString("run_id")) &&
                     safeLabel.matches(config.optString("device_alias")) &&
-                    safeLabel.matches(config.optString("scenario"))
+                    safeLabel.matches(config.optString("scenario")) &&
+                    safeLabel.matches(config.optString("browser_family")) &&
+                    safeLabel.matches(config.optString("build_mode"))
             }
-            ?.let { Config(it.getString("run_id"), it.getString("device_alias"), it.getString("scenario")) }
+            ?.let {
+                Config(
+                    it.getString("run_id"),
+                    it.getString("device_alias"),
+                    it.getString("scenario"),
+                    it.getString("browser_family"),
+                    it.getString("build_mode"),
+                )
+            }
     }
 }

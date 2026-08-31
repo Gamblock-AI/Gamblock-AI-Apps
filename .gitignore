@@ -69,3 +69,7 @@ Thumbs.db
 
 # ===== Logs =====
 *.log
+
+# ===== Local Python verification cache =====
+__pycache__/
+*.pyc

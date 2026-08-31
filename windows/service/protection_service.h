@@ -99,6 +99,8 @@ private:
     std::string run_id;
     std::string device_alias;
     std::string scenario;
+    std::string browser_family;
+    std::string build_mode;
     std::string model_version;
     std::string ruleset_version;
   };

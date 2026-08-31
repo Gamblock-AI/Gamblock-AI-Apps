@@ -163,7 +163,10 @@ void NativeProtectionBridge::HandleWindowMessage() {
             browser_block_succeeded && foreground && raised && restored_z_order;
         pending_block_action_duration_ms_ = browser_block_duration_ms;
         SetTimer(window_, kInterventionExpiryTimer, 30000, nullptr);
-        SetTimer(window_, kInterventionCloseGateTimer, 7000, nullptr);
+        static_assert(kPatternInterruptDurationMs >= 5000 &&
+                      kPatternInterruptDurationMs <= 10000);
+        SetTimer(window_, kInterventionCloseGateTimer,
+                 kPatternInterruptDurationMs, nullptr);
       }
       DispatchEvent(message);
       FlushPendingBlockAction(750);

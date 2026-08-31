@@ -147,6 +147,13 @@ def close(left: float, right: float, tolerance: float = 1e-6) -> bool:
     return abs(left - right) <= tolerance
 
 
+def unigram_count_from_offsets(ngram_counts: list[int]) -> int:
+    """Validate the ONNX n-gram boundary without freezing a vocabulary size."""
+    if len(ngram_counts) != 2 or ngram_counts[0] != 0 or ngram_counts[1] <= 0:
+        raise ValueError(f"unexpected unigram boundary: {ngram_counts}")
+    return ngram_counts[1]
+
+
 def export_model(onnx_path: Path, metadata_path: Path) -> dict[str, object]:
     lines = decode_model(onnx_path)
     scaler = attributes(node(lines, "Scaler"))
@@ -163,9 +170,7 @@ def export_model(onnx_path: Path, metadata_path: Path) -> dict[str, object]:
 
     if len(offsets) != len(FEATURE_NAMES) or len(scales) != len(FEATURE_NAMES):
         raise ValueError("unexpected URL scaler width")
-    if ngram_counts != [0, 5664]:
-        raise ValueError(f"unexpected ngram offsets: {ngram_counts}")
-    unigram_count = ngram_counts[1]
+    unigram_count = unigram_count_from_offsets(ngram_counts)
     bigram_pool = len(pool) - unigram_count
     if bigram_pool < 0 or bigram_pool % 2 != 0:
         raise ValueError("invalid vectorizer pool")

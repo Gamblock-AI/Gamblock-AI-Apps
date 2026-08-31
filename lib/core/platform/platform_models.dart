@@ -39,7 +39,7 @@ class ProtectionSnapshot {
       sensorStatus: map['sensor_status']?.toString() ?? 'disconnected',
       permissionStatus: map['permission_status']?.toString() ?? 'unknown',
       modelVersion:
-          map['model_version']?.toString() ?? 'gamblock-lr-bfafb725511a',
+          map['model_version']?.toString() ?? 'gamblock-lr-14012bec0479',
       rulesetVersion:
           map['ruleset_version']?.toString() ??
           'gambling-keywords-b4f2932a7647',
@@ -56,7 +56,7 @@ class ProtectionSnapshot {
     serviceRunning: false,
     sensorStatus: 'disconnected',
     permissionStatus: 'unknown',
-    modelVersion: 'gamblock-lr-bfafb725511a',
+    modelVersion: 'gamblock-lr-14012bec0479',
     rulesetVersion: 'gambling-keywords-b4f2932a7647',
     supportsControlledRemoval: false,
     degradedReasonCode: 'native_bridge_unavailable',
