@@ -140,7 +140,7 @@ python3 scripts/merge_l10n.py --check  # validate parity only
 flutter gen-l10n                    # regenerate Dart localization classes
 
 # Android Research tamper evidence is owned by the testing repository.
-python3 ../gamblock-ai-testing/scripts/verify_public_evidence.py
+python3 ../gamblock-ai-testing/orchestration/scripts/verify_public_evidence.py
 
 # Explicit user request only:
 flutter test

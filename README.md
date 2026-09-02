@@ -245,7 +245,7 @@ Android evidence mode and export:
 ./scripts/phase4-android-evidence.sh export --device SERIAL \
   --output android-latency.jsonl
 ./scripts/phase4-android-evidence.sh disable --device SERIAL
-python3 ../gamblock-ai-testing/scripts/phase4_latency_report.py android-latency.jsonl
+python3 ../gamblock-ai-testing/flutter/scripts/phase4_latency_report.py android-latency.jsonl
 ```
 
 Windows evidence mode/export and the ordinary process-kill recovery scenario
@@ -257,7 +257,7 @@ run from an elevated PowerShell on an approved disposable VM:
   -BrowserFamily chrome -BuildMode profile
 .\windows\scripts\phase4-evidence.ps1 Export -Output windows-latency.jsonl
 .\windows\scripts\phase4-evidence.ps1 Disable
-python ..\gamblock-ai-testing\scripts\phase4_latency_report.py windows-latency.jsonl
+python ..\gamblock-ai-testing\flutter\scripts\phase4_latency_report.py windows-latency.jsonl
 .\windows\scripts\run-phase4-hardening.ps1 `
   -RunId RUN_ID -DeviceAlias DEVICE_ALIAS `
   -Output windows-resilience.json -AcknowledgeDisposableVm
