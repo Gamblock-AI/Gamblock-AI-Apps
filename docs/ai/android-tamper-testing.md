@@ -6,7 +6,7 @@ Firebase Device Streaming guidance, promotion, and the canonical result belong
 to the public testing repository:
 
 - Runbook: <https://github.com/Gamblock-AI/Gamblock-AI-Testing/blob/main/docs/ai/android-anti-uninstall-testing.md>
-- Canonical summary: <https://github.com/Gamblock-AI/Gamblock-AI-Testing/blob/main/reports/testing-summary.md>
+- Canonical Flutter/Android report: <https://github.com/Gamblock-AI/Gamblock-AI-Testing/blob/main/flutter/report.md>
 
 Do not add a second summary or commit screenshots, ADB traces, serial numbers,
 URLs, DOM text, or participant data here. Product behavior changes belong in

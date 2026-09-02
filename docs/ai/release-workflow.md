@@ -4,7 +4,8 @@ Dokumen ini adalah **Standard Operating Procedure (SOP)** wajib bagi AI assistan
 
 Runtime/device evidence is not a release artifact and is owned by the public
 [Gamblock-AI-Testing repository](https://github.com/Gamblock-AI/Gamblock-AI-Testing).
-Release notes and this SOP must link to its canonical summary instead of
+Release notes and this SOP must link to the relevant canonical technology
+report instead of
 copying test results.
 
 ---
