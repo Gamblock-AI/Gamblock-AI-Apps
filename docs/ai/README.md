@@ -112,6 +112,12 @@ were removed after the run.
 Canonical cross-repository evidence and the Android anti-uninstall runbook:
 [Gamblock-AI-Testing](https://github.com/Gamblock-AI/Gamblock-AI-Testing).
 
+When an explicit Flutter, Android, or Windows test is requested for project
+evidence, the agent must synchronize `flutter/report.md` (and any validated
+technology ledger) and provide a test receipt listing public and private/local
+data changes. This client documentation must not duplicate run-specific
+results.
+
 ## Context maintenance
 
 Update this file when wiring, native build inclusion, model status, commands,

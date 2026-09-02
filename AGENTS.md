@@ -152,6 +152,18 @@ Mirror `lib/` under `test/` when tests are in scope. Use `mocktail` for
 repository tests and `flutter_test` for widgets. Never call real backend or
 external services.
 
+## Cross-repository testing handoff
+
+When the user explicitly requests Flutter, Android, or Windows testing to be
+retained as project evidence, synchronize the matching report through
+`../gamblock-ai-testing/docs/tools/run_evaluation.py` and the Android/Windows
+runbook as applicable. A direct Flutter or device command alone is not a
+completed evidence handoff. Inspect both repositories and provide the test
+receipt required by the umbrella/testing context, including public report or
+ledger changes, private/local artifacts, validation, and commit/push status.
+If the testing checkout or device is unavailable, report the exact blocker and
+do not claim that `flutter/report.md` was updated.
+
 CI builds the `play` and `research` Android flavors, the Windows debug bundle,
 and a diagnostic MSI without production keys. The CI diagnostic lane also
 produces a `research`-flavor staging APK pointed at `api-staging.gamblock-ai.com`
