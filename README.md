@@ -114,11 +114,10 @@ historical fixed vocabulary count. A new artifact still requires fixture,
 integrity, validation, and final-test review before replacing the bundled pair.
 
 The active artifact is `trained: true` and retains `evaluated: false` because
-its evidence maturity is still provisional. Its governed 2,592-row offline
-deployment projection passes the numeric gates: accuracy 97.22%, precision
-96.25%, recall 95.10%, F1 95.67%, and FPR 1.77%. Dataset provenance,
-domain-grouped evaluation, and physical Android/Windows runtime evidence remain
-required before a production-readiness claim.
+its evidence maturity is still provisional. Cross-repository replay and runtime
+results are maintained in the canonical testing repository summary; dataset
+provenance, domain-grouped evaluation, and physical Android/Windows runtime
+evidence remain required before a production-readiness claim.
 
 ## Android runtime
 
@@ -246,7 +245,7 @@ Android evidence mode and export:
 ./scripts/phase4-android-evidence.sh export --device SERIAL \
   --output android-latency.jsonl
 ./scripts/phase4-android-evidence.sh disable --device SERIAL
-python3 scripts/phase4_latency_report.py android-latency.jsonl
+python3 ../gamblock-ai-testing/scripts/phase4_latency_report.py android-latency.jsonl
 ```
 
 Windows evidence mode/export and the ordinary process-kill recovery scenario
@@ -258,7 +257,7 @@ run from an elevated PowerShell on an approved disposable VM:
   -BrowserFamily chrome -BuildMode profile
 .\windows\scripts\phase4-evidence.ps1 Export -Output windows-latency.jsonl
 .\windows\scripts\phase4-evidence.ps1 Disable
-python scripts\phase4_latency_report.py windows-latency.jsonl
+python ..\gamblock-ai-testing\scripts\phase4_latency_report.py windows-latency.jsonl
 .\windows\scripts\run-phase4-hardening.ps1 `
   -RunId RUN_ID -DeviceAlias DEVICE_ALIAS `
   -Output windows-resilience.json -AcknowledgeDisposableVm
@@ -277,6 +276,15 @@ These harnesses emit the standardized `phase4_resilience_run` shape for one
 ordinary process-kill cell. Remaining approved matrix scenarios must be
 captured with the workbench template and reviewed; an unexecuted scenario is
 never a passed evaluation.
+
+## Android anti-uninstall test matrix
+
+The Research flavor remains the production-code owner of Android removal
+friction and its unit tests. Cross-device execution, ADB evidence promotion,
+Firebase guidance, and the canonical result are owned by the public
+[`Gamblock-AI-Testing`](https://github.com/Gamblock-AI/Gamblock-AI-Testing)
+repository. This repository must not create a second tamper summary or publish
+raw screenshots/logs.
 
 ## Backend contracts
 

@@ -5,6 +5,11 @@ Windows variants produced by this repository. The PKM proposal remains the
 authority for product intent; this matrix records how that intent is packaged
 under each platform's distribution boundary.
 
+Cross-device and runtime evidence for the Research variant is maintained in
+the public [Gamblock-AI-Testing repository](https://github.com/Gamblock-AI/Gamblock-AI-Testing).
+This build matrix defines artifact capability boundaries only; it does not
+duplicate testing results.
+
 ## Variant matrix
 
 | Variant | Output | Identity | Capability boundary | Audience/channel | Signing requirement |

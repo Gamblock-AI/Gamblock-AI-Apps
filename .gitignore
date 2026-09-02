@@ -73,3 +73,6 @@ Thumbs.db
 # ===== Local Python verification cache =====
 __pycache__/
 *.pyc
+
+# ===== Local Android tamper evidence =====
+/private/

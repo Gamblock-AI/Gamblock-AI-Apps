@@ -282,4 +282,107 @@ class TamperActionDetectorTest {
         val action = TamperActionDetector.detect(observation)
         assertEquals(TamperAction.FORCE_STOP, action)
     }
+
+    @Test
+    fun xiaomiUninstallDataWarningStillTriggersUninstall() {
+        val observation = TamperObservation(
+            surface = TamperSurface.PACKAGE_INSTALLER,
+            eventKind = TamperEventKind.WINDOW_CHANGED,
+            sourceTexts = emptyList(),
+            windowTexts = listOf(
+                "Uninstal akan menghapus semua data aplikasi",
+                "Gamblock-AI Research",
+                "Batal",
+                "OK",
+            ),
+            targetIdentifiers = targetIdentifiers,
+            launcherArmed = false,
+            sourceCheckable = false,
+            sourceChecked = false,
+        )
+        val action = TamperActionDetector.detect(observation)
+        assertEquals(TamperAction.UNINSTALL, action)
+    }
+
+    @Test
+    fun englishAccessibilityToggleOffTriggersDisableAccessibility() {
+        val observation = TamperObservation(
+            surface = TamperSurface.SETTINGS,
+            eventKind = TamperEventKind.CLICK,
+            sourceTexts = listOf("Use Gamblock-AI"),
+            windowTexts = listOf(
+                "Accessibility service",
+                "Use Gamblock-AI",
+                "Gamblock-AI Research",
+            ),
+            targetIdentifiers = targetIdentifiers,
+            launcherArmed = false,
+            sourceCheckable = true,
+            sourceChecked = false,
+        )
+        val action = TamperActionDetector.detect(observation)
+        assertEquals(TamperAction.DISABLE_ACCESSIBILITY, action)
+    }
+
+    @Test
+    fun packageInstallerEnglishConfirmationTriggersUninstall() {
+        val observation = TamperObservation(
+            surface = TamperSurface.PACKAGE_INSTALLER,
+            eventKind = TamperEventKind.CONTENT_CHANGED,
+            sourceTexts = emptyList(),
+            windowTexts = listOf(
+                "Do you want to uninstall this app?",
+                "Gamblock-AI Research",
+                "Cancel",
+                "OK",
+            ),
+            targetIdentifiers = targetIdentifiers,
+            launcherArmed = false,
+            sourceCheckable = false,
+            sourceChecked = false,
+        )
+        val action = TamperActionDetector.detect(observation)
+        assertEquals(TamperAction.UNINSTALL, action)
+    }
+
+    @Test
+    fun clearingGamblockDataIsNotClassifiedAsUninstall() {
+        val observation = TamperObservation(
+            surface = TamperSurface.SETTINGS,
+            eventKind = TamperEventKind.CLICK,
+            sourceTexts = listOf("Hapus data"),
+            windowTexts = listOf(
+                "Info aplikasi",
+                "Gamblock-AI Research",
+                "Hapus data",
+            ),
+            targetIdentifiers = targetIdentifiers,
+            launcherArmed = false,
+            sourceCheckable = false,
+            sourceChecked = false,
+        )
+        val action = TamperActionDetector.detect(observation)
+        assertEquals(TamperAction.CLEAR_DATA, action)
+        assertEquals(false, action == TamperAction.UNINSTALL)
+    }
+
+    @Test
+    fun clearingAnotherAppDataDoesNotTriggerTamper() {
+        val observation = TamperObservation(
+            surface = TamperSurface.SETTINGS,
+            eventKind = TamperEventKind.CLICK,
+            sourceTexts = listOf("Hapus data"),
+            windowTexts = listOf(
+                "Info aplikasi",
+                "Spotify Music",
+                "Hapus data",
+            ),
+            targetIdentifiers = targetIdentifiers,
+            launcherArmed = false,
+            sourceCheckable = false,
+            sourceChecked = false,
+        )
+        val action = TamperActionDetector.detect(observation)
+        assertEquals(TamperAction.NONE, action)
+    }
 }

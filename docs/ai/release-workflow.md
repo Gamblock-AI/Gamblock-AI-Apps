@@ -2,6 +2,11 @@
 
 Dokumen ini adalah **Standard Operating Procedure (SOP)** wajib bagi AI assistant / developer saat menerima instruksi untuk membuat rilis baru (contoh: *"buat release baru 1.4.0"*, *"create release v1.5.0"*).
 
+Runtime/device evidence is not a release artifact and is owned by the public
+[Gamblock-AI-Testing repository](https://github.com/Gamblock-AI/Gamblock-AI-Testing).
+Release notes and this SOP must link to its canonical summary instead of
+copying test results.
+
 ---
 
 ## 1. Aturan Baku & Invarian Rilis (Non-Negotiable)
