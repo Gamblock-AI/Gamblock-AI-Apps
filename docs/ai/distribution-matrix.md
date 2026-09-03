@@ -81,6 +81,13 @@ time:
 
 - Pull requests and `main` run verification and diagnostic builds without
   production secrets.
+- When the `ENABLE_CI_TESTS` repository variable is `true`, the verification
+  job runs the full Flutter unit suite with coverage and the client model
+  artifact contract tests against a shallow checkout of
+  `Gamblock-AI/Gamblock-AI-Model`.
+- The diagnostic Android job builds the Play and Research APKs, while the
+  diagnostic Windows job builds the Windows bundle and MSI after verification
+  succeeds.
 - Diagnostic output is uploaded only through `actions/upload-artifact` with a
   short retention period.
 - The `Signed Release Candidates` workflow (`release.yml`) runs from an

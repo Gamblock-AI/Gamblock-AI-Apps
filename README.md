@@ -27,6 +27,11 @@ Play/Research/Windows candidates are built only from immutable version tags (or 
 Environments. The complete matrix, key names, and artifact contract are in
 [`docs/ai/distribution-matrix.md`](docs/ai/distribution-matrix.md).
 
+When the repository variable `ENABLE_CI_TESTS=true`, the verification job also
+runs the full Flutter unit suite and the client model-artifact contract tests
+against a checked-out model source repository. The diagnostic Android and
+Windows jobs then build their CI artifacts.
+
 ## Run
 
 ```sh
@@ -207,6 +212,12 @@ pause does not authorize removal. The PowerShell files under
 `windows/scripts/` are developer/evidence helpers and are not shipped by the
 MSI. Windows runtime, signing, and uninstall behavior still require validation
 on a Windows VM/device.
+
+The cross-repository Chrome-to-model runtime smoke test is maintained in
+`../gamblock-ai-testing/windows/`. It pairs the passive extension with the
+installed service and exercises the bundled Hybrid-v2 artifacts; use that
+runbook for Windows integration evidence rather than treating a local build as
+runtime proof.
 
 The Windows service is split by responsibility under `windows/service/`:
 runtime/SCM lifecycle, WebSocket handling, named-pipe commands, local state,

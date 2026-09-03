@@ -35,6 +35,20 @@ jobs:
       - run: bash scripts/verify-ai-context.sh
       - run: flutter pub get
       - run: flutter analyze
+      - name: Checkout model source for client contract tests
+        if: ${{ vars.ENABLE_CI_TESTS == 'true' }}
+        uses: actions/checkout@v4
+        with:
+          repository: Gamblock-AI/Gamblock-AI-Model
+          ref: main
+          path: gamblock-ai-model
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Run client model contract tests
+        if: ${{ vars.ENABLE_CI_TESTS == 'true' }}
+        env:
+          GAMBLOCK_MODEL_ROOT: ${{ github.workspace }}/gamblock-ai-model
+        run: python3 -m unittest discover -s test/scripts -p '*test.py'
       - run: flutter test --coverage
         if: ${{ vars.ENABLE_CI_TESTS == 'true' }}
       - uses: actions/upload-artifact@v4
