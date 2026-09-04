@@ -97,6 +97,11 @@ Do not hardcode URLs in features or call Dio from presentation code.
   Research prompts for Device Admin activation on first app resume and from
   setup; the active-admin state is the primary uninstall guard, while the
   action-aware Accessibility detector remains an OEM-specific fallback.
+  Phase 4 latency capture is opt-in, local-only, and allowlisted: it records
+  the binary's actual product flavor and refuses a configured build mode that
+  does not match the running binary. The PKM v5 progress checkpoint is the
+  `researchRelease` Android/Chrome `warm_foreground_online` group; the
+  cross-platform matrix remains final-readiness evidence.
 - Windows uses `windows/service/` for the LocalSystem authority and the
   small `windows/runner/native_protection_*.{cpp,h}` modules for the
   user-session agent. Pending interventions are replayed by ID until the agent

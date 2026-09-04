@@ -239,9 +239,15 @@ browsing timestamp. Schema v2 separates extraction, relay/queue,
 preprocessing, rule, inference, decision, block action, and presentation.
 `input_to_visible_ms` measures complete supported local input through the
 first committed Pattern Interrupt frame. Schema v3 adds allowlisted
-`browser_family` and `build_mode` labels, so the engineering gate is p95
-strictly below 200 ms for each platform/device/scenario/browser/build group,
-with at least 30 samples and no failed block or visibility outcome.
+`browser_family`, `build_mode`, and the Android binary's actual
+`product_flavor` labels; Android declines capture when the configured build
+mode does not equal the running binary. The progress-report checkpoint is one
+reproducible `researchRelease` Android + Chrome + `warm_foreground_online`
+group: p95 strictly below 200 ms, at least 30 successful samples, and no
+failed block or visibility outcome. A separate feasibility gate accepts one
+homogeneous group, while final readiness retains every Android/Windows ×
+Chrome/Edge/Opera × profile/release cell under the same per-cell criteria.
+Debug builds are diagnostic only, not progress or final acceptance evidence.
 `SCENARIO` is one of `warm_foreground_online`, `warm_foreground_offline`,
 `warm_background_online`, `warm_background_offline`, `cold_foreground_online`,
 `cold_foreground_offline`, `cold_background_online`, or
@@ -251,11 +257,14 @@ Android evidence mode and export:
 
 ```sh
 ./scripts/phase4-android-evidence.sh enable --device SERIAL \
-  --run-id RUN_ID --device-alias DEVICE_ALIAS --scenario SCENARIO \
-  --browser chrome --build-mode profile
+  --package com.gamblock.gamblock_ai_apps.research \
+  --run-id RUN_ID --device-alias DEVICE_ALIAS \
+  --scenario warm_foreground_online --browser chrome --build-mode release
 ./scripts/phase4-android-evidence.sh export --device SERIAL \
+  --package com.gamblock.gamblock_ai_apps.research \
   --output android-latency.jsonl
-./scripts/phase4-android-evidence.sh disable --device SERIAL
+./scripts/phase4-android-evidence.sh disable --device SERIAL \
+  --package com.gamblock.gamblock_ai_apps.research
 python3 ../gamblock-ai-testing/flutter/scripts/phase4_latency_report.py android-latency.jsonl
 ```
 

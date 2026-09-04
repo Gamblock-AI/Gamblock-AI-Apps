@@ -125,6 +125,7 @@ class Phase4EvidenceRecorder(context: Context) {
                 put("scenario", sample.config.scenario)
                 put("browser_family", sample.config.browserFamily)
                 put("build_mode", sample.config.buildMode)
+                put("product_flavor", BuildConfig.FLAVOR)
                 put("model_version", sample.start.modelVersion)
                 put("ruleset_version", sample.start.rulesetVersion)
                 put("outcome", outcome)
@@ -177,7 +178,8 @@ class Phase4EvidenceRecorder(context: Context) {
                     safeLabel.matches(config.optString("device_alias")) &&
                     safeLabel.matches(config.optString("scenario")) &&
                     safeLabel.matches(config.optString("browser_family")) &&
-                    safeLabel.matches(config.optString("build_mode"))
+                    safeLabel.matches(config.optString("build_mode")) &&
+                    config.optString("build_mode") == BuildConfig.BUILD_TYPE
             }
             ?.let {
                 Config(
