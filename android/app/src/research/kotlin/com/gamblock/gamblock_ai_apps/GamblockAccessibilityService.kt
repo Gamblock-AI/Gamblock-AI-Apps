@@ -96,12 +96,16 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
             return
         }
 
-        val root = rootInActiveWindow ?: return
+        // During an OEM system-UI transition the event can arrive before the
+        // accessibility window root is available. The event/source labels are
+        // still useful (and may contain the uninstall confirmation), so do not
+        // drop the tamper check solely because the root is temporarily null.
+        val root = rootInActiveWindow
         val observation = TamperObservation(
             surface = surface,
             eventKind = eventKind(event.eventType),
             sourceTexts = sourceTexts,
-            windowTexts = collectNodeTexts(root, limit = 320),
+            windowTexts = root?.let { collectNodeTexts(it, limit = 320) }.orEmpty(),
             targetIdentifiers = targetIdentifiers,
             launcherArmed = SystemClock.elapsedRealtime() <= launcherArmedUntilElapsedMs,
             sourceCheckable = event.source?.isCheckable == true,

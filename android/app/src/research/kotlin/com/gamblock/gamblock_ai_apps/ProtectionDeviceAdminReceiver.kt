@@ -13,6 +13,33 @@ import android.content.Intent
  */
 class ProtectionDeviceAdminReceiver : DeviceAdminReceiver() {
     override fun onDisableRequested(context: Context, intent: Intent): CharSequence {
+        recordUnapprovedDisable(context)
         return context.getString(R.string.device_admin_disable_warning)
+    }
+
+    override fun onDisabled(context: Context, intent: Intent) {
+        // Some OEM Settings flows skip the Accessibility event and disable the
+        // administrator immediately before continuing with removal. Persist the
+        // attempt from the Device Admin callback as a second, OS-level signal.
+        // A valid removal grant is the only approved path and must not create a
+        // stale approval request if the user cancels the uninstall dialog.
+        val stateStore = ProtectionStateStore(context.applicationContext)
+        if (stateStore.activeGrantAllowsControlledRemoval()) {
+            stateStore.clearPendingTamperAction()
+            stateStore.setStatus("inactive", "approved_removal")
+            return
+        }
+        recordUnapprovedDisable(context, stateStore)
+    }
+
+    private fun recordUnapprovedDisable(
+        context: Context,
+        stateStore: ProtectionStateStore = ProtectionStateStore(context.applicationContext),
+    ) {
+        if (stateStore.activeGrantAllowsControlledRemoval()) return
+        if (stateStore.recordPendingTamperAction("uninstall")) {
+            DailyAggregateStore(context.applicationContext).increment("tamper_detected")
+        }
+        stateStore.setStatus("degraded", "device_admin_inactive")
     }
 }

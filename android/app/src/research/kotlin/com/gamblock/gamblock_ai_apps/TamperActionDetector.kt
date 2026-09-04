@@ -103,6 +103,7 @@ object TamperActionDetector {
         "yes",
         "ya",
         "ok",
+        "oke",
         "cancel",
         "batal",
         "batalkan",
@@ -129,8 +130,12 @@ object TamperActionDetector {
             containsGamblockTarget(observation.sourceTexts, observation.targetIdentifiers)
         val sourceAction = actionFrom(source)
         val windowAction = actionFrom(window)
+        val combinedAction = actionFrom(normalizedCombined(observation.windowTexts + observation.sourceTexts))
+        // OEMs can expose the confirmation text only on the event source
+        // while the window root is unavailable during a Settings transition.
+        // Treat either label collection as confirmation evidence.
         val isConfirmation = confirmationPhrases.any { phrase ->
-            containsPhrase(window, phrase)
+            containsPhrase(window, phrase) || containsPhrase(source, phrase)
         }
         val accessibilityToggleOff = observation.sourceCheckable &&
             !observation.sourceChecked &&
@@ -147,8 +152,9 @@ object TamperActionDetector {
 
                 (observation.eventKind == TamperEventKind.WINDOW_CHANGED ||
                     observation.eventKind == TamperEventKind.CONTENT_CHANGED) &&
-                    targetsGamblock && windowAction != TamperAction.NONE &&
-                    isConfirmation -> windowAction
+                    targetsGamblock &&
+                    combinedAction != TamperAction.NONE &&
+                    isConfirmation -> combinedAction
 
                 else -> TamperAction.NONE
             }

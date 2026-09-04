@@ -46,6 +46,17 @@ strictly below 200 ms); and the retained Android/Windows final matrix. The
 actual product flavor is emitted by the Android binary and the configured build
 mode must match the running binary. Debug evidence is diagnostic only.
 
+### Android removal-guard hardening
+
+The Research Accessibility path now continues tamper classification when an
+OEM system-UI transition temporarily has no window root, using the event/source
+labels that Android still provides. The Research Device Admin receiver also
+persists an unapproved administrator-disable attempt before and after the OS
+callback, while a valid removal grant is excluded from that tamper path. These
+changes improve MIUI recovery and auditability but remain best-effort: Android
+does not let a sideloaded Device Admin veto a user-initiated deactivation, so a
+Settings uninstall can still be an OS-level break-glass path.
+
 The client remains the owner of production behavior and local unit tests. The
 testing repository owns the evidence schema, device workflow, public ledger,
 and one canonical report per technology. Physical Android/Windows runtime evidence remains

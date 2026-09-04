@@ -145,6 +145,28 @@ class TamperActionDetectorTest {
     }
 
     @Test
+    fun settingsSourceOnlyMiuiConfirmationTriggersUninstall() {
+        // MIUI can expose the confirmation labels on the event source while
+        // rootInActiveWindow is temporarily unavailable.
+        val observation = TamperObservation(
+            surface = TamperSurface.SETTINGS,
+            eventKind = TamperEventKind.CONTENT_CHANGED,
+            sourceTexts = listOf(
+                "Gamblock-AI Research",
+                "Uninstal akan menghapus semua data aplikasi",
+                "Oke",
+            ),
+            windowTexts = emptyList(),
+            targetIdentifiers = targetIdentifiers,
+            launcherArmed = false,
+            sourceCheckable = false,
+            sourceChecked = false,
+        )
+        val action = TamperActionDetector.detect(observation)
+        assertEquals(TamperAction.UNINSTALL, action)
+    }
+
+    @Test
     fun settingsTurningOffGamblockAccessibilityTriggersDisableAccessibility() {
         val observation = TamperObservation(
             surface = TamperSurface.SETTINGS,
