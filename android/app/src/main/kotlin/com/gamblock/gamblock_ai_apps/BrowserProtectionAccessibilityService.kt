@@ -52,10 +52,44 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             "com.sec.android.app.sbrowser:id/search_box_text",
             "com.sec.android.app.sbrowser:id/toolbar_url",
             "com.sec.android.app.sbrowser:id/location_bar_text",
+            "com.sec.android.app.sbrowser.beta:id/location_bar_edit_text",
+            "com.sec.android.app.sbrowser.beta:id/location_bar",
+            "com.sec.android.app.sbrowser.beta:id/url_bar",
+            "com.sec.android.app.sbrowser.beta:id/url_bar_text",
+            "com.sec.android.app.sbrowser.beta:id/search_box_text",
+            "com.sec.android.app.sbrowser.beta:id/toolbar_url",
+            "com.sec.android.app.sbrowser.beta:id/location_bar_text",
+            "com.samsung.android.app.sbrowser:id/location_bar_edit_text",
+            "com.samsung.android.app.sbrowser:id/location_bar",
+            "com.samsung.android.app.sbrowser:id/url_bar",
+            "com.samsung.android.app.sbrowser:id/url_bar_text",
+            "com.samsung.android.app.sbrowser:id/search_box_text",
+            "com.samsung.android.app.sbrowser:id/toolbar_url",
+            "com.samsung.android.app.sbrowser:id/location_bar_text",
             "org.mozilla.firefox:id/toolbar_url",
             "org.mozilla.firefox:id/mozac_browser_toolbar_url_view",
             "com.brave.browser:id/url_bar",
             "com.opera.browser:id/url_field",
+        )
+        private val SAMSUNG_INTERNET_PACKAGES = setOf(
+            "com.sec.android.app.sbrowser",
+            "com.sec.android.app.sbrowser.beta",
+            "com.samsung.android.app.sbrowser",
+        )
+        private val SAMSUNG_PAGE_CONTENT_RESOURCE_IDS = setOf(
+            "com.sec.android.app.sbrowser:id/content_layout",
+            "com.sec.android.app.sbrowser.beta:id/content_layout",
+            "com.samsung.android.app.sbrowser:id/content_layout",
+        )
+        private val ACCESSIBILITY_CONTROL_CHARS = Regex("[\\p{Cc}]")
+        private val ACCESSIBILITY_FORMAT_CHARS = Regex("[\\p{Cf}]")
+        private val ACCESSIBILITY_WHITESPACE = Regex("\\s+")
+        private val SAMSUNG_BROWSER_CHROME_RESOURCE_MARKERS = listOf(
+            ":id/location_bar",
+            ":id/url_bar",
+            ":id/search_box",
+            ":id/toolbar",
+            ":id/tab_",
         )
         private val TAB_SWITCHER_SURFACE_RESOURCE_MARKERS = listOf(
             "tab_switcher_view",
@@ -81,23 +115,49 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         }
 
         fun looksLikeUrl(value: String): Boolean {
-            val trimmed = value.trim()
+            val trimmed = normalizeAccessibilityText(value)
             return trimmed.startsWith("http://") ||
                 trimmed.startsWith("https://") ||
                 (trimmed.contains('.') && !trimmed.contains(' ') && trimmed.length >= 4)
         }
 
         fun isBetterUrlCandidate(candidate: String, current: String): Boolean {
-            if (current.isEmpty()) return true
-            val candidateIsUrl = looksLikeUrl(candidate)
-            val currentIsUrl = looksLikeUrl(current)
+            val normalizedCandidate = normalizeAccessibilityText(candidate)
+            val normalizedCurrent = normalizeAccessibilityText(current)
+            if (normalizedCurrent.isEmpty()) return true
+            val candidateIsUrl = looksLikeUrl(normalizedCandidate)
+            val currentIsUrl = looksLikeUrl(normalizedCurrent)
             if (candidateIsUrl != currentIsUrl) return candidateIsUrl
             val candidateHasScheme =
-                candidate.startsWith("http://") || candidate.startsWith("https://")
+                normalizedCandidate.startsWith("http://") ||
+                    normalizedCandidate.startsWith("https://")
             val currentHasScheme =
-                current.startsWith("http://") || current.startsWith("https://")
+                normalizedCurrent.startsWith("http://") ||
+                    normalizedCurrent.startsWith("https://")
             if (candidateHasScheme != currentHasScheme) return candidateHasScheme
-            return candidate.length > current.length
+            return normalizedCandidate.length > normalizedCurrent.length
+        }
+
+        fun normalizeAccessibilityText(value: String): String {
+            return value
+                .replace(ACCESSIBILITY_FORMAT_CHARS, "")
+                .replace(ACCESSIBILITY_CONTROL_CHARS, " ")
+                .replace(ACCESSIBILITY_WHITESPACE, " ")
+                .trim()
+        }
+
+        fun isSamsungInternetPackage(packageName: String): Boolean {
+            return packageName.trim().lowercase() in SAMSUNG_INTERNET_PACKAGES
+        }
+
+        fun isSamsungInternetPageContentResourceId(viewId: String): Boolean {
+            return viewId.trim().lowercase() in SAMSUNG_PAGE_CONTENT_RESOURCE_IDS
+        }
+
+        fun isSamsungInternetChromeResourceId(viewId: String): Boolean {
+            val normalized = viewId.trim().lowercase()
+            return normalized.isNotEmpty() &&
+                SAMSUNG_BROWSER_CHROME_RESOURCE_MARKERS.any { normalized.contains(it) }
         }
 
         /**
@@ -197,7 +257,15 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC
             notificationTimeout = 150
             flags = AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or
-                AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
+                AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS or
+                // Samsung Internet can mark its page bridge as not important
+                // even though it is the only accessible representation of the
+                // committed page. Keep extraction local and filter browser
+                // chrome below before any text reaches the classifier.
+                AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS or
+                // Ask Chromium/Samsung browser bridges to expose their
+                // enhanced web-accessibility representation when available.
+                AccessibilityServiceInfo.FLAG_REQUEST_ENHANCED_WEB_ACCESSIBILITY
             packageNames = (observedBrowsers + additionalObservedPackages).toTypedArray()
         }
         classifier = HybridClassifier(applicationContext)
@@ -360,10 +428,11 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         root: AccessibilityNodeInfo?,
     ): ClassificationInput? {
         if (root == null) return null
+        val samsungInternet = isSamsungInternetPackage(event.packageName?.toString().orEmpty())
         var url = ""
         for (resourceId in URL_RESOURCE_IDS) {
             val node = root.findAccessibilityNodeInfosByViewId(resourceId).firstOrNull()
-            val value = node?.text?.toString()?.trim().orEmpty()
+            val value = normalizeAccessibilityText(node?.text?.toString().orEmpty())
             if (value.isNotEmpty()) {
                 url = value
                 break
@@ -377,7 +446,10 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         queue.add(
             QueuedBrowserNode(
                 node = root,
-                insideWebContent = isBrowserWebContentClassName(root.className?.toString().orEmpty()),
+                insideWebContent = isBrowserWebContentClassName(root.className?.toString().orEmpty()) ||
+                    (samsungInternet && isSamsungInternetPageContentResourceId(
+                        root.viewIdResourceName?.toString().orEmpty(),
+                    )),
             ),
         )
         var pageTextCount = 0
@@ -393,12 +465,19 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                 // Return before collecting their text for local classification.
                 return null
             }
-            val rawText = (node.text?.toString() ?: node.contentDescription?.toString() ?: "").trim()
+            val viewId = node.viewIdResourceName?.lowercase().orEmpty()
+            val samsungPageRoot = samsungInternet && isSamsungInternetPageContentResourceId(viewId)
+            val samsungBrowserChrome = samsungInternet &&
+                !samsungPageRoot &&
+                isSamsungInternetChromeResourceId(viewId)
+            val rawText = normalizeAccessibilityText(
+                node.text?.toString() ?: node.contentDescription?.toString().orEmpty(),
+            )
             val text = rawText.take(256)
             val insideWebContent = queued.insideWebContent ||
-                isBrowserWebContentClassName(node.className?.toString().orEmpty())
+                isBrowserWebContentClassName(node.className?.toString().orEmpty()) ||
+                samsungPageRoot
 
-            val viewId = node.viewIdResourceName?.lowercase().orEmpty()
             if (viewId.contains("url") || viewId.contains("location") || viewId.contains("search_box") || viewId.contains("address")) {
                 if (rawText.isNotEmpty() && isBetterUrlCandidate(rawText, fallbackUrlCandidate)) {
                     fallbackUrlCandidate = rawText
@@ -407,7 +486,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
                 fallbackUrlCandidate = rawText
             }
 
-            if (insideWebContent && text.isNotEmpty()) {
+            if (insideWebContent && !samsungBrowserChrome && text.isNotEmpty()) {
                 pageTextCount++
                 val isHeadingNode = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && node.isHeading) ||
                     (text.length in 4..80 && (node.className == "android.widget.TextView" || node.className == "android.view.View"))
@@ -421,7 +500,12 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             }
             for (index in 0 until node.childCount) {
                 node.getChild(index)?.let {
-                    queue.add(QueuedBrowserNode(it, insideWebContent))
+                    queue.add(
+                        QueuedBrowserNode(
+                            it,
+                            insideWebContent && !samsungBrowserChrome,
+                        ),
+                    )
                 }
             }
         }
@@ -438,7 +522,7 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             event.text.firstOrNull()?.toString(),
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) root.paneTitle?.toString() else null,
             headings.firstOrNull(),
-        ).map { it?.trim().orEmpty() }
+        ).map { normalizeAccessibilityText(it.orEmpty()) }
             .firstOrNull { it.isNotEmpty() && !looksLikeUrl(it) }
             .orEmpty()
             .take(512)

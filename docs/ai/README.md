@@ -97,6 +97,20 @@ The required pipeline includes URL rules, DOM title/headings/anchors, BoW,
 Logistic Regression, local decision/block, a 5–10 second Pattern Interrupt,
 and a browsing-data-free recovery handoff.
 
+### Samsung Internet page extraction
+
+The Research Android service keeps Samsung Internet in the audited browser
+package set and uses a Samsung-specific Accessibility fallback. When Samsung
+exposes the committed page through `content_layout` instead of a class named
+`WebView`, the extractor treats that subtree as page content while excluding
+Samsung URL-bar, toolbar, and tab controls. Accessibility control/formatting
+marks are normalized locally before URL or page-text extraction, and the
+`FLAG_INCLUDE_NOT_IMPORTANT_VIEWS` request allows Samsung's page bridge to be
+returned when it is marked as non-important. This remains best-effort because
+Samsung Internet can withhold its renderer text entirely; runtime evidence
+must be re-recorded on the target browser/device before the capability is
+considered verified.
+
 ## Default AI validation
 
 The Flutter client accepts only the `user` account role. Admin-provisioned

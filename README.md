@@ -150,7 +150,11 @@ monitoring is absent from its source set and accessibility configuration. The
 Research flavor additionally observes the audited non-Play package families
 listed above. Known Samsung Internet, Brave, Opera, and Firefox URL controls are
 used where available; the remaining packages use a best-effort editable-URL
-fallback. It contains transparent settings/removal friction tied to bounded
+fallback. Samsung Internet additionally uses a `content_layout` page-subtree
+fallback when its accessibility bridge does not identify the page as a
+`WebView`; toolbar and tab controls remain excluded, and the browser remains
+best-effort until physical runtime evidence confirms the browser/version pair.
+It contains transparent settings/removal friction tied to bounded
 approval or emergency grants. Its detector is
 action-aware: merely opening App Info is not tamper evidence, while an explicit
   uninstall, Accessibility-disable, force-stop, or clear-data action is handled

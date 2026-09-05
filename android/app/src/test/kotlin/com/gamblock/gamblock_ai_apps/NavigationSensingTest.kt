@@ -97,4 +97,40 @@ class NavigationSensingTest {
         )
         assertEquals(false, result)
     }
+
+    @Test
+    fun samsungInternetPackageIsRecognized() {
+        assertEquals(
+            true,
+            BrowserProtectionAccessibilityService.isSamsungInternetPackage(
+                "com.sec.android.app.sbrowser",
+            ),
+        )
+    }
+
+    @Test
+    fun samsungInternetContentLayoutIsPageContent() {
+        assertEquals(
+            true,
+            BrowserProtectionAccessibilityService.isSamsungInternetPageContentResourceId(
+                "com.sec.android.app.sbrowser:id/content_layout",
+            ),
+        )
+    }
+
+    @Test
+    fun samsungInternetToolbarIsNotPageContent() {
+        assertEquals(
+            true,
+            BrowserProtectionAccessibilityService.isSamsungInternetChromeResourceId(
+                "com.sec.android.app.sbrowser:id/location_bar_edit_text",
+            ),
+        )
+        assertEquals(
+            false,
+            BrowserProtectionAccessibilityService.isSamsungInternetPageContentResourceId(
+                "com.sec.android.app.sbrowser:id/location_bar_edit_text",
+            ),
+        )
+    }
 }

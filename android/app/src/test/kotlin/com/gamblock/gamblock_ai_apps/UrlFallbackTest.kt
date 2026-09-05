@@ -71,4 +71,14 @@ class UrlFallbackTest {
             ),
         )
     }
+
+    @Test
+    fun accessibilityFormattingMarksAreRemovedBeforeClassification() {
+        assertEquals(
+            "https://judi-online.example/path",
+            BrowserProtectionAccessibilityService.normalizeAccessibilityText(
+                "\u200Ehttps://judi-online.example/path\u200F",
+            ),
+        )
+    }
 }

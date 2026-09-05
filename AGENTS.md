@@ -86,8 +86,9 @@ Do not hardcode URLs in features or call Dio from presentation code.
   + scaled URL-feature + Logistic Regression fusion contract. It is trained
   but not evaluated by project evidence; supplied metrics remain unverified.
 - Android native source is wired through the active manifest and Method/Event
-  Channels for Chrome/Edge sensing, classification, intervention, grant state,
-  and aggregates. Intervention delivery is ID-based and native-first: the
+  Channels for Chrome/Edge sensing, Research-only non-standard browser
+  extraction, classification, intervention, grant state, and aggregates.
+  Intervention delivery is ID-based and native-first: the
   resident overlay owns the first committed frame while Flutter is retained as
   the acknowledgement-safe fallback if Android rejects overlay attachment.
   Research-only removal sensing must remain action-aware so passive
