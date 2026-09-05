@@ -106,7 +106,7 @@ Do not hardcode URLs in features or call Dio from presentation code.
   does not match the running binary. The current progress checkpoint is the
   `researchRelease` Android/Chrome `warm_foreground_online` group; the
   The former Android/Windows Chrome Release latency matrix has been replaced by
-  the balanced local-model and cross-platform browser-support runtime contracts
+  the cross-platform browser-support runtime contract
   documented in the testing repository.
 - Windows uses `windows/service/` for the LocalSystem authority and the
   small `windows/runner/native_protection_*.{cpp,h}` modules for the

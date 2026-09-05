@@ -252,10 +252,10 @@ reproducible `researchRelease` Android + Chrome + `warm_foreground_online`
 group: p95 strictly below 200 ms, at least 30 successful samples, and no
 failed block or visibility outcome. A separate feasibility gate accepts one
 homogeneous group. The former final-readiness latency matrix is replaced by a
-balanced local-model evaluation (50 gambling + 50 non-gambling samples on
-Android and Windows) and a browser-support regression (one Android device and
-one Windows VM, five configured browsers per platform, 5 gambling + 5
-non-gambling fixtures per browser). Debug builds are diagnostic only, not
+browser-support regression on one required Android device with four configured
+Android browsers; the five configured Windows browsers are optional. Each
+browser uses 5 gambling + 5 non-gambling fixtures. Debug builds are diagnostic
+only, not
 progress or client-runtime acceptance evidence.
 `SCENARIO` is one of `warm_foreground_online`, `warm_foreground_offline`,
 `warm_background_online`, `warm_background_offline`, `cold_foreground_online`,
