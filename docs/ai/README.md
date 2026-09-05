@@ -106,10 +106,13 @@ exposes the committed page through `content_layout` instead of a class named
 Samsung URL-bar, toolbar, and tab controls. Accessibility control/formatting
 marks are normalized locally before URL or page-text extraction, and the
 `FLAG_INCLUDE_NOT_IMPORTANT_VIEWS` request allows Samsung's page bridge to be
-returned when it is marked as non-important. This remains best-effort because
-Samsung Internet can withhold its renderer text entirely; runtime evidence
-must be re-recorded on the target browser/device before the capability is
-considered verified.
+returned when it is marked as non-important. If Samsung still withholds
+renderer text, the Research service captures the current display through the
+Accessibility screenshot API, crops out browser chrome, and runs bundled Latin
+OCR locally before passing transient text to the existing on-device
+classifier. The bitmap and OCR result are never persisted or transmitted. This
+remains best-effort; runtime evidence must be re-recorded on the target
+browser/device before the capability is considered verified.
 
 ## Default AI validation
 

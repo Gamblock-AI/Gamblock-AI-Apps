@@ -10,7 +10,7 @@ real-device correctness.
 | Artifact | Identity | Audience | Required protection behavior |
 |---|---|---|---|
 | Play AAB | `com.gamblock.gamblock_ai_apps` / Gamblock-AI | Public Android | Chrome/Edge Accessibility sensing, local classification/block/Pattern Interrupt; no Settings or uninstall interception |
-| Research APK | `com.gamblock.gamblock_ai_apps.research` / Gamblock-AI Research | Approved PKM cohort | Chrome/Edge plus documented non-standard browsers, action-aware best-effort removal friction, and partner-approved normal Android removal handoff |
+| Research APK | `com.gamblock.gamblock_ai_apps.research` / Gamblock-AI Research | Approved PKM cohort | Chrome/Edge plus documented non-standard browsers, including Samsung's transient local screenshot/OCR renderer fallback, action-aware best-effort removal friction, and partner-approved normal Android removal handoff |
 | Pilot MSI | Gamblock-AI Pilot | Approved Windows cohort | Per-machine LocalSystem service, in-app partner-approved MSI removal, and direct elevated administrator break-glass |
 | Research staging APK + MSI | Research flavor + Gamblock-AI Pilot identity, staging backend | QA/test | Grant-capable Research/pilot behavior pointed at `api-staging.gamblock-ai.com`; attached to the matching unified versioned release by the manual `staging-release.yml` lane after public trust-store validation |
 

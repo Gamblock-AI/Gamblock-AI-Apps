@@ -136,4 +136,8 @@ flutter {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     testImplementation("junit:junit:4.13.2")
+    // Samsung Internet can expose only pixels for a committed page. Keep the
+    // bundled Latin OCR model in Research, where that browser fallback lives;
+    // Play remains free of screenshot/OCR dependencies.
+    add("researchImplementation", "com.google.mlkit:text-recognition:16.0.1")
 }

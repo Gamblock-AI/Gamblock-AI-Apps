@@ -331,6 +331,18 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
         sourcePackage: String,
     ) = Unit
 
+    /**
+     * Allows a distribution-specific local sensor to augment browser signals
+     * before classification. The default keeps Chrome/Edge and Play behavior
+     * unchanged; Research uses this for Samsung's visual-only page bridge.
+     */
+    protected open fun requestAdditionalBrowserSignals(
+        event: AccessibilityEvent,
+        root: AccessibilityNodeInfo?,
+        input: ClassificationInput,
+        onReady: (ClassificationInput) -> Unit,
+    ) = onReady(input)
+
     protected open fun onProtectionServiceConnected() = Unit
 
     protected open fun onProtectionServiceDestroyed() = Unit
@@ -361,48 +373,54 @@ abstract class BrowserProtectionAccessibilityService : AccessibilityService() {
             val input = extractSignals(event, root)
             // Transient intermediate frames during navigation are normal; ignore without degrading
             if (input == null) return@Runnable
-            val inputReadyNanos = SystemClock.elapsedRealtimeNanos()
-
-            worker.execute {
-                val classificationStartedNanos = SystemClock.elapsedRealtimeNanos()
-                val result = classifier.classify(input)
-                val classificationFinishedNanos = SystemClock.elapsedRealtimeNanos()
-                val signature = listOf(input.url, input.title, input.headings, input.anchorTexts).hashCode()
-                val now = System.currentTimeMillis()
-                if (signature == lastSignature && now - lastDecisionAt < 500 && result.decision != "block") {
-                    return@execute
-                }
-                lastSignature = signature
-                lastDecisionAt = now
-                stateStore.setLastEventNow()
-                if (result.decision == "block") {
-                    val acquisition = stateStore.acquireIntervention(
-                        reasonCode = result.reasonCode,
-                        modelVersion = result.modelVersion,
-                        rulesetVersion = result.rulesetVersion,
-                    )
-                    if (!acquisition.created) return@execute
-                    phase4Evidence?.begin(
-                        acquisition.intervention.id,
-                        Phase4LatencyStart(
-                            scanStartedNanos = scanStartedNanos,
-                            inputReadyNanos = inputReadyNanos,
-                            classificationStartedNanos = classificationStartedNanos,
-                            classificationFinishedNanos = classificationFinishedNanos,
-                            timings = result.timings,
+            requestAdditionalBrowserSignals(event, root, input) { enrichedInput ->
+                val inputReadyNanos = SystemClock.elapsedRealtimeNanos()
+                worker.execute {
+                    val classificationStartedNanos = SystemClock.elapsedRealtimeNanos()
+                    val result = classifier.classify(enrichedInput)
+                    val classificationFinishedNanos = SystemClock.elapsedRealtimeNanos()
+                    val signature = listOf(
+                        enrichedInput.url,
+                        enrichedInput.title,
+                        enrichedInput.headings,
+                        enrichedInput.anchorTexts,
+                    ).hashCode()
+                    val now = System.currentTimeMillis()
+                    if (signature == lastSignature && now - lastDecisionAt < 500 && result.decision != "block") {
+                        return@execute
+                    }
+                    lastSignature = signature
+                    lastDecisionAt = now
+                    stateStore.setLastEventNow()
+                    if (result.decision == "block") {
+                        val acquisition = stateStore.acquireIntervention(
+                            reasonCode = result.reasonCode,
                             modelVersion = result.modelVersion,
                             rulesetVersion = result.rulesetVersion,
-                        ),
-                    )
-                    // Prioritize the accepted block and native overlay over
-                    // follow-up browser accessibility scans. Those scans are
-                    // best-effort and must not delay the protection boundary.
-                    mainHandler.postAtFrontOfQueue {
-                        executeBlockAndIntervention(acquisition.intervention)
+                        )
+                        if (!acquisition.created) return@execute
+                        phase4Evidence?.begin(
+                            acquisition.intervention.id,
+                            Phase4LatencyStart(
+                                scanStartedNanos = scanStartedNanos,
+                                inputReadyNanos = inputReadyNanos,
+                                classificationStartedNanos = classificationStartedNanos,
+                                classificationFinishedNanos = classificationFinishedNanos,
+                                timings = result.timings,
+                                modelVersion = result.modelVersion,
+                                rulesetVersion = result.rulesetVersion,
+                            ),
+                        )
+                        // Prioritize the accepted block and native overlay over
+                        // follow-up browser accessibility scans. Those scans are
+                        // best-effort and must not delay the protection boundary.
+                        mainHandler.postAtFrontOfQueue {
+                            executeBlockAndIntervention(acquisition.intervention)
+                        }
+                    } else {
+                        stateStore.setStatus("active")
+                        ProtectionBridge.emit(this, snapshotEvent())
                     }
-                } else {
-                    stateStore.setStatus("active")
-                    ProtectionBridge.emit(this, snapshotEvent())
                 }
             }
         }

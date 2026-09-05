@@ -47,10 +47,12 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
         AccessibilityEvent.TYPE_VIEW_LONG_CLICKED
 
     private lateinit var tamperOverlay: TamperWarningOverlay
+    private lateinit var samsungScreenshotOcr: SamsungInternetScreenshotOcr
     private var launcherArmedUntilElapsedMs = 0L
     private var lastDeviceAdminPromptAtElapsedMs = 0L
 
     override fun onProtectionServiceConnected() {
+        samsungScreenshotOcr = SamsungInternetScreenshotOcr(this)
         tamperOverlay = TamperWarningOverlay(this)
         if (!isDeviceAdminActiveForResearch()) {
             stateStore.setStatus("degraded", "device_admin_inactive")
@@ -60,7 +62,25 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
     }
 
     override fun onProtectionServiceDestroyed() {
+        if (::samsungScreenshotOcr.isInitialized) samsungScreenshotOcr.close()
         if (::tamperOverlay.isInitialized) tamperOverlay.dismiss()
+    }
+
+    override fun requestAdditionalBrowserSignals(
+        event: AccessibilityEvent,
+        root: AccessibilityNodeInfo?,
+        input: ClassificationInput,
+        onReady: (ClassificationInput) -> Unit,
+    ) {
+        val packageName = event.packageName?.toString().orEmpty()
+        if (!BrowserProtectionAccessibilityService.isSamsungInternetPackage(packageName) ||
+            input.hasDomContent ||
+            !::samsungScreenshotOcr.isInitialized
+        ) {
+            onReady(input)
+            return
+        }
+        samsungScreenshotOcr.request(root, input, onReady)
     }
 
     override fun handleAdditionalAccessibilityEvent(

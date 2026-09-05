@@ -87,7 +87,10 @@ Do not hardcode URLs in features or call Dio from presentation code.
   but not evaluated by project evidence; supplied metrics remain unverified.
 - Android native source is wired through the active manifest and Method/Event
   Channels for Chrome/Edge sensing, Research-only non-standard browser
-  extraction, classification, intervention, grant state, and aggregates.
+  extraction, classification, intervention, grant state, and aggregates. The
+  Research Samsung Internet path also has a transient screenshot/OCR fallback
+  for versions that expose only pixels after the `content_layout` bridge; the
+  bitmap and OCR result remain local and in memory.
   Intervention delivery is ID-based and native-first: the
   resident overlay owns the first committed frame while Flutter is retained as
   the acknowledgement-safe fallback if Android rejects overlay attachment.

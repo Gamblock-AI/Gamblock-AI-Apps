@@ -151,9 +151,11 @@ Research flavor additionally observes the audited non-Play package families
 listed above. Known Samsung Internet, Brave, Opera, and Firefox URL controls are
 used where available; the remaining packages use a best-effort editable-URL
 fallback. Samsung Internet additionally uses a `content_layout` page-subtree
-fallback when its accessibility bridge does not identify the page as a
-`WebView`; toolbar and tab controls remain excluded, and the browser remains
-best-effort until physical runtime evidence confirms the browser/version pair.
+fallback and, when that subtree contains no renderer text, a Research-only
+transient on-device screenshot/OCR fallback. Toolbar and tab controls are
+excluded from the crop. The screenshot and OCR text stay in process memory and
+are never persisted or sent to the backend; the browser remains best-effort
+until physical runtime evidence confirms the browser/version pair.
 It contains transparent settings/removal friction tied to bounded
 approval or emergency grants. Its detector is
 action-aware: merely opening App Info is not tamper evidence, while an explicit
