@@ -99,10 +99,14 @@ class PatternBreathingOrb extends StatelessWidget {
                               ),
                               child: Center(
                                 child: Image.asset(
-                                  'assets/images/gami-meditate.webp',
+                                  'assets/images/gamblock-1.png',
+                                  key: const ValueKey(
+                                    'pattern-interrupt-brand-logo',
+                                  ),
                                   width: imageSize,
                                   height: imageSize,
                                   fit: BoxFit.contain,
+                                  excludeFromSemantics: true,
                                   errorBuilder: (_, __, ___) => Icon(
                                     Icons.self_improvement_rounded,
                                     size: imageSize * 0.8,

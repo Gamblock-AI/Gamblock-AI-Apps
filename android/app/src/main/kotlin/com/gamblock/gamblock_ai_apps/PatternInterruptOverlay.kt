@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.AssetFileDescriptor
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.graphics.Matrix
 import android.graphics.PixelFormat
 import android.graphics.SurfaceTexture
@@ -29,6 +30,7 @@ import android.view.WindowManager
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import io.flutter.FlutterInjector
@@ -135,12 +137,15 @@ class PatternInterruptOverlay(
             gravity = Gravity.CENTER_HORIZONTAL
         }
 
-        val breathing = View(service).apply {
+        val breathing = ImageView(service).apply {
             background = GradientDrawable().apply {
                 shape = GradientDrawable.OVAL
                 setColor(Color.argb(35, 56, 189, 248))
                 setStroke(dp(3), Color.rgb(186, 230, 253))
             }
+            setPadding(dp(9), dp(9), dp(9), dp(9))
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
+            setImageDrawable(loadFlutterAsset("assets/images/gamblock-1.png"))
             contentDescription = if (isEnglish) "Slow breathing guide" else "Panduan napas perlahan"
         }
         headerLayout.addView(
@@ -581,6 +586,22 @@ class PatternInterruptOverlay(
             } catch (_: Exception) {
                 null
             }
+        }
+    }
+
+    private fun loadFlutterAsset(assetPath: String): Drawable? {
+        return runCatching {
+            val loader = FlutterInjector.instance().flutterLoader()
+            val key = loader.getLookupKeyForAsset(assetPath)
+            service.assets.open(key).use { input ->
+                Drawable.createFromStream(input, assetPath)
+            }
+        }.getOrElse {
+            runCatching {
+                service.assets.open("flutter_assets/$assetPath").use { input ->
+                    Drawable.createFromStream(input, assetPath)
+                }
+            }.getOrNull()
         }
     }
 

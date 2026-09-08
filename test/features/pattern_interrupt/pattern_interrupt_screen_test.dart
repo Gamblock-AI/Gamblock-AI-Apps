@@ -32,6 +32,13 @@ void main() {
     );
 
     expect(find.text('Lanjut ke Psikoedukasi'), findsOneWidget);
+    final brandLogo = tester.widget<Image>(
+      find.byKey(const ValueKey('pattern-interrupt-brand-logo')),
+    );
+    expect(
+      (brandLogo.image as AssetImage).assetName,
+      'assets/images/gamblock-1.png',
+    );
     FilledButton recoveryButton() => tester.widget<FilledButton>(
       find.widgetWithText(FilledButton, 'Lanjut ke Psikoedukasi'),
     );
