@@ -91,9 +91,12 @@ Do not hardcode URLs in features or call Dio from presentation code.
   Research Samsung Internet path also has a transient screenshot/OCR fallback
   for versions that expose only pixels after the `content_layout` bridge; the
   bitmap and OCR result remain local and in memory. Samsung Internet 30.0.0.67
-  has passed one physical Research-release smoke test through the
-  OCR-to-classifier-to-Pattern-Interrupt path; broader browser/version/device
-  coverage remains required.
+  has passed the physical Research-release browser matrix batch with five
+  gambling and five non-gambling samples, including the OCR-to-classifier-to-
+  Pattern-Interrupt path. The built-in Xiaomi Browser also passed its physical
+  Research-release five-gambling/five-non-gambling batch with intervention and
+  allow outcomes respectively. Broader version/device coverage remains
+  required.
   Intervention delivery is ID-based and native-first: the
   resident overlay owns the first committed frame while Flutter is retained as
   the acknowledgement-safe fallback if Android rejects overlay attachment.
@@ -101,9 +104,12 @@ Do not hardcode URLs in features or call Dio from presentation code.
   App Info does not trigger friction; Play must remain Chrome/Edge-only without
   Settings/package-installer monitoring. Broader real-device coverage,
   accessibility, lifecycle, and performance evidence are still required.
-  Research prompts for Device Admin activation on first app resume and from
-  setup; the active-admin state is the primary uninstall guard, while the
-  action-aware Accessibility detector remains an OEM-specific fallback.
+  Research opens Device Admin and Accessibility settings only after an explicit
+  setup/recovery action; lifecycle callbacks and the service must never launch
+  those settings. The active-admin state is the primary uninstall guard, while
+  the action-aware Accessibility detector remains an OEM-specific fallback.
+  Controlled removal requires a partner `uninstall_detected` grant or a
+  two-admin `emergency_access` grant; never restore partnerless self-removal.
   Phase 4 latency capture is opt-in, local-only, and allowlisted: it records
   the binary's actual product flavor and refuses a configured build mode that
   does not match the running binary. The current progress checkpoint is the

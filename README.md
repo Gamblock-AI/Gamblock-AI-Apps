@@ -154,30 +154,33 @@ fallback. Samsung Internet additionally uses a `content_layout` page-subtree
 fallback and, when that subtree contains no renderer text, a Research-only
 transient on-device screenshot/OCR fallback. Toolbar and tab controls are
 excluded from the crop. The screenshot and OCR text stay in process memory and
-are never persisted or sent to the backend. Samsung Internet 30.0.0.67 passed
-one physical Research-release smoke test covering OCR, local classification,
-and Pattern Interrupt; support remains best-effort for other versions/devices
-until broader runtime coverage is recorded.
+are never persisted or sent to the backend. Samsung Internet and Xiaomi Browser
+are included in the required Android browser-support matrix. Samsung Internet
+30.0.0.67 and the built-in Xiaomi Browser passed their physical Research-release
+matrix batches with five gambling interventions and five non-gambling allows;
+Samsung's batch also covered OCR, local classification, and Pattern Interrupt.
+The retained results are aggregate-only.
 It contains transparent settings/removal friction tied to bounded
 approval or emergency grants. Its detector is
 action-aware: merely opening App Info is not tamper evidence, while an explicit
   uninstall, Accessibility-disable, force-stop, or clear-data action is handled
   according to its own purpose. A valid `uninstall_detected` grant can open the
-  normal Android removal UI after explicit user confirmation; a protection pause
-  does not authorize uninstall. Other browsers and arbitrary Android WebViews
+  normal Android removal UI after explicit user confirmation; a two-admin
+  `emergency_access` grant can do the same, while a protection pause does not
+  authorize uninstall. Other browsers and arbitrary Android WebViews
   are not claimed as covered. A sideloaded app cannot make itself impossible to
   uninstall; the research prototype adds best-effort, OS-supported friction and
   transparent recovery rather than unsafe device-owner behavior. Research asks
-  for Device Admin activation on the first app resume and from the setup card;
-  Android's active-admin check is the primary uninstall guard, while the
-  Accessibility detector remains an OEM-specific fallback. The Research
-  service re-checks that guard when it connects and re-opens the activation
-  flow when an OEM reports an explicit tamper attempt while the admin is
-  inactive; the warning overlay is held back while that system prompt is
-  visible. This does not claim to make Android force-stop itself
-  unresistible. After prior Accessibility consent, reopening the app requests
-  a normal system rebind or opens Accessibility Settings when Xiaomi/Redmi has
-  removed the service from its enabled list; Android still requires the user to
+  for Device Admin activation only from explicit setup/recovery actions;
+  lifecycle callbacks and the Accessibility service never open Device Admin or
+  Accessibility settings automatically. Android's active-admin check is the
+  primary uninstall guard, while the stateful Accessibility detector keeps a
+  five-second Gamblock target context for split OEM Settings events. An
+  unapproved action receives best-effort Back/Home plus a warning overlay.
+  This does not claim to make Android force-stop itself unresistible. After
+  prior Accessibility consent, reopening the app requests a normal system
+  rebind or reports a degraded state when Xiaomi/Redmi removed the service;
+  Android still requires the user to explicitly open setup and
   toggle that permission manually; when the service remains enabled, the app
   keeps the protection bridge ready and leaves binding to Android.
 
@@ -218,7 +221,8 @@ the installed MSI by its registered ProductCode. Direct elevated Windows
 Installer removal remains the administrator break-glass path; a protection
 pause does not authorize removal. The PowerShell files under
 `windows/scripts/` are developer/evidence helpers and are not shipped by the
-MSI. Windows runtime, signing, and uninstall behavior still require validation
+  MSI. Partnerless self-removal is not supported; partner approval or the
+  two-admin emergency path is required. Windows runtime, signing, and uninstall behavior still require validation
 on a Windows VM/device.
 
 The cross-repository Chrome-to-model runtime smoke test is maintained in
@@ -254,7 +258,7 @@ reproducible `researchRelease` Android + Chrome + `warm_foreground_online`
 group: p95 strictly below 200 ms, at least 30 successful samples, and no
 failed block or visibility outcome. A separate feasibility gate accepts one
 homogeneous group. The former final-readiness latency matrix is replaced by a
-browser-support regression on one required Android device with four configured
+browser-support regression on one required Android device with six configured
 Android browsers; the five configured Windows browsers are optional. Each
 browser uses 5 gambling + 5 non-gambling fixtures. Debug builds are diagnostic
 only, not
