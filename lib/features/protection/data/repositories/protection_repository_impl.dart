@@ -29,5 +29,6 @@ class ProtectionRepositoryImpl implements ProtectionRepository {
       PlatformBridge.runLocalSelfTest();
 
   @override
-  Future<bool> beginApprovedRemoval() => PlatformBridge.beginApprovedRemoval();
+  Future<RemovalStartResult> beginApprovedRemoval() =>
+      PlatformBridge.beginApprovedRemoval();
 }

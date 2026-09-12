@@ -175,10 +175,11 @@ void ProtectionService::HandlePipeCommand(const std::string &command) {
     if (recorded)
       SendAgentEvent(SnapshotJson(""));
   } else if (type == "begin_approved_removal") {
-    const bool launched = BeginApprovedRemoval();
+    const std::string status = BeginApprovedRemovalResult();
     SendAgentEvent("{\"type\":\"response\",\"request_id\":\"" +
                    EscapeJson(request_id) +
-                   "\",\"ok\":" + (launched ? "true" : "false") + "}");
+                   "\",\"ok\":" + (status == "started" ? "true" : "false") +
+                   ",\"status\":\"" + EscapeJson(status) + "\"}");
   } else if (type == "snapshot") {
     SendAgentEvent(SnapshotJson(request_id));
   } else if (type == "self_test") {

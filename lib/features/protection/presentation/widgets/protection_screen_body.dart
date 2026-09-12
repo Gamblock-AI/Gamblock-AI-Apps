@@ -42,8 +42,6 @@ class ProtectionScreenBody extends StatelessWidget {
     required this.onLogin,
     required this.onOpenAccountSetup,
     required this.onOpenDeviceAdmin,
-    this.canStandaloneRemoval = false,
-    this.onRequestStandaloneRemoval,
   });
 
   final bool isLoading;
@@ -65,8 +63,6 @@ class ProtectionScreenBody extends StatelessWidget {
   final VoidCallback onLogin;
   final VoidCallback onOpenAccountSetup;
   final VoidCallback onOpenDeviceAdmin;
-  final bool canStandaloneRemoval;
-  final VoidCallback? onRequestStandaloneRemoval;
 
   @override
   Widget build(BuildContext context) {
@@ -151,8 +147,6 @@ class ProtectionScreenBody extends StatelessWidget {
                   onEnterEmergencyKey: onEnterEmergencyKey,
                   onLogin: onLogin,
                   onOpenSetup: onOpenAccountSetup,
-                  canStandaloneRemoval: canStandaloneRemoval,
-                  onRequestStandaloneRemoval: onRequestStandaloneRemoval,
                 ),
               ],
             ],

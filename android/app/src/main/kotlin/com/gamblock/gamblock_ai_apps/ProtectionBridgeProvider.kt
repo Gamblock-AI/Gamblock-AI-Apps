@@ -117,9 +117,8 @@ class ProtectionBridgeProvider : ContentProvider() {
             "store_grant" -> Bundle().apply {
                 putBoolean("value", stateStore.storeGrant(arg.orEmpty()))
             }
-            "begin_approved_removal" -> Bundle().apply {
-                putBoolean("value", beginApprovedRemoval())
-            }
+            "begin_approved_removal" -> removalResult(beginApprovedRemoval())
+            "handle_removal_resume" -> removalResult(handleRemovalResume())
             "drain_daily_aggregates" -> aggregatesBundle(aggregates.completedDays())
             "get_current_daily_aggregates" -> aggregatesBundle(aggregates.currentDay())
             "ack_daily_aggregates" -> {
@@ -212,17 +211,8 @@ class ProtectionBridgeProvider : ContentProvider() {
         return Bundle().apply { putParcelableArrayList("rows", list) }
     }
 
-    private fun beginApprovedRemoval(): Boolean {
-        if (!BuildConfig.SUPPORTS_CONTROLLED_REMOVAL) return false
-        if (!stateStore.activeGrantAllowsControlledRemoval()) return false
-        // Partner-approved removal: deactivate our own device administrator
-        // first so Android allows the uninstall.
-        val dpm = context!!.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-        runCatching {
-            dpm.removeActiveAdmin(
-                ComponentName(context!!.packageName, "com.gamblock.gamblock_ai_apps.ProtectionDeviceAdminReceiver"),
-            )
-        }
+    private fun beginApprovedRemoval(): String {
+        if (!BuildConfig.SUPPORTS_CONTROLLED_REMOVAL) return "unsupported"
         val removalIntent = Intent(
             Intent.ACTION_DELETE,
             Uri.parse("package:${context!!.packageName}"),
@@ -230,14 +220,64 @@ class ProtectionBridgeProvider : ContentProvider() {
         val handlerPackage = removalIntent.resolveActivity(context!!.packageManager)
             ?.packageName
             ?.takeIf(String::isNotBlank)
-            ?: return false
+            ?: return "installer_unavailable"
+
+        val pending = stateStore.activeApprovedRemoval()
+            ?: stateStore.consumeControlledRemovalGrant()
+            ?: return "not_authorized"
+        if (pending.stage == "installer_started") return "started"
+
+        val dpm = context!!.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        val admin = ComponentName(
+            context!!.packageName,
+            "com.gamblock.gamblock_ai_apps.ProtectionDeviceAdminReceiver",
+        )
+        if (runCatching { dpm.isAdminActive(admin) }.getOrDefault(false)) {
+            if (!stateStore.updateApprovedRemovalStage("pending_admin_deactivation")) {
+                return "admin_deactivation_failed"
+            }
+            val requested = runCatching {
+                dpm.removeActiveAdmin(admin)
+                true
+            }.getOrDefault(false)
+            if (!requested) return "admin_deactivation_failed"
+            if (runCatching { dpm.isAdminActive(admin) }.getOrDefault(true)) {
+                return "pending_admin_deactivation"
+            }
+        }
+
         removalIntent.setPackage(handlerPackage)
         removalIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (!stateStore.updateApprovedRemovalStage("installer_started")) {
+            return "launch_failed"
+        }
         return runCatching {
             context!!.startActivity(removalIntent)
             stateStore.clearPendingTamperAction()
-            true
-        }.getOrDefault(false)
+            "started"
+        }.getOrElse {
+            stateStore.clearApprovedRemoval()
+            stateStore.setStatus("degraded", "approved_removal_launch_failed")
+            "launch_failed"
+        }
+    }
+
+    private fun handleRemovalResume(): String {
+        val pending = stateStore.activeApprovedRemoval() ?: return "none"
+        if (pending.stage != "installer_started") return "none"
+        stateStore.clearApprovedRemoval()
+        if (!isDeviceAdminActive()) {
+            stateStore.setStatus("degraded", "approved_removal_cancelled")
+            ProtectionBridge.emit(context!!, snapshot())
+        }
+        return "cancelled"
+    }
+
+    private fun removalResult(status: String): Bundle {
+        return Bundle().apply {
+            putString("status", status)
+            putBoolean("value", status == "started")
+        }
     }
 
     private fun isDeviceAdminActive(): Boolean {

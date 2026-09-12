@@ -24,8 +24,6 @@ class ProtectionAccountabilitySection extends StatelessWidget {
     required this.onEnterEmergencyKey,
     required this.onLogin,
     required this.onOpenSetup,
-    this.canStandaloneRemoval = false,
-    this.onRequestStandaloneRemoval,
   });
 
   final AuthState auth;
@@ -40,8 +38,6 @@ class ProtectionAccountabilitySection extends StatelessWidget {
   final VoidCallback onEnterEmergencyKey;
   final VoidCallback onLogin;
   final VoidCallback onOpenSetup;
-  final bool canStandaloneRemoval;
-  final VoidCallback? onRequestStandaloneRemoval;
 
   @override
   Widget build(BuildContext context) {
@@ -84,8 +80,6 @@ class ProtectionAccountabilitySection extends StatelessWidget {
             onManagePartner: onManagePartner,
             onRequestEmergency: onRequestEmergency,
             onEnterEmergencyKey: onEnterEmergencyKey,
-            canStandaloneRemoval: canStandaloneRemoval,
-            onRequestStandaloneRemoval: onRequestStandaloneRemoval,
           ),
       ],
     );

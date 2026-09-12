@@ -225,31 +225,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'This request needs your active partner\'s approval. Protection stays on until the change is applied.';
 
   @override
-  String get protectionStandaloneRemovalButton => 'Remove app';
-
-  @override
-  String get protectionStandaloneRemovalTitle => 'Remove app without a partner';
-
-  @override
-  String protectionStandaloneRemovalBody(String phrase) {
-    return 'You have no active partner. To prevent accidental removal, wait for the countdown and type $phrase to remove the app and disable the device admin.';
-  }
-
-  @override
-  String protectionStandaloneRemovalCountdown(int seconds) {
-    return '$seconds seconds';
-  }
-
-  @override
-  String protectionStandaloneRemovalPhraseMismatch(String phrase) {
-    return 'Type $phrase exactly to continue.';
-  }
-
-  @override
-  String get protectionStandaloneRemovalSuccess =>
-      'Protection removed. Follow the system prompt to delete the app.';
-
-  @override
   String get protectionPauseAction => 'Pause';
 
   @override
@@ -1034,6 +1009,40 @@ class AppLocalizationsEn extends AppLocalizations {
       'The emergency grant is active for 10 minutes.';
 
   @override
+  String get emergencyRemovalChoiceTitle => 'Choose emergency action';
+
+  @override
+  String get emergencyRemovalChoiceBody =>
+      'Keep the emergency access active, or use this one-time grant to uninstall Gamblock-AI from this device.';
+
+  @override
+  String get emergencyContinueAccessAction => 'Keep emergency access';
+
+  @override
+  String get removalAdminDeactivationPending =>
+      'Android is still deactivating removal protection. Try the approved removal again in a moment.';
+
+  @override
+  String get removalUnsupported =>
+      'Controlled removal is not available in this app distribution.';
+
+  @override
+  String get removalNotAuthorized =>
+      'The removal approval is missing, expired, or has already been used.';
+
+  @override
+  String get removalInstallerUnavailable =>
+      'Android or Windows could not find the trusted system uninstaller.';
+
+  @override
+  String get removalAdminDeactivationFailed =>
+      'Android could not deactivate removal protection. Check Device Admin status and try again with a new approval if needed.';
+
+  @override
+  String get removalLaunchFailed =>
+      'The system uninstaller could not be started. Removal protection must be restored before trying again.';
+
+  @override
   String get checkSetupAction => 'Check setup';
 
   @override
@@ -1101,6 +1110,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deviceAdminSetupAction => 'Activate';
+
+  @override
+  String get deviceAdminSetupReadyTitle => 'Removal protection is active';
+
+  @override
+  String get deviceAdminSetupReady =>
+      'Removal protection is active. Android Device Admin can only be opened again from an explicit recovery action.';
 
   @override
   String get analyticsTitle => 'Analytics';

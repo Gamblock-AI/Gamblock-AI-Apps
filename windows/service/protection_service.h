@@ -30,6 +30,7 @@ public:
   bool Install();
   bool Uninstall(bool require_grant = true);
   bool BeginApprovedRemoval();
+  std::string BeginApprovedRemovalResult();
   int RunConsole();
 
 private:

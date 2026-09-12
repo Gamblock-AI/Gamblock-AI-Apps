@@ -34,6 +34,15 @@
   "emergencyKeyLabel": "Single-use key",
   "emergencyKeyHelp": "The key is approved by two admins, belongs to this device, and works for 24 hours.",
   "emergencyKeyApplied": "The emergency grant is active for 10 minutes.",
+  "emergencyRemovalChoiceTitle": "Choose emergency action",
+  "emergencyRemovalChoiceBody": "Keep the emergency access active, or use this one-time grant to uninstall Gamblock-AI from this device.",
+  "emergencyContinueAccessAction": "Keep emergency access",
+  "removalAdminDeactivationPending": "Android is still deactivating removal protection. Try the approved removal again in a moment.",
+  "removalUnsupported": "Controlled removal is not available in this app distribution.",
+  "removalNotAuthorized": "The removal approval is missing, expired, or has already been used.",
+  "removalInstallerUnavailable": "Android or Windows could not find the trusted system uninstaller.",
+  "removalAdminDeactivationFailed": "Android could not deactivate removal protection. Check Device Admin status and try again with a new approval if needed.",
+  "removalLaunchFailed": "The system uninstaller could not be started. Removal protection must be restored before trying again.",
   "checkSetupAction": "Check setup",
   "helpPageOpenError": "The help page could not be opened yet. Try again.",
   "statusChipOk": "OK",
@@ -55,5 +64,7 @@
   "statusExpired": "expired",
   "deviceAdminSetupTitle": "Removal protection is not active",
   "deviceAdminSetupSubtitle": "Activate it first so Android refuses uninstallation without your partner's approval.",
-  "deviceAdminSetupAction": "Activate"
+  "deviceAdminSetupAction": "Activate",
+  "deviceAdminSetupReadyTitle": "Removal protection is active",
+  "deviceAdminSetupReady": "Removal protection is active. Android Device Admin can only be opened again from an explicit recovery action."
 }

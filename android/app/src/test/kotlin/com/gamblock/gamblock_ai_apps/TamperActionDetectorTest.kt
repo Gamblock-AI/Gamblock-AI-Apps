@@ -167,6 +167,57 @@ class TamperActionDetectorTest {
     }
 
     @Test
+    fun settingsArmedGamblockContextAllowsSplitMiuiUninstallClick() {
+        val observation = TamperObservation(
+            surface = TamperSurface.SETTINGS,
+            eventKind = TamperEventKind.CLICK,
+            sourceTexts = listOf("Nonaktifkan & uninstal"),
+            windowTexts = listOf("Aplikasi admin perangkat"),
+            targetIdentifiers = targetIdentifiers,
+            launcherArmed = false,
+            settingsArmed = true,
+            sourceCheckable = false,
+            sourceChecked = false,
+        )
+        val action = TamperActionDetector.detect(observation)
+        assertEquals(TamperAction.UNINSTALL, action)
+    }
+
+    @Test
+    fun expiredSettingsContextDoesNotCaptureGenericUninstallClick() {
+        val observation = TamperObservation(
+            surface = TamperSurface.SETTINGS,
+            eventKind = TamperEventKind.CLICK,
+            sourceTexts = listOf("Uninstal"),
+            windowTexts = listOf("Info aplikasi"),
+            targetIdentifiers = targetIdentifiers,
+            launcherArmed = false,
+            settingsArmed = false,
+            sourceCheckable = false,
+            sourceChecked = false,
+        )
+        val action = TamperActionDetector.detect(observation)
+        assertEquals(TamperAction.NONE, action)
+    }
+
+    @Test
+    fun armedSettingsContextDoesNotCaptureAnotherAppsGenericUninstall() {
+        val observation = TamperObservation(
+            surface = TamperSurface.SETTINGS,
+            eventKind = TamperEventKind.CLICK,
+            sourceTexts = listOf("Uninstal"),
+            windowTexts = listOf("Info aplikasi", "Spotify Music"),
+            targetIdentifiers = targetIdentifiers,
+            launcherArmed = false,
+            settingsArmed = true,
+            sourceCheckable = false,
+            sourceChecked = false,
+        )
+        val action = TamperActionDetector.detect(observation)
+        assertEquals(TamperAction.NONE, action)
+    }
+
+    @Test
     fun settingsTurningOffGamblockAccessibilityTriggersDisableAccessibility() {
         val observation = TamperObservation(
             surface = TamperSurface.SETTINGS,

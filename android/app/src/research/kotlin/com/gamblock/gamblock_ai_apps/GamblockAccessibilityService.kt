@@ -1,9 +1,5 @@
 package com.gamblock.gamblock_ai_apps
 
-import android.app.admin.DevicePolicyManager
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
 import android.os.SystemClock
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
@@ -36,7 +32,7 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
             "com.UCMobile.intl",
         )
         private const val LAUNCHER_ARM_TTL_MS = 5_000L
-        private const val DEVICE_ADMIN_PROMPT_COOLDOWN_MS = 10_000L
+        private const val SETTINGS_ARM_TTL_MS = 5_000L
     }
 
     private val resolvedTamperPackages: ResolvedTamperPackages by lazy {
@@ -51,14 +47,13 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
     private lateinit var tamperOverlay: TamperWarningOverlay
     private var samsungScreenshotOcr: SamsungInternetScreenshotOcr? = null
     private var launcherArmedUntilElapsedMs = 0L
-    private var lastDeviceAdminPromptAtElapsedMs = 0L
+    private var settingsArmedUntilElapsedMs = 0L
 
     override fun onProtectionServiceConnected() {
         samsungScreenshotOcr = SamsungInternetScreenshotOcr.createOrNull(this)
         tamperOverlay = TamperWarningOverlay(this)
         if (!isDeviceAdminActiveForResearch()) {
             stateStore.setStatus("degraded", "device_admin_inactive")
-            requestDeviceAdminActivationIfNeeded()
             ProtectionBridge.emit(this, snapshotMap())
         }
     }
@@ -112,7 +107,11 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
         sourcePackage: String,
     ) {
         val surface = resolvedTamperPackages.surfaceFor(sourcePackage)
-        if (surface == TamperSurface.OTHER) return
+        if (surface == TamperSurface.OTHER) {
+            launcherArmedUntilElapsedMs = 0L
+            settingsArmedUntilElapsedMs = 0L
+            return
+        }
 
         val sourceTexts = buildList {
             event.text.mapNotNull { it?.toString()?.trim() }
@@ -130,12 +129,13 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
             "Gamblock AI Research",
             "Gamblock AI",
         )
+        val nowElapsedMs = SystemClock.elapsedRealtime()
         if (
             surface == TamperSurface.LAUNCHER &&
             event.eventType == AccessibilityEvent.TYPE_VIEW_LONG_CLICKED
         ) {
             if (TamperActionDetector.containsGamblockTarget(sourceTexts, targetIdentifiers)) {
-                launcherArmedUntilElapsedMs = SystemClock.elapsedRealtime() + LAUNCHER_ARM_TTL_MS
+                launcherArmedUntilElapsedMs = nowElapsedMs + LAUNCHER_ARM_TTL_MS
             }
             return
         }
@@ -145,81 +145,63 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
         // still useful (and may contain the uninstall confirmation), so do not
         // drop the tamper check solely because the root is temporarily null.
         val root = rootInActiveWindow
+        val windowTexts = root?.let { collectNodeTexts(it, limit = 320) }.orEmpty()
+        val targetVisible =
+            TamperActionDetector.containsGamblockTarget(sourceTexts, targetIdentifiers) ||
+                TamperActionDetector.containsGamblockTarget(windowTexts, targetIdentifiers)
+        if (surface != TamperSurface.SETTINGS) {
+            settingsArmedUntilElapsedMs = 0L
+        } else if (targetVisible) {
+            settingsArmedUntilElapsedMs = nowElapsedMs + SETTINGS_ARM_TTL_MS
+        }
         val observation = TamperObservation(
             surface = surface,
             eventKind = eventKind(event.eventType),
             sourceTexts = sourceTexts,
-            windowTexts = root?.let { collectNodeTexts(it, limit = 320) }.orEmpty(),
+            windowTexts = windowTexts,
             targetIdentifiers = targetIdentifiers,
-            launcherArmed = SystemClock.elapsedRealtime() <= launcherArmedUntilElapsedMs,
+            launcherArmed = nowElapsedMs <= launcherArmedUntilElapsedMs,
+            settingsArmed = nowElapsedMs <= settingsArmedUntilElapsedMs,
             sourceCheckable = event.source?.isCheckable == true,
             sourceChecked = event.source?.isChecked == true,
         )
         val action = TamperActionDetector.detect(observation)
-        if (action == TamperAction.NONE) return
+        if (action == TamperAction.NONE) {
+            if (
+                surface == TamperSurface.SETTINGS &&
+                observation.eventKind == TamperEventKind.CLICK &&
+                !targetVisible
+            ) {
+                settingsArmedUntilElapsedMs = 0L
+            }
+            return
+        }
         launcherArmedUntilElapsedMs = 0L
-        if (stateStore.activeGrantAllowsTamperAction(action.wireValue)) return
+        settingsArmedUntilElapsedMs = 0L
+        if (stateStore.hasApprovedRemovalPending()) return
+        if (
+            action != TamperAction.UNINSTALL &&
+            stateStore.activeGrantAllowsTamperAction(action.wireValue)
+        ) return
 
         val newlyPending = stateStore.recordPendingTamperAction(action.wireValue)
         if (newlyPending) {
             aggregateStore.increment("tamper_detected")
         }
         var surfaceCleared = safelyLeaveTamperSurface()
-        // Xiaomi/Redmi can terminate the protection process immediately after
-        // confirming force-stop. Re-request the OS uninstall guard while the
-        // Accessibility event is still available; the durable tamper event is
-        // already persisted above for replay after the next app launch.
-        val adminPromptStarted = requestDeviceAdminActivationIfNeeded()
-        if (!adminPromptStarted) {
-            tamperOverlay.show(
-                tamperAction = action.wireValue,
-                onSafeDismiss = {
-                    if (!surfaceCleared) {
-                        surfaceCleared = safelyLeaveTamperSurface()
-                    }
-                },
-            )
-        }
+        tamperOverlay.show(
+            tamperAction = action.wireValue,
+            onSafeDismiss = {
+                if (!surfaceCleared) {
+                    surfaceCleared = safelyLeaveTamperSurface()
+                }
+            },
+        )
         if (newlyPending) {
             stateStore.pendingApprovalEvent()?.let {
                 ProtectionBridge.emit(this, it)
             }
         }
-    }
-
-    /**
-     * Device Admin is the only supported uninstall guard for a sideloaded
-     * Research app. It cannot prevent force-stop itself, so this is a
-     * best-effort re-arm before an OEM completes the force-stop action.
-     */
-    private fun requestDeviceAdminActivationIfNeeded(): Boolean {
-        if (!BuildConfig.SUPPORTS_CONTROLLED_REMOVAL) return false
-        if (isDeviceAdminActiveForResearch()) return false
-
-        val now = SystemClock.elapsedRealtime()
-        if (now - lastDeviceAdminPromptAtElapsedMs < DEVICE_ADMIN_PROMPT_COOLDOWN_MS) {
-            return false
-        }
-        lastDeviceAdminPromptAtElapsedMs = now
-
-        return runCatching {
-            val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-            val component = ComponentName(
-                packageName,
-                "com.gamblock.gamblock_ai_apps.ProtectionDeviceAdminReceiver",
-            )
-            if (dpm.isAdminActive(component)) return@runCatching false
-            val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
-                putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, component)
-                putExtra(
-                    DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                    getString(R.string.device_admin_explanation),
-                )
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            startActivity(intent)
-            true
-        }.getOrDefault(false)
     }
 
     private fun safelyLeaveTamperSurface(): Boolean {

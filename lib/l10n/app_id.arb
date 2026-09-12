@@ -74,33 +74,6 @@
   "protectionApprovalApplied": "Persetujuan diterapkan pada perangkat.",
   "protectionApprovalDialogTitle": "Minta perubahan proteksi",
   "protectionApprovalDialogBody": "Permintaan terikat pada perangkat dan harus disetujui pendamping aktif. Proteksi tetap berjalan sampai grant diterapkan.",
-  "protectionStandaloneRemovalButton": "Copot Aplikasi",
-  "protectionStandaloneRemovalTitle": "Copot Aplikasi Tanpa Pendamping",
-  "protectionStandaloneRemovalBody": "Anda tidak memiliki pendamping aktif. Untuk mencegah penghapusan tidak sengaja, tunggu hitung mundur lalu ketik {phrase} untuk mencopot aplikasi dan menonaktifkan admin perangkat.",
-  "@protectionStandaloneRemovalBody": {
-    "placeholders": {
-      "phrase": {
-        "type": "String"
-      }
-    }
-  },
-  "protectionStandaloneRemovalCountdown": "{seconds} detik",
-  "@protectionStandaloneRemovalCountdown": {
-    "placeholders": {
-      "seconds": {
-        "type": "int"
-      }
-    }
-  },
-  "protectionStandaloneRemovalPhraseMismatch": "Ketik {phrase} persis untuk melanjutkan.",
-  "@protectionStandaloneRemovalPhraseMismatch": {
-    "placeholders": {
-      "phrase": {
-        "type": "String"
-      }
-    }
-  },
-  "protectionStandaloneRemovalSuccess": "Proteksi dicopot. Ikuti prompt sistem untuk menghapus aplikasi.",
   "protectionPauseAction": "Jeda",
   "protectionDisableAction": "Nonaktifkan",
   "protectionUninstallAction": "Copot",
@@ -373,6 +346,15 @@
   "emergencyKeyLabel": "Kunci satu-kali-pakai",
   "emergencyKeyHelp": "Kunci diterbitkan setelah ditinjau dua admin platform berbeda, terikat pada perangkat ini, dan berlaku 24 jam.",
   "emergencyKeyApplied": "Grant darurat diterapkan selama 10 menit.",
+  "emergencyRemovalChoiceTitle": "Pilih tindakan darurat",
+  "emergencyRemovalChoiceBody": "Pertahankan akses darurat, atau gunakan grant satu-kali-pakai ini untuk mencopot Gamblock-AI dari perangkat ini.",
+  "emergencyContinueAccessAction": "Pertahankan akses darurat",
+  "removalAdminDeactivationPending": "Android masih menonaktifkan perlindungan pencopotan. Coba kembali pencopotan yang telah disetujui beberapa saat lagi.",
+  "removalUnsupported": "Pencopotan terkendali tidak tersedia pada distribusi aplikasi ini.",
+  "removalNotAuthorized": "Persetujuan pencopotan tidak tersedia, kedaluwarsa, atau sudah digunakan.",
+  "removalInstallerUnavailable": "Android atau Windows tidak menemukan pencopot sistem tepercaya.",
+  "removalAdminDeactivationFailed": "Android tidak dapat menonaktifkan perlindungan pencopotan. Periksa status Admin Perangkat dan gunakan persetujuan baru bila diperlukan.",
+  "removalLaunchFailed": "Pencopot sistem tidak dapat dimulai. Pulihkan perlindungan sebelum mencoba kembali.",
   "checkSetupAction": "Periksa setup",
   "helpPageOpenError": "Halaman bantuan belum dapat dibuka. Coba lagi.",
   "statusChipOk": "OK",
@@ -395,6 +377,8 @@
   "deviceAdminSetupTitle": "Perlindungan penghapusan belum aktif",
   "deviceAdminSetupSubtitle": "Aktifkan terlebih dahulu agar Android menolak pencopotan tanpa persetujuan pendamping.",
   "deviceAdminSetupAction": "Aktifkan",
+  "deviceAdminSetupReadyTitle": "Perlindungan pencopotan aktif",
+  "deviceAdminSetupReady": "Perlindungan pencopotan aktif. Admin Perangkat hanya akan dibuka kembali melalui tindakan pemulihan yang dipilih secara eksplisit.",
   "analyticsTitle": "Analitik",
   "analyticsSignInTitle": "Masuk untuk melihat analitik",
   "analyticsSignInBody": "Analitik hanya berisi hitungan agregat perangkat dan tidak memuat URL atau riwayat penjelajahan.",

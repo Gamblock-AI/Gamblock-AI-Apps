@@ -144,8 +144,13 @@ void NativeProtectionBridge::ConfigureMethodChannel(
       }
       result->Success(flutter::EncodableValue(completed));
     } else if (call.method_name() == "beginApprovedRemoval") {
-      result->Success(flutter::EncodableValue(
-          JsonBool(CallService("begin_approved_removal", "", 10000), "ok")));
+      const std::string response =
+          CallService("begin_approved_removal", "", 10000);
+      result->Success(flutter::EncodableValue(flutter::EncodableMap{
+          {flutter::EncodableValue("status"),
+           flutter::EncodableValue(
+               JsonString(response, "status", "launch_failed"))},
+      }));
     } else {
       result->NotImplemented();
     }

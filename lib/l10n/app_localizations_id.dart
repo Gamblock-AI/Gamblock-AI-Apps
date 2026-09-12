@@ -227,32 +227,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Permintaan terikat pada perangkat dan harus disetujui pendamping aktif. Proteksi tetap berjalan sampai grant diterapkan.';
 
   @override
-  String get protectionStandaloneRemovalButton => 'Copot Aplikasi';
-
-  @override
-  String get protectionStandaloneRemovalTitle =>
-      'Copot Aplikasi Tanpa Pendamping';
-
-  @override
-  String protectionStandaloneRemovalBody(String phrase) {
-    return 'Anda tidak memiliki pendamping aktif. Untuk mencegah penghapusan tidak sengaja, tunggu hitung mundur lalu ketik $phrase untuk mencopot aplikasi dan menonaktifkan admin perangkat.';
-  }
-
-  @override
-  String protectionStandaloneRemovalCountdown(int seconds) {
-    return '$seconds detik';
-  }
-
-  @override
-  String protectionStandaloneRemovalPhraseMismatch(String phrase) {
-    return 'Ketik $phrase persis untuk melanjutkan.';
-  }
-
-  @override
-  String get protectionStandaloneRemovalSuccess =>
-      'Proteksi dicopot. Ikuti prompt sistem untuk menghapus aplikasi.';
-
-  @override
   String get protectionPauseAction => 'Jeda';
 
   @override
@@ -1032,6 +1006,40 @@ class AppLocalizationsId extends AppLocalizations {
   String get emergencyKeyApplied => 'Grant darurat diterapkan selama 10 menit.';
 
   @override
+  String get emergencyRemovalChoiceTitle => 'Pilih tindakan darurat';
+
+  @override
+  String get emergencyRemovalChoiceBody =>
+      'Pertahankan akses darurat, atau gunakan grant satu-kali-pakai ini untuk mencopot Gamblock-AI dari perangkat ini.';
+
+  @override
+  String get emergencyContinueAccessAction => 'Pertahankan akses darurat';
+
+  @override
+  String get removalAdminDeactivationPending =>
+      'Android masih menonaktifkan perlindungan pencopotan. Coba kembali pencopotan yang telah disetujui beberapa saat lagi.';
+
+  @override
+  String get removalUnsupported =>
+      'Pencopotan terkendali tidak tersedia pada distribusi aplikasi ini.';
+
+  @override
+  String get removalNotAuthorized =>
+      'Persetujuan pencopotan tidak tersedia, kedaluwarsa, atau sudah digunakan.';
+
+  @override
+  String get removalInstallerUnavailable =>
+      'Android atau Windows tidak menemukan pencopot sistem tepercaya.';
+
+  @override
+  String get removalAdminDeactivationFailed =>
+      'Android tidak dapat menonaktifkan perlindungan pencopotan. Periksa status Admin Perangkat dan gunakan persetujuan baru bila diperlukan.';
+
+  @override
+  String get removalLaunchFailed =>
+      'Pencopot sistem tidak dapat dimulai. Pulihkan perlindungan sebelum mencoba kembali.';
+
+  @override
   String get checkSetupAction => 'Periksa setup';
 
   @override
@@ -1099,6 +1107,13 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get deviceAdminSetupAction => 'Aktifkan';
+
+  @override
+  String get deviceAdminSetupReadyTitle => 'Perlindungan pencopotan aktif';
+
+  @override
+  String get deviceAdminSetupReady =>
+      'Perlindungan pencopotan aktif. Admin Perangkat hanya akan dibuka kembali melalui tindakan pemulihan yang dipilih secara eksplisit.';
 
   @override
   String get analyticsTitle => 'Analitik';

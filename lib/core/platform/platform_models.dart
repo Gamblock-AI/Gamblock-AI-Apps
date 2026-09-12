@@ -63,6 +63,45 @@ class ProtectionSnapshot {
   );
 }
 
+enum RemovalStartStatus {
+  started,
+  pendingAdminDeactivation,
+  unsupported,
+  notAuthorized,
+  installerUnavailable,
+  adminDeactivationFailed,
+  launchFailed;
+
+  static RemovalStartStatus fromWire(String value) {
+    return switch (value) {
+      'started' => started,
+      'pending_admin_deactivation' => pendingAdminDeactivation,
+      'unsupported' => unsupported,
+      'not_authorized' => notAuthorized,
+      'installer_unavailable' => installerUnavailable,
+      'admin_deactivation_failed' => adminDeactivationFailed,
+      _ => launchFailed,
+    };
+  }
+}
+
+class RemovalStartResult {
+  const RemovalStartResult(this.status);
+
+  final RemovalStartStatus status;
+
+  bool get started => status == RemovalStartStatus.started;
+  bool get pending => status == RemovalStartStatus.pendingAdminDeactivation;
+
+  factory RemovalStartResult.fromMap(Map<Object?, Object?> map) {
+    return RemovalStartResult(
+      RemovalStartStatus.fromWire(map['status']?.toString() ?? ''),
+    );
+  }
+
+  static const failed = RemovalStartResult(RemovalStartStatus.launchFailed);
+}
+
 class NativeProtectionEvent {
   const NativeProtectionEvent({required this.type, required this.payload});
 

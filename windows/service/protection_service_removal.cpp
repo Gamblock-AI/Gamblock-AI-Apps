@@ -51,11 +51,19 @@ std::optional<std::filesystem::path> SystemMsiexecPath() {
 }  // namespace
 
 bool ProtectionService::BeginApprovedRemoval() {
+  return BeginApprovedRemovalResult() == "started";
+}
+
+std::string ProtectionService::BeginApprovedRemovalResult() {
   const auto product_code = InstalledProductCode();
   const auto msiexec_path = SystemMsiexecPath();
-  if (!product_code || !msiexec_path || !ConsumeActiveGrant("uninstall")) {
+  if (!product_code || !msiexec_path) {
+    SetLastError(ERROR_FILE_NOT_FOUND);
+    return "installer_unavailable";
+  }
+  if (!ConsumeActiveGrant("uninstall")) {
     SetLastError(ERROR_ACCESS_DENIED);
-    return false;
+    return "not_authorized";
   }
 
   std::wstring command = L"\"" + msiexec_path->wstring() + L"\" /x " +
@@ -72,7 +80,7 @@ bool ProtectionService::BeginApprovedRemoval() {
     CloseHandle(process.hThread);
     CloseHandle(process.hProcess);
   }
-  return launched;
+  return launched ? "started" : "launch_failed";
 }
 
 }  // namespace gamblock

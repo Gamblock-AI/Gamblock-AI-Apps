@@ -5,6 +5,7 @@ import '../../accountability/domain/entities/accountability_models.dart';
 import '../../../core/auth/auth_state.dart';
 import '../../../core/device/aggregate_sync.dart';
 import '../../../core/device/device_registry.dart';
+import '../../../core/platform/platform_models.dart';
 import '../data/providers.dart';
 import '../domain/entities/protection_status.dart';
 
@@ -62,7 +63,7 @@ class ProtectionCoordinator {
     return _ref.read(protectionRepositoryProvider).runLocalSelfTest();
   }
 
-  Future<bool> beginApprovedRemoval() {
+  Future<RemovalStartResult> beginApprovedRemoval() {
     return _ref.read(protectionRepositoryProvider).beginApprovedRemoval();
   }
 
@@ -91,12 +92,6 @@ class ProtectionCoordinator {
     return _ref
         .read(accountabilityRepositoryProvider)
         .applyApproval(requestId: requestId, deviceId: deviceId);
-  }
-
-  Future<void> requestStandaloneRemoval({required String deviceId}) {
-    return _ref
-        .read(accountabilityRepositoryProvider)
-        .requestStandaloneRemoval(deviceId: deviceId);
   }
 
   Future<void> requestEmergency(String deviceId) {

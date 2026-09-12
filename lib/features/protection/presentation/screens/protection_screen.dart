@@ -17,7 +17,6 @@ import '../widgets/approval_request_dialog.dart';
 import '../widgets/emergency_key_dialog.dart';
 import '../widgets/protection_screen_body.dart';
 import '../widgets/self_test_result_dialog.dart';
-import '../widgets/standalone_removal_dialog.dart';
 
 class ProtectionScreen extends ConsumerStatefulWidget {
   const ProtectionScreen({
@@ -49,7 +48,6 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
   bool _actionLoading = false;
   bool _handledRequestedApproval = false;
   bool _requestExemptionOnNextResume = false;
-  bool _openAccessibilitySetupOnNextResume = false;
   StreamSubscription<NativeProtectionEvent>? _statusSub;
   int _loadGeneration = 0;
 
@@ -77,14 +75,11 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
     if (state == AppLifecycleState.resumed) {
       _load();
       PlatformBridge.ensureBackgroundProtection().catchError((_) => false);
-      if (_openAccessibilitySetupOnNextResume) {
-        _openAccessibilitySetupOnNextResume = false;
-        unawaited(_openAccessibilitySetup());
-      }
       if (_requestExemptionOnNextResume) {
         _requestExemptionOnNextResume = false;
-        PlatformBridge.requestBatteryOptimizationExemption()
-            .catchError((_) => false);
+        PlatformBridge.requestBatteryOptimizationExemption().catchError(
+          (_) => false,
+        );
       }
     }
   }
@@ -162,15 +157,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       if (requested == 'uninstall' || requested == 'uninstall_detected') {
-        final membership = _accountability?.activeMembership;
-        final canStandalone = membership == null &&
-            _status?.supportsControlledRemoval == true &&
-            _status?.deviceAdminActive == true;
-        if (canStandalone) {
-          await _requestStandaloneRemoval();
-        } else {
-          _requestApproval(initialAction: 'uninstall_detected');
-        }
+        _requestApproval(initialAction: 'uninstall_detected');
       } else {
         AppFeedback.error(context, AppLocalizations.of(context)!.emergencyBody);
       }
@@ -178,22 +165,16 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
   }
 
   Future<void> _openSetup() async {
-    _requestExemptionOnNextResume = true;
     final needsRemovalProtection =
         _status?.supportsControlledRemoval == true &&
         _status?.deviceAdminActive != true;
     if (needsRemovalProtection) {
-      // Device Admin must be confirmed by Android before Accessibility setup
-      // is opened; otherwise a Research install remains uninstallable through
-      // Samsung/Oppo system surfaces even when the partner has not approved.
-      _openAccessibilitySetupOnNextResume = true;
-      final started = await PlatformBridge.requestDeviceAdminActivation();
-      if (!started && mounted) {
-        _openAccessibilitySetupOnNextResume = false;
-        await _openAccessibilitySetup();
-      }
+      // Each Android settings surface follows an explicit user action. After
+      // returning, the user can press setup again to open Accessibility.
+      await PlatformBridge.requestDeviceAdminActivation();
       return;
     }
+    _requestExemptionOnNextResume = true;
     await _openAccessibilitySetup();
   }
 
@@ -235,12 +216,6 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
       return;
     }
     if (membership == null) {
-      final canStandalone = _status?.supportsControlledRemoval == true &&
-          _status?.deviceAdminActive == true;
-      if (canStandalone) {
-        await _requestStandaloneRemoval();
-        return;
-      }
       AppFeedback.error(
         context,
         AppLocalizations.of(context)!.protectionPartnerRequired,
@@ -262,31 +237,6 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
       ),
       AppLocalizations.of(context)!.protectionRequestSent,
     );
-  }
-
-  Future<void> _requestStandaloneRemoval() async {
-    final auth = ref.read(authProvider);
-    final deviceId = auth.deviceId;
-    if (deviceId == null) return;
-    final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (_) => const StandaloneRemovalDialog(),
-    );
-    if (confirmed != true || !mounted) return;
-    await _runAccountabilityAction(
-      () => ProtectionCoordinator(ref).requestStandaloneRemoval(
-        deviceId: deviceId,
-      ),
-      l10n.protectionStandaloneRemovalSuccess,
-    );
-    if (!mounted) return;
-    setState(() => _actionLoading = true);
-    final started = await ProtectionCoordinator(ref).beginApprovedRemoval();
-    if (mounted && !started) {
-      AppFeedback.error(context, l10n.msgErrGeneric);
-    }
-    if (mounted) setState(() => _actionLoading = false);
   }
 
   Future<void> _applyApproval(ApprovalRequest request) async {
@@ -323,13 +273,7 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
       AppLocalizations.of(context)!.protectionApprovalApplied,
     );
     if (!applied || !controlledRemoval || !mounted) return;
-    final l10n = AppLocalizations.of(context)!;
-    setState(() => _actionLoading = true);
-    final started = await ProtectionCoordinator(ref).beginApprovedRemoval();
-    if (mounted && !started) {
-      AppFeedback.error(context, l10n.msgErrGeneric);
-    }
-    if (mounted) setState(() => _actionLoading = false);
+    await _beginApprovedRemoval();
   }
 
   Future<void> _requestEmergency() async {
@@ -345,12 +289,66 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
     final key = await showEmergencyKeyDialog(context);
     final deviceId = ref.read(authProvider).deviceId;
     if (key == null || key.isEmpty || deviceId == null || !mounted) return;
-    await _runAccountabilityAction(
+    final applied = await _runAccountabilityAction(
       () => ProtectionCoordinator(
         ref,
       ).applyEmergencyKey(deviceId: deviceId, emergencyKey: key),
       AppLocalizations.of(context)!.emergencyKeyApplied,
     );
+    if (!applied || !mounted || _status?.supportsControlledRemoval != true) {
+      return;
+    }
+    final l10n = AppLocalizations.of(context)!;
+    final remove = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.emergencyRemovalChoiceTitle),
+        content: Text(l10n.emergencyRemovalChoiceBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l10n.emergencyContinueAccessAction),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l10n.protectionUninstallAction),
+          ),
+        ],
+      ),
+    );
+    if (remove == true && mounted) await _beginApprovedRemoval();
+  }
+
+  Future<void> _beginApprovedRemoval() async {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() => _actionLoading = true);
+    var outcome = await ProtectionCoordinator(ref).beginApprovedRemoval();
+    for (var attempt = 0; outcome.pending && attempt < 4; attempt++) {
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+      outcome = await ProtectionCoordinator(ref).beginApprovedRemoval();
+    }
+    if (mounted && !outcome.started) {
+      AppFeedback.error(context, _removalFailureMessage(l10n, outcome.status));
+    }
+    if (mounted) setState(() => _actionLoading = false);
+  }
+
+  String _removalFailureMessage(
+    AppLocalizations l10n,
+    RemovalStartStatus status,
+  ) {
+    return switch (status) {
+      RemovalStartStatus.pendingAdminDeactivation =>
+        l10n.removalAdminDeactivationPending,
+      RemovalStartStatus.unsupported => l10n.removalUnsupported,
+      RemovalStartStatus.notAuthorized => l10n.removalNotAuthorized,
+      RemovalStartStatus.installerUnavailable =>
+        l10n.removalInstallerUnavailable,
+      RemovalStartStatus.adminDeactivationFailed =>
+        l10n.removalAdminDeactivationFailed,
+      RemovalStartStatus.launchFailed => l10n.removalLaunchFailed,
+      RemovalStartStatus.started => l10n.msgErrGeneric,
+    };
   }
 
   Future<bool> _runAccountabilityAction(
@@ -401,10 +399,6 @@ class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
           onLogin: () => context.go('/login'),
           onOpenAccountSetup: () => context.go('/setup'),
           onOpenDeviceAdmin: _openDeviceAdmin,
-          canStandaloneRemoval:
-              _status?.supportsControlledRemoval == true &&
-              _status?.deviceAdminActive == true,
-          onRequestStandaloneRemoval: _requestStandaloneRemoval,
         ),
       ),
     );

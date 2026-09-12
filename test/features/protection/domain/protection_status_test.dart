@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gamblock_ai_apps/core/platform/platform_models.dart';
 import 'package:gamblock_ai_apps/features/protection/domain/entities/protection_status.dart';
 
 void main() {
@@ -29,11 +30,32 @@ void main() {
       sensorStatus: 'connected',
       permissionStatus: 'granted',
       rulesetVersion: 'gambling-keywords-b4f2932a7647',
-        modelVersion: 'gamblock-lr-14012bec0479',
+      modelVersion: 'gamblock-lr-14012bec0479',
     );
 
     expect(status.isActive, isFalse);
     expect(status.isPaused, isTrue);
     expect(status.isDegraded, isFalse);
+  });
+
+  test('controlled-removal wire statuses stay actionable', () {
+    expect(
+      RemovalStartResult.fromMap(const {
+        'status': 'pending_admin_deactivation',
+      }).status,
+      RemovalStartStatus.pendingAdminDeactivation,
+    );
+    expect(
+      RemovalStartResult.fromMap(const {'status': 'not_authorized'}).started,
+      isFalse,
+    );
+    expect(
+      RemovalStartResult.fromMap(const {'status': 'started'}).started,
+      isTrue,
+    );
+    expect(
+      RemovalStartResult.fromMap(const {'status': 'unexpected'}).status,
+      RemovalStartStatus.launchFailed,
+    );
   });
 }

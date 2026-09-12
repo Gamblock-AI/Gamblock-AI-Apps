@@ -96,8 +96,18 @@ class PlatformBridge {
     });
   }
 
-  static Future<bool> beginApprovedRemoval() =>
-      _boolMethod('beginApprovedRemoval');
+  static Future<RemovalStartResult> beginApprovedRemoval() async {
+    try {
+      final result = await _channel.invokeMethod<Map<Object?, Object?>>(
+        'beginApprovedRemoval',
+      );
+      return result == null
+          ? RemovalStartResult.failed
+          : RemovalStartResult.fromMap(result);
+    } catch (_) {
+      return RemovalStartResult.failed;
+    }
+  }
 
   /// Compatibility alias for pre-v1.5.1 native evidence callers.
   static Future<bool> recordInterventionCommitted(String evidenceId) =>

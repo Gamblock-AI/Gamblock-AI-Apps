@@ -19,8 +19,6 @@ class ProtectionAccountabilityCard extends StatelessWidget {
     required this.onManagePartner,
     required this.onRequestEmergency,
     required this.onEnterEmergencyKey,
-    this.canStandaloneRemoval = false,
-    this.onRequestStandaloneRemoval,
   });
 
   final AccountabilityOverview? accountability;
@@ -32,8 +30,6 @@ class ProtectionAccountabilityCard extends StatelessWidget {
   final VoidCallback onManagePartner;
   final VoidCallback onRequestEmergency;
   final VoidCallback onEnterEmergencyKey;
-  final bool canStandaloneRemoval;
-  final VoidCallback? onRequestStandaloneRemoval;
 
   @override
   Widget build(BuildContext context) {
@@ -142,23 +138,21 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                             ),
                           ),
                         )
-                      : canStandaloneRemoval
+                      : membership == null
                       ? FilledButton.icon(
                           style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.crimson,
+                            backgroundColor: AppColors.navy,
                             padding: const EdgeInsets.symmetric(horizontal: 6),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          onPressed: isLoading || onRequestStandaloneRemoval == null
-                              ? null
-                              : onRequestStandaloneRemoval,
-                          icon: const Icon(Icons.dangerous_outlined, size: 16),
+                          onPressed: isLoading ? null : onManagePartner,
+                          icon: const Icon(Icons.person_add_alt_1, size: 16),
                           label: FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
-                              l10n.protectionStandaloneRemovalButton,
+                              l10n.partnerManageAction,
                               style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
@@ -174,8 +168,7 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          onPressed:
-                              membership == null || pending != null || isLoading
+                          onPressed: pending != null || isLoading
                               ? null
                               : onRequestApproval,
                           icon: const Icon(Icons.lock_clock_outlined, size: 16),
@@ -194,36 +187,38 @@ class ProtectionAccountabilityCard extends StatelessWidget {
                         ),
                 ),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: SizedBox(
-                  height: 40,
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      foregroundColor: AppColors.navy,
-                      side: BorderSide(
-                        color: AppColors.border.withValues(alpha: 0.8),
+              if (membership != null) ...[
+                const SizedBox(width: 8),
+                Expanded(
+                  child: SizedBox(
+                    height: 40,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        foregroundColor: AppColors.navy,
+                        side: BorderSide(
+                          color: AppColors.border.withValues(alpha: 0.8),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: onManagePartner,
-                    icon: const Icon(Icons.person_search_outlined, size: 16),
-                    label: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        l10n.partnerManageAction,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
+                      onPressed: onManagePartner,
+                      icon: const Icon(Icons.person_search_outlined, size: 16),
+                      label: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          l10n.partnerManageAction,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ],
           ),
 

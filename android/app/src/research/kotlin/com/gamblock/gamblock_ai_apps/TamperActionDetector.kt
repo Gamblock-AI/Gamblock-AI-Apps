@@ -33,6 +33,7 @@ data class TamperObservation(
     val windowTexts: List<String>,
     val targetIdentifiers: Set<String>,
     val launcherArmed: Boolean,
+    val settingsArmed: Boolean = false,
     val sourceCheckable: Boolean,
     val sourceChecked: Boolean,
 )
@@ -140,6 +141,9 @@ object TamperActionDetector {
         val accessibilityToggleOff = observation.sourceCheckable &&
             !observation.sourceChecked &&
             accessibilityContextPhrases.any(window::contains)
+        val hasSettingsRemovalContext = accessibilityContextPhrases.any { phrase ->
+            window.contains(phrase) || source.contains(phrase)
+        }
 
         return when (observation.surface) {
             TamperSurface.SETTINGS -> when {
@@ -148,11 +152,15 @@ object TamperActionDetector {
                     TamperAction.DISABLE_ACCESSIBILITY
 
                 observation.eventKind == TamperEventKind.CLICK &&
-                    targetsGamblock && sourceAction != TamperAction.NONE -> sourceAction
+                    (targetsGamblock ||
+                        observation.settingsArmed &&
+                        sourceAction == TamperAction.UNINSTALL &&
+                        (hasSettingsRemovalContext || isConfirmation)) &&
+                    sourceAction != TamperAction.NONE -> sourceAction
 
                 (observation.eventKind == TamperEventKind.WINDOW_CHANGED ||
                     observation.eventKind == TamperEventKind.CONTENT_CHANGED) &&
-                    targetsGamblock &&
+                    (targetsGamblock || observation.settingsArmed) &&
                     combinedAction != TamperAction.NONE &&
                     isConfirmation -> combinedAction
 

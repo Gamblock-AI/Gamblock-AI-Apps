@@ -38,8 +38,6 @@ class MainActivity : FlutterActivity() {
     private var eventSink: EventChannel.EventSink? = null
     private var protectionReceiver: BroadcastReceiver? = null
     private val uiToken = Binder()
-    private var deviceAdminPromptShownThisSession = false
-    private var accessibilityRecoveryOpenedThisSession = false
 
     private fun bridgeUri(): Uri {
         return Uri.parse("content://${packageName}.protection.bridge")
@@ -64,11 +62,10 @@ class MainActivity : FlutterActivity() {
         }
         consentStore = AccessibilityConsentStore(applicationContext)
         // FlutterActivity may dispatch the first onResume before the bridge
-        // has finished configuring. Retry recovery after the consent store is
-        // ready so an OEM-disabled Accessibility service cannot be missed.
+        // has finished configuring. Refresh the runtime after the consent
+        // store is ready without opening an Android settings screen.
         window.decorView.post {
-            promptForResearchDeviceAdminIfNeeded()
-            recoverAccessibilityAfterOemStop()
+            refreshProtectionAfterResume()
         }
 
         EventChannel(
@@ -187,7 +184,8 @@ class MainActivity : FlutterActivity() {
                 }
                 "beginApprovedRemoval" -> background(result) {
                     bridgeCall("begin_approved_removal", null, null)
-                        ?.getBoolean("value", false) ?: false
+                        ?.let(ProtectionBridge::bundleToMap)
+                        ?: mapOf("status" to "launch_failed")
                 }
                 "drainDailyAggregates" -> background(result) {
                     bridgeAggregateRows("drain_daily_aggregates")
@@ -266,48 +264,21 @@ class MainActivity : FlutterActivity() {
 
     override fun onResume() {
         super.onResume()
-        promptForResearchDeviceAdminIfNeeded()
-        recoverAccessibilityAfterOemStop()
+        refreshProtectionAfterResume()
+        bridgeCall("handle_removal_resume", null, null)
         handleIntentEvents(intent)
     }
 
     /**
-     * Some OEMs, including Xiaomi/Redmi, remove an Accessibility service from
-     * the enabled list after the user confirms force-stop. Android does not
-     * allow an app to enable that permission silently, so reopen the system
-     * settings after prior disclosure consent. If the OEM kept the service
-     * enabled, keep the protection bridge alive and let Android own the
-     * service binding lifecycle.
+     * Refresh only. Device Admin and Accessibility settings are opened solely
+     * from explicit setup/recovery actions in Flutter, never from lifecycle
+     * callbacks after an OEM disables protection.
      */
-    private fun recoverAccessibilityAfterOemStop() {
+    private fun refreshProtectionAfterResume() {
         if (!::consentStore.isInitialized || !consentStore.hasCurrentConsent()) return
         if (isAccessibilityEnabled()) {
             bridgeCall("ensure_background_protection", null, null)
-            return
         }
-        if (accessibilityRecoveryOpenedThisSession) return
-        accessibilityRecoveryOpenedThisSession = true
-        window.decorView.post {
-            if (!isFinishing && !isAccessibilityEnabled()) {
-                startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-            }
-        }
-    }
-
-    /**
-     * A Research install cannot silently become uninstall-resistant: Android
-     * requires the student to confirm device-admin activation. Prompt on the
-     * first app resume so the optional dashboard card cannot be overlooked.
-     * The OS device-admin check remains the actual uninstall guard.
-     */
-    private fun promptForResearchDeviceAdminIfNeeded() {
-        if (
-            !BuildConfig.SUPPORTS_CONTROLLED_REMOVAL ||
-            deviceAdminPromptShownThisSession ||
-            isDeviceAdminActive()
-        ) return
-        deviceAdminPromptShownThisSession = true
-        window.decorView.post { requestDeviceAdminActivation() }
     }
 
     private fun handleIntentEvents(incomingIntent: Intent?) {

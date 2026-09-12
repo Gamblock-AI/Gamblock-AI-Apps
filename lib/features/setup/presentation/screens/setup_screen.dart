@@ -21,7 +21,8 @@ class SetupScreen extends ConsumerStatefulWidget {
   ConsumerState<SetupScreen> createState() => _SetupScreenState();
 }
 
-class _SetupScreenState extends ConsumerState<SetupScreen> {
+class _SetupScreenState extends ConsumerState<SetupScreen>
+    with WidgetsBindingObserver {
   ProtectionSnapshot _snapshot = ProtectionSnapshot.fallback;
   bool _loading = false;
   bool? _selfTestPassed;
@@ -29,7 +30,19 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     Future<void>.microtask(_refresh);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _refresh();
   }
 
   Future<void> _refresh() async {
@@ -71,6 +84,13 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final auth = ref.watch(authProvider);
+    final requiresDeviceAdmin =
+        _snapshot.platform == 'android' && _snapshot.supportsControlledRemoval;
+    final platformReady = _snapshot.isActive || _snapshot.isPaused;
+    final canOpenAccessibility =
+        !requiresDeviceAdmin || _snapshot.deviceAdminActive;
+    final protectionReady =
+        platformReady && (!requiresDeviceAdmin || _snapshot.deviceAdminActive);
     final steps = <SetupStep>[
       SetupStep(
         icon: Icons.privacy_tip_outlined,
@@ -102,20 +122,42 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
             ? l10n.setupDeviceAction
             : null,
       ),
+      if (requiresDeviceAdmin)
+        SetupStep(
+          icon: Icons.admin_panel_settings_outlined,
+          title: _snapshot.deviceAdminActive
+              ? l10n.deviceAdminSetupReadyTitle
+              : l10n.deviceAdminSetupTitle,
+          body: _snapshot.deviceAdminActive
+              ? l10n.deviceAdminSetupReady
+              : l10n.deviceAdminSetupSubtitle,
+          isComplete: _snapshot.deviceAdminActive,
+          onAction: _snapshot.deviceAdminActive
+              ? null
+              : () async {
+                  await PlatformBridge.requestDeviceAdminActivation();
+                  await _refresh();
+                },
+          actionLabel: _snapshot.deviceAdminActive
+              ? null
+              : l10n.deviceAdminSetupAction,
+        ),
       SetupStep(
         icon: Icons.accessibility_new,
         title: l10n.setupPlatformTitle,
-        body: _snapshot.isActive || _snapshot.isPaused
+        body: platformReady
             ? l10n.setupPlatformReady
-            : l10n.setupPlatformBody,
-        isComplete: _snapshot.isActive || _snapshot.isPaused,
-        onAction: _snapshot.isActive || _snapshot.isPaused
+            : canOpenAccessibility
+            ? l10n.setupPlatformBody
+            : l10n.deviceAdminSetupSubtitle,
+        isComplete: platformReady,
+        onAction: platformReady || !canOpenAccessibility
             ? null
             : () async {
                 await PlatformBridge.openPlatformSetup();
                 await _refresh();
               },
-        actionLabel: _snapshot.isActive || _snapshot.isPaused
+        actionLabel: platformReady || !canOpenAccessibility
             ? null
             : l10n.setupPlatformAction,
       ),
@@ -164,7 +206,9 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
               ),
             const SizedBox(height: 8),
             FilledButton.icon(
-              onPressed: () => context.go('/dashboard'),
+              onPressed: requiresDeviceAdmin && !protectionReady
+                  ? null
+                  : () => context.go('/dashboard'),
               icon: const Icon(Icons.shield_outlined),
               label: Text(l10n.setupFinishAction),
             ),

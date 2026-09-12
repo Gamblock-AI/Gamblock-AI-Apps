@@ -500,42 +500,6 @@ abstract class AppLocalizations {
   /// **'Permintaan terikat pada perangkat dan harus disetujui pendamping aktif. Proteksi tetap berjalan sampai grant diterapkan.'**
   String get protectionApprovalDialogBody;
 
-  /// No description provided for @protectionStandaloneRemovalButton.
-  ///
-  /// In id, this message translates to:
-  /// **'Copot Aplikasi'**
-  String get protectionStandaloneRemovalButton;
-
-  /// No description provided for @protectionStandaloneRemovalTitle.
-  ///
-  /// In id, this message translates to:
-  /// **'Copot Aplikasi Tanpa Pendamping'**
-  String get protectionStandaloneRemovalTitle;
-
-  /// No description provided for @protectionStandaloneRemovalBody.
-  ///
-  /// In id, this message translates to:
-  /// **'Anda tidak memiliki pendamping aktif. Untuk mencegah penghapusan tidak sengaja, tunggu hitung mundur lalu ketik {phrase} untuk mencopot aplikasi dan menonaktifkan admin perangkat.'**
-  String protectionStandaloneRemovalBody(String phrase);
-
-  /// No description provided for @protectionStandaloneRemovalCountdown.
-  ///
-  /// In id, this message translates to:
-  /// **'{seconds} detik'**
-  String protectionStandaloneRemovalCountdown(int seconds);
-
-  /// No description provided for @protectionStandaloneRemovalPhraseMismatch.
-  ///
-  /// In id, this message translates to:
-  /// **'Ketik {phrase} persis untuk melanjutkan.'**
-  String protectionStandaloneRemovalPhraseMismatch(String phrase);
-
-  /// No description provided for @protectionStandaloneRemovalSuccess.
-  ///
-  /// In id, this message translates to:
-  /// **'Proteksi dicopot. Ikuti prompt sistem untuk menghapus aplikasi.'**
-  String get protectionStandaloneRemovalSuccess;
-
   /// No description provided for @protectionPauseAction.
   ///
   /// In id, this message translates to:
@@ -1958,6 +1922,60 @@ abstract class AppLocalizations {
   /// **'Grant darurat diterapkan selama 10 menit.'**
   String get emergencyKeyApplied;
 
+  /// No description provided for @emergencyRemovalChoiceTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih tindakan darurat'**
+  String get emergencyRemovalChoiceTitle;
+
+  /// No description provided for @emergencyRemovalChoiceBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Pertahankan akses darurat, atau gunakan grant satu-kali-pakai ini untuk mencopot Gamblock-AI dari perangkat ini.'**
+  String get emergencyRemovalChoiceBody;
+
+  /// No description provided for @emergencyContinueAccessAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Pertahankan akses darurat'**
+  String get emergencyContinueAccessAction;
+
+  /// No description provided for @removalAdminDeactivationPending.
+  ///
+  /// In id, this message translates to:
+  /// **'Android masih menonaktifkan perlindungan pencopotan. Coba kembali pencopotan yang telah disetujui beberapa saat lagi.'**
+  String get removalAdminDeactivationPending;
+
+  /// No description provided for @removalUnsupported.
+  ///
+  /// In id, this message translates to:
+  /// **'Pencopotan terkendali tidak tersedia pada distribusi aplikasi ini.'**
+  String get removalUnsupported;
+
+  /// No description provided for @removalNotAuthorized.
+  ///
+  /// In id, this message translates to:
+  /// **'Persetujuan pencopotan tidak tersedia, kedaluwarsa, atau sudah digunakan.'**
+  String get removalNotAuthorized;
+
+  /// No description provided for @removalInstallerUnavailable.
+  ///
+  /// In id, this message translates to:
+  /// **'Android atau Windows tidak menemukan pencopot sistem tepercaya.'**
+  String get removalInstallerUnavailable;
+
+  /// No description provided for @removalAdminDeactivationFailed.
+  ///
+  /// In id, this message translates to:
+  /// **'Android tidak dapat menonaktifkan perlindungan pencopotan. Periksa status Admin Perangkat dan gunakan persetujuan baru bila diperlukan.'**
+  String get removalAdminDeactivationFailed;
+
+  /// No description provided for @removalLaunchFailed.
+  ///
+  /// In id, this message translates to:
+  /// **'Pencopot sistem tidak dapat dimulai. Pulihkan perlindungan sebelum mencoba kembali.'**
+  String get removalLaunchFailed;
+
   /// No description provided for @checkSetupAction.
   ///
   /// In id, this message translates to:
@@ -2089,6 +2107,18 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Aktifkan'**
   String get deviceAdminSetupAction;
+
+  /// No description provided for @deviceAdminSetupReadyTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Perlindungan pencopotan aktif'**
+  String get deviceAdminSetupReadyTitle;
+
+  /// No description provided for @deviceAdminSetupReady.
+  ///
+  /// In id, this message translates to:
+  /// **'Perlindungan pencopotan aktif. Admin Perangkat hanya akan dibuka kembali melalui tindakan pemulihan yang dipilih secara eksplisit.'**
+  String get deviceAdminSetupReady;
 
   /// No description provided for @analyticsTitle.
   ///

@@ -5,7 +5,9 @@ import android.os.SystemClock
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import org.json.JSONArray
 import org.json.JSONObject
+import java.security.MessageDigest
 import java.security.KeyStore
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -45,11 +47,20 @@ data class InterventionVisibilityClaim(
     val newlyVisible: Boolean,
 )
 
+data class ApprovedRemovalState(
+    val tokenIdDigest: String,
+    val action: String,
+    val expiresAtSeconds: Long,
+    val stage: String,
+)
+
 class ProtectionStateStore(private val context: Context) {
     companion object {
         private const val PREFS = "gamblock_protection_state"
         private const val ENCRYPTION_KEY_ALIAS = "gamblock_approval_grant"
         private const val GRANT_KEY = "encrypted_grant"
+        private const val CONSUMED_GRANTS_KEY = "encrypted_consumed_grants"
+        private const val PENDING_REMOVAL_KEY = "encrypted_pending_removal"
         private const val PENDING_INTERVENTION_KEY = "pending_intervention"
         private const val PENDING_TAMPER_ACTION_KEY = "pending_tamper_action"
         private const val PENDING_TAMPER_ACTION_ID_KEY = "pending_tamper_action_id"
@@ -59,6 +70,7 @@ class ProtectionStateStore(private val context: Context) {
         private const val INTERVENTION_TTL_MS = 30_000L
         private const val FLUTTER_ACK_TIMEOUT_MS = 2_000L
         private const val TAMPER_ATTEMPT_DEDUP_MS = 2_000L
+        private const val MAX_CONSUMED_GRANTS = 64
         private const val OWNER_NONE = "none"
         private const val OWNER_FLUTTER = "flutter_visible"
         private const val OWNER_NATIVE_PENDING = "native_pending"
@@ -132,7 +144,9 @@ class ProtectionStateStore(private val context: Context) {
         return deviceGrantKey.enrollment(deviceId.trim(), challengeToken)
     }
 
+    @Synchronized
     fun storeGrant(compactToken: String): Boolean {
+        if (activeApprovedRemoval() != null) return false
         val expectedDevice = deviceId()
         val thumbprint = runCatching { deviceGrantKey.jwkThumbprint() }.getOrNull() ?: return false
         val nowWall = System.currentTimeMillis()
@@ -142,6 +156,8 @@ class ProtectionStateStore(private val context: Context) {
             expectedJwkThumbprint = thumbprint,
             nowMillis = nowWall,
         ) ?: return false
+        val tokenId = payload.optString("jti")
+        if (tokenId.isBlank() || isGrantConsumed(tokenId, nowWall / 1000)) return false
         return runCatching {
             val clearState = JSONObject().apply {
                 put("token", compactToken.trim())
@@ -208,14 +224,20 @@ class ProtectionStateStore(private val context: Context) {
                 clearGrant()
                 return null
             }
-            grantVerifier.verify(
+            val verified = grantVerifier.verify(
                 compactToken = clearState.getString("token"),
                 expectedDeviceId = deviceId(),
                 expectedJwkThumbprint = thumbprint,
                 nowMillis = currentWall,
             ) ?: run {
                 clearGrant()
+                return null
+            }
+            if (isGrantConsumed(verified.optString("jti"), currentWall / 1000)) {
+                clearGrant()
                 null
+            } else {
+                verified
             }
         } catch (_: Exception) {
             clearGrant()
@@ -233,16 +255,89 @@ class ProtectionStateStore(private val context: Context) {
         }
     }
 
-    /** A removal grant is intentionally narrower than an emergency grant. */
+    /** Emergency grants can authorize non-removal recovery actions. */
     fun activeGrantAllowsTamperAction(tamperAction: String): Boolean {
         return grantAllowsTamperAction(activeGrant()?.optString("action"), tamperAction)
     }
 
-    fun activeGrantAllowsControlledRemoval(): Boolean {
-        return when (activeGrant()?.optString("action")) {
-            "uninstall_detected", "emergency_access" -> true
-            else -> false
+    /**
+     * Consumes an uninstall/emergency grant exactly once and creates the
+     * encrypted state needed to finish Android's non-atomic admin/uninstall
+     * hand-off. No compact token is retained in the pending transaction.
+     */
+    @Synchronized
+    fun consumeControlledRemovalGrant(): ApprovedRemovalState? {
+        activeApprovedRemoval()?.let { return it }
+        val grant = activeGrant() ?: return null
+        val action = grant.optString("action")
+        if (action != "uninstall_detected" && action != "emergency_access") return null
+        val tokenId = grant.optString("jti")
+        val expiresAt = grant.optLong("exp", 0L)
+        val now = System.currentTimeMillis() / 1000
+        if (tokenId.isBlank() || expiresAt <= now) return null
+
+        val digest = grantIdDigest(tokenId)
+        val consumed = readConsumedGrants(now) ?: return null
+        if (consumed.containsKey(digest)) return null
+        consumed[digest] = expiresAt
+        val state = ApprovedRemovalState(
+            tokenIdDigest = digest,
+            action = action,
+            expiresAtSeconds = expiresAt,
+            stage = "authorized",
+        )
+        val ledger = encodeConsumedGrants(consumed) ?: return null
+        val pending = encryptJson(removalStateJson(state)) ?: return null
+        val committed = preferences.edit()
+            .putString(CONSUMED_GRANTS_KEY, ledger)
+            .putString(PENDING_REMOVAL_KEY, pending)
+            .remove(GRANT_KEY)
+            .commit()
+        if (!committed) return null
+        cachedGrant = null
+        cachedGrantAtElapsedMs = 0L
+        return state
+    }
+
+    @Synchronized
+    fun activeApprovedRemoval(): ApprovedRemovalState? {
+        val encoded = preferences.getString(PENDING_REMOVAL_KEY, null) ?: return null
+        val json = decryptJson(encoded)
+        val state = json?.let {
+            ApprovedRemovalState(
+                tokenIdDigest = it.optString("jti_digest"),
+                action = it.optString("action"),
+                expiresAtSeconds = it.optLong("expires_at", 0L),
+                stage = it.optString("stage"),
+            )
         }
+        if (
+            state == null ||
+            state.tokenIdDigest.length != 64 ||
+            state.action !in setOf("uninstall_detected", "emergency_access") ||
+            state.stage !in setOf("authorized", "pending_admin_deactivation", "installer_started") ||
+            state.expiresAtSeconds <= System.currentTimeMillis() / 1000
+        ) {
+            preferences.edit().remove(PENDING_REMOVAL_KEY).commit()
+            return null
+        }
+        return state
+    }
+
+    fun hasApprovedRemovalPending(): Boolean = activeApprovedRemoval() != null
+
+    @Synchronized
+    fun updateApprovedRemovalStage(stage: String): Boolean {
+        if (stage !in setOf("authorized", "pending_admin_deactivation", "installer_started")) {
+            return false
+        }
+        val current = activeApprovedRemoval() ?: return false
+        val encoded = encryptJson(removalStateJson(current.copy(stage = stage))) ?: return false
+        return preferences.edit().putString(PENDING_REMOVAL_KEY, encoded).commit()
+    }
+
+    fun clearApprovedRemoval() {
+        preferences.edit().remove(PENDING_REMOVAL_KEY).apply()
     }
 
     /**
@@ -486,6 +581,87 @@ class ProtectionStateStore(private val context: Context) {
         preferences.edit().remove(GRANT_KEY).apply()
         cachedGrant = null
         cachedGrantAtElapsedMs = 0L
+    }
+
+    private fun isGrantConsumed(tokenId: String, now: Long): Boolean {
+        if (tokenId.isBlank()) return true
+        val consumed = readConsumedGrants(now) ?: return true
+        return consumed.containsKey(grantIdDigest(tokenId))
+    }
+
+    private fun readConsumedGrants(now: Long): MutableMap<String, Long>? {
+        val encoded = preferences.getString(CONSUMED_GRANTS_KEY, null) ?: return mutableMapOf()
+        val values = decryptJson(encoded)?.optJSONArray("items") ?: return null
+        val result = mutableMapOf<String, Long>()
+        for (index in 0 until values.length()) {
+            val item = values.optJSONObject(index) ?: continue
+            val digest = item.optString("digest")
+            val expiresAt = item.optLong("expires_at", 0L)
+            if (digest.length == 64 && expiresAt > now) result[digest] = expiresAt
+        }
+        return result
+    }
+
+    private fun encodeConsumedGrants(values: Map<String, Long>): String? {
+        val items = JSONArray()
+        values.entries
+            .sortedByDescending { it.value }
+            .take(MAX_CONSUMED_GRANTS)
+            .forEach { (digest, expiresAt) ->
+                items.put(JSONObject().apply {
+                    put("digest", digest)
+                    put("expires_at", expiresAt)
+                })
+            }
+        return encryptJson(JSONObject().put("items", items))
+    }
+
+    private fun removalStateJson(state: ApprovedRemovalState): JSONObject {
+        return JSONObject().apply {
+            put("jti_digest", state.tokenIdDigest)
+            put("action", state.action)
+            put("expires_at", state.expiresAtSeconds)
+            put("stage", state.stage)
+        }
+    }
+
+    private fun encryptJson(value: JSONObject): String? {
+        return runCatching {
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey())
+            val encrypted = cipher.doFinal(value.toString().toByteArray(Charsets.UTF_8))
+            JSONObject().apply {
+                put("iv", Base64.encodeToString(cipher.iv, Base64.NO_WRAP))
+                put("payload", Base64.encodeToString(encrypted, Base64.NO_WRAP))
+            }.toString()
+        }.getOrNull()
+    }
+
+    private fun decryptJson(encoded: String): JSONObject? {
+        return runCatching {
+            val packed = JSONObject(encoded)
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            cipher.init(
+                Cipher.DECRYPT_MODE,
+                secretKey(),
+                GCMParameterSpec(128, Base64.decode(packed.getString("iv"), Base64.NO_WRAP)),
+            )
+            val clear = cipher.doFinal(Base64.decode(packed.getString("payload"), Base64.NO_WRAP))
+            JSONObject(String(clear, Charsets.UTF_8))
+        }.getOrNull()
+    }
+
+    private fun grantIdDigest(tokenId: String): String {
+        val bytes = MessageDigest.getInstance("SHA-256")
+            .digest(tokenId.toByteArray(Charsets.UTF_8))
+        val digits = "0123456789abcdef"
+        return buildString(bytes.size * 2) {
+            bytes.forEach { byte ->
+                val value = byte.toInt() and 0xff
+                append(digits[value ushr 4])
+                append(digits[value and 0x0f])
+            }
+        }
     }
 
     private fun secretKey(): SecretKey {
