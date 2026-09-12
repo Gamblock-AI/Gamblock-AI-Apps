@@ -156,11 +156,13 @@ fallback. Samsung Internet additionally uses a `content_layout` page-subtree
 fallback and, when that subtree contains no renderer text, a Research-only
 transient on-device screenshot/OCR fallback. Toolbar and tab controls are
 excluded from the crop. The screenshot and OCR text stay in process memory and
-are never persisted or sent to the backend. Samsung Internet and Xiaomi Browser
-are included in the required Android browser-support matrix. Samsung Internet
-30.0.0.67 and the built-in Xiaomi Browser passed their physical Research-release
-matrix batches with five gambling interventions and five non-gambling allows;
-Samsung's batch also covered OCR, local classification, and Pattern Interrupt.
+are never persisted or sent to the backend. Samsung Internet, Xiaomi Browser,
+and UPX Browser are included in the required Android browser-support matrix.
+Samsung Internet 30.0.0.67 and the built-in Xiaomi Browser passed their
+physical Research-release matrix batches with five gambling interventions and
+five non-gambling allows; UPX Browser also passed its signed Research-release
+5+5 batch with the same aggregate outcomes. Samsung's batch also covered OCR,
+local classification, and Pattern Interrupt.
 The retained results are aggregate-only.
 It contains transparent settings/removal friction tied to bounded
 approval or emergency grants. Its detector is
