@@ -4,9 +4,11 @@ import android.accessibilityservice.AccessibilityService
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.os.Build
+import android.util.Log
 import android.view.Display
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.core.content.ContextCompat
+import com.google.mlkit.common.MlKit
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -21,6 +23,27 @@ import java.util.concurrent.atomic.AtomicBoolean
 class SamsungInternetScreenshotOcr(
     private val service: AccessibilityService,
 ) {
+    companion object {
+        private const val TAG = "GamblockSamsungOcr"
+
+        /**
+         * ML Kit's automatic provider initialization runs in the app's
+         * default process. The Accessibility Service runs in :protection,
+         * so initialize ML Kit explicitly before creating the recognizer.
+         * OCR is only a Research fallback; a failure must not take down the
+         * core protection service.
+         */
+        fun createOrNull(service: AccessibilityService): SamsungInternetScreenshotOcr? {
+            return try {
+                MlKit.initialize(service.applicationContext)
+                SamsungInternetScreenshotOcr(service)
+            } catch (error: RuntimeException) {
+                Log.w(TAG, "Samsung Internet OCR disabled: ${error.javaClass.simpleName}")
+                null
+            }
+        }
+    }
+
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
     private val inFlight = AtomicBoolean(false)
 
@@ -29,14 +52,19 @@ class SamsungInternetScreenshotOcr(
         input: ClassificationInput,
         onReady: (ClassificationInput) -> Unit,
     ) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R ||
-            !inFlight.compareAndSet(false, true)
-        ) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            Log.w(TAG, "screenshot unavailable on sdk=${Build.VERSION.SDK_INT}")
+            onReady(input)
+            return
+        }
+        if (!inFlight.compareAndSet(false, true)) {
+            Log.d(TAG, "screenshot request skipped while another request is in flight")
             onReady(input)
             return
         }
 
         try {
+            Log.d(TAG, "requesting Samsung screenshot")
             service.takeScreenshot(
                 Display.DEFAULT_DISPLAY,
                 ContextCompat.getMainExecutor(service),
@@ -44,27 +72,36 @@ class SamsungInternetScreenshotOcr(
                     override fun onSuccess(result: AccessibilityService.ScreenshotResult) {
                         val bitmap = screenshotBitmap(result, root)
                         if (bitmap == null) {
+                            Log.w(TAG, "screenshot returned no bitmap")
                             complete(input, onReady)
                             return
                         }
+                        Log.d(TAG, "screenshot captured")
                         recognizer.process(InputImage.fromBitmap(bitmap, 0))
                             .addOnSuccessListener { text ->
                                 val enriched = enrich(input, text.text)
+                                Log.d(
+                                    TAG,
+                                    "ocr complete lines=${enriched.anchorTexts.size - input.anchorTexts.size}",
+                                )
                                 bitmap.recycle()
                                 complete(enriched, onReady)
                             }
-                            .addOnFailureListener {
+                            .addOnFailureListener { error ->
+                                Log.w(TAG, "ocr failed: ${error.javaClass.simpleName}")
                                 bitmap.recycle()
                                 complete(input, onReady)
                             }
                     }
 
                     override fun onFailure(errorCode: Int) {
+                        Log.w(TAG, "screenshot failed code=$errorCode")
                         complete(input, onReady)
                     }
                 },
             )
-        } catch (_: RuntimeException) {
+        } catch (error: RuntimeException) {
+            Log.w(TAG, "screenshot request threw ${error.javaClass.simpleName}")
             complete(input, onReady)
         }
     }

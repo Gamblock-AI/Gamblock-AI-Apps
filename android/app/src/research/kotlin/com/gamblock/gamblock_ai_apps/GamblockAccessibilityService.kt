@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
+import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import java.util.ArrayDeque
@@ -12,6 +13,7 @@ import java.util.ArrayDeque
 /** Research distribution: browser protection plus transparent removal friction. */
 class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
     companion object {
+        private const val TAG = "GamblockAccessibility"
         private val NON_STANDARD_BROWSERS = setOf(
             "com.sec.android.app.sbrowser",
             "com.sec.android.app.sbrowser.beta",
@@ -47,12 +49,12 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
         AccessibilityEvent.TYPE_VIEW_LONG_CLICKED
 
     private lateinit var tamperOverlay: TamperWarningOverlay
-    private lateinit var samsungScreenshotOcr: SamsungInternetScreenshotOcr
+    private var samsungScreenshotOcr: SamsungInternetScreenshotOcr? = null
     private var launcherArmedUntilElapsedMs = 0L
     private var lastDeviceAdminPromptAtElapsedMs = 0L
 
     override fun onProtectionServiceConnected() {
-        samsungScreenshotOcr = SamsungInternetScreenshotOcr(this)
+        samsungScreenshotOcr = SamsungInternetScreenshotOcr.createOrNull(this)
         tamperOverlay = TamperWarningOverlay(this)
         if (!isDeviceAdminActiveForResearch()) {
             stateStore.setStatus("degraded", "device_admin_inactive")
@@ -62,7 +64,8 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
     }
 
     override fun onProtectionServiceDestroyed() {
-        if (::samsungScreenshotOcr.isInitialized) samsungScreenshotOcr.close()
+        samsungScreenshotOcr?.close()
+        samsungScreenshotOcr = null
         if (::tamperOverlay.isInitialized) tamperOverlay.dismiss()
     }
 
@@ -72,15 +75,17 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
         input: ClassificationInput,
         onReady: (ClassificationInput) -> Unit,
     ) {
+        val screenshotOcr = samsungScreenshotOcr
         val packageName = event.packageName?.toString().orEmpty()
         if (!BrowserProtectionAccessibilityService.isSamsungInternetPackage(packageName) ||
             input.hasDomContent ||
-            !::samsungScreenshotOcr.isInitialized
+            screenshotOcr == null
         ) {
             onReady(input)
             return
         }
-        samsungScreenshotOcr.request(root, input, onReady)
+        Log.d(TAG, "requesting Samsung screenshot fallback")
+        screenshotOcr.request(root, input, onReady)
     }
 
     override fun handleAdditionalAccessibilityEvent(
