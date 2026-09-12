@@ -11,111 +11,493 @@ import androidx.core.content.ContextCompat
 import com.google.mlkit.common.MlKit
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.util.ArrayDeque
-import java.util.concurrent.atomic.AtomicBoolean
+
+internal data class SamsungOcrBounds(
+    val left: Int,
+    val top: Int,
+    val right: Int,
+    val bottom: Int,
+) {
+    val width: Int get() = right - left
+    val height: Int get() = bottom - top
+    val area: Long get() = width.toLong() * height.toLong()
+
+    fun intersect(frameWidth: Int, frameHeight: Int): SamsungOcrBounds? {
+        val clipped = SamsungOcrBounds(
+            left = left.coerceIn(0, frameWidth),
+            top = top.coerceIn(0, frameHeight),
+            right = right.coerceIn(0, frameWidth),
+            bottom = bottom.coerceIn(0, frameHeight),
+        )
+        return clipped.takeIf { it.width > 0 && it.height > 0 }
+    }
+}
+
+internal data class SamsungOcrPageState(
+    val isSamsungPackage: Boolean,
+    val hasCommittedPageSurface: Boolean,
+    val isEditingBrowserChrome: Boolean,
+    val isTabSwitcher: Boolean,
+    val pageBounds: List<SamsungOcrBounds> = emptyList(),
+    val toolbarBottoms: List<Int> = emptyList(),
+    val bottomBarTops: List<Int> = emptyList(),
+) {
+    val isEligible: Boolean
+        get() = isSamsungPackage &&
+            hasCommittedPageSurface &&
+            !isEditingBrowserChrome &&
+            !isTabSwitcher
+}
+
+internal object SamsungOcrCropBoundsResolver {
+    private const val MIN_PAGE_DIMENSION_PX = 32
+    private const val FALLBACK_TOP_RATIO = 0.088f
+    private const val FALLBACK_BOTTOM_RATIO = 0.942f
+
+    fun resolve(
+        state: SamsungOcrPageState,
+        frameWidth: Int,
+        frameHeight: Int,
+    ): SamsungOcrBounds? {
+        if (frameWidth < MIN_PAGE_DIMENSION_PX || frameHeight < MIN_PAGE_DIMENSION_PX) {
+            return null
+        }
+
+        val toolbarBottom = state.toolbarBottoms
+            .filter { it in 1 until frameHeight }
+            .maxOrNull()
+        val bottomBarTop = state.bottomBarTops
+            .filter { it in 1..frameHeight }
+            .minOrNull()
+
+        val pageBounds = state.pageBounds
+            .mapNotNull { it.intersect(frameWidth, frameHeight) }
+            .map { bounds ->
+                SamsungOcrBounds(
+                    left = bounds.left,
+                    top = toolbarBottom?.let { maxOf(bounds.top, it) } ?: bounds.top,
+                    right = bounds.right,
+                    bottom = bottomBarTop?.let { minOf(bounds.bottom, it) } ?: bounds.bottom,
+                )
+            }
+            .filter { isLargeEnough(it, frameWidth, frameHeight) }
+            .filterNot { it.covers(frameWidth, frameHeight) }
+            .maxByOrNull(SamsungOcrBounds::area)
+        if (pageBounds != null) return pageBounds
+
+        val fallback = fallbackBounds(frameWidth, frameHeight) ?: return null
+        val chromeBounds = SamsungOcrBounds(
+            left = 0,
+            top = toolbarBottom ?: fallback.top,
+            right = frameWidth,
+            bottom = bottomBarTop ?: fallback.bottom,
+        )
+        return chromeBounds.takeIf { isLargeEnough(it, frameWidth, frameHeight) } ?: fallback
+    }
+
+    private fun fallbackBounds(frameWidth: Int, frameHeight: Int): SamsungOcrBounds? {
+        val bounds = SamsungOcrBounds(
+            left = 0,
+            top = (frameHeight * FALLBACK_TOP_RATIO).toInt().coerceIn(0, frameHeight),
+            right = frameWidth,
+            bottom = (frameHeight * FALLBACK_BOTTOM_RATIO).toInt().coerceIn(0, frameHeight),
+        )
+        return bounds.takeIf { isLargeEnough(it, frameWidth, frameHeight) }
+    }
+
+    private fun isLargeEnough(
+        bounds: SamsungOcrBounds,
+        frameWidth: Int,
+        frameHeight: Int,
+    ): Boolean {
+        val minimumWidth = maxOf(MIN_PAGE_DIMENSION_PX, frameWidth / 4)
+        val minimumHeight = maxOf(MIN_PAGE_DIMENSION_PX, frameHeight / 5)
+        return bounds.width >= minimumWidth && bounds.height >= minimumHeight
+    }
+
+    private fun SamsungOcrBounds.covers(frameWidth: Int, frameHeight: Int): Boolean {
+        return left == 0 && top == 0 && right == frameWidth && bottom == frameHeight
+    }
+}
+
+internal data class SamsungOcrRequestTicket<T>(
+    internal val id: Long,
+    val value: T,
+)
+
+internal data class SamsungOcrRequestCompletion<T>(
+    val shouldDeliver: Boolean,
+    val next: SamsungOcrRequestTicket<T>?,
+)
+
+/** Keeps one active request and only the newest request waiting behind it. */
+internal class SamsungOcrLatestRequestCoordinator<T> {
+    private var sequence = 0L
+    private var latestId = 0L
+    private var active: SamsungOcrRequestTicket<T>? = null
+    private var pending: SamsungOcrRequestTicket<T>? = null
+    private var closed = false
+
+    @Synchronized
+    fun submit(value: T): SamsungOcrRequestTicket<T>? {
+        if (closed) return null
+        val ticket = SamsungOcrRequestTicket(++sequence, value)
+        latestId = ticket.id
+        if (active == null) {
+            active = ticket
+            return ticket
+        }
+        pending = ticket
+        return null
+    }
+
+    @Synchronized
+    fun invalidate() {
+        if (closed) return
+        latestId = ++sequence
+        pending = null
+    }
+
+    @Synchronized
+    fun isCurrent(ticket: SamsungOcrRequestTicket<T>): Boolean {
+        return !closed && active?.id == ticket.id && latestId == ticket.id
+    }
+
+    @Synchronized
+    fun complete(ticket: SamsungOcrRequestTicket<T>): SamsungOcrRequestCompletion<T> {
+        if (active?.id != ticket.id) {
+            return SamsungOcrRequestCompletion(shouldDeliver = false, next = null)
+        }
+        active = null
+        val shouldDeliver = !closed && latestId == ticket.id
+        val next = if (closed) null else pending
+        pending = null
+        active = next
+        return SamsungOcrRequestCompletion(shouldDeliver, next)
+    }
+
+    @Synchronized
+    fun close() {
+        closed = true
+        active = null
+        pending = null
+    }
+}
 
 /**
  * Research-only Samsung fallback for browser versions that expose pixels but
  * no renderer nodes through Accessibility. The bitmap and OCR result remain
  * transient in this process and are never persisted or sent to the backend.
  */
-class SamsungInternetScreenshotOcr(
+internal class SamsungInternetScreenshotOcr private constructor(
     private val service: AccessibilityService,
+    private val recognizer: TextRecognizer,
 ) {
     companion object {
         private const val TAG = "GamblockSamsungOcr"
+        private const val MAX_ACCESSIBILITY_NODES = 500
+        private val ADDRESS_BAR_RESOURCE_MARKERS = listOf(
+            ":id/location_bar",
+            ":id/url_bar",
+            ":id/search_box",
+            ":id/toolbar_url",
+            ":id/address",
+        )
+        private val BOTTOM_BAR_RESOURCE_MARKERS = listOf(
+            ":id/bottombar",
+            ":id/bottom_bar",
+        )
+        private var mlKitReadyInProcess = false
 
         /**
-         * ML Kit's automatic provider initialization runs in the app's
-         * default process. The Accessibility Service runs in :protection,
-         * so initialize ML Kit explicitly before creating the recognizer.
-         * OCR is only a Research fallback; a failure must not take down the
-         * core protection service.
+         * The Accessibility Service runs in :protection, where the default
+         * process provider does not initialize ML Kit. Initialize once per
+         * protection process, then create a fresh recognizer for each service
+         * instance. Recognizer creation remains the final capability check.
          */
+        @Synchronized
         fun createOrNull(service: AccessibilityService): SamsungInternetScreenshotOcr? {
+            var initializationFailure: RuntimeException? = null
+            if (!mlKitReadyInProcess) {
+                try {
+                    MlKit.initialize(service.applicationContext)
+                    mlKitReadyInProcess = true
+                    Log.d(TAG, "ML Kit initialized in protection process")
+                } catch (error: RuntimeException) {
+                    initializationFailure = error
+                }
+            }
+
             return try {
-                MlKit.initialize(service.applicationContext)
-                SamsungInternetScreenshotOcr(service)
+                val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+                if (!mlKitReadyInProcess) {
+                    // Another component may have initialized the process first.
+                    // A usable recognizer is the authoritative capability check.
+                    mlKitReadyInProcess = true
+                    Log.d(TAG, "ML Kit was already available in protection process")
+                }
+                SamsungInternetScreenshotOcr(service, recognizer)
             } catch (error: RuntimeException) {
-                Log.w(TAG, "Samsung Internet OCR disabled: ${error.javaClass.simpleName}")
+                initializationFailure?.let {
+                    Log.w(TAG, "ML Kit initialization failed: ${it.javaClass.simpleName}")
+                }
+                Log.w(TAG, "Samsung Internet recognizer unavailable: ${error.javaClass.simpleName}")
                 null
             }
         }
+
+        fun capturePageState(
+            root: AccessibilityNodeInfo?,
+            expectedPackageName: String,
+            clickedNode: AccessibilityNodeInfo? = null,
+        ): SamsungOcrPageState {
+            if (root == null) {
+                return SamsungOcrPageState(
+                    isSamsungPackage = false,
+                    hasCommittedPageSurface = false,
+                    isEditingBrowserChrome = false,
+                    isTabSwitcher = false,
+                )
+            }
+
+            val rootPackage = root.packageName?.toString().orEmpty()
+            val packageMatches =
+                BrowserProtectionAccessibilityService.isSamsungInternetPackage(expectedPackageName) &&
+                    (rootPackage.isBlank() ||
+                        BrowserProtectionAccessibilityService.isSamsungInternetPackage(rootPackage))
+            var hasCommittedPageSurface = false
+            var isEditingBrowserChrome = clickedNode?.let(::isAddressBarNode) == true
+            var isTabSwitcher = false
+            val pageBounds = mutableListOf<SamsungOcrBounds>()
+            val toolbarBottoms = mutableListOf<Int>()
+            val bottomBarTops = mutableListOf<Int>()
+            val queue = ArrayDeque<AccessibilityNodeInfo>()
+            queue.add(root)
+            var visited = 0
+            while (queue.isNotEmpty() && visited < MAX_ACCESSIBILITY_NODES) {
+                val node = queue.removeFirst()
+                visited++
+                val viewId = node.viewIdResourceName?.toString()?.lowercase().orEmpty()
+                val className = node.className?.toString().orEmpty()
+                val nodeBounds = Rect()
+                node.getBoundsInScreen(nodeBounds)
+                val immutableBounds = SamsungOcrBounds(
+                    nodeBounds.left,
+                    nodeBounds.top,
+                    nodeBounds.right,
+                    nodeBounds.bottom,
+                )
+
+                val isPageSurface =
+                    BrowserProtectionAccessibilityService.isSamsungInternetPageContentResourceId(viewId) ||
+                        BrowserProtectionAccessibilityService.isBrowserWebContentClassName(className)
+                if (isPageSurface) {
+                    hasCommittedPageSurface = true
+                    if (immutableBounds.width > 0 && immutableBounds.height > 0) {
+                        pageBounds.add(immutableBounds)
+                    }
+                }
+                if (BrowserProtectionAccessibilityService.isTabSwitcherResourceId(viewId) ||
+                    BrowserProtectionAccessibilityService.isTabSwitcherClassName(className)
+                ) {
+                    isTabSwitcher = true
+                }
+                if (isAddressBarNode(node) && node.isFocused) {
+                    isEditingBrowserChrome = true
+                }
+                if (viewId.contains(":id/toolbar") && nodeBounds.bottom > nodeBounds.top) {
+                    toolbarBottoms.add(nodeBounds.bottom)
+                }
+                if (BOTTOM_BAR_RESOURCE_MARKERS.any(viewId::contains) &&
+                    nodeBounds.bottom > nodeBounds.top
+                ) {
+                    bottomBarTops.add(nodeBounds.top)
+                }
+
+                for (index in 0 until node.childCount) {
+                    node.getChild(index)?.let(queue::add)
+                }
+            }
+
+            return SamsungOcrPageState(
+                isSamsungPackage = packageMatches,
+                hasCommittedPageSurface = hasCommittedPageSurface,
+                isEditingBrowserChrome = isEditingBrowserChrome,
+                isTabSwitcher = isTabSwitcher,
+                pageBounds = pageBounds,
+                toolbarBottoms = toolbarBottoms,
+                bottomBarTops = bottomBarTops,
+            )
+        }
+
+        private fun isAddressBarNode(node: AccessibilityNodeInfo): Boolean {
+            val viewId = node.viewIdResourceName?.toString()?.lowercase().orEmpty()
+            return ADDRESS_BAR_RESOURCE_MARKERS.any(viewId::contains)
+        }
     }
 
-    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-    private val inFlight = AtomicBoolean(false)
+    private data class Request(
+        val pageState: SamsungOcrPageState,
+        val input: ClassificationInput,
+        val onReady: (ClassificationInput) -> Unit,
+    )
+
+    private val requests = SamsungOcrLatestRequestCoordinator<Request>()
+    private val mainExecutor = ContextCompat.getMainExecutor(service)
 
     fun request(
-        root: AccessibilityNodeInfo?,
+        pageState: SamsungOcrPageState,
         input: ClassificationInput,
         onReady: (ClassificationInput) -> Unit,
     ) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-            Log.w(TAG, "screenshot unavailable on sdk=${Build.VERSION.SDK_INT}")
-            onReady(input)
+        if (!pageState.isEligible) {
+            invalidate()
             return
         }
-        if (!inFlight.compareAndSet(false, true)) {
-            Log.d(TAG, "screenshot request skipped while another request is in flight")
-            onReady(input)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            safelyDeliver(input, onReady)
             return
         }
 
+        val ticket = requests.submit(Request(pageState, input, onReady))
+        if (ticket == null) {
+            Log.d(TAG, "newest Samsung screenshot request queued")
+            return
+        }
+        start(ticket)
+    }
+
+    fun invalidate() {
+        requests.invalidate()
+    }
+
+    fun close() {
+        requests.close()
+        try {
+            recognizer.close()
+        } catch (error: RuntimeException) {
+            Log.w(TAG, "recognizer close failed: ${error.javaClass.simpleName}")
+        }
+    }
+
+    private fun start(ticket: SamsungOcrRequestTicket<Request>) {
+        if (!requests.isCurrent(ticket) || !currentPageIsEligible()) {
+            finish(ticket, null)
+            return
+        }
         try {
             Log.d(TAG, "requesting Samsung screenshot")
             service.takeScreenshot(
                 Display.DEFAULT_DISPLAY,
-                ContextCompat.getMainExecutor(service),
+                mainExecutor,
                 object : AccessibilityService.TakeScreenshotCallback {
                     override fun onSuccess(result: AccessibilityService.ScreenshotResult) {
-                        val bitmap = screenshotBitmap(result, root)
-                        if (bitmap == null) {
-                            Log.w(TAG, "screenshot returned no bitmap")
-                            complete(input, onReady)
-                            return
-                        }
-                        Log.d(TAG, "screenshot captured")
-                        recognizer.process(InputImage.fromBitmap(bitmap, 0))
-                            .addOnSuccessListener { text ->
-                                val enriched = enrich(input, text.text)
-                                Log.d(
-                                    TAG,
-                                    "ocr complete lines=${enriched.anchorTexts.size - input.anchorTexts.size}",
-                                )
-                                bitmap.recycle()
-                                complete(enriched, onReady)
-                            }
-                            .addOnFailureListener { error ->
-                                Log.w(TAG, "ocr failed: ${error.javaClass.simpleName}")
-                                bitmap.recycle()
-                                complete(input, onReady)
-                            }
+                        handleScreenshot(ticket, result)
                     }
 
                     override fun onFailure(errorCode: Int) {
                         Log.w(TAG, "screenshot failed code=$errorCode")
-                        complete(input, onReady)
+                        finish(ticket, ticket.value.input)
                     }
                 },
             )
         } catch (error: RuntimeException) {
             Log.w(TAG, "screenshot request threw ${error.javaClass.simpleName}")
-            complete(input, onReady)
+            finish(ticket, ticket.value.input)
         }
     }
 
-    fun close() {
-        recognizer.close()
+    private fun handleScreenshot(
+        ticket: SamsungOcrRequestTicket<Request>,
+        result: AccessibilityService.ScreenshotResult,
+    ) {
+        if (!requests.isCurrent(ticket) || !currentPageIsEligible()) {
+            closeHardwareBuffer(result)
+            finish(ticket, null)
+            return
+        }
+
+        val bitmap = try {
+            screenshotBitmap(result, ticket.value.pageState)
+        } catch (error: RuntimeException) {
+            Log.w(TAG, "screenshot conversion failed: ${error.javaClass.simpleName}")
+            finish(ticket, ticket.value.input)
+            return
+        }
+        if (bitmap == null) {
+            Log.w(TAG, "screenshot returned no safe page bitmap")
+            finish(ticket, ticket.value.input)
+            return
+        }
+        Log.d(TAG, "screenshot captured")
+
+        try {
+            val image = InputImage.fromBitmap(bitmap, 0)
+            recognizer.process(image).addOnCompleteListener(mainExecutor) { task ->
+                val output = try {
+                    if (task.isSuccessful) {
+                        val enriched = enrich(ticket.value.input, task.result?.text.orEmpty())
+                        Log.d(
+                            TAG,
+                            "ocr complete lines=${enriched.anchorTexts.size - ticket.value.input.anchorTexts.size}",
+                        )
+                        enriched
+                    } else {
+                        Log.w(
+                            TAG,
+                            "ocr failed: ${task.exception?.javaClass?.simpleName ?: "unknown"}",
+                        )
+                        ticket.value.input
+                    }
+                } catch (error: RuntimeException) {
+                    Log.w(TAG, "ocr callback failed: ${error.javaClass.simpleName}")
+                    ticket.value.input
+                } finally {
+                    recycleSafely(bitmap)
+                }
+                finish(ticket, output)
+            }
+        } catch (error: RuntimeException) {
+            recycleSafely(bitmap)
+            Log.w(TAG, "ocr request threw ${error.javaClass.simpleName}")
+            finish(ticket, ticket.value.input)
+        }
     }
 
-    private fun complete(
+    private fun finish(
+        ticket: SamsungOcrRequestTicket<Request>,
+        output: ClassificationInput?,
+    ) {
+        val completion = requests.complete(ticket)
+        if (completion.shouldDeliver && output != null && currentPageIsEligible()) {
+            safelyDeliver(output, ticket.value.onReady)
+        }
+        completion.next?.let(::start)
+    }
+
+    private fun safelyDeliver(
         input: ClassificationInput,
         onReady: (ClassificationInput) -> Unit,
     ) {
-        inFlight.set(false)
-        onReady(input)
+        try {
+            onReady(input)
+        } catch (error: RuntimeException) {
+            Log.w(TAG, "OCR handoff failed: ${error.javaClass.simpleName}")
+        }
+    }
+
+    private fun currentPageIsEligible(): Boolean {
+        return try {
+            val root = service.rootInActiveWindow ?: return false
+            val packageName = root.packageName?.toString().orEmpty()
+            capturePageState(root, packageName).isEligible
+        } catch (error: RuntimeException) {
+            Log.w(TAG, "current Samsung page unavailable: ${error.javaClass.simpleName}")
+            false
+        }
     }
 
     private fun enrich(input: ClassificationInput, recognizedText: String): ClassificationInput {
@@ -137,73 +519,73 @@ class SamsungInternetScreenshotOcr(
 
     private fun screenshotBitmap(
         result: AccessibilityService.ScreenshotResult,
-        root: AccessibilityNodeInfo?,
+        pageState: SamsungOcrPageState,
     ): Bitmap? {
         val hardwareBuffer = result.hardwareBuffer
+        var softwareBitmap: Bitmap? = null
         return try {
             val hardwareBitmap = Bitmap.wrapHardwareBuffer(
                 hardwareBuffer,
                 result.colorSpace,
             ) ?: return null
-            val bitmap = hardwareBitmap.copy(Bitmap.Config.ARGB_8888, false)
-            hardwareBitmap.recycle()
-            bitmap?.let { cropToPage(it, root) }
+            val copiedBitmap = try {
+                hardwareBitmap.copy(Bitmap.Config.ARGB_8888, false)
+            } finally {
+                recycleSafely(hardwareBitmap)
+            } ?: return null
+            softwareBitmap = copiedBitmap
+            val pageBitmap = cropToPage(copiedBitmap, pageState)
+            softwareBitmap = null
+            pageBitmap
+        } catch (error: RuntimeException) {
+            softwareBitmap?.let(::recycleSafely)
+            throw error
         } finally {
-            hardwareBuffer.close()
+            try {
+                hardwareBuffer.close()
+            } catch (error: RuntimeException) {
+                Log.w(TAG, "hardware buffer cleanup failed: ${error.javaClass.simpleName}")
+            }
         }
     }
 
-    private fun cropToPage(bitmap: Bitmap, root: AccessibilityNodeInfo?): Bitmap {
-        val bounds = pageBounds(root, bitmap.width, bitmap.height)
-        if (bounds.left == 0 && bounds.top == 0 &&
-            bounds.right == bitmap.width && bounds.bottom == bitmap.height
-        ) {
-            return bitmap
+    private fun cropToPage(
+        bitmap: Bitmap,
+        pageState: SamsungOcrPageState,
+    ): Bitmap? {
+        val bounds = SamsungOcrCropBoundsResolver.resolve(
+            pageState,
+            bitmap.width,
+            bitmap.height,
+        ) ?: run {
+            recycleSafely(bitmap)
+            return null
         }
         val cropped = Bitmap.createBitmap(
             bitmap,
             bounds.left,
             bounds.top,
-            bounds.width(),
-            bounds.height(),
+            bounds.width,
+            bounds.height,
         )
-        bitmap.recycle()
+        if (cropped !== bitmap) recycleSafely(bitmap)
         return cropped
     }
 
-    private fun pageBounds(
-        root: AccessibilityNodeInfo?,
-        width: Int,
-        height: Int,
-    ): Rect {
-        var toolbarBottom = (height * 0.088f).toInt()
-        var bottomBarTop = (height * 0.942f).toInt()
-        if (root != null) {
-            val queue = ArrayDeque<AccessibilityNodeInfo>()
-            queue.add(root)
-            var visited = 0
-            while (queue.isNotEmpty() && visited < 500) {
-                val node = queue.removeFirst()
-                visited++
-                val viewId = node.viewIdResourceName?.toString()?.lowercase().orEmpty()
-                val bounds = Rect()
-                node.getBoundsInScreen(bounds)
-                if (viewId.contains(":id/toolbar") && bounds.bottom > toolbarBottom) {
-                    toolbarBottom = bounds.bottom
-                }
-                if (viewId.contains(":id/bottombar") && bounds.top < bottomBarTop) {
-                    bottomBarTop = bounds.top
-                }
-                for (index in 0 until node.childCount) {
-                    node.getChild(index)?.let(queue::add)
-                }
-            }
+    private fun closeHardwareBuffer(result: AccessibilityService.ScreenshotResult) {
+        try {
+            result.hardwareBuffer.close()
+        } catch (error: RuntimeException) {
+            Log.w(TAG, "stale screenshot cleanup failed: ${error.javaClass.simpleName}")
         }
-        return Rect(
-            0,
-            toolbarBottom.coerceIn(0, height - 1),
-            width,
-            bottomBarTop.coerceIn(toolbarBottom + 1, height),
-        )
+    }
+
+    private fun recycleSafely(bitmap: Bitmap) {
+        if (bitmap.isRecycled) return
+        try {
+            bitmap.recycle()
+        } catch (error: RuntimeException) {
+            Log.w(TAG, "bitmap cleanup failed: ${error.javaClass.simpleName}")
+        }
     }
 }

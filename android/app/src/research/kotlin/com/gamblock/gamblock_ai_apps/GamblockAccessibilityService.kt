@@ -77,15 +77,34 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
     ) {
         val screenshotOcr = samsungScreenshotOcr
         val packageName = event.packageName?.toString().orEmpty()
-        if (!BrowserProtectionAccessibilityService.isSamsungInternetPackage(packageName) ||
-            input.hasDomContent ||
-            screenshotOcr == null
-        ) {
+        if (!BrowserProtectionAccessibilityService.isSamsungInternetPackage(packageName)) {
+            screenshotOcr?.invalidate()
+            onReady(input)
+            return
+        }
+
+        val clickedNode = event.source.takeIf {
+            event.eventType == AccessibilityEvent.TYPE_VIEW_CLICKED
+        }
+        val pageState = try {
+            SamsungInternetScreenshotOcr.capturePageState(root, packageName, clickedNode)
+        } catch (error: RuntimeException) {
+            Log.w(TAG, "Samsung page state unavailable: ${error.javaClass.simpleName}")
+            screenshotOcr?.invalidate()
+            return
+        }
+        if (!pageState.isEligible) {
+            screenshotOcr?.invalidate()
+            Log.d(TAG, "Samsung screenshot suppressed for non-page browser UI")
+            return
+        }
+        if (input.hasDomContent || screenshotOcr == null) {
+            screenshotOcr?.invalidate()
             onReady(input)
             return
         }
         Log.d(TAG, "requesting Samsung screenshot fallback")
-        screenshotOcr.request(root, input, onReady)
+        screenshotOcr.request(pageState, input, onReady)
     }
 
     override fun handleAdditionalAccessibilityEvent(

@@ -1,8 +1,8 @@
 name: Research Staging Release
 
-# Publishes the Research staging debug APK and the Windows staging pilot MSI
+# Publishes a signed Research staging APK and the Windows staging pilot MSI
 # (both pointing at the staging backend) as a GitHub Release for QA/test
-# distribution. Diagnostic-quality artifacts, not store/pilot candidates.
+# distribution. They are staging QA artifacts, not store candidates.
 # Trigger manually.
 on:
   workflow_dispatch:
