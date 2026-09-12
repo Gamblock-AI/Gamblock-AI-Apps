@@ -71,22 +71,21 @@ class PatternBreathingOrb extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            // Inner frosted glass core
+                            // Solid logo core keeps the transparent logo areas
+                            // readable over the animated video background.
                             Container(
+                              key: const ValueKey(
+                                'pattern-interrupt-brand-core',
+                              ),
                               width: coreSize,
                               height: coreSize,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                gradient: RadialGradient(
-                                  colors: [
-                                    Colors.white.withValues(alpha: 0.32),
-                                    AppColors.skyDark.withValues(alpha: 0.40),
-                                    const Color(0xFF0F172A).withValues(alpha: 0.70),
-                                  ],
-                                  stops: const [0.0, 0.65, 1.0],
-                                ),
+                                color: Colors.white,
                                 border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.50 + (t * 0.25)),
+                                  color: Colors.white.withValues(
+                                    alpha: 0.50 + (t * 0.25),
+                                  ),
                                   width: 1.4,
                                 ),
                                 boxShadow: [
