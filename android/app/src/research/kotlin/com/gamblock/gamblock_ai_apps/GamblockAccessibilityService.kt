@@ -6,31 +6,38 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import java.util.ArrayDeque
 
+/** Research-only browser package registry, isolated for local unit coverage. */
+internal object ResearchBrowserPackages {
+    const val UPX_BROWSER_PACKAGE = "net.upx.proxy.browser"
+
+    val additionalBrowserPackages = setOf(
+        "com.sec.android.app.sbrowser",
+        "com.sec.android.app.sbrowser.beta",
+        "com.samsung.android.app.sbrowser",
+        "com.brave.browser",
+        "com.opera.browser",
+        "com.opera.mini.native",
+        "com.opera.touch",
+        "org.mozilla.firefox",
+        "org.mozilla.firefox_beta",
+        "org.mozilla.focus",
+        "com.mi.globalbrowser",
+        "com.vivo.browser",
+        "com.heytap.browser",
+        "com.coloros.browser",
+        "com.oppo.browser",
+        "com.duckduckgo.mobile.android",
+        "com.uc.browser",
+        "com.uc.browser.en",
+        "com.UCMobile.intl",
+        UPX_BROWSER_PACKAGE,
+    )
+}
+
 /** Research distribution: browser protection plus transparent removal friction. */
 class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
     companion object {
         private const val TAG = "GamblockAccessibility"
-        private val NON_STANDARD_BROWSERS = setOf(
-            "com.sec.android.app.sbrowser",
-            "com.sec.android.app.sbrowser.beta",
-            "com.samsung.android.app.sbrowser",
-            "com.brave.browser",
-            "com.opera.browser",
-            "com.opera.mini.native",
-            "com.opera.touch",
-            "org.mozilla.firefox",
-            "org.mozilla.firefox_beta",
-            "org.mozilla.focus",
-            "com.mi.globalbrowser",
-            "com.vivo.browser",
-            "com.heytap.browser",
-            "com.coloros.browser",
-            "com.oppo.browser",
-            "com.duckduckgo.mobile.android",
-            "com.uc.browser",
-            "com.uc.browser.en",
-            "com.UCMobile.intl",
-        )
         private const val LAUNCHER_ARM_TTL_MS = 5_000L
         private const val SETTINGS_ARM_TTL_MS = 5_000L
     }
@@ -40,7 +47,8 @@ class GamblockAccessibilityService : BrowserProtectionAccessibilityService() {
     }
     override val additionalObservedPackages: Set<String>
         get() = resolvedTamperPackages.observed
-    override val additionalBrowserPackages: Set<String> = NON_STANDARD_BROWSERS
+    override val additionalBrowserPackages: Set<String> =
+        ResearchBrowserPackages.additionalBrowserPackages
     override val additionalAccessibilityEventTypes: Int =
         AccessibilityEvent.TYPE_VIEW_LONG_CLICKED
 

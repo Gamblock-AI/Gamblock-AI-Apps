@@ -96,7 +96,10 @@ Do not hardcode URLs in features or call Dio from presentation code.
   Pattern-Interrupt path. The built-in Xiaomi Browser also passed its physical
   Research-release five-gambling/five-non-gambling batch with intervention and
   allow outcomes respectively. Broader version/device coverage remains
-  required.
+  required. UPX Browser (`net.upx.proxy.browser`) is routed through the same
+  local Chromium Accessibility path and must complete its own signed
+  Research-release five-gambling/five-non-gambling batch before it is claimed
+  as matrix-passed.
   Intervention delivery is ID-based and native-first: the
   resident overlay owns the first committed frame while Flutter is retained as
   the acknowledgement-safe fallback if Android rejects overlay attachment.

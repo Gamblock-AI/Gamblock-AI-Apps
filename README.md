@@ -132,8 +132,8 @@ an Accessibility Service that supports:
 - Chrome (`com.android.chrome`) and Edge
   (`com.microsoft.emmx`) URL/title/headings/anchor extraction; the Research
   flavor additionally observes audited Samsung Internet, Brave, Opera,
-  Firefox, Xiaomi/Vivo/Oppo browsers, DuckDuckGo, and UC Browser package
-  families;
+  Firefox, Xiaomi/Vivo/Oppo browsers, DuckDuckGo, UC Browser, and UPX Browser
+  (`net.upx.proxy.browser`) package families;
 - bounded, debounced, single-threaded local classification;
 - local Back navigation plus native-first Pattern Interrupt delivery from the
   resident Accessibility process; Flutter remains an acknowledgement-safe
@@ -148,7 +148,9 @@ an Accessibility Service that supports:
 The Play flavor observes Chrome and Edge only; Settings/package-installer
 monitoring is absent from its source set and accessibility configuration. The
 Research flavor additionally observes the audited non-Play package families
-listed above. Known Samsung Internet, Brave, Opera, and Firefox URL controls are
+listed above. UPX Browser uses the existing local Chromium Accessibility path;
+it has no Samsung OCR or screenshot path. Known Samsung Internet, Brave, Opera,
+and Firefox URL controls are
 used where available; the remaining packages use a best-effort editable-URL
 fallback. Samsung Internet additionally uses a `content_layout` page-subtree
 fallback and, when that subtree contains no renderer text, a Research-only
