@@ -154,8 +154,10 @@ fallback. Samsung Internet additionally uses a `content_layout` page-subtree
 fallback and, when that subtree contains no renderer text, a Research-only
 transient on-device screenshot/OCR fallback. Toolbar and tab controls are
 excluded from the crop. The screenshot and OCR text stay in process memory and
-are never persisted or sent to the backend; the browser remains best-effort
-until physical runtime evidence confirms the browser/version pair.
+are never persisted or sent to the backend. Samsung Internet 30.0.0.67 passed
+one physical Research-release smoke test covering OCR, local classification,
+and Pattern Interrupt; support remains best-effort for other versions/devices
+until broader runtime coverage is recorded.
 It contains transparent settings/removal friction tied to bounded
 approval or emergency grants. Its detector is
 action-aware: merely opening App Info is not tamper evidence, while an explicit

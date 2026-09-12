@@ -1,6 +1,6 @@
 # Flutter Client AI Context
 
-Context version: `2026-09-05.2`
+Context version: `2026-09-06.2`
 
 
 Jika ada pertentangan dengan `pkm_proposal.md`, proposal PKM adalah sumber mutlak.
@@ -109,9 +109,12 @@ returned when it is marked as non-important. If Samsung still withholds
 renderer text, the Research service captures the current display through the
 Accessibility screenshot API, crops out browser chrome, and runs bundled Latin
 OCR locally before passing transient text to the existing on-device
-classifier. The bitmap and OCR result are never persisted or transmitted. This
-remains best-effort; runtime evidence must be re-recorded on the target
-browser/device before the capability is considered verified.
+classifier. The bitmap and OCR result are never persisted or transmitted.
+Samsung Internet 30.0.0.67 is now runtime-verified for one physical
+Research-release smoke scenario covering the OCR-to-classifier-to-Pattern-
+Interrupt path. This confirms that browser/version pair for the tested
+scenario only; broader version/device coverage remains best-effort, and this
+does not replace the required Android browser-support matrix.
 
 ## Default AI validation
 
