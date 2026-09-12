@@ -4,6 +4,9 @@ import android.accessibilityservice.AccessibilityService
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
 import android.util.Log
 import android.view.Display
 import android.view.accessibility.AccessibilityNodeInfo
@@ -125,6 +128,7 @@ internal object SamsungOcrCropBoundsResolver {
 
 internal data class SamsungOcrRequestTicket<T>(
     internal val id: Long,
+    internal val generation: Long,
     val value: T,
 )
 
@@ -133,10 +137,12 @@ internal data class SamsungOcrRequestCompletion<T>(
     val next: SamsungOcrRequestTicket<T>?,
 )
 
-/** Keeps one active request and only the newest request waiting behind it. */
-internal class SamsungOcrLatestRequestCoordinator<T> {
+/** Keeps one active request and coalesces bursts without starving useful OCR. */
+internal class SamsungOcrLatestRequestCoordinator<T>(
+    private val representsSamePage: (T, T) -> Boolean = { left, right -> left == right },
+) {
     private var sequence = 0L
-    private var latestId = 0L
+    private var generation = 0L
     private var active: SamsungOcrRequestTicket<T>? = null
     private var pending: SamsungOcrRequestTicket<T>? = null
     private var closed = false
@@ -144,8 +150,7 @@ internal class SamsungOcrLatestRequestCoordinator<T> {
     @Synchronized
     fun submit(value: T): SamsungOcrRequestTicket<T>? {
         if (closed) return null
-        val ticket = SamsungOcrRequestTicket(++sequence, value)
-        latestId = ticket.id
+        val ticket = SamsungOcrRequestTicket(++sequence, generation, value)
         if (active == null) {
             active = ticket
             return ticket
@@ -157,23 +162,37 @@ internal class SamsungOcrLatestRequestCoordinator<T> {
     @Synchronized
     fun invalidate() {
         if (closed) return
-        latestId = ++sequence
+        generation++
         pending = null
     }
 
     @Synchronized
     fun isCurrent(ticket: SamsungOcrRequestTicket<T>): Boolean {
-        return !closed && active?.id == ticket.id && latestId == ticket.id
+        if (closed || active?.id != ticket.id || ticket.generation != generation) {
+            return false
+        }
+        val queued = pending ?: return true
+        return queued.generation != generation || representsSamePage(ticket.value, queued.value)
     }
 
     @Synchronized
-    fun complete(ticket: SamsungOcrRequestTicket<T>): SamsungOcrRequestCompletion<T> {
+    fun complete(
+        ticket: SamsungOcrRequestTicket<T>,
+        coalesceSamePagePending: Boolean = false,
+    ): SamsungOcrRequestCompletion<T> {
         if (active?.id != ticket.id) {
             return SamsungOcrRequestCompletion(shouldDeliver = false, next = null)
         }
         active = null
-        val shouldDeliver = !closed && latestId == ticket.id
-        val next = if (closed) null else pending
+        val valid = !closed && ticket.generation == generation
+        val queued = if (closed) null else pending
+        val coalesceQueued = valid &&
+            coalesceSamePagePending &&
+            queued != null &&
+            queued.generation == generation &&
+            representsSamePage(ticket.value, queued.value)
+        val shouldDeliver = valid && (queued == null || coalesceQueued)
+        val next = if (coalesceQueued) null else queued
         pending = null
         active = next
         return SamsungOcrRequestCompletion(shouldDeliver, next)
@@ -184,6 +203,33 @@ internal class SamsungOcrLatestRequestCoordinator<T> {
         closed = true
         active = null
         pending = null
+    }
+}
+
+internal class SamsungOcrScreenshotThrottle(
+    private val minimumIntervalMs: Long,
+) {
+    private var lastRequestAtElapsedMs: Long? = null
+
+    fun delayBeforeRequest(nowElapsedMs: Long): Long {
+        val lastRequestAt = lastRequestAtElapsedMs ?: return 0L
+        return (minimumIntervalMs - (nowElapsedMs - lastRequestAt)).coerceAtLeast(0L)
+    }
+
+    fun markRequested(nowElapsedMs: Long) {
+        lastRequestAtElapsedMs = nowElapsedMs
+    }
+}
+
+internal object SamsungOcrScreenshotRetryPolicy {
+    private const val LEGACY_INTERVAL_RETRY_DELAY_MS = 1_000L
+    private const val MAX_INTERVAL_RETRIES = 1
+
+    fun retryDelayMs(errorCode: Int, intervalRetryCount: Int): Long? {
+        return LEGACY_INTERVAL_RETRY_DELAY_MS.takeIf {
+            errorCode == AccessibilityService.ERROR_TAKE_SCREENSHOT_INTERVAL_TIME_SHORT &&
+                intervalRetryCount < MAX_INTERVAL_RETRIES
+        }
     }
 }
 
@@ -199,6 +245,7 @@ internal class SamsungInternetScreenshotOcr private constructor(
     companion object {
         private const val TAG = "GamblockSamsungOcr"
         private const val MAX_ACCESSIBILITY_NODES = 500
+        private const val MIN_SCREENSHOT_INTERVAL_MS = 350L
         private val ADDRESS_BAR_RESOURCE_MARKERS = listOf(
             ":id/location_bar",
             ":id/url_bar",
@@ -343,10 +390,14 @@ internal class SamsungInternetScreenshotOcr private constructor(
         val pageState: SamsungOcrPageState,
         val input: ClassificationInput,
         val onReady: (ClassificationInput) -> Unit,
+        var intervalRetryCount: Int = 0,
     )
 
-    private val requests = SamsungOcrLatestRequestCoordinator<Request>()
+    private val requests = SamsungOcrLatestRequestCoordinator<Request>(::representsSamePage)
+    private val screenshotThrottle = SamsungOcrScreenshotThrottle(MIN_SCREENSHOT_INTERVAL_MS)
+    private val mainHandler = Handler(Looper.getMainLooper())
     private val mainExecutor = ContextCompat.getMainExecutor(service)
+    private val scheduledStarts = mutableMapOf<Long, Runnable>()
 
     fun request(
         pageState: SamsungOcrPageState,
@@ -376,6 +427,8 @@ internal class SamsungInternetScreenshotOcr private constructor(
 
     fun close() {
         requests.close()
+        scheduledStarts.values.forEach(mainHandler::removeCallbacks)
+        scheduledStarts.clear()
         try {
             recognizer.close()
         } catch (error: RuntimeException) {
@@ -383,12 +436,25 @@ internal class SamsungInternetScreenshotOcr private constructor(
         }
     }
 
-    private fun start(ticket: SamsungOcrRequestTicket<Request>) {
+    private fun start(
+        ticket: SamsungOcrRequestTicket<Request>,
+        minimumDelayMs: Long = 0L,
+    ) {
         if (!requests.isCurrent(ticket) || !currentPageIsEligible()) {
             finish(ticket, null)
             return
         }
+        val nowElapsedMs = SystemClock.elapsedRealtime()
+        val delayMs = maxOf(
+            minimumDelayMs,
+            screenshotThrottle.delayBeforeRequest(nowElapsedMs),
+        )
+        if (delayMs > 0L) {
+            scheduleStart(ticket, delayMs)
+            return
+        }
         try {
+            screenshotThrottle.markRequested(nowElapsedMs)
             Log.d(TAG, "requesting Samsung screenshot")
             service.takeScreenshot(
                 Display.DEFAULT_DISPLAY,
@@ -400,7 +466,20 @@ internal class SamsungInternetScreenshotOcr private constructor(
 
                     override fun onFailure(errorCode: Int) {
                         Log.w(TAG, "screenshot failed code=$errorCode")
-                        finish(ticket, ticket.value.input)
+                        val retryDelayMs = SamsungOcrScreenshotRetryPolicy.retryDelayMs(
+                            errorCode,
+                            ticket.value.intervalRetryCount,
+                        )
+                        if (retryDelayMs != null && requests.isCurrent(ticket)) {
+                            ticket.value.intervalRetryCount++
+                            Log.d(TAG, "screenshot interval retry scheduled")
+                            start(ticket, retryDelayMs)
+                        } else {
+                            finish(
+                                ticket,
+                                ticket.value.input.takeIf { requests.isCurrent(ticket) },
+                            )
+                        }
                     }
                 },
             )
@@ -471,11 +550,40 @@ internal class SamsungInternetScreenshotOcr private constructor(
         ticket: SamsungOcrRequestTicket<Request>,
         output: ClassificationInput?,
     ) {
-        val completion = requests.complete(ticket)
-        if (completion.shouldDeliver && output != null && currentPageIsEligible()) {
+        scheduledStarts.remove(ticket.id)?.let(mainHandler::removeCallbacks)
+        val currentPageEligible = output != null && currentPageIsEligible()
+        val completion = requests.complete(
+            ticket,
+            coalesceSamePagePending = currentPageEligible && output?.hasDomContent == true,
+        )
+        if (completion.shouldDeliver && currentPageEligible) {
+            Log.d(TAG, "OCR result delivered to classifier")
             safelyDeliver(output, ticket.value.onReady)
         }
         completion.next?.let(::start)
+    }
+
+    private fun scheduleStart(ticket: SamsungOcrRequestTicket<Request>, delayMs: Long) {
+        scheduledStarts.remove(ticket.id)?.let(mainHandler::removeCallbacks)
+        val runnable = Runnable {
+            scheduledStarts.remove(ticket.id)
+            start(ticket)
+        }
+        scheduledStarts[ticket.id] = runnable
+        Log.d(TAG, "Samsung screenshot delayed for interval safety")
+        mainHandler.postDelayed(runnable, delayMs)
+    }
+
+    private fun representsSamePage(left: Request, right: Request): Boolean {
+        val leftUrl = BrowserProtectionAccessibilityService.normalizeAccessibilityText(left.input.url)
+        val rightUrl = BrowserProtectionAccessibilityService.normalizeAccessibilityText(right.input.url)
+        if (leftUrl.isNotEmpty() || rightUrl.isNotEmpty()) {
+            return leftUrl.isNotEmpty() && rightUrl.isNotEmpty() && leftUrl == rightUrl
+        }
+        val leftTitle = BrowserProtectionAccessibilityService.normalizeAccessibilityText(left.input.title)
+        val rightTitle = BrowserProtectionAccessibilityService.normalizeAccessibilityText(right.input.title)
+        return leftTitle.isNotEmpty() && rightTitle.isNotEmpty() &&
+            leftTitle.equals(rightTitle, ignoreCase = true)
     }
 
     private fun safelyDeliver(

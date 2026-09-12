@@ -117,14 +117,49 @@ class SamsungInternetScreenshotOcrTest {
     }
 
     @Test
-    fun newestQueuedRequestReplacesOlderPendingRequest() {
+    fun samePageBurstDeliversUsefulActiveResultAndDropsPendingRequest() {
         val coordinator = SamsungOcrLatestRequestCoordinator<String>()
-        val first = coordinator.submit("first")
-        assertNotNull(first)
-        assertNull(coordinator.submit("second"))
-        assertNull(coordinator.submit("third"))
+        val first = coordinator.submit("page")!!
+        assertNull(coordinator.submit("page"))
+        assertNull(coordinator.submit("page"))
+        assertTrue(coordinator.isCurrent(first))
 
-        val firstCompletion = coordinator.complete(first!!)
+        val firstCompletion = coordinator.complete(
+            first,
+            coalesceSamePagePending = true,
+        )
+        assertTrue(firstCompletion.shouldDeliver)
+        assertNull(firstCompletion.next)
+    }
+
+    @Test
+    fun samePageBurstPromotesNewestPendingWhenActiveOcrIsNotUseful() {
+        val coordinator = SamsungOcrLatestRequestCoordinator<String>()
+        val first = coordinator.submit("page")!!
+        coordinator.submit("page")
+
+        val firstCompletion = coordinator.complete(
+            first,
+            coalesceSamePagePending = false,
+        )
+
+        assertFalse(firstCompletion.shouldDeliver)
+        assertEquals("page", firstCompletion.next?.value)
+        assertTrue(coordinator.isCurrent(firstCompletion.next!!))
+    }
+
+    @Test
+    fun newestDifferentPageRequestReplacesOlderPendingRequest() {
+        val coordinator = SamsungOcrLatestRequestCoordinator<String>()
+        val first = coordinator.submit("first")!!
+        coordinator.submit("second")
+        coordinator.submit("third")
+
+        assertFalse(coordinator.isCurrent(first))
+        val firstCompletion = coordinator.complete(
+            first,
+            coalesceSamePagePending = true,
+        )
         assertFalse(firstCompletion.shouldDeliver)
         assertEquals("third", firstCompletion.next?.value)
 
@@ -170,5 +205,43 @@ class SamsungInternetScreenshotOcrTest {
         assertFalse(duplicate.shouldDeliver)
         assertNull(duplicate.next)
         assertTrue(coordinator.isCurrent(second))
+    }
+
+    @Test
+    fun screenshotThrottleWaitsUntilMinimumIntervalHasElapsed() {
+        val throttle = SamsungOcrScreenshotThrottle(minimumIntervalMs = 350L)
+
+        assertEquals(0L, throttle.delayBeforeRequest(nowElapsedMs = 1_000L))
+        throttle.markRequested(nowElapsedMs = 1_000L)
+
+        assertEquals(350L, throttle.delayBeforeRequest(nowElapsedMs = 1_000L))
+        assertEquals(1L, throttle.delayBeforeRequest(nowElapsedMs = 1_349L))
+        assertEquals(0L, throttle.delayBeforeRequest(nowElapsedMs = 1_350L))
+    }
+
+    @Test
+    fun screenshotIntervalFailureGetsOnlyOneBoundedRetry() {
+        assertEquals(
+            1_000L,
+            SamsungOcrScreenshotRetryPolicy.retryDelayMs(
+                android.accessibilityservice.AccessibilityService
+                    .ERROR_TAKE_SCREENSHOT_INTERVAL_TIME_SHORT,
+                intervalRetryCount = 0,
+            ),
+        )
+        assertNull(
+            SamsungOcrScreenshotRetryPolicy.retryDelayMs(
+                android.accessibilityservice.AccessibilityService
+                    .ERROR_TAKE_SCREENSHOT_INTERVAL_TIME_SHORT,
+                intervalRetryCount = 1,
+            ),
+        )
+        assertNull(
+            SamsungOcrScreenshotRetryPolicy.retryDelayMs(
+                android.accessibilityservice.AccessibilityService
+                    .ERROR_TAKE_SCREENSHOT_INTERNAL_ERROR,
+                intervalRetryCount = 0,
+            ),
+        )
     }
 }
